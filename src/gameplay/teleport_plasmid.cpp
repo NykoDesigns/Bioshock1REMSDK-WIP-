@@ -5,6 +5,7 @@
 #include "../core/log.h"
 #include <cmath>
 #include <atomic>
+#include <Windows.h>
 
 namespace bs1sdk {
 
@@ -14,11 +15,10 @@ static int s_HijackHookId = -1;
 static bool s_Initialized = false;
 static float s_TeleportDistance = 800.0f;
 
-// Projectile tracking: when a hijacked projectile exists, we poll its location
-static UObject* s_TrackedBeacon = nullptr;       // BeaconProjectile we're watching
-static UObject* s_TrackedDart = nullptr;         // SummonGathererDartProjectile we're watching
-static bool s_WaitingForBeaconHit = false;
-static bool s_WaitingForDartHit = false;
+// Projectile spawn time tracking — ignore events in the first N ms after spawn
+static DWORD s_BeaconSpawnTime = 0;
+static DWORD s_DartSpawnTime = 0;
+static constexpr DWORD PROJECTILE_MIN_FLIGHT_MS = 150; // Ignore events within 150ms of spawn
 
 // Cached property offsets (resolved once)
 static int32_t s_LocationOffset = -1;
@@ -217,9 +217,9 @@ bool InitPlasmidHijacks()
         return false;
     }
 
-    // Diagnostic: track what events fire on projectiles
-    static bool s_beaconDiagDone = false;
-    static bool s_dartDiagDone = false;
+    // Per-throw state
+    static bool s_beaconTeleported = false;
+    static bool s_dartSummoned = false;
 
     ProcessEventHook hook;
     hook.Name = "PlasmidHijacks";
@@ -228,80 +228,82 @@ bool InitPlasmidHijacks()
         std::string funcName = func->GetName();
 
         // ─── SECURITY BULLSEYE → TELEPORT ─────────────────────────
-        // Log ALL events on BeaconProjectile to diagnose which ones fire
+        // From diagnostics: events are PreBeginPlay, BeginPlay, ZoneChange,
+        // PhysicsVolumeChange (at spawn), then Tick... then BaseChange/Destroyed
+        // at impact. We use Destroyed as the reliable "it hit something" signal,
+        // reading its final Location right before it's destroyed.
         if (IsA(obj, "BeaconProjectile") || obj->GetObjClassName() == "BeaconProjectile") {
-            FVector projLoc = obj->GetField<FVector>(s_LocationOffset);
 
-            if (!s_beaconDiagDone) {
-                LOG_INFO("[Teleport][DIAG] BeaconProjectile event: {} @ ({:.0f}, {:.0f}, {:.0f})",
-                         funcName, projLoc.X, projLoc.Y, projLoc.Z);
+            // Record spawn time on PreBeginPlay
+            if (funcName == "PreBeginPlay") {
+                s_BeaconSpawnTime = GetTickCount();
+                s_beaconTeleported = false;
+                LOG_INFO("[Teleport] Beacon spawned — tracking...");
+                return false;
             }
 
-            // Detect impact: any collision/touch/hit event
-            if (funcName == "HitWall" || funcName == "Touch" ||
-                funcName == "Landed" || funcName == "ProcessLanded" ||
-                funcName == "OnAttached" || funcName == "EncroachingOn" ||
-                funcName == "EncroachedBy" || funcName == "PhysicsVolumeChange" ||
-                funcName == "TriggerEffectEvent" || funcName == "WeaponImpacted" ||
-                funcName == "OnDetached") {
+            // Ignore events within first 150ms (these are spawn-time false positives)
+            DWORD elapsed = GetTickCount() - s_BeaconSpawnTime;
+            if (elapsed < PROJECTILE_MIN_FLIGHT_MS) {
+                return false;
+            }
+
+            // Impact events: BaseChange or Destroyed (confirmed from log)
+            if (!s_beaconTeleported &&
+                (funcName == "BaseChange" || funcName == "Destroyed" ||
+                 funcName == "EndState" || funcName == "HitWall" ||
+                 funcName == "Touch" || funcName == "Landed")) {
+
+                FVector projLoc = obj->GetField<FVector>(s_LocationOffset);
 
                 if (projLoc.X != 0.0f || projLoc.Y != 0.0f || projLoc.Z != 0.0f) {
-                    LOG_INFO("[Teleport] Beacon impact ({}) at ({:.0f}, {:.0f}, {:.0f})!",
-                             funcName, projLoc.X, projLoc.Y, projLoc.Z);
+                    LOG_INFO("[Teleport] Beacon hit ({}) at ({:.0f}, {:.0f}, {:.0f}) after {}ms — teleporting!",
+                             funcName, projLoc.X, projLoc.Y, projLoc.Z, elapsed);
                     DoTeleportTo(projLoc.X, projLoc.Y, projLoc.Z + 80.0f);
-                    s_beaconDiagDone = true; // Only teleport once per throw
+                    s_beaconTeleported = true;
                 }
-                return true; // Block original
+                return false; // Don't block Destroyed — let cleanup happen
             }
 
-            // Don't block movement/tick events — projectile needs to fly
             return false;
-        }
-
-        // ─── SECURITY BULLSEYE ABILITY FIRE ──────────────────────
-        if (obj->GetObjClassName() == "SecurityBeaconAbility") {
-            if (funcName == "UseAbility" || funcName == "StartedUsingAbility") {
-                LOG_INFO("[Teleport] Security Bullseye fired — waiting for beacon impact...");
-                s_beaconDiagDone = false; // Reset for this throw
-                return false; // Let it fire the projectile
-            }
         }
 
         // ─── HYPNOTIZE BIG DADDY → SUMMON ────────────────────────
+        // From diagnostics: events are PreBeginPlay, BeginPlay, Tick...,
+        // ZoneChange, then GainedChild, BaseChange, EndState, Destroyed at impact.
         if (IsA(obj, "SummonGathererDartProjectile") ||
             obj->GetObjClassName() == "SummonGathererDartProjectile") {
-            FVector projLoc = obj->GetField<FVector>(s_LocationOffset);
 
-            if (!s_dartDiagDone) {
-                LOG_INFO("[BigDaddy][DIAG] Dart event: {} @ ({:.0f}, {:.0f}, {:.0f})",
-                         funcName, projLoc.X, projLoc.Y, projLoc.Z);
+            if (funcName == "PreBeginPlay") {
+                s_DartSpawnTime = GetTickCount();
+                s_dartSummoned = false;
+                LOG_INFO("[BigDaddy] Dart spawned — tracking...");
+                return false;
             }
 
-            if (funcName == "HitWall" || funcName == "Touch" ||
-                funcName == "Landed" || funcName == "ProcessLanded" ||
-                funcName == "OnAttached" || funcName == "TriggerEffectEvent" ||
-                funcName == "WeaponImpacted" || funcName == "OnDetached") {
+            DWORD elapsed = GetTickCount() - s_DartSpawnTime;
+            if (elapsed < PROJECTILE_MIN_FLIGHT_MS) {
+                return false;
+            }
+
+            // Impact: BaseChange or Destroyed (confirmed from log at end of flight)
+            if (!s_dartSummoned &&
+                (funcName == "BaseChange" || funcName == "Destroyed" ||
+                 funcName == "EndState" || funcName == "HitWall" ||
+                 funcName == "Touch" || funcName == "Landed")) {
+
+                FVector projLoc = obj->GetField<FVector>(s_LocationOffset);
 
                 if (projLoc.X != 0.0f || projLoc.Y != 0.0f || projLoc.Z != 0.0f) {
-                    LOG_INFO("[BigDaddy] Dart impact ({}) at ({:.0f}, {:.0f}, {:.0f})!",
-                             funcName, projLoc.X, projLoc.Y, projLoc.Z);
+                    LOG_INFO("[BigDaddy] Dart hit ({}) at ({:.0f}, {:.0f}, {:.0f}) after {}ms — summoning!",
+                             funcName, projLoc.X, projLoc.Y, projLoc.Z, elapsed);
                     SummonBigDaddyAt(projLoc.X, projLoc.Y, projLoc.Z + 80.0f);
-                    s_dartDiagDone = true;
+                    s_dartSummoned = true;
                 }
-                return true;
+                return false; // Don't block cleanup
             }
 
             return false;
-        }
-
-        // ─── HYPNOTIZE ABILITY FIRE ──────────────────────────────
-        if (obj->GetObjClassName() == "SummonProtectorAbility" ||
-            obj->GetObjClassName() == "SummonProtectorTwoAbility") {
-            if (funcName == "UseAbility" || funcName == "StartedUsingAbility") {
-                LOG_INFO("[BigDaddy] Hypnotize fired — waiting for dart impact...");
-                s_dartDiagDone = false;
-                return false;
-            }
         }
 
         return false;
