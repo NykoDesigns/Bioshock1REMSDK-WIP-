@@ -1,0 +1,15 @@
+{
+  "WorkspaceID": "dv.ws.a05fde44-92df-4b43-b38f-ee1588f7ab15",
+  "RepoID": "dv.repo.98e08775-8649-4e6b-916f-2a6f43722097",
+  "Path": "Z:\\Bioshock1SDK",
+  "AccountID": "Google_109642059903248859228",
+  "BranchID": "dv.branch.1",
+  "BranchName": "main",
+  "CommitID": "dv.commit.2",
+  "Paused": false,
+  "ShouldDownload": false,
+  "RepoName": "BioshockSDK",
+  "ReadOnly": false,
+  "DigestMethod": "sha1",
+  "OrganizationTier": "INDIE"
+}
