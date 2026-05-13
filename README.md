@@ -19,10 +19,18 @@
 - **SDK Generator** — Auto-generate C++ headers from runtime class data
 
 ### Planned Features
+
+**Mod Export & Persistence**
+- Preset/config system — save & load mod settings as JSON, shareable between users
+- INI patching tool — modify game config files for permanent stat changes without DLL
+- Package (.u/.bsm) binary patcher — modify compiled UnrealScript in ShockGame.u for true permanent mods
+- New package creation — build entirely new .u packages with custom classes and bytecode
+- External companion GUI — desktop window (second monitor friendly) communicating with injected DLL via IPC
+
+**Content & Gameplay**
 - Custom maps and level editing
 - Asset importing/exporting
 - AI editing / custom enemies
-- Mod packaging and distribution
 - Multiplayer features
 
 ## Building
