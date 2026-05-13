@@ -8,6 +8,7 @@
 #include "../scripting/lua_bridge.h"
 #include "../gameplay/teleport_plasmid.h"
 #include "../gameplay/gameplay_mods.h"
+#include "../core/mod_config.h"
 
 #include <imgui.h>
 #include <imgui_impl_dx11.h>
@@ -884,6 +885,7 @@ void Overlay::RenderConsole()
             LogInfo("  factions [on|off]       - Toggle splicer factions");
             LogInfo("  tag <1|2>               - Tag nearest splicer to faction");
             LogInfo("  chain [on|off|r N|j N]  - Chain lightning config");
+            LogInfo("  saveconfig              - Save current mod settings to JSON");
             LogYellow("=== Lua Scripting ===");
             LogInfo("  lua <code>              - Execute Lua code inline");
             LogInfo("  luafile <path>          - Execute a Lua script file");
@@ -1425,6 +1427,18 @@ void Overlay::RenderConsole()
                 else if (tokens[1] == "f" && tokens.size() >= 3) SetChainLightningDamageFalloff(std::stof(tokens[2]));
             }
             LogInfo(std::string("Chain Lightning: ") + (IsChainLightningEnabled() ? "ON" : "OFF"));
+        }
+        // ─── saveconfig ─── save current settings to mod_config.json
+        else if (tokens[0] == "saveconfig") {
+            ModConfig cfg;
+            cfg.decoyTeleport = IsDecoyTeleportEnabled();
+            cfg.friendlyBots = IsFriendlyBotsEnabled();
+            cfg.friendlyBotLimit = 3; // TODO: expose getter
+            cfg.rivetPistol = IsRivetPistolEnabled();
+            cfg.splicerFactions = IsSplicerFactionsEnabled();
+            cfg.chainLightning = IsChainLightningEnabled();
+            SaveModConfig(cfg);
+            LogGreen("Config saved to mod_config.json");
         }
         // ─── lua <code> ─── execute Lua code
         else if (tokens[0] == "lua" && tokens.size() >= 2) {

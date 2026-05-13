@@ -1,6 +1,7 @@
 # Build output
 build/
 out/
+dist/
 
 # Generated SDK headers (can regenerate at runtime)
 sdk_gen/

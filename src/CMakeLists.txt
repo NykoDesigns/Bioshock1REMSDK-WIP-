@@ -6,6 +6,7 @@ add_library(BS1SDK SHARED
     core/pattern.cpp
     core/config.cpp
     core/log.cpp
+    core/mod_config.cpp
     hooks/d3d9_hook.cpp
     hooks/process_event.cpp
     render/overlay.cpp

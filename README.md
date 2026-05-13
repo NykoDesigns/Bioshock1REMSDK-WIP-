@@ -18,25 +18,36 @@
 - **Event Logger** — Dump all ProcessEvent calls to file for analysis
 - **Lua 5.4 Scripting** — Full scripting bridge with hot-reload
 - **SDK Generator** — Auto-generate C++ headers from runtime class data
-- **BSM Package Parser** — Full .bsm/.U file analysis with property deserialization (bsm_tool v0.3.0)
+- **BSM Package Tools** — Full .bsm/.U analysis, spawn patcher, property editor (bsm_tool v0.4.0)
+- **INI Config Tool** — Parse, edit, diff BioShock INI files (ini_tool v1.0.0)
+- **Gameplay Mods** — Decoy→Teleport, Chain Lightning, Friendly Bots, Rivet Pistol, Splicer Factions
+- **Mod Distribution** — winmm.dll proxy loader (no injector needed) + JSON config + packager script
+
+### Implemented Gameplay Mods
+
+All mods activate via `initmods` console command or automatically via `mod_config.json`:
+
+- **Decoy → Teleport** — Use Decoy plasmid to instantly teleport to spawn position
+- **Chain Lightning** — Electro Bolt chains to nearby enemies (configurable radius/jumps/falloff)
+- **Friendly Security Bots** — Security Command recruits bots (3 max, oldest recycled)
+- **Rivet Pistol** — Revolver fires Rosie rivet projectiles (toggle on/off)
+- **Splicer Factions** — Tag splicers into factions that fight each other
+- **BSM Spawn Patcher** — Multiply enemy spawners offline (bsm_tool patch)
+- **BSM Property Editor** — Edit any actor property in map files (bsm_tool setprop)
+- **INI Patcher** — Modify weapons, AI, loot, plasmid configs (ini_tool set)
+
+### Mod Distribution
+
+End users don't need the SDK — just drop two files in the game folder:
+```
+Build\Final\
+  ├── winmm.dll         ← Proxy loader (auto-loads BS1SDK.dll)
+  ├── BS1SDK.dll        ← All runtime mods
+  └── mod_config.json   ← Settings (editable, restart to apply)
+```
+Package with: `.\scripts\package_mod.ps1 -Name "MyMod"`
 
 ### Planned Features
-
-**Gameplay Mods** (see `docs/reverse-engineering/gameplay-goals.md`)
-- Decoy plasmid → Teleportation (hijack placement logic for instant TP)
-- Security Command → Friendly bot spawner (3 bot hard limit)
-- Chain Lightning Electro Bolt (chains between nearby enemies, tonic-gated)
-- Revolver fires Rosie rivets (projectile class swap)
-- Splicer factions (two groups fight each other via AI targeting hooks)
-- Custom splicer type control per encounter (BSM property editing)
-- Full War In Rapture absorption (spawn multiplication, weapons, vending, plasmids)
-
-**Map Editing & Content**
-- BSM round-trip writing — modify actor properties, rewrite packages
-- Export cloning — duplicate spawners, inject scripted encounters
-- INI/IBF patching tool — modify game config for weapons, loot, AI, spawning
-- Map dumper — extract all actors with positions, classes, properties
-- Custom map creation — build new .bsm packages from scratch
 
 **Co-op Multiplayer** (see `docs/reverse-engineering/co-op-feasibility.md`)
 - UDP network bridge between two game instances
@@ -44,8 +55,9 @@
 - NPC puppet system for remote player visualization
 - Damage and world state synchronization
 
-**Mod Export & Persistence**
-- Preset/config system — save & load mod settings as JSON
+**Additional Content**
+- Custom map creation — build new .bsm packages from scratch
+- IBF archive repacker — inject modified INI files back into archives
 - External companion GUI — desktop window via IPC with injected DLL
 
 ## Building

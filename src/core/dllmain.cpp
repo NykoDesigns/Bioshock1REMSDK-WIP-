@@ -2,7 +2,9 @@
 #include "log.h"
 #include "memory.h"
 #include "pattern.h"
+#include "mod_config.h"
 #include "../engine/uobject.h"
+#include "../gameplay/gameplay_mods.h"
 
 #include <Windows.h>
 #include <thread>
@@ -123,6 +125,27 @@ void InitializeSDK()
     // Phase 3: Discover UField/UStruct/UProperty layout
     if (GetEngineGlobals().IsValid()) {
         DumpPropertyLayout();
+    }
+
+    // Phase 4: Load mod config and auto-init gameplay mods
+    ModConfig cfg = LoadModConfig();
+    if (cfg.autoInitMods && GetEngineGlobals().IsValid()) {
+        LOG_INFO("Auto-initializing gameplay mods from config...");
+        // Wait a bit more for game classes to be fully loaded
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+        if (InitGameplayMods()) {
+            SetDecoyTeleportEnabled(cfg.decoyTeleport);
+            SetFriendlyBotsEnabled(cfg.friendlyBots);
+            SetFriendlyBotLimit(cfg.friendlyBotLimit);
+            SetChainLightningEnabled(cfg.chainLightning);
+            SetChainLightningRadius(cfg.chainRadius);
+            SetChainLightningJumps(cfg.chainMaxJumps);
+            SetChainLightningDamageFalloff(cfg.chainDamageFalloff);
+            if (cfg.rivetPistol) SetRivetPistolEnabled(true);
+            if (cfg.splicerFactions) SetSplicerFactionsEnabled(true);
+            LOG_INFO("Gameplay mods configured from mod_config.json");
+        }
     }
 
     LOG_INFO("BS1SDK initialization complete");

@@ -1,0 +1,16 @@
+; winmm.dll proxy - export name redirections
+; Maps real winmm export names to our proxy_ prefixed functions
+LIBRARY winmm
+EXPORTS
+    timeGetTime        = proxy_timeGetTime
+    timeBeginPeriod    = proxy_timeBeginPeriod
+    timeEndPeriod      = proxy_timeEndPeriod
+    timeGetDevCaps     = proxy_timeGetDevCaps
+    timeSetEvent       = proxy_timeSetEvent
+    timeKillEvent      = proxy_timeKillEvent
+    waveOutGetNumDevs  = proxy_waveOutGetNumDevs
+    joyGetNumDevs      = proxy_joyGetNumDevs
+    mciSendCommandW    = proxy_mciSendCommandW
+    mciSendStringW     = proxy_mciSendStringW
+    PlaySoundA         = proxy_PlaySoundA
+    PlaySoundW         = proxy_PlaySoundW

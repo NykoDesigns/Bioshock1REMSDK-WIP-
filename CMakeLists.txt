@@ -24,6 +24,9 @@ add_subdirectory(external)
 # Main SDK DLL
 add_subdirectory(src)
 
+# Proxy loader (winmm.dll — drop-in auto-loader, no injector needed)
+add_subdirectory(src/loader)
+
 # Injector
 if(BS1SDK_BUILD_INJECTOR)
     add_subdirectory(injector)
