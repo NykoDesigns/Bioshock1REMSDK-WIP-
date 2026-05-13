@@ -9,6 +9,7 @@
 #include "../gameplay/teleport_plasmid.h"
 #include "../gameplay/gameplay_mods.h"
 #include "../core/mod_config.h"
+#include "../network/coop_bridge.h"
 
 #include <imgui.h>
 #include <imgui_impl_dx11.h>
@@ -118,6 +119,9 @@ void Overlay::Render()
 
     // Render our content
     RenderMainMenu();
+
+    // Tick co-op network (approx 16ms at 60fps)
+    if (IsCoopActive()) CoopTick(1.0f / 60.0f);
 
     // Finish frame
     ImGui::EndFrame();
@@ -886,6 +890,12 @@ void Overlay::RenderConsole()
             LogInfo("  tag <1|2>               - Tag nearest splicer to faction");
             LogInfo("  chain [on|off|r N|j N]  - Chain lightning config");
             LogInfo("  saveconfig              - Save current mod settings to JSON");
+            LogYellow("=== Co-op Multiplayer ===");
+            LogInfo("  host [port]             - Host a co-op session");
+            LogInfo("  join <ip> [port]        - Join a co-op session");
+            LogInfo("  netstatus               - Show network status");
+            LogInfo("  disconnect              - Leave co-op session");
+            LogInfo("  chat <msg>              - Send chat to co-op partner");
             LogYellow("=== Lua Scripting ===");
             LogInfo("  lua <code>              - Execute Lua code inline");
             LogInfo("  luafile <path>          - Execute a Lua script file");
@@ -1439,6 +1449,36 @@ void Overlay::RenderConsole()
             cfg.chainLightning = IsChainLightningEnabled();
             SaveModConfig(cfg);
             LogGreen("Config saved to mod_config.json");
+        }
+        // ─── host [port] ─── host co-op session
+        else if (tokens[0] == "host") {
+            uint16_t port = 27015;
+            if (tokens.size() >= 2) port = (uint16_t)std::stoi(tokens[1]);
+            if (CoopHost(port)) LogGreen("Hosting on port " + std::to_string(port) + " - waiting for player...");
+            else LogRed("Failed to start host");
+        }
+        // ─── join <ip> [port] ─── join co-op session
+        else if (tokens[0] == "join" && tokens.size() >= 2) {
+            std::string ip = tokens[1];
+            uint16_t port = 27015;
+            if (tokens.size() >= 3) port = (uint16_t)std::stoi(tokens[2]);
+            if (CoopJoin(ip, port)) LogGreen("Connecting to " + ip + ":" + std::to_string(port) + "...");
+            else LogRed("Failed to join");
+        }
+        // ─── netstatus ─── show co-op network status
+        else if (tokens[0] == "netstatus") {
+            LogInfo(GetCoopStatus());
+        }
+        // ─── disconnect ─── leave co-op session
+        else if (tokens[0] == "disconnect") {
+            CoopDisconnect();
+            LogInfo("Disconnected from co-op session");
+        }
+        // ─── chat <msg> ─── send chat message
+        else if (tokens[0] == "chat" && tokens.size() >= 2) {
+            std::string msg = cmd.substr(cmd.find(' ') + 1);
+            NetSendChat(msg);
+            LogInfo("[You] " + msg);
         }
         // ─── lua <code> ─── execute Lua code
         else if (tokens[0] == "lua" && tokens.size() >= 2) {

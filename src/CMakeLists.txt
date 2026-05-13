@@ -17,6 +17,9 @@ add_library(BS1SDK SHARED
     scripting/lua_bridge.cpp
     gameplay/teleport_plasmid.cpp
     gameplay/gameplay_mods.cpp
+    network/udp_socket.cpp
+    network/net_manager.cpp
+    network/coop_bridge.cpp
 )
 
 target_include_directories(BS1SDK PRIVATE
@@ -29,6 +32,7 @@ target_link_libraries(BS1SDK PRIVATE
     lua_static
     d3d9
     psapi
+    ws2_32
 )
 
 target_compile_definitions(BS1SDK PRIVATE
