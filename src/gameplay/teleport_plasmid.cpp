@@ -337,8 +337,8 @@ float GetTeleportDistance()
 
 std::string GetPlasmidHijackStatus()
 {
-    if (!s_Initialized) return "Not initialized — run 'initplasmid'";
-    return "Active: Bullseye→Teleport, Hypnotize→Summon BD";
+    if (!s_Initialized) return "Not initialized — run 'initplasmid' (or 'initmods' for all)";
+    return "Active: Bullseye→Teleport, Hypnotize→Summon BD (also try 'initmods' for Decoy→TP)";
 }
 
 } // namespace bs1sdk

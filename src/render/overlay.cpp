@@ -7,6 +7,7 @@
 #include "../hooks/process_event.h"
 #include "../scripting/lua_bridge.h"
 #include "../gameplay/teleport_plasmid.h"
+#include "../gameplay/gameplay_mods.h"
 
 #include <imgui.h>
 #include <imgui_impl_dx11.h>
@@ -874,6 +875,15 @@ void Overlay::RenderConsole()
             LogInfo("  teleport [dist]         - Blink forward (default 800)");
             LogInfo("  initplasmid             - Hijack Security Bullseye → teleport");
             LogInfo("  tpdist <dist>           - Set teleport distance");
+            LogYellow("=== Gameplay Mods ===");
+            LogInfo("  initmods                - Activate all gameplay mods");
+            LogInfo("  mods                    - Show gameplay mods status");
+            LogInfo("  decoytp [on|off]        - Toggle Decoy→Teleport");
+            LogInfo("  bots [on|off|limit N]   - Toggle friendly bots / set limit");
+            LogInfo("  rivets [on|off]         - Toggle Rivet Pistol");
+            LogInfo("  factions [on|off]       - Toggle splicer factions");
+            LogInfo("  tag <1|2>               - Tag nearest splicer to faction");
+            LogInfo("  chain [on|off|r N|j N]  - Chain lightning config");
             LogYellow("=== Lua Scripting ===");
             LogInfo("  lua <code>              - Execute Lua code inline");
             LogInfo("  luafile <path>          - Execute a Lua script file");
@@ -1354,6 +1364,67 @@ void Overlay::RenderConsole()
             float d = std::stof(tokens[1]);
             SetTeleportDistance(d);
             LogGreen("Teleport distance: " + std::to_string((int)d));
+        }
+        // ─── initmods ─── activate all gameplay mods
+        else if (tokens[0] == "initmods") {
+            if (InitGameplayMods())
+                LogGreen("All gameplay mods activated!");
+            else
+                LogRed("Failed to init gameplay mods");
+        }
+        // ─── mods ─── show status
+        else if (tokens[0] == "mods") {
+            LogInfo(GetGameplayModsStatus());
+        }
+        // ─── decoytp [on|off] ───
+        else if (tokens[0] == "decoytp") {
+            if (tokens.size() >= 2) {
+                SetDecoyTeleportEnabled(tokens[1] == "on" || tokens[1] == "1");
+            }
+            LogInfo(std::string("Decoy Teleport: ") + (IsDecoyTeleportEnabled() ? "ON" : "OFF"));
+        }
+        // ─── bots [on|off|limit N] ───
+        else if (tokens[0] == "bots") {
+            if (tokens.size() >= 2) {
+                if (tokens[1] == "limit" && tokens.size() >= 3) {
+                    SetFriendlyBotLimit(std::stoi(tokens[2]));
+                    LogGreen("Bot limit set to " + tokens[2]);
+                } else {
+                    SetFriendlyBotsEnabled(tokens[1] == "on" || tokens[1] == "1");
+                }
+            }
+            LogInfo(std::string("Friendly Bots: ") + (IsFriendlyBotsEnabled() ? "ON" : "OFF") +
+                    " (" + std::to_string(GetFriendlyBotCount()) + " alive)");
+        }
+        // ─── rivets [on|off] ───
+        else if (tokens[0] == "rivets") {
+            if (tokens.size() >= 2) {
+                SetRivetPistolEnabled(tokens[1] == "on" || tokens[1] == "1");
+            }
+            LogInfo(std::string("Rivet Pistol: ") + (IsRivetPistolEnabled() ? "ON" : "OFF"));
+        }
+        // ─── factions [on|off] ───
+        else if (tokens[0] == "factions") {
+            if (tokens.size() >= 2) {
+                SetSplicerFactionsEnabled(tokens[1] == "on" || tokens[1] == "1");
+            }
+            LogInfo(std::string("Splicer Factions: ") + (IsSplicerFactionsEnabled() ? "ON" : "OFF"));
+        }
+        // ─── tag <1|2> ─── tag nearest splicer
+        else if (tokens[0] == "tag" && tokens.size() >= 2) {
+            int fid = std::stoi(tokens[1]);
+            TagSplicerFaction(fid);
+        }
+        // ─── chain [on|off|r N|j N] ───
+        else if (tokens[0] == "chain") {
+            if (tokens.size() >= 2) {
+                if (tokens[1] == "on" || tokens[1] == "1") SetChainLightningEnabled(true);
+                else if (tokens[1] == "off" || tokens[1] == "0") SetChainLightningEnabled(false);
+                else if (tokens[1] == "r" && tokens.size() >= 3) SetChainLightningRadius(std::stof(tokens[2]));
+                else if (tokens[1] == "j" && tokens.size() >= 3) SetChainLightningJumps(std::stoi(tokens[2]));
+                else if (tokens[1] == "f" && tokens.size() >= 3) SetChainLightningDamageFalloff(std::stof(tokens[2]));
+            }
+            LogInfo(std::string("Chain Lightning: ") + (IsChainLightningEnabled() ? "ON" : "OFF"));
         }
         // ─── lua <code> ─── execute Lua code
         else if (tokens[0] == "lua" && tokens.size() >= 2) {

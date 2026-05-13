@@ -29,4 +29,8 @@ inline bool InitTeleportPlasmid() { return InitPlasmidHijacks(); }
 inline bool GivePlayerTeleportPlasmid() { return InitPlasmidHijacks(); }
 inline std::string GetTeleportStatus() { return GetPlasmidHijackStatus(); }
 
+// ─── Gameplay Mods (Goals 2-7) ──────────────────────────────────────────
+// See gameplay_mods.h for the full API. This header just provides the
+// combined init for use from dllmain/console.
+
 } // namespace bs1sdk
