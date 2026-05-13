@@ -14,6 +14,7 @@ struct NetPeer {
     std::string ip;
     uint16_t    port = 0;
     std::string name;
+    std::string levelName;              // remote player's current map
     uint32_t    sessionId = 0;
     float       lastRecvTime = 0.0f;   // seconds since connection
     PlayerStateData lastState{};        // most recent state from this peer
@@ -57,5 +58,13 @@ const NetPeer* GetRemotePeer();
 /// Register callbacks.
 void SetOnRemoteState(OnRemoteStateFunc fn);
 void SetOnPeerEvent(OnPeerEventFunc fn);
+
+/// Level tracking — set before host/join for mismatch detection.
+void NetSetLocalLevel(const std::string& levelName);
+std::string NetGetLocalLevel();
+std::string NetGetRemoteLevel();
+
+/// Raw packet sending (used by coop_sync).
+bool NetSendRawPacket(PacketType type, const void* data, uint16_t size);
 
 } // namespace bs1sdk

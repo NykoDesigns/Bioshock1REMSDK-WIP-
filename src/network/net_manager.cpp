@@ -15,6 +15,7 @@ static UdpSocket     s_Socket;
 static NetRole       s_Role = NetRole::None;
 static NetPeer       s_RemotePeer;
 static std::string   s_LocalName;
+static std::string   s_LocalLevel;
 static uint32_t      s_SessionId = 0;
 static float         s_Uptime = 0.0f;
 static float         s_SendAccum = 0.0f;
@@ -70,15 +71,25 @@ static void HandleHandshake(const std::string& fromIp, uint16_t fromPort,
         s_RemotePeer.ip = fromIp;
         s_RemotePeer.port = fromPort;
         s_RemotePeer.name = data->playerName;
+        s_RemotePeer.levelName = data->levelName;
         s_RemotePeer.sessionId = data->sessionId;
         s_RemotePeer.lastRecvTime = s_Uptime;
         s_RemotePeer.connected = true;
 
-        LOG_INFO("[Net] Player '{}' connected from {}:{}", data->playerName, fromIp, fromPort);
+        LOG_INFO("[Net] Player '{}' connected from {}:{} (level: {})",
+                 data->playerName, fromIp, fromPort, data->levelName);
 
-        // Send HandshakeAck
+        // Warn if levels don't match
+        if (s_LocalLevel.length() > 0 && s_RemotePeer.levelName.length() > 0 &&
+            s_LocalLevel != s_RemotePeer.levelName) {
+            LOG_WARN("[Net] LEVEL MISMATCH! Local='{}' Remote='{}' - sync will not work!",
+                     s_LocalLevel, s_RemotePeer.levelName);
+        }
+
+        // Send HandshakeAck with our info
         HandshakeData ack{};
         strncpy(ack.playerName, s_LocalName.c_str(), sizeof(ack.playerName) - 1);
+        strncpy(ack.levelName, s_LocalLevel.c_str(), sizeof(ack.levelName) - 1);
         ack.sessionId = s_SessionId;
         SendPacket(PacketType::HandshakeAck, &ack, sizeof(ack));
 
@@ -91,11 +102,20 @@ static void HandleHandshakeAck(const std::string& fromIp, uint16_t fromPort,
 {
     if (s_Role == NetRole::Client && !s_RemotePeer.connected) {
         s_RemotePeer.name = data->playerName;
+        s_RemotePeer.levelName = data->levelName;
         s_RemotePeer.sessionId = data->sessionId;
         s_RemotePeer.lastRecvTime = s_Uptime;
         s_RemotePeer.connected = true;
 
-        LOG_INFO("[Net] Connected to host '{}' at {}:{}", data->playerName, fromIp, fromPort);
+        LOG_INFO("[Net] Connected to host '{}' at {}:{} (level: {})",
+                 data->playerName, fromIp, fromPort, data->levelName);
+
+        if (s_LocalLevel.length() > 0 && s_RemotePeer.levelName.length() > 0 &&
+            s_LocalLevel != s_RemotePeer.levelName) {
+            LOG_WARN("[Net] LEVEL MISMATCH! Local='{}' Remote='{}' - sync will not work!",
+                     s_LocalLevel, s_RemotePeer.levelName);
+        }
+
         if (s_OnPeerEvent) s_OnPeerEvent(s_RemotePeer, true);
     }
 }
@@ -245,16 +265,17 @@ bool NetJoin(const std::string& hostIp, uint16_t port, const std::string& player
     s_RemotePeer.ip = hostIp;
     s_RemotePeer.port = port;
 
-    // Send handshake
+    // Send handshake with level info
     HandshakeData hs{};
     strncpy(hs.playerName, playerName.c_str(), sizeof(hs.playerName) - 1);
+    strncpy(hs.levelName, s_LocalLevel.c_str(), sizeof(hs.levelName) - 1);
     hs.sessionId = s_SessionId;
 
     int size = 0;
     BuildPacket(s_SendBuf, size, PacketType::Handshake, &hs, sizeof(hs));
     s_Socket.SendTo(s_SendBuf, size, hostIp, port);
 
-    LOG_INFO("[Net] Joining {}:{} as '{}'...", hostIp, port, playerName);
+    LOG_INFO("[Net] Joining {}:{} as '{}' (level: {})...", hostIp, port, playerName, s_LocalLevel);
     return true;
 }
 
@@ -292,6 +313,7 @@ void NetTick(float deltaTime)
             s_SendAccum = 0.0f;
             HandshakeData hs{};
             strncpy(hs.playerName, s_LocalName.c_str(), sizeof(hs.playerName) - 1);
+            strncpy(hs.levelName, s_LocalLevel.c_str(), sizeof(hs.levelName) - 1);
             hs.sessionId = s_SessionId;
 
             int size = 0;
@@ -371,6 +393,21 @@ void SetOnPeerEvent(OnPeerEventFunc fn) { s_OnPeerEvent = std::move(fn); }
 bool NetSendRawPacket(PacketType type, const void* data, uint16_t size)
 {
     return SendPacket(type, data, size);
+}
+
+void NetSetLocalLevel(const std::string& levelName)
+{
+    s_LocalLevel = levelName;
+}
+
+std::string NetGetLocalLevel()
+{
+    return s_LocalLevel;
+}
+
+std::string NetGetRemoteLevel()
+{
+    return s_RemotePeer.levelName;
 }
 
 } // namespace bs1sdk

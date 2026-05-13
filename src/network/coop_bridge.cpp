@@ -26,6 +26,34 @@ static int s_HealthOffset = -1;  // Health (float)
 // Remote player puppet
 static UObject* s_PuppetPawn = nullptr;
 
+// Level tracking
+static std::string s_LocalLevelName;
+static std::string s_RemoteLevelName;
+static bool s_LevelMismatch = false;
+
+// ─── Level Detection ───────────────────────────────────────────────────
+
+/// Get current map name by finding ShockPlayer's outermost package.
+static std::string DetectCurrentLevel()
+{
+    UObject* player = FindObjectByClassName("ShockPlayer");
+    if (!player) return "";
+
+    // Walk Outer chain to get the outermost package (= map name)
+    UObject* outer = player->GetOuter();
+    UObject* prev = player;
+    while (outer) {
+        prev = outer;
+        outer = outer->GetOuter();
+    }
+
+    std::string name = prev->GetName();
+
+    // Strip common prefixes/suffixes if needed
+    // BioShock maps are like "1-Welcome", "1-Medical", etc.
+    return name;
+}
+
 // ─── Player State Reading ──────────────────────────────────────────────
 
 static bool CachePlayerOffsets()
@@ -155,10 +183,19 @@ static void OnRemoteStateReceived(const NetPeer& peer, const PlayerStateData& st
 static void OnPeerConnectionEvent(const NetPeer& peer, bool connected)
 {
     if (connected) {
-        LOG_INFO("[Co-op] Player '{}' joined!", peer.name);
+        s_RemoteLevelName = peer.levelName;
+        s_LevelMismatch = (!s_LocalLevelName.empty() && !s_RemoteLevelName.empty() &&
+                           s_LocalLevelName != s_RemoteLevelName);
+        if (s_LevelMismatch) {
+            LOG_WARN("[Co-op] Player '{}' is on level '{}' but you are on '{}' - sync won't work!",
+                     peer.name, peer.levelName, s_LocalLevelName);
+        } else {
+            LOG_INFO("[Co-op] Player '{}' joined on level '{}'!", peer.name, peer.levelName);
+        }
     } else {
         LOG_INFO("[Co-op] Player '{}' left.", peer.name);
-        // TODO: hide/destroy puppet
+        s_RemoteLevelName.clear();
+        s_LevelMismatch = false;
     }
 }
 
@@ -245,6 +282,16 @@ void ShutdownCoopBridge()
 bool CoopHost(uint16_t port, const std::string& name)
 {
     if (!s_Initialized) InitCoopBridge();
+
+    // Detect and set current level before handshake
+    s_LocalLevelName = DetectCurrentLevel();
+    NetSetLocalLevel(s_LocalLevelName);
+    if (s_LocalLevelName.empty()) {
+        LOG_WARN("[Co-op] Could not detect level - are you in-game?");
+    } else {
+        LOG_INFO("[Co-op] Current level: {}", s_LocalLevelName);
+    }
+
     if (!NetHost(port, name)) return false;
     s_Active = true;
     return true;
@@ -253,6 +300,16 @@ bool CoopHost(uint16_t port, const std::string& name)
 bool CoopJoin(const std::string& ip, uint16_t port, const std::string& name)
 {
     if (!s_Initialized) InitCoopBridge();
+
+    // Detect and set current level before handshake
+    s_LocalLevelName = DetectCurrentLevel();
+    NetSetLocalLevel(s_LocalLevelName);
+    if (s_LocalLevelName.empty()) {
+        LOG_WARN("[Co-op] Could not detect level - are you in-game?");
+    } else {
+        LOG_INFO("[Co-op] Current level: {}", s_LocalLevelName);
+    }
+
     if (!NetJoin(ip, port, name)) return false;
     s_Active = true;
     return true;
@@ -304,6 +361,14 @@ std::string GetCoopStatus()
             status += buf;
         }
     }
+
+    // Level info
+    if (!s_LocalLevelName.empty())
+        status += "\n  Local level: " + s_LocalLevelName;
+    if (!s_RemoteLevelName.empty())
+        status += "\n  Remote level: " + s_RemoteLevelName;
+    if (s_LevelMismatch)
+        status += "\n  *** LEVEL MISMATCH - sync disabled! ***";
 
     if (s_LocOffset > 0)
         status += "\n  Location offset: +" + std::to_string(s_LocOffset);

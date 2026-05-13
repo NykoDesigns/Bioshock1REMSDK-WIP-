@@ -67,6 +67,7 @@ static_assert(sizeof(PlayerStateData) == 36, "PlayerStateData must be 36 bytes")
 
 struct HandshakeData {
     char playerName[32];        // null-terminated player name
+    char levelName[32];         // current map (e.g. "1-Welcome")
     uint32_t sessionId;         // random session identifier
 };
 

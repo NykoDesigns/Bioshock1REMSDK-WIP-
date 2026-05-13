@@ -334,10 +334,6 @@ void CoopSendDamage(float amount, float hitX, float hitY, float hitZ,
     dmg.targetNameHash = targetNameHash;
     dmg.damageType = damageType;
 
-    // Send via net manager — need to add Damage packet type to manager
-    // For now, use the raw SendPacket approach via net_manager internals
-    // We'll add a helper in net_manager
-    extern bool NetSendRawPacket(PacketType type, const void* data, uint16_t size);
     NetSendRawPacket(PacketType::Damage, &dmg, sizeof(dmg));
 }
 
@@ -353,7 +349,6 @@ void CoopSendWorldEvent(uint8_t eventType, uint8_t state,
     evt.posX = posX; evt.posY = posY; evt.posZ = posZ;
     evt.actorNameHash = actorNameHash;
 
-    extern bool NetSendRawPacket(PacketType type, const void* data, uint16_t size);
     NetSendRawPacket(PacketType::WorldEvent, &evt, sizeof(evt));
 }
 
