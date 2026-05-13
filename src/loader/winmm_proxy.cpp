@@ -384,8 +384,20 @@ static bool LoadRealWinMM()
 
 static DWORD WINAPI LoadBS1SDKThread(LPVOID param)
 {
-    // Wait briefly for Steam DRM and other DLLs to finish initializing
-    Sleep(2000);
+    // Wait for the game to actually start — Steam DRM must complete first.
+    // We detect this by waiting for the game window to appear, which only
+    // happens after Steam validates the exe and unpacks it.
+    for (int i = 0; i < 60; i++) { // up to 30 seconds
+        Sleep(500);
+        // Look for the game window (BioShock uses D3D window)
+        HWND hwnd = FindWindowA("LaunchUnrealUWindowsClient", nullptr);
+        if (!hwnd) hwnd = FindWindowA("UnrealUWindowsClient", nullptr);
+        if (!hwnd) hwnd = FindWindowA(nullptr, "BioShock");
+        if (hwnd) {
+            Sleep(1000); // extra 1s after window appears for stability
+            break;
+        }
+    }
 
     // Load BS1SDK.dll from the same directory as the game exe
     char myPath[MAX_PATH];
