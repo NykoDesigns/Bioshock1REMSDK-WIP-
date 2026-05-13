@@ -12,6 +12,7 @@ namespace bs1sdk {
 static UStruct* s_TeleportClass = nullptr;
 static int s_TeleportHookId = -1;
 static bool s_Initialized = false;
+static float s_TeleportDistance = 800.0f;
 
 // ─── Math helpers ───────────────────────────────────────────────────────
 
@@ -86,91 +87,56 @@ bool DoTeleport(float distance)
     return true;
 }
 
-// ─── Plasmid Initialization ─────────────────────────────────────────────
+// ─── Plasmid Hijack ─────────────────────────────────────────────────────
+// Hijacks the Security Bullseye plasmid (SecurityBeaconAbility).
+// When the player fires Security Bullseye, we block the projectile
+// and teleport them forward instead.
 
 bool InitTeleportPlasmid()
 {
     if (s_Initialized) return true;
 
-    // Step 1: Find an existing plasmid class to clone
-    // Look for any concrete ActivePlasmid subclass in the game
-    auto& globals = GetEngineGlobals();
-    if (!globals.IsValid()) {
-        LOG_ERROR("[Teleport] Engine globals not valid");
-        return false;
-    }
-
-    // Find InsectSwarmPlasmid or any ActivePlasmid subclass as our donor
-    UStruct* donorClass = FindClass("InsectSwarmPlasmid");
-    if (!donorClass) donorClass = FindClass("ElectroBolt");
-    if (!donorClass) donorClass = FindClass("Incinerate");
-    if (!donorClass) donorClass = FindClass("ActivePlasmid");
-    if (!donorClass) {
-        // Try to find ANY class with "Plasmid" in its name that isn't abstract
-        uintptr_t objData = *reinterpret_cast<uintptr_t*>(globals.GObjects);
-        int32_t objCount = *reinterpret_cast<int32_t*>(globals.GObjects + 4);
-        for (int i = 0; i < objCount && !donorClass; i++) {
-            uintptr_t ptr = *reinterpret_cast<uintptr_t*>(objData + i * 4);
-            if (!ptr) continue;
-            UObject* obj = reinterpret_cast<UObject*>(ptr);
-            if (obj->GetObjClassName() == "Class") {
-                std::string name = obj->GetName();
-                if (name.find("Plasmid") != std::string::npos &&
-                    name != "Plasmid" && name != "ActivePlasmid" &&
-                    name != "WeaponPlasmid" && name != "PhysicalPlasmid" &&
-                    name != "EcologyPlasmid" && name != "EngineeringPlasmid") {
-                    donorClass = reinterpret_cast<UStruct*>(obj);
-                    LOG_INFO("[Teleport] Using donor class: {}", name);
-                }
-            }
-        }
-    }
-
-    if (!donorClass) {
-        LOG_ERROR("[Teleport] No suitable plasmid donor class found");
-        return false;
-    }
-
-    LOG_INFO("[Teleport] Donor class: {}", reinterpret_cast<UObject*>(donorClass)->GetName());
-
-    // Step 2: Clone it as "TeleportPlasmid"
-    s_TeleportClass = CloneClass(
-        reinterpret_cast<UObject*>(donorClass)->GetName(),
-        "TeleportPlasmid");
-
-    if (!s_TeleportClass) {
-        LOG_ERROR("[Teleport] Failed to clone plasmid class");
-        return false;
-    }
-
-    // Step 3: Hook ProcessEvent to intercept when our plasmid is "fired"
-    // We look for the plasmid's fire/use function being called
     if (!IsProcessEventHooked()) InitProcessEventHook();
 
-    ProcessEventHook hook;
-    hook.Name = "TeleportPlasmid";
-    hook.FunctionFilter = ""; // Watch all events to find plasmid activation
-    hook.Callback = [](UObject* obj, UFunction* func, void* parms) -> bool {
-        // Check if this is a plasmid firing event on an object that uses our class
-        std::string funcName = func->GetName();
+    // Hook UseAbility on SecurityBeaconAbility objects.
+    // The call chain is:
+    //   Player fires plasmid → SecurityBeaconAbility.UseAbility()
+    //                        → spawns BeaconProjectile
+    // We intercept UseAbility and block it, doing teleport instead.
+    //
+    // We also catch the projectile spawn as a fallback.
 
-        // Common plasmid activation function names
-        if (funcName == "InitiateDamage" || funcName == "BeginFiring" ||
-            funcName == "OnFiringStarted") {
-            // Check if the object's class is our TeleportPlasmid
-            UObject* objClass = obj->GetClass();
-            if (objClass == reinterpret_cast<UObject*>(s_TeleportClass)) {
-                LOG_INFO("[Teleport] Plasmid activated! Teleporting...");
-                DoTeleport(800.0f);
-                return true; // Block the original behavior
+    ProcessEventHook hook;
+    hook.Name = "TeleportHijack";
+    hook.FunctionFilter = ""; // Need to check multiple function names
+    hook.Callback = [](UObject* obj, UFunction* func, void* parms) -> bool {
+        std::string funcName = func->GetName();
+        std::string className = obj->GetObjClassName();
+
+        // Primary: intercept when SecurityBeaconAbility fires
+        if (className == "SecurityBeaconAbility") {
+            if (funcName == "UseAbility" || funcName == "StartedUsingAbility") {
+                LOG_INFO("[Teleport] Security Bullseye fired → Teleporting {:.0f} units!",
+                         s_TeleportDistance);
+                DoTeleport(s_TeleportDistance);
+                return true; // Block the original projectile
             }
         }
+
+        // Fallback: block the beacon projectile from spawning
+        if (className == "BeaconProjectile") {
+            return true; // Block any BeaconProjectile events
+        }
+
         return false;
     };
-    s_TeleportHookId = RegisterProcessEventHook(hook);
 
+    s_TeleportHookId = RegisterProcessEventHook(hook);
     s_Initialized = true;
-    LOG_INFO("[Teleport] Custom TeleportPlasmid initialized successfully!");
+
+    LOG_INFO("[Teleport] Hijacked Security Bullseye → Teleport Plasmid!");
+    LOG_INFO("[Teleport] Buy/equip Security Bullseye at any Gatherer's Garden, fire it to teleport.");
+    LOG_INFO("[Teleport] Distance: {:.0f} units (change with 'tpdist <n>')", s_TeleportDistance);
     return true;
 }
 
@@ -182,25 +148,32 @@ bool GivePlayerTeleportPlasmid()
         if (!InitTeleportPlasmid()) return false;
     }
 
-    // The game's AddAvailablePlasmid takes a Class<Plasmid> argument.
-    // Since we can't easily call native functions with class arguments through
-    // our current function caller (which uses string params), we use a different
-    // approach: directly add to the player's plasmid manager inventory.
-
-    // For now, log that the plasmid is ready and can be triggered
-    LOG_INFO("[Teleport] TeleportPlasmid is registered. Use 'teleport' command to activate.");
-    LOG_INFO("[Teleport] The plasmid class exists at: 0x{:08X}",
-             reinterpret_cast<uintptr_t>(s_TeleportClass));
+    LOG_INFO("[Teleport] Hijack active on Security Bullseye.");
+    LOG_INFO("[Teleport] If you already have Security Bullseye, equip and fire it.");
+    LOG_INFO("[Teleport] Otherwise, buy it at any Gatherer's Garden.");
     return true;
+}
+
+// ─── Distance Config ────────────────────────────────────────────────────
+
+void SetTeleportDistance(float dist)
+{
+    s_TeleportDistance = dist;
+    LOG_INFO("[Teleport] Distance set to {:.0f}", dist);
+}
+
+float GetTeleportDistance()
+{
+    return s_TeleportDistance;
 }
 
 // ─── Status ─────────────────────────────────────────────────────────────
 
 std::string GetTeleportStatus()
 {
-    if (!s_Initialized) return "Not initialized";
-    return "Active (class at 0x" +
-           std::to_string(reinterpret_cast<uintptr_t>(s_TeleportClass)) + ")";
+    if (!s_Initialized) return "Not initialized — run 'initplasmid'";
+    return "Active: Security Bullseye → Teleport (" +
+           std::to_string((int)s_TeleportDistance) + " units)";
 }
 
 } // namespace bs1sdk

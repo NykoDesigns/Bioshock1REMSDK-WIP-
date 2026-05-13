@@ -19,6 +19,10 @@ bool GivePlayerTeleportPlasmid();
 /// Moves the player forward by 'distance' units in their look direction.
 bool DoTeleport(float distance = 1000.0f);
 
+/// Set/get teleport distance.
+void SetTeleportDistance(float dist);
+float GetTeleportDistance();
+
 /// Get status string for the teleport plasmid system.
 std::string GetTeleportStatus();
 

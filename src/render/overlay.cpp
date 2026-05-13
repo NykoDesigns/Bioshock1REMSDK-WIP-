@@ -870,10 +870,10 @@ void Overlay::RenderConsole()
             LogYellow("=== Functions ===");
             LogInfo("  call <class> <func> [args] - Call a UFunction");
             LogInfo("  funcs <class> [filter]     - List functions on a class");
-            LogYellow("=== Custom Plasmids ===");
+            LogYellow("=== Teleport Plasmid ===");
             LogInfo("  teleport [dist]         - Blink forward (default 800)");
-            LogInfo("  initplasmid             - Create TeleportPlasmid class");
-            LogInfo("  giveplasmid             - Give teleport to player");
+            LogInfo("  initplasmid             - Hijack Security Bullseye → teleport");
+            LogInfo("  tpdist <dist>           - Set teleport distance");
             LogYellow("=== Lua Scripting ===");
             LogInfo("  lua <code>              - Execute Lua code inline");
             LogInfo("  luafile <path>          - Execute a Lua script file");
@@ -1342,19 +1342,18 @@ void Overlay::RenderConsole()
             else
                 LogRed("Teleport failed (player not found?)");
         }
-        // ─── initplasmid ─── initialize custom teleport plasmid
+        // ─── initplasmid ─── hijack Security Bullseye → teleport
         else if (tokens[0] == "initplasmid") {
             if (InitTeleportPlasmid())
-                LogGreen("TeleportPlasmid created and registered!");
+                LogGreen("Security Bullseye hijacked → Teleport! Fire it to blink forward.");
             else
-                LogRed("Failed to create TeleportPlasmid");
+                LogRed("Failed to init teleport plasmid");
         }
-        // ─── giveplasmid ─── give player the teleport plasmid
-        else if (tokens[0] == "giveplasmid") {
-            if (GivePlayerTeleportPlasmid())
-                LogGreen("TeleportPlasmid given to player");
-            else
-                LogRed("Failed - run 'initplasmid' first");
+        // ─── tpdist <distance> ─── set teleport distance
+        else if (tokens[0] == "tpdist" && tokens.size() >= 2) {
+            float d = std::stof(tokens[1]);
+            SetTeleportDistance(d);
+            LogGreen("Teleport distance: " + std::to_string((int)d));
         }
         // ─── lua <code> ─── execute Lua code
         else if (tokens[0] == "lua" && tokens.size() >= 2) {
@@ -1638,25 +1637,33 @@ void Overlay::RenderModMenu()
         static bool plasmidInit = false;
 
         if (!plasmidInit) {
-            if (ImGui::Button("Create TeleportPlasmid Class")) {
+            if (ImGui::Button("Hijack Security Bullseye")) {
                 plasmidInit = InitTeleportPlasmid();
             }
+            ImGui::SameLine();
+            ImGui::TextWrapped("Replaces Security Bullseye with Teleport");
         } else {
-            ImGui::TextColored(ImVec4(0.4f, 1, 0.4f, 1), "TeleportPlasmid: %s",
+            ImGui::TextColored(ImVec4(0.4f, 1, 0.4f, 1), "%s",
                                GetTeleportStatus().c_str());
         }
 
         ImGui::Separator();
-        static float tpDist = 800.0f;
-        ImGui::SetNextItemWidth(120);
-        ImGui::SliderFloat("Distance##tp", &tpDist, 100.0f, 5000.0f, "%.0f");
+        float tpDist = GetTeleportDistance();
+        ImGui::SetNextItemWidth(180);
+        if (ImGui::SliderFloat("Blink Distance##tp", &tpDist, 100.0f, 5000.0f, "%.0f")) {
+            SetTeleportDistance(tpDist);
+        }
         ImGui::SameLine();
         if (ImGui::Button("Teleport!")) {
             DoTeleport(tpDist);
         }
 
-        ImGui::TextWrapped("Blinks forward in the look direction. "
-                           "Also available: 'tp [dist]' console command or sdk.teleport(dist) in Lua.");
+        if (plasmidInit) {
+            ImGui::TextColored(ImVec4(1, 1, 0.4f, 1),
+                "Equip Security Bullseye and fire to teleport!");
+        }
+        ImGui::TextWrapped("Also: 'tp [dist]' / 'tpdist <n>' in console, "
+                           "or sdk.teleport(dist) in Lua.");
     }
 
     // ═══════════════════════════════════════════════════════
