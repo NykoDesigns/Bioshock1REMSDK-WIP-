@@ -4,8 +4,10 @@
 #include <string>
 #include <iomanip>
 #include <cstring>
+#include <cmath>
 #include <filesystem>
 #include <algorithm>
+#include <map>
 #include <cstdint>
 
 /// BSM Tool - Standalone .bsm/.U file analyzer
@@ -69,6 +71,7 @@ struct ExportEntry {
     int32_t  serialSize;    // compact index
     int32_t  serialOffset;  // compact index (if serialSize > 0)
     int32_t  unknownBS2;    // BioShock extra field (version >= 130)
+    std::vector<uint8_t> rawEntry;  // raw bytes of the export table entry (for round-trip)
 };
 
 struct ParsedPackage {
@@ -171,6 +174,71 @@ void HexDump(const uint8_t* data, size_t size, size_t baseOffset = 0)
         }
         std::printf("|\n");
     }
+}
+
+// ─── Compact Index Writer ───────────────────────────────────────────────
+// Inverse of ReadCompactIndex — encodes an int32 to 1-5 byte UE2.5 format.
+
+static std::vector<uint8_t> WriteCompactIndex(int value)
+{
+    std::vector<uint8_t> buf;
+    bool isNeg = value < 0;
+    uint32_t absVal = isNeg ? (uint32_t)(-value) : (uint32_t)value;
+
+    // Byte 0: bit7=sign, bit6=continue, bits5-0 = low 6 data bits
+    uint8_t b0 = absVal & 0x3F;
+    absVal >>= 6;
+    if (isNeg) b0 |= 0x80;
+    if (absVal > 0) b0 |= 0x40;
+    buf.push_back(b0);
+
+    // Bytes 1-3: bit7=continue, bits6-0 = 7 data bits each
+    for (int i = 1; i <= 3 && absVal > 0; i++) {
+        uint8_t bn = absVal & 0x7F;
+        absVal >>= 7;
+        if (absVal > 0) bn |= 0x80;
+        buf.push_back(bn);
+    }
+
+    // Byte 4: remaining bits (up to 5 bits in byte 4)
+    if (absVal > 0) {
+        buf.push_back((uint8_t)(absVal & 0x1F));
+    }
+
+    return buf;
+}
+
+// ─── Export Entry Writer ────────────────────────────────────────────────
+// Serializes an ExportEntry to bytes (BioShock v142 format).
+
+static std::vector<uint8_t> WriteExportEntry(const ExportEntry& exp)
+{
+    std::vector<uint8_t> buf;
+    auto append = [&](const std::vector<uint8_t>& v) { buf.insert(buf.end(), v.begin(), v.end()); };
+    auto appendI32 = [&](int32_t v) {
+        buf.push_back((uint8_t)(v)); buf.push_back((uint8_t)(v>>8));
+        buf.push_back((uint8_t)(v>>16)); buf.push_back((uint8_t)(v>>24));
+    };
+    auto appendU32 = [&](uint32_t v) { appendI32((int32_t)v); };
+    auto appendU64 = [&](uint64_t v) {
+        appendU32((uint32_t)(v & 0xFFFFFFFF));
+        appendU32((uint32_t)(v >> 32));
+    };
+
+    append(WriteCompactIndex(exp.classIndex));
+    append(WriteCompactIndex(exp.superIndex));
+    appendI32(exp.outerIndex);
+    appendI32(exp.unknownBS1);
+    // FName: compact_index + int32 (stored as number+1)
+    append(WriteCompactIndex(exp.objectName.index));
+    appendI32(exp.objectName.number + 1); // stored as value+1
+    appendU64(exp.objectFlags);
+    append(WriteCompactIndex(exp.serialSize));
+    if (exp.serialSize > 0) {
+        append(WriteCompactIndex(exp.serialOffset));
+    }
+    appendI32(exp.unknownBS2);
+    return buf;
 }
 
 // ─── Full Package Parser ────────────────────────────────────────────────
@@ -290,6 +358,7 @@ ParsedPackage ParsePackage(const std::string& filepath)
     for (int i = 0; i < pkg.header.exportCount && pos < fileSize; ++i) {
         ExportEntry ee;
         size_t br;
+        size_t entryStart = pos;
         
         ee.classIndex  = ReadCompactIndex(d + pos, fileSize - pos, br); pos += br;
         ee.superIndex  = ReadCompactIndex(d + pos, fileSize - pos, br); pos += br;
@@ -304,6 +373,9 @@ ParsedPackage ParsePackage(const std::string& filepath)
             ee.serialOffset = 0;
         }
         ee.unknownBS2  = *reinterpret_cast<int32_t*>(d + pos); pos += 4; // BioShock extra (v>=130)
+        
+        // Capture raw entry bytes for round-trip writing
+        ee.rawEntry.assign(d + entryStart, d + pos);
         
         pkg.exports.push_back(ee);
     }
@@ -784,9 +856,244 @@ void DumpSpawners(const std::string& filepath)
     std::cout << "\nTotal spawners: " << total << "\n";
 }
 
+// ═══════════════════════════════════════════════════════════════════════
+// Goal 1: BSM Spawn Patcher — duplicate spawners to multiply enemy count
+// ═══════════════════════════════════════════════════════════════════════
+// Port of TheWarInRapture/core/bsm_spawn_patcher.py to C++.
+// Strategy:
+//   1. Copy all data up to name table (header + original serial data)
+//   2. Append cloned serial data with offset positions
+//   3. Append name table (unchanged)
+//   4. Append import table (unchanged)
+//   5. Append original export entries (raw bytes) + new export entries
+//   6. Patch header (counts, table offsets, generation)
+
+void PatchSpawners(const std::string& filepath, int multiplier, bool dryRun = false)
+{
+    if (multiplier < 2 || multiplier > 10) {
+        std::cerr << "Error: multiplier must be 2-10\n";
+        return;
+    }
+
+    auto pkg = ParsePackage(filepath);
+    if (!pkg.valid) { std::cerr << "Error: Failed to parse\n"; return; }
+
+    std::string mapName = std::filesystem::path(filepath).filename().string();
+    std::cout << "═══════════════════════════════════════════════════════════\n";
+    std::cout << "  PATCH: " << mapName << " (x" << multiplier << ")\n";
+    std::cout << "═══════════════════════════════════════════════════════════\n";
+
+    const auto& names = pkg.names;
+    const auto& d = pkg.rawData.data();
+
+    static const char* spawnerClasses[] = {
+        "AggressorSpawner", "ProtectorSpawner", "SecurityBotSpawner"
+    };
+
+    // Find spawners and their locations
+    struct SpawnerInfo {
+        int exportIdx;
+        std::string className;
+        float x, y, z;
+        int headerSkip;
+        int locationValuePos; // offset of Location value within serial data (relative to serial start)
+    };
+
+    std::vector<SpawnerInfo> spawners;
+
+    for (int i = 0; i < (int)pkg.exports.size(); i++) {
+        auto& exp = pkg.exports[i];
+        std::string cn = pkg.ResolveClassName(exp.classIndex);
+
+        bool isSpawner = false;
+        for (auto& sc : spawnerClasses)
+            if (cn == sc) { isSpawner = true; break; }
+        if (!isSpawner || exp.serialSize <= 0) continue;
+
+        int skip = DetectHeaderSkip(d, exp.serialOffset, exp.serialSize, names);
+        auto props = ParseProperties(d, exp.serialOffset + skip, names, exp.serialOffset + exp.serialSize);
+
+        SpawnerInfo si{};
+        si.exportIdx = i;
+        si.className = cn;
+        si.headerSkip = skip;
+        si.locationValuePos = -1;
+
+        for (auto& p : props) {
+            if (p.name == "Location" && p.value.size() == 12) {
+                memcpy(&si.x, p.value.data(), 4);
+                memcpy(&si.y, p.value.data()+4, 4);
+                memcpy(&si.z, p.value.data()+8, 4);
+                // p.valueOffset is the absolute file position of the value data.
+                si.locationValuePos = (int)(p.valueOffset - exp.serialOffset);
+            }
+        }
+
+        if (si.locationValuePos < 0) continue; // skip if no Location
+
+        spawners.push_back(si);
+        std::printf("  [%5d] %-22s loc=(%.0f, %.0f, %.0f)\n",
+                     i, cn.c_str(), si.x, si.y, si.z);
+    }
+
+    std::cout << "\n  Found " << spawners.size() << " spawners\n";
+
+    int dupsPerSpawner = multiplier - 1;
+    int totalNew = (int)spawners.size() * dupsPerSpawner;
+    std::cout << "  Creating " << totalNew << " clones (" << dupsPerSpawner << " per spawner)\n\n";
+
+    if (spawners.empty() || totalNew == 0) {
+        std::cout << "  Nothing to patch.\n";
+        return;
+    }
+
+    // Find max name_num per class for unique numbering
+    std::map<std::string, int32_t> maxNameNum;
+    for (auto& sp : spawners) {
+        auto& exp = pkg.exports[sp.exportIdx];
+        auto it = maxNameNum.find(sp.className);
+        if (it == maxNameNum.end() || exp.objectName.number > it->second)
+            maxNameNum[sp.className] = exp.objectName.number;
+    }
+
+    // Build new exports
+    struct NewExport {
+        ExportEntry entry;
+        std::vector<uint8_t> serialData;
+    };
+    std::vector<NewExport> newExports;
+
+    constexpr float OFFSET_DIST = 150.0f;
+    constexpr float PI = 3.14159265358979f;
+
+    for (auto& sp : spawners) {
+        auto& origExp = pkg.exports[sp.exportIdx];
+        int32_t& nextNum = maxNameNum[sp.className];
+
+        for (int dup = 0; dup < dupsPerSpawner; dup++) {
+            nextNum++;
+
+            // Calculate offset position (radial distribution)
+            float angle = (2.0f * PI * dup) / (float)dupsPerSpawner;
+            float nx = sp.x + OFFSET_DIST * cosf(angle);
+            float ny = sp.y + OFFSET_DIST * sinf(angle);
+            float nz = sp.z;
+
+            // Clone serial data
+            std::vector<uint8_t> serial(d + origExp.serialOffset,
+                                        d + origExp.serialOffset + origExp.serialSize);
+
+            // Patch Location in cloned data
+            if (sp.locationValuePos >= 0 && sp.locationValuePos + 12 <= (int)serial.size()) {
+                memcpy(serial.data() + sp.locationValuePos,     &nx, 4);
+                memcpy(serial.data() + sp.locationValuePos + 4, &ny, 4);
+                memcpy(serial.data() + sp.locationValuePos + 8, &nz, 4);
+            }
+
+            // Build new export entry
+            ExportEntry ne{};
+            ne.classIndex = origExp.classIndex;
+            ne.superIndex = origExp.superIndex;
+            ne.outerIndex = origExp.outerIndex;
+            ne.unknownBS1 = origExp.unknownBS1;
+            ne.objectName.index = origExp.objectName.index;
+            ne.objectName.number = nextNum;
+            ne.objectFlags = origExp.objectFlags;
+            ne.serialSize = (int32_t)serial.size();
+            ne.serialOffset = 0; // will be set during write
+            ne.unknownBS2 = origExp.unknownBS2;
+
+            newExports.push_back({ne, std::move(serial)});
+
+            std::printf("  NEW %-22s #%-4d from #%-4d  loc=(%.0f, %.0f, %.0f)\n",
+                         sp.className.c_str(), nextNum, origExp.objectName.number, nx, ny, nz);
+        }
+    }
+
+    std::cout << "\n  Total: " << spawners.size() << " original + "
+              << newExports.size() << " clones = "
+              << spawners.size() + newExports.size() << " spawners\n";
+
+    if (dryRun) {
+        std::cout << "\n  [DRY RUN — no files modified]\n";
+        return;
+    }
+
+    // === WRITE PATCHED FILE ===
+    std::cout << "\n  WRITING PATCHED FILE...\n";
+
+    // 1. Copy everything up to name table (header + all original serial data)
+    std::vector<uint8_t> output(d, d + pkg.header.nameOffset);
+
+    // 2. Append new serial data (record offsets)
+    for (auto& ne : newExports) {
+        ne.entry.serialOffset = (int32_t)output.size();
+        output.insert(output.end(), ne.serialData.begin(), ne.serialData.end());
+    }
+
+    // Pad to 4 bytes
+    while (output.size() % 4 != 0) output.push_back(0);
+
+    // 3. Append name table (unchanged)
+    int32_t newNameOffset = (int32_t)output.size();
+    output.insert(output.end(), d + pkg.header.nameOffset, d + pkg.header.importOffset);
+
+    // 4. Append import table (unchanged)
+    int32_t newImportOffset = (int32_t)output.size();
+    output.insert(output.end(), d + pkg.header.importOffset, d + pkg.header.exportOffset);
+
+    // 5. Append export table
+    int32_t newExportOffset = (int32_t)output.size();
+
+    // Original entries (raw bytes for exact round-trip)
+    for (auto& exp : pkg.exports) {
+        output.insert(output.end(), exp.rawEntry.begin(), exp.rawEntry.end());
+    }
+
+    // New entries (serialized from struct)
+    for (auto& ne : newExports) {
+        auto bytes = WriteExportEntry(ne.entry);
+        output.insert(output.end(), bytes.begin(), bytes.end());
+    }
+
+    int32_t newExportCount = (int32_t)(pkg.exports.size() + newExports.size());
+
+    // 6. Patch header
+    memcpy(output.data() + 16, &newNameOffset, 4);    // NameOffset
+    memcpy(output.data() + 20, &newExportCount, 4);   // ExportCount
+    memcpy(output.data() + 24, &newExportOffset, 4);  // ExportOffset
+    memcpy(output.data() + 32, &newImportOffset, 4);  // ImportOffset
+
+    // Patch generation table (offset 56 = Gen[0].ExportCount)
+    memcpy(output.data() + 56, &newExportCount, 4);
+
+    // Backup original
+    std::filesystem::path backupDir = std::filesystem::path(filepath).parent_path() / "backups";
+    std::filesystem::create_directories(backupDir);
+    std::filesystem::path backupPath = backupDir / mapName;
+    if (!std::filesystem::exists(backupPath)) {
+        std::filesystem::copy_file(filepath, backupPath);
+        std::cout << "  Backed up: " << backupPath.string() << "\n";
+    }
+
+    // Write
+    std::ofstream outFile(filepath, std::ios::binary);
+    if (!outFile.is_open()) {
+        std::cerr << "Error: Cannot write to " << filepath << "\n";
+        return;
+    }
+    outFile.write(reinterpret_cast<char*>(output.data()), output.size());
+    outFile.close();
+
+    size_t origSize = pkg.rawData.size();
+    std::cout << "  Written: " << filepath << "\n";
+    std::cout << "  Size: " << origSize << " -> " << output.size()
+              << " (+" << (output.size() - origSize) << " bytes)\n";
+}
+
 int main(int argc, char* argv[])
 {
-    std::cout << "BS1SDK - BSM File Tool v0.3.0\n\n";
+    std::cout << "BS1SDK - BSM File Tool v0.4.0\n\n";
 
     if (argc < 3) {
         std::cout << "Usage:\n";
@@ -800,6 +1107,7 @@ int main(int argc, char* argv[])
         std::cout << "  bsm_tool dump <file>               - Full dump (names+imports+exports)\n";
         std::cout << "  bsm_tool hexdump <file> [off] [len] - Hex dump\n";
         std::cout << "  bsm_tool compare <a> <b>           - Compare two packages\n";
+        std::cout << "  bsm_tool patch <file> <mult> [dry]  - Duplicate spawners (x2-x10)\n";
         return 1;
     }
 
@@ -838,6 +1146,10 @@ int main(int argc, char* argv[])
         DumpSpawners(argv[2]);
     } else if (command == "dump") {
         DumpFull(argv[2]);
+    } else if (command == "patch" && argc >= 4) {
+        int mult = std::stoi(argv[3]);
+        bool dry = (argc >= 5 && std::string(argv[4]) == "dry");
+        PatchSpawners(argv[2], mult, dry);
     } else {
         std::cerr << "Unknown command: " << command << "\n";
         return 1;
