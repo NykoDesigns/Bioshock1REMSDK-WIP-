@@ -22,12 +22,21 @@
 
 ### Planned Features
 
+**Gameplay Mods** (see `docs/reverse-engineering/gameplay-goals.md`)
+- Decoy plasmid → Teleportation (hijack placement logic for instant TP)
+- Security Command → Friendly bot spawner (3 bot hard limit)
+- Chain Lightning Electro Bolt (chains between nearby enemies, tonic-gated)
+- Revolver fires Rosie rivets (projectile class swap)
+- Splicer factions (two groups fight each other via AI targeting hooks)
+- Custom splicer type control per encounter (BSM property editing)
+- Full War In Rapture absorption (spawn multiplication, weapons, vending, plasmids)
+
 **Map Editing & Content**
 - BSM round-trip writing — modify actor properties, rewrite packages
 - Export cloning — duplicate spawners, inject scripted encounters
+- INI/IBF patching tool — modify game config for weapons, loot, AI, spawning
 - Map dumper — extract all actors with positions, classes, properties
 - Custom map creation — build new .bsm packages from scratch
-- Visual map editor (long-term) — 3D viewport with actor placement
 
 **Co-op Multiplayer** (see `docs/reverse-engineering/co-op-feasibility.md`)
 - UDP network bridge between two game instances
@@ -37,8 +46,6 @@
 
 **Mod Export & Persistence**
 - Preset/config system — save & load mod settings as JSON
-- INI patching tool — modify game config files for permanent stat changes
-- Package binary patcher — modify compiled UnrealScript in ShockGame.U
 - External companion GUI — desktop window via IPC with injected DLL
 
 ## Building
@@ -165,8 +172,9 @@ BS1SDK/
 │   └── bsm_tool/   — BSM package analyzer (parse, props, spawners)
 ├── docs/
 │   └── reverse-engineering/
-│       ├── bsm-format.md       — BSM file format specification
-│       └── co-op-feasibility.md — Co-op multiplayer research
+│       ├── bsm-format.md        — BSM file format specification
+│       ├── co-op-feasibility.md — Co-op multiplayer research
+│       └── gameplay-goals.md    — Gameplay mod feasibility & plans
 ├── external/       — Third-party (MinHook, ImGui, Lua via FetchContent)
 └── tests/          — Unit tests
 ```
