@@ -507,20 +507,299 @@ void DumpFull(const std::string& filepath)
     DumpExports(filepath);
 }
 
+// ─── Property Deserialization ────────────────────────────────────────────
+// Ported from TheWarInRapture bsm_parser.py parse_properties
+// Reads UE1-style property tags from serialized object data.
+
+enum PropType {
+    PT_None = 0, PT_Byte = 1, PT_Int = 2, PT_Bool = 3, PT_Float = 4,
+    PT_Object = 5, PT_Name = 6, PT_String = 7, PT_Class = 8, PT_Array = 9,
+    PT_Struct = 10, PT_Vector = 11, PT_Rotator = 12, PT_Str = 13,
+    PT_Map = 14, PT_FixedArray = 15
+};
+
+static const char* PropTypeName(int t) {
+    static const char* names[] = {
+        "None","Byte","Int","Bool","Float","Object","Name","String",
+        "Class","Array","Struct","Vector","Rotator","Str","Map","FixedArray"
+    };
+    return (t >= 0 && t <= 15) ? names[t] : "Unknown";
+}
+
+struct SerialProp {
+    std::string name;
+    int type;
+    int size;
+    int arrayIndex;
+    size_t valueOffset;  // file offset of value data
+    std::vector<uint8_t> value;
+    bool boolValue;
+    std::string structName;
+};
+
+static int DecodePackedSize(const uint8_t* d, size_t& pos, int sizeBits) {
+    switch (sizeBits) {
+        case 0: return 1;   case 1: return 2;
+        case 2: return 4;   case 3: return 12;
+        case 4: return 16;
+        case 5: return d[pos++];
+        case 6: { uint16_t v; memcpy(&v, d+pos, 2); pos += 2; return v; }
+        case 7: { uint32_t v; memcpy(&v, d+pos, 4); pos += 4; return (int)v; }
+        default: return 0;
+    }
+}
+
+// Read compact index for property parser (same encoding, simpler signature)
+static int ReadCI(const uint8_t* d, size_t& pos) {
+    uint8_t b0 = d[pos++];
+    bool sign = (b0 & 0x80) != 0;
+    bool more = (b0 & 0x40) != 0;
+    int val = b0 & 0x3F;
+    if (more) {
+        uint8_t b1 = d[pos++]; val |= (b1 & 0x7F) << 6;
+        if (b1 & 0x80) { uint8_t b2 = d[pos++]; val |= (b2 & 0x7F) << 13;
+            if (b2 & 0x80) { uint8_t b3 = d[pos++]; val |= (b3 & 0x7F) << 20;
+                if (b3 & 0x80) { uint8_t b4 = d[pos++]; val |= (b4 & 0x7F) << 27; }
+            }
+        }
+    }
+    return sign ? -val : val;
+}
+
+// Read a BioShock name ref for property parser: compact_index + INT32 number
+struct PropNameRef { int idx; uint32_t num; };
+static PropNameRef ReadPropNameRef(const uint8_t* d, size_t& pos) {
+    PropNameRef r;
+    r.idx = ReadCI(d, pos);
+    memcpy(&r.num, d + pos, 4); pos += 4;
+    return r;
+}
+
+std::vector<SerialProp> ParseProperties(const uint8_t* data, size_t pos,
+                                         const std::vector<NameEntry>& names,
+                                         size_t endPos)
+{
+    std::vector<SerialProp> props;
+
+    while (pos < endPos - 5) {
+        SerialProp p;
+        p.boolValue = false;
+        p.arrayIndex = 0;
+
+        auto nr = ReadPropNameRef(data, pos);
+        if (nr.idx == 0) {
+            p.name = "None"; p.type = PT_None; p.size = 0;
+            props.push_back(p);
+            break;
+        }
+        if (nr.idx < 0 || nr.idx >= (int)names.size()) break;
+
+        p.name = names[nr.idx].name;
+        if (nr.num > 0) p.name += "_" + std::to_string(nr.num);
+
+        if (pos >= endPos) break;
+
+        uint8_t info = data[pos++];
+        p.type = info & 0x0F;
+        int sizeBits = (info >> 4) & 0x07;
+        int arrayFlag = (info >> 7) & 1;
+
+        // Struct: extra name ref for struct type
+        if (p.type == PT_Struct) {
+            auto sn = ReadPropNameRef(data, pos);
+            if (sn.idx >= 0 && sn.idx < (int)names.size())
+                p.structName = names[sn.idx].name;
+        }
+
+        p.size = DecodePackedSize(data, pos, sizeBits);
+
+        // Bool: value in flag bit. Otherwise array index.
+        if (p.type == PT_Bool) {
+            p.boolValue = (arrayFlag != 0);
+        } else if (arrayFlag) {
+            uint8_t b = data[pos++];
+            if ((b & 0x80) == 0) p.arrayIndex = b;
+            else if ((b & 0xC0) == 0x80) { uint8_t c = data[pos++]; p.arrayIndex = ((b&0x7F)<<8)+c; }
+            else { uint8_t c=data[pos++],d2=data[pos++],e=data[pos++]; p.arrayIndex=((b&0x3F)<<24)+(c<<16)+(d2<<8)+e; }
+        }
+
+        p.valueOffset = pos;
+        if (p.size > 0 && pos + p.size <= endPos)
+            p.value.assign(data + pos, data + pos + p.size);
+        pos += p.size;
+
+        props.push_back(p);
+    }
+    return props;
+}
+
+// Auto-detect header skip bytes before properties start
+// Ported from TheWarInRapture bsm_spawn_patcher.py detect_header_skip
+int DetectHeaderSkip(const uint8_t* data, size_t offset, int size,
+                     const std::vector<NameEntry>& names)
+{
+    int bestSkip = 57;
+    int bestScore = 0;
+    static const char* knownProps[] = {
+        "Tag","Location","Rotation","Label","Region","Level",
+        "SpawnZones","RepopulationPatrol","RepopulationAITypes",
+        "PhysicsVolume","CheckpointTypePadding","DrawScale3D",
+        "StaticMesh","CollisionRadius","CollisionHeight"
+    };
+
+    for (int skip = 4; skip < 80 && skip < size; skip++) {
+        try {
+            auto props = ParseProperties(data, offset + skip, names, offset + size);
+            int score = 0;
+            for (auto& p : props) {
+                if (p.type == PT_None) continue;
+                for (auto& kp : knownProps)
+                    if (p.name == kp) score++;
+            }
+            if (score > bestScore) { bestScore = score; bestSkip = skip; }
+        } catch (...) { continue; }
+    }
+    return bestSkip;
+}
+
+void DumpProps(const std::string& filepath, int exportIdx)
+{
+    auto pkg = ParsePackage(filepath);
+    if (!pkg.valid) { std::cerr << "Error: Failed to parse\n"; return; }
+
+    if (exportIdx < 0 || exportIdx >= (int)pkg.exports.size()) {
+        std::cerr << "Error: Export index out of range (0-" << pkg.exports.size()-1 << ")\n";
+        return;
+    }
+
+    auto& exp = pkg.exports[exportIdx];
+    std::string className = pkg.ResolveClassName(exp.classIndex);
+    std::string objName = pkg.ResolveFName(exp.objectName);
+
+    std::cout << "Properties for export [" << exportIdx << "] "
+              << className << " '" << objName << "'"
+              << " (serial size=" << exp.serialSize << " offset=0x" << std::hex << exp.serialOffset << std::dec << ")\n\n";
+
+    if (exp.serialSize <= 0) {
+        std::cout << "  No serial data.\n";
+        return;
+    }
+
+    int skip = DetectHeaderSkip(pkg.rawData.data(), exp.serialOffset, exp.serialSize, pkg.names);
+    std::cout << "  Header skip: " << skip << " bytes\n\n";
+
+    auto props = ParseProperties(pkg.rawData.data(), exp.serialOffset + skip,
+                                  pkg.names, exp.serialOffset + exp.serialSize);
+
+    for (auto& p : props) {
+        if (p.type == PT_None) { std::cout << "  [None] (end)\n"; break; }
+
+        std::printf("  %-30s %-10s size=%-4d", p.name.c_str(), PropTypeName(p.type), p.size);
+
+        if (!p.structName.empty())
+            std::printf(" struct=%s", p.structName.c_str());
+        if (p.arrayIndex > 0)
+            std::printf(" [%d]", p.arrayIndex);
+
+        // Print value interpretation
+        if (p.type == PT_Bool) {
+            std::printf(" = %s", p.boolValue ? "true" : "false");
+        } else if (p.type == PT_Int && p.value.size() == 4) {
+            int32_t v; memcpy(&v, p.value.data(), 4);
+            std::printf(" = %d", v);
+        } else if (p.type == PT_Float && p.value.size() == 4) {
+            float v; memcpy(&v, p.value.data(), 4);
+            std::printf(" = %.4f", v);
+        } else if (p.type == PT_Object && p.value.size() >= 1) {
+            size_t vpos = 0;
+            int ref = ReadCI(p.value.data(), vpos);
+            std::printf(" = %s", pkg.ResolveObjRef(ref).c_str());
+        } else if (p.type == PT_Name && p.value.size() >= 5) {
+            size_t vpos = 0;
+            auto nr = ReadPropNameRef(p.value.data(), vpos);
+            if (nr.idx >= 0 && nr.idx < (int)pkg.names.size())
+                std::printf(" = '%s'", pkg.names[nr.idx].name.c_str());
+        } else if ((p.type == PT_Struct || p.type == PT_Vector) && p.value.size() == 12) {
+            float x, y, z;
+            memcpy(&x, p.value.data(), 4);
+            memcpy(&y, p.value.data()+4, 4);
+            memcpy(&z, p.value.data()+8, 4);
+            std::printf(" = (%.1f, %.1f, %.1f)", x, y, z);
+        } else if (p.type == PT_Rotator && p.value.size() == 12) {
+            int32_t pitch, yaw, roll;
+            memcpy(&pitch, p.value.data(), 4);
+            memcpy(&yaw, p.value.data()+4, 4);
+            memcpy(&roll, p.value.data()+8, 4);
+            std::printf(" = (P=%d, Y=%d, R=%d)", pitch, yaw, roll);
+        } else if (p.type == PT_Byte && p.value.size() == 1) {
+            std::printf(" = %d", p.value[0]);
+        }
+
+        std::printf("\n");
+    }
+}
+
+void DumpSpawners(const std::string& filepath)
+{
+    auto pkg = ParsePackage(filepath);
+    if (!pkg.valid) { std::cerr << "Error: Failed to parse\n"; return; }
+
+    std::cout << "Spawners in: " << std::filesystem::path(filepath).filename().string() << "\n\n";
+
+    static const char* spawnerClasses[] = {
+        "AggressorSpawner", "ProtectorSpawner", "SecurityBotSpawner",
+        "ProtectorControls", "ActionSpawnAI"
+    };
+
+    int total = 0;
+    for (int i = 0; i < (int)pkg.exports.size(); ++i) {
+        auto& exp = pkg.exports[i];
+        std::string cn = pkg.ResolveClassName(exp.classIndex);
+
+        bool isSpawner = false;
+        for (auto& sc : spawnerClasses)
+            if (cn == sc) { isSpawner = true; break; }
+        if (!isSpawner) continue;
+
+        std::string objName = pkg.ResolveFName(exp.objectName);
+        std::printf("[%5d] %-25s %-25s", i, cn.c_str(), objName.c_str());
+
+        if (exp.serialSize > 0) {
+            int skip = DetectHeaderSkip(pkg.rawData.data(), exp.serialOffset, exp.serialSize, pkg.names);
+            auto props = ParseProperties(pkg.rawData.data(), exp.serialOffset + skip,
+                                          pkg.names, exp.serialOffset + exp.serialSize);
+            for (auto& p : props) {
+                if (p.name == "Location" && p.value.size() == 12) {
+                    float x, y, z;
+                    memcpy(&x, p.value.data(), 4);
+                    memcpy(&y, p.value.data()+4, 4);
+                    memcpy(&z, p.value.data()+8, 4);
+                    std::printf("  loc=(%.0f, %.0f, %.0f)", x, y, z);
+                }
+            }
+        }
+        std::printf("\n");
+        total++;
+    }
+    std::cout << "\nTotal spawners: " << total << "\n";
+}
+
 int main(int argc, char* argv[])
 {
-    std::cout << "BS1SDK - BSM File Tool v0.2.0\n\n";
+    std::cout << "BS1SDK - BSM File Tool v0.3.0\n\n";
 
     if (argc < 3) {
         std::cout << "Usage:\n";
-        std::cout << "  bsm_tool analyze <file>          - Analyze header + validation\n";
-        std::cout << "  bsm_tool names <file>            - Dump name table\n";
-        std::cout << "  bsm_tool imports <file>          - Dump import table\n";
-        std::cout << "  bsm_tool exports <file>          - Dump export table\n";
-        std::cout << "  bsm_tool actors <file>           - Dump non-structural exports\n";
-        std::cout << "  bsm_tool dump <file>             - Full dump (names+imports+exports)\n";
+        std::cout << "  bsm_tool analyze <file>            - Analyze header + validation\n";
+        std::cout << "  bsm_tool names <file>              - Dump name table\n";
+        std::cout << "  bsm_tool imports <file>            - Dump import table\n";
+        std::cout << "  bsm_tool exports <file>            - Dump export table\n";
+        std::cout << "  bsm_tool actors <file>             - Dump non-structural exports\n";
+        std::cout << "  bsm_tool props <file> <export_idx>  - Dump properties of an export\n";
+        std::cout << "  bsm_tool spawners <file>           - Find spawner actors with locations\n";
+        std::cout << "  bsm_tool dump <file>               - Full dump (names+imports+exports)\n";
         std::cout << "  bsm_tool hexdump <file> [off] [len] - Hex dump\n";
-        std::cout << "  bsm_tool compare <a> <b>         - Compare two packages\n";
+        std::cout << "  bsm_tool compare <a> <b>           - Compare two packages\n";
         return 1;
     }
 
@@ -553,6 +832,10 @@ int main(int argc, char* argv[])
         DumpExports(argv[2]);
     } else if (command == "actors") {
         DumpActors(argv[2]);
+    } else if (command == "props" && argc >= 4) {
+        DumpProps(argv[2], std::stoi(argv[3]));
+    } else if (command == "spawners") {
+        DumpSpawners(argv[2]);
     } else if (command == "dump") {
         DumpFull(argv[2]);
     } else {
