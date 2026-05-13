@@ -9,31 +9,31 @@
 namespace bs1sdk {
 
 /// .BSM file format parser and editor.
-/// 
-/// RESEARCH STATUS: The .bsm format is undocumented and requires reverse engineering.
-/// This header defines the EXPECTED structure based on UE2.5 package format knowledge.
-/// All structures are provisional and will be updated as RE progresses.
 ///
-/// Strategy:
-/// 1. Dump .bsm file headers and compare across multiple maps
-/// 2. Hook file I/O to observe how the engine reads .bsm data
-/// 3. Set breakpoints on package loading code to trace deserialization
-/// 4. Cross-reference with known UE2.5 .u/.utx/.unr formats
+/// FORMAT STATUS: CONFIRMED via EliotVU/Unreal-Library cross-reference + hex validation.
+/// BioShock Remastered uses Unreal Engine 2.5 Vengeance package format:
+///   Magic: 0x9E2A83C1, FileVersion: 142, LicenseeVersion: 56
 ///
-/// The .bsm format likely shares heritage with Unreal Package format:
-/// - Same magic number (0x9E2A83C1) or BioShock-specific variant
-/// - Similar table structure (names, imports, exports)
-/// - Potentially compressed with zlib
-/// - May have additional BioShock-specific sections (streaming hints, etc.)
+/// BioShock-specific differences from standard UE2.5:
+///   - FName in file = CompactIndex(name_index) + int32(number+1)  [always includes Number]
+///   - Name table strings: CompactIndex length, negated for Vengeance → always UTF-16LE
+///   - Export table has 2 extra int32 fields (unknown purpose, version >= 130/132)
+///   - Export ObjectFlags is uint64 (not uint32) for licenseeVersion >= 40
+///   - Compact indices (1-5 bytes) used for ClassIndex, SuperIndex, SerialSize, SerialOffset
+///
+/// Tested successfully on:
+///   Entry.bsm (20KB):   153 names, 21 imports, 40 exports
+///   1-Medical.bsm (204MB): 29295 names, 1381 imports, 49140 exports
+///   0-Lighthouse.bsm (187MB): 24096 names, 596 imports, 22780 exports
 
-// ─── Provisional Header Structure ─────────────────────────────────────────
+// ─── Confirmed Header Structure ──────────────────────────────────────────
 
 #pragma pack(push, 1)
 
 struct BSMHeader {
-    uint32_t Magic;              // Expected: 0x9E2A83C1 or custom
-    uint16_t FileVersion;        // Package format version
-    uint16_t LicenseeVersion;    // BioShock-specific version
+    uint32_t Magic;              // 0x9E2A83C1 (standard UE package signature)
+    uint16_t FileVersion;        // 142 for BioShock
+    uint16_t LicenseeVersion;    // 56 for BioShock
     uint32_t PackageFlags;       // EPackageFlags
     
     int32_t  NameCount;          // Number of entries in name table
@@ -45,39 +45,39 @@ struct BSMHeader {
     int32_t  ImportCount;        // Number of import entries
     int32_t  ImportOffset;       // File offset to import table
     
-    // Possibly additional fields:
-    // uint32_t GUID[4];         // Package GUID
-    // int32_t  GenerationCount; // Generation info
-    // uint32_t EngineVersion;
-    // uint32_t CookerVersion;
-    // int32_t  CompressionFlags;
-    // int32_t  CompressedChunkCount;
-    // int32_t  CompressedChunkOffset;
+    // GUID(16 bytes) + GenerationCount(4) + Generation entries follow
+};
+
+/// FName reference in BioShock package files.
+/// Always stored as CompactIndex(name table index) + int32(number, stored as value+1).
+struct BSMFNameRef {
+    int32_t Index;    // Name table index
+    int32_t Number;   // Instance number (-1 = no suffix, 0+ = _N display suffix)
 };
 
 struct BSMNameEntry {
-    // In UE2.5, name entries are length-prefixed strings
-    // Format: int32 Length, char[Length], uint32 Flags
+    // BioShock Vengeance: CompactIndex(len, negated) → UTF-16LE chars, 8 bytes flags
     std::string Name;
-    uint32_t Flags;
+    uint64_t Flags;     // 8 bytes for version >= 141
 };
 
 struct BSMImportEntry {
-    int32_t ClassPackage;    // FName index - package containing the class
-    int32_t ClassName;       // FName index - name of the class
-    int32_t PackageIndex;    // Index of the package this import is from
-    int32_t ObjectName;      // FName index - name of this import
+    BSMFNameRef ClassPackage; // Package containing the class (e.g. "Core", "Engine")
+    BSMFNameRef ClassName;    // Class name (e.g. "Package", "Class", "Texture")
+    int32_t     OuterIndex;   // Object reference: outer/package (int32, not compact)
+    BSMFNameRef ObjectName;   // Name of the imported object
 };
 
 struct BSMExportEntry {
-    int32_t ClassIndex;      // Object's class (index into import/export table)
-    int32_t SuperIndex;      // Object's parent class
-    int32_t PackageIndex;    // Outer/package (index in export table, or 0 for root)
-    int32_t ObjectName;      // FName index
-    uint32_t ObjectFlags;    // EObjectFlags
-    int32_t SerialSize;      // Size of serialized object data
-    int32_t SerialOffset;    // File offset to serialized data
-    // Possibly more fields depending on version
+    int32_t     ClassIndex;    // Object reference (compact index): class of this object
+    int32_t     SuperIndex;    // Object reference (compact index): parent class
+    int32_t     OuterIndex;    // Object reference (int32): outer/package
+    int32_t     UnknownBS1;    // BioShock extra field (version >= 132, purpose unknown)
+    BSMFNameRef ObjectName;    // FName: name of this exported object
+    uint64_t    ObjectFlags;   // uint64 for BioShock (licenseeVersion >= 40)
+    int32_t     SerialSize;    // Compact index: size of serialized object data in bytes
+    int32_t     SerialOffset;  // Compact index: file offset to serialized data (if size > 0)
+    int32_t     UnknownBS2;    // BioShock extra field (version >= 130, purpose unknown)
 };
 
 #pragma pack(pop)
@@ -106,6 +106,9 @@ public:
 
     /// Resolve a name index to string
     std::string ResolveName(int32_t index) const;
+    
+    /// Resolve FName reference to display string (with instance number suffix)
+    std::string ResolveFName(const BSMFNameRef& fname) const;
 
     /// Get raw serialized data for an export
     std::vector<uint8_t> GetExportData(int32_t exportIndex) const;
@@ -139,6 +142,12 @@ private:
     std::vector<BSMExportEntry> m_Exports;
     std::vector<uint8_t> m_RawData;
     bool m_Valid = false;
+    
+    /// Read a FCompactIndex (1-5 byte variable-length signed integer) from raw data
+    static int ReadCompactIndex(const uint8_t* data, size_t maxLen, size_t& bytesRead);
+    
+    /// Read a FName reference (compact index + int32 number) from raw data
+    static BSMFNameRef ReadFNameRef(const uint8_t* data, size_t maxLen, size_t& bytesRead);
 };
 
 // ─── BSM Format Detection ─────────────────────────────────────────────────

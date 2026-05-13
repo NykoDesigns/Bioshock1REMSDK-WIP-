@@ -1,6 +1,6 @@
 # .BSM File Format - Reverse Engineering Notes
 
-## Status: EARLY RESEARCH
+## Status: CONFIRMED — Full name/import/export table parsing working
 
 ## Hypothesis
 
@@ -171,3 +171,60 @@ None, CheckpointTypePadding, FlushDetail, Type, LOD, Core, System,
 **Note:** `dxgi.dll` in Build/Final suggests the remaster wraps D3D9 calls
 through a D3D9→D3D11 translation layer. Our D3D9 hooks should still work
 since the game code still calls D3D9 APIs, but we need to verify.
+
+### 2025-06-14: Import & Export Table Format — FULLY CONFIRMED
+
+Cross-referenced with **EliotVU/Unreal-Library** (C# decompiler with explicit BioShock build support)
+and validated by parsing 3 BSM files with 100% success.
+
+**BioShock-specific differences from standard UE2.5:**
+
+1. **FName in file** = `CompactIndex(name_index) + int32(number+1)` — always includes Number field
+2. **Name table strings**: `CompactIndex(length)`, negated for Vengeance engine → always UTF-16LE
+3. **Export table** has 2 extra int32 fields (purpose unknown, version >= 130/132)
+4. **Export ObjectFlags** is uint64 (not uint32) for licenseeVersion >= 40
+
+**Name table entry format (corrected):**
+```
+CompactIndex  StringLength   (Vengeance negates → always unicode)
+wchar_t[]     Characters     (UTF-16LE, null-terminated)
+uint64        Flags          (8 bytes for version >= 141)
+```
+
+**Import table entry format:**
+```
+FName    ClassPackage   (CompactIndex + int32)  e.g. "Core"
+FName    ClassName      (CompactIndex + int32)  e.g. "Class", "Package", "Texture"
+int32    OuterIndex     (object reference, always 32-bit)
+FName    ObjectName     (CompactIndex + int32)  e.g. "Engine", "PlayerStart"
+```
+
+**Export table entry format (BioShock v142, licensee 56):**
+```
+CompactIndex  ClassIndex     Object reference (neg=import, pos=export, 0=Class)
+CompactIndex  SuperIndex     Parent class reference
+int32         OuterIndex     Outer/package reference (always 32-bit)
+int32         UnknownBS1     BioShock extra (version >= 132, always 0 observed)
+FName         ObjectName     CompactIndex + int32(number+1)
+uint64        ObjectFlags    BioShock: 8 bytes (licensee >= 40)
+CompactIndex  SerialSize     Size of serialized object data
+CompactIndex  SerialOffset   File offset to data (only if SerialSize > 0)
+int32         UnknownBS2     BioShock extra (version >= 130, always 0 observed)
+```
+
+**CompactIndex encoding (1-5 bytes):**
+```
+Byte 0: bit7=sign, bit6=continue, bits5-0 = 6 data bits
+Bytes 1-3: bit7=continue, bits6-0 = 7 data bits each
+Byte 4: bits7-0 = 8 data bits (no continue)
+Value = data_bits, negated if sign bit set
+```
+
+**Validation results:**
+| File | Names | Imports | Exports | Status |
+|------|-------|---------|---------|--------|
+| Entry.bsm (20KB) | 153/153 | 21/21 | 40/40 | ✅ |
+| 1-Medical.bsm (204MB) | 29295/29295 | 1381/1381 | 49140/49140 | ✅ |
+| 0-Lighthouse.bsm (187MB) | 24096/24096 | 596/596 | 22780/22780 | ✅ |
+
+**Reference:** EliotVU/Unreal-Library `UExportTableItem.cs` Deserialize method with `#if BIOSHOCK` conditionals.
