@@ -382,9 +382,12 @@ static bool LoadRealWinMM()
     return true;
 }
 
-static void LoadBS1SDK()
+static DWORD WINAPI LoadBS1SDKThread(LPVOID param)
 {
-    // Load BS1SDK.dll from the same directory as this proxy
+    // Wait briefly for Steam DRM and other DLLs to finish initializing
+    Sleep(2000);
+
+    // Load BS1SDK.dll from the same directory as the game exe
     char myPath[MAX_PATH];
     GetModuleFileNameA(nullptr, myPath, MAX_PATH);
 
@@ -405,6 +408,7 @@ static void LoadBS1SDK()
                  sdkPath.c_str(), GetLastError());
         OutputDebugStringA(msg);
     }
+    return 0;
 }
 
 // ─── DllMain ───────────────────────────────────────────────────────────
@@ -415,7 +419,9 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID reserved)
     case DLL_PROCESS_ATTACH:
         DisableThreadLibraryCalls(hModule);
         LoadRealWinMM();
-        LoadBS1SDK();
+        // Defer SDK loading to background thread — avoids interfering with
+        // Steam DRM check and other early initialization
+        CreateThread(nullptr, 0, LoadBS1SDKThread, nullptr, 0, nullptr);
         break;
 
     case DLL_PROCESS_DETACH:
