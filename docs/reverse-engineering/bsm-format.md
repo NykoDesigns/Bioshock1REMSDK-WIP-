@@ -1,6 +1,6 @@
 # .BSM File Format - Reverse Engineering Notes
 
-## Status: CONFIRMED — Full name/import/export table parsing working
+## Status: CONFIRMED — Full name/import/export/property parsing working (v0.3.0)
 
 ## Hypothesis
 
@@ -62,21 +62,38 @@ SWAT 4's package format is well-documented by its modding community and should s
 
 ## Research Tasks
 
-- [ ] Collect multiple .bsm files from game install
-- [ ] Check first 4 bytes for magic number
-- [ ] Compare headers across files to identify fixed vs variable fields
+- [x] Collect multiple .bsm files from game install
+- [x] Check first 4 bytes for magic number — `0x9E2A83C1` (standard UE)
+- [x] Compare headers across files to identify fixed vs variable fields
+- [x] Cross-reference with UE2.5 package format documentation
+- [x] Parse name table (UTF-16LE with CompactIndex length, 8-byte flags)
+- [x] Parse import table (FName refs with class/package/outer)
+- [x] Parse export table (with BioShock-specific extra fields)
+- [x] Deserialize UE1-style property tags from export serial data
+- [x] Auto-detect header skip before properties (brute-force scoring)
+- [x] Port property parser from TheWarInRapture Python to C++ bsm_tool
 - [ ] Hook CreateFileW to observe .bsm load order
 - [ ] Set breakpoints on file read to trace deserialization code
 - [ ] Look for decompression calls (zlib inflate) during .bsm loading
-- [ ] Identify name table by looking for known strings (level names, class names)
-- [ ] Cross-reference with UE2.5 package format documentation
+- [ ] Identify BSP geometry data within exports
+- [ ] Implement round-trip BSM writing (modify properties, rewrite package)
+- [ ] Export cloning (duplicate actors with offset positions)
 
 ## Tools
 
-- `bsm_tool analyze <file>` - Our custom analysis tool
-- HxD - Hex editor for manual inspection
-- 010 Editor - With binary template support
-- IDA Pro / Ghidra - For tracing deserialization code
+- `bsm_tool analyze <file>` — Header analysis and validation
+- `bsm_tool names <file>` — Dump name table
+- `bsm_tool imports <file>` — Dump import table
+- `bsm_tool exports <file>` — Dump export table with resolved class names
+- `bsm_tool actors <file>` — Dump non-structural exports only
+- `bsm_tool props <file> <idx>` — Dump all properties of an export (with values)
+- `bsm_tool spawners <file>` — Find spawner actors with 3D locations
+- `bsm_tool dump <file>` — Full dump (names + imports + exports)
+- `bsm_tool hexdump <file> [off] [len]` — Raw hex dump
+- `bsm_tool compare <a> <b>` — Compare two package headers
+- HxD — Hex editor for manual inspection
+- 010 Editor — With binary template support
+- IDA Pro / Ghidra — For tracing deserialization code
 
 ## References
 
@@ -228,3 +245,70 @@ Value = data_bits, negated if sign bit set
 | 0-Lighthouse.bsm (187MB) | 24096/24096 | 596/596 | 22780/22780 | ✅ |
 
 **Reference:** EliotVU/Unreal-Library `UExportTableItem.cs` Deserialize method with `#if BIOSHOCK` conditionals.
+
+### 2026-05-13: Property Deserialization — FULLY WORKING
+
+Ported from **TheWarInRapture** Python codebase (`core/bsm_parser.py`) to C++ in `bsm_tool`.
+
+**UE1-style property tag format:**
+```
+NameRef       PropertyName    (CompactIndex + int32 number)
+uint8         InfoByte        bits[3:0]=type, bits[6:4]=sizeClass, bit7=arrayFlag
+[NameRef]     StructName      (only if type==Struct)
+[variable]    PackedSize      (depends on sizeClass 0-7)
+[variable]    ArrayIndex      (only if arrayFlag && type!=Bool)
+byte[]        Value           (PackedSize bytes)
+```
+
+**Property types (16):**
+| ID | Type | Size | Value Encoding |
+|----|------|------|----------------|
+| 0 | None | 0 | End-of-properties sentinel |
+| 1 | Byte | 1 | uint8 |
+| 2 | Int | 4 | int32 |
+| 3 | Bool | 0 | Value in arrayFlag bit (no payload) |
+| 4 | Float | 4 | IEEE 754 float |
+| 5 | Object | var | CompactIndex (object reference) |
+| 6 | Name | 5+ | CompactIndex + int32 (FName) |
+| 10 | Struct | var | Nested data (extra NameRef for struct type) |
+| 11 | Vector | 12 | 3× float (X, Y, Z) |
+| 12 | Rotator | 12 | 3× int32 (Pitch, Yaw, Roll) |
+
+**Packed size classes:**
+| SizeClass | Size |
+|-----------|------|
+| 0 | 1 byte |
+| 1 | 2 bytes |
+| 2 | 4 bytes |
+| 3 | 12 bytes |
+| 4 | 16 bytes |
+| 5 | uint8 (next byte) |
+| 6 | uint16 (next 2 bytes) |
+| 7 | uint32 (next 4 bytes) |
+
+**Header skip detection:**
+Export serial data has a variable-length header before properties start (~4-80 bytes).
+We brute-force test offsets 4-80, parsing properties at each, scoring against known
+property names (Tag, Location, Rotation, Level, Region, etc.) to find the best match.
+TheWarInRapture uses 57 as default; our testing confirms 57 is correct for most actor types.
+
+**Example — AggressorSpawner from 1-Welcome.bsm (export #5091):**
+```
+RepopulationPatrol     Name       = 'TransitHubPatrol'
+RepopulationAITypes    Array      size=3
+SpawnZones             Array      size=7
+Level                  Object     = LevelInfo_0 [Export#2972]
+OwnerGroups            Array      size=7
+Region                 Struct     struct=PointRegion
+Tag                    Name       = 'AggressorSpawner'
+PhysicsVolume          Object     = DefaultPhysicsVolume_5 [Export#2973]
+Location               Struct     struct=Vector = (-9032.0, 7064.0, 2160.0)
+Rotation               Struct     struct=Rotator = (0, 0, 0)
+Label                  Name       = 'AggressorSpawner'
+```
+
+**Validation results (property parsing):**
+| File | Exports Tested | Props Parsed | Status |
+|------|---------------|-------------|--------|
+| 1-Welcome.bsm | AggressorSpawner #5091, #5433 | 11-12 props each | ✅ |
+| 1-Medical.bsm | 27 spawners, 60 ActionSpawnAI | All props readable | ✅ |

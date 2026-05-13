@@ -14,24 +14,32 @@
 - **Function Caller** — Invoke any UFunction on any object from console
 - **Weapon Editor** — Live editing of fire rate, accuracy, magazine size, ammo
 - **Gameplay Mods** — God mode, one-hit kill, infinite ammo via PE hooks
+- **Plasmid Hijacks** — Security Bullseye → teleport to impact, Hypnotize → summon Big Daddy
 - **Event Logger** — Dump all ProcessEvent calls to file for analysis
 - **Lua 5.4 Scripting** — Full scripting bridge with hot-reload
 - **SDK Generator** — Auto-generate C++ headers from runtime class data
+- **BSM Package Parser** — Full .bsm/.U file analysis with property deserialization (bsm_tool v0.3.0)
 
 ### Planned Features
 
-**Mod Export & Persistence**
-- Preset/config system — save & load mod settings as JSON, shareable between users
-- INI patching tool — modify game config files for permanent stat changes without DLL
-- Package (.u/.bsm) binary patcher — modify compiled UnrealScript in ShockGame.u for true permanent mods
-- New package creation — build entirely new .u packages with custom classes and bytecode
-- External companion GUI — desktop window (second monitor friendly) communicating with injected DLL via IPC
+**Map Editing & Content**
+- BSM round-trip writing — modify actor properties, rewrite packages
+- Export cloning — duplicate spawners, inject scripted encounters
+- Map dumper — extract all actors with positions, classes, properties
+- Custom map creation — build new .bsm packages from scratch
+- Visual map editor (long-term) — 3D viewport with actor placement
 
-**Content & Gameplay**
-- Custom maps and level editing
-- Asset importing/exporting
-- AI editing / custom enemies
-- Multiplayer features
+**Co-op Multiplayer** (see `docs/reverse-engineering/co-op-feasibility.md`)
+- UDP network bridge between two game instances
+- Player state sync (position, rotation, health, weapon)
+- NPC puppet system for remote player visualization
+- Damage and world state synchronization
+
+**Mod Export & Persistence**
+- Preset/config system — save & load mod settings as JSON
+- INI patching tool — modify game config files for permanent stat changes
+- Package binary patcher — modify compiled UnrealScript in ShockGame.U
+- External companion GUI — desktop window via IPC with injected DLL
 
 ## Building
 
@@ -55,7 +63,7 @@ Dependencies (MinHook, ImGui, Lua 5.4) are fetched automatically via CMake Fetch
 ### Output
 - `build/bin/Release/BS1SDK.dll` — Main SDK (inject into game)
 - `build/bin/Release/BS1Injector.exe` — DLL injector
-- `build/bin/Release/bsm_tool.exe` — Standalone .bsm file analyzer
+- `build/bin/Release/bsm_tool.exe` — BSM/UE package analyzer (v0.3.0, 10 commands)
 
 ## Usage
 
@@ -148,11 +156,17 @@ BS1SDK/
 │   ├── engine/     — UObject, UProperty, UFunction, function caller
 │   ├── hooks/      — DXGI Present hook, ProcessEvent hook (MinHook)
 │   ├── render/     — ImGui overlay, mod menu, console
+│   ├── gameplay/   — Plasmid hijacks (teleport, Big Daddy summon)
 │   ├── scripting/  — Lua 5.4 bridge
 │   └── sdk/        — Runtime SDK header generation
 ├── scripts/        — Example Lua scripts
 ├── injector/       — Standalone DLL injector
-├── tools/          — Offline tools (bsm_tool)
+├── tools/
+│   └── bsm_tool/   — BSM package analyzer (parse, props, spawners)
+├── docs/
+│   └── reverse-engineering/
+│       ├── bsm-format.md       — BSM file format specification
+│       └── co-op-feasibility.md — Co-op multiplayer research
 ├── external/       — Third-party (MinHook, ImGui, Lua via FetchContent)
 └── tests/          — Unit tests
 ```
