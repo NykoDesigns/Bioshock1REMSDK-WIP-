@@ -169,7 +169,8 @@ BS1SDK/
 ├── scripts/        — Example Lua scripts
 ├── injector/       — Standalone DLL injector
 ├── tools/
-│   └── bsm_tool/   — BSM package analyzer (parse, props, spawners)
+│   ├── bsm_tool/   — BSM package analyzer + spawn patcher + prop editor
+│   └── ini_tool/   — INI config parser + patcher (weapons, AI, loot)
 ├── docs/
 │   └── reverse-engineering/
 │       ├── bsm-format.md        — BSM file format specification

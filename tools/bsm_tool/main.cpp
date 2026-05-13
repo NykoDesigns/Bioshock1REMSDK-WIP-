@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <vector>
 #include <string>
 #include <iomanip>
@@ -1091,6 +1092,126 @@ void PatchSpawners(const std::string& filepath, int multiplier, bool dryRun = fa
               << " (+" << (output.size() - origSize) << " bytes)\n";
 }
 
+// ═══════════════════════════════════════════════════════════════════════
+// Goal 4: BSM Property Editor — modify property values in export serial data
+// ═══════════════════════════════════════════════════════════════════════
+// Patches a specific property value in a specific export entry, in-place.
+// Supports: Int, Float, Vector (Location/Rotation), Name, Bool, Byte
+// For vectors: provide "x,y,z" as the value string.
+
+void SetExportProp(const std::string& filepath, int exportIdx,
+                   const std::string& propName, const std::string& valueStr)
+{
+    auto pkg = ParsePackage(filepath);
+    if (!pkg.valid) { std::cerr << "Error: Failed to parse\n"; return; }
+
+    if (exportIdx < 0 || exportIdx >= (int)pkg.exports.size()) {
+        std::cerr << "Error: Export index out of range (0-" << pkg.exports.size()-1 << ")\n";
+        return;
+    }
+
+    auto& exp = pkg.exports[exportIdx];
+    std::string className = pkg.ResolveClassName(exp.classIndex);
+    std::string objName = pkg.ResolveFName(exp.objectName);
+
+    if (exp.serialSize <= 0) {
+        std::cerr << "Error: Export has no serial data\n";
+        return;
+    }
+
+    int skip = DetectHeaderSkip(pkg.rawData.data(), exp.serialOffset, exp.serialSize, pkg.names);
+    auto props = ParseProperties(pkg.rawData.data(), exp.serialOffset + skip,
+                                  pkg.names, exp.serialOffset + exp.serialSize);
+
+    bool found = false;
+    for (auto& p : props) {
+        if (p.name != propName) continue;
+        found = true;
+
+        size_t valuePos = p.valueOffset; // absolute file position of value data
+
+        if ((p.type == PT_Struct || p.type == PT_Vector) && p.value.size() == 12) {
+            // Parse "x,y,z"
+            float x, y, z;
+            char comma1, comma2;
+            std::istringstream iss(valueStr);
+            if (!(iss >> x >> comma1 >> y >> comma2 >> z) || comma1 != ',' || comma2 != ',') {
+                std::cerr << "Error: Vector format must be 'x,y,z' e.g. '100.0,200.0,300.0'\n";
+                return;
+            }
+            float oldX, oldY, oldZ;
+            memcpy(&oldX, pkg.rawData.data() + valuePos, 4);
+            memcpy(&oldY, pkg.rawData.data() + valuePos + 4, 4);
+            memcpy(&oldZ, pkg.rawData.data() + valuePos + 8, 4);
+
+            memcpy(pkg.rawData.data() + valuePos,     &x, 4);
+            memcpy(pkg.rawData.data() + valuePos + 4, &y, 4);
+            memcpy(pkg.rawData.data() + valuePos + 8, &z, 4);
+
+            std::printf("  [%d] %s.%s '%s': (%.1f, %.1f, %.1f) -> (%.1f, %.1f, %.1f)\n",
+                         exportIdx, className.c_str(), objName.c_str(), propName.c_str(),
+                         oldX, oldY, oldZ, x, y, z);
+
+        } else if (p.type == PT_Float && p.value.size() == 4) {
+            float newVal = std::stof(valueStr);
+            float oldVal;
+            memcpy(&oldVal, pkg.rawData.data() + valuePos, 4);
+            memcpy(pkg.rawData.data() + valuePos, &newVal, 4);
+            std::printf("  [%d] %s.%s '%s': %.4f -> %.4f\n",
+                         exportIdx, className.c_str(), objName.c_str(), propName.c_str(),
+                         oldVal, newVal);
+
+        } else if (p.type == PT_Int && p.value.size() == 4) {
+            int32_t newVal = std::stoi(valueStr);
+            int32_t oldVal;
+            memcpy(&oldVal, pkg.rawData.data() + valuePos, 4);
+            memcpy(pkg.rawData.data() + valuePos, &newVal, 4);
+            std::printf("  [%d] %s.%s '%s': %d -> %d\n",
+                         exportIdx, className.c_str(), objName.c_str(), propName.c_str(),
+                         oldVal, newVal);
+
+        } else if (p.type == PT_Byte && p.value.size() == 1) {
+            uint8_t newVal = (uint8_t)std::stoi(valueStr);
+            uint8_t oldVal = pkg.rawData[valuePos];
+            pkg.rawData[valuePos] = newVal;
+            std::printf("  [%d] %s.%s '%s': %d -> %d\n",
+                         exportIdx, className.c_str(), objName.c_str(), propName.c_str(),
+                         oldVal, newVal);
+
+        } else {
+            std::cerr << "Error: Unsupported property type for editing (type=" << p.type
+                      << " size=" << p.value.size() << ")\n";
+            return;
+        }
+        break;
+    }
+
+    if (!found) {
+        std::cerr << "Error: Property '" << propName << "' not found in export " << exportIdx << "\n";
+        return;
+    }
+
+    // Backup
+    std::string mapName = std::filesystem::path(filepath).filename().string();
+    std::filesystem::path backupDir = std::filesystem::path(filepath).parent_path() / "backups";
+    std::filesystem::create_directories(backupDir);
+    std::filesystem::path backupPath = backupDir / mapName;
+    if (!std::filesystem::exists(backupPath)) {
+        std::filesystem::copy_file(filepath, backupPath);
+        std::cout << "  Backed up: " << backupPath.string() << "\n";
+    }
+
+    // Write the modified raw data back
+    std::ofstream outFile(filepath, std::ios::binary);
+    if (!outFile.is_open()) {
+        std::cerr << "Error: Cannot write to " << filepath << "\n";
+        return;
+    }
+    outFile.write(reinterpret_cast<char*>(pkg.rawData.data()), pkg.rawData.size());
+    outFile.close();
+    std::cout << "  Written: " << filepath << "\n";
+}
+
 int main(int argc, char* argv[])
 {
     std::cout << "BS1SDK - BSM File Tool v0.4.0\n\n";
@@ -1108,6 +1229,7 @@ int main(int argc, char* argv[])
         std::cout << "  bsm_tool hexdump <file> [off] [len] - Hex dump\n";
         std::cout << "  bsm_tool compare <a> <b>           - Compare two packages\n";
         std::cout << "  bsm_tool patch <file> <mult> [dry]  - Duplicate spawners (x2-x10)\n";
+        std::cout << "  bsm_tool setprop <file> <idx> <prop> <val> - Edit export property\n";
         return 1;
     }
 
@@ -1150,6 +1272,8 @@ int main(int argc, char* argv[])
         int mult = std::stoi(argv[3]);
         bool dry = (argc >= 5 && std::string(argv[4]) == "dry");
         PatchSpawners(argv[2], mult, dry);
+    } else if (command == "setprop" && argc >= 6) {
+        SetExportProp(argv[2], std::stoi(argv[3]), argv[4], argv[5]);
     } else {
         std::cerr << "Unknown command: " << command << "\n";
         return 1;
