@@ -1,0 +1,18 @@
+[mod]
+name = "Example Mod"
+version = "1.0.0"
+author = "BS1SDK Team"
+description = "Demonstrates basic SDK modding capabilities"
+sdk_version = ">=0.1.0"
+
+[dependencies]
+# No dependencies for this example
+
+[load]
+priority = 100
+scripts = ["scripts/main.lua"]
+
+[config]
+# Mod-specific configuration
+greeting = "Hello from Example Mod!"
+debug_overlay = true

@@ -1,0 +1,33 @@
+# Build output
+build/
+out/
+
+# Generated SDK headers (can regenerate at runtime)
+sdk_gen/
+
+# Runtime dumps (large files)
+object_dump.txt
+event_dump.txt
+property_layout.txt
+
+# IDE files
+.vs/
+.vscode/
+*.user
+*.suo
+*.sln
+*.vcxproj
+*.vcxproj.filters
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Compiled binaries
+*.dll
+*.exe
+*.pdb
+*.lib
+*.obj
+*.ilk
+*.exp
