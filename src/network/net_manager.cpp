@@ -1,4 +1,5 @@
 #include "net_manager.h"
+#include "coop_sync.h"
 #include "udp_socket.h"
 #include "../core/log.h"
 
@@ -169,6 +170,14 @@ static void ProcessIncoming()
             break;
         case PacketType::Disconnect:
             HandleDisconnect();
+            break;
+        case PacketType::Damage:
+            if (hdr->size >= sizeof(DamageData))
+                QueueDamagePacket(*reinterpret_cast<const DamageData*>(payload));
+            break;
+        case PacketType::WorldEvent:
+            if (hdr->size >= sizeof(WorldEventData))
+                QueueWorldEventPacket(*reinterpret_cast<const WorldEventData*>(payload));
             break;
         default:
             break;
@@ -358,5 +367,10 @@ const NetPeer* GetRemotePeer()
 
 void SetOnRemoteState(OnRemoteStateFunc fn) { s_OnRemoteState = std::move(fn); }
 void SetOnPeerEvent(OnPeerEventFunc fn) { s_OnPeerEvent = std::move(fn); }
+
+bool NetSendRawPacket(PacketType type, const void* data, uint16_t size)
+{
+    return SendPacket(type, data, size);
+}
 
 } // namespace bs1sdk

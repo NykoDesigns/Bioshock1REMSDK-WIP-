@@ -10,6 +10,7 @@
 #include "../gameplay/gameplay_mods.h"
 #include "../core/mod_config.h"
 #include "../network/coop_bridge.h"
+#include "../network/coop_render.h"
 
 #include <imgui.h>
 #include <imgui_impl_dx11.h>
@@ -121,7 +122,10 @@ void Overlay::Render()
     RenderMainMenu();
 
     // Tick co-op network (approx 16ms at 60fps)
-    if (IsCoopActive()) CoopTick(1.0f / 60.0f);
+    if (IsCoopActive()) {
+        CoopTick(1.0f / 60.0f);
+        RenderCoopOverlay(); // Draw remote player marker
+    }
 
     // Finish frame
     ImGui::EndFrame();

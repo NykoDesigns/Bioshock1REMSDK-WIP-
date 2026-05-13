@@ -74,9 +74,21 @@ struct HandshakeData {
 
 struct DamageData {
     float amount;
-    float hitX, hitY, hitZ;     // hit location
+    float hitX, hitY, hitZ;     // hit location (for target matching)
+    float targetX, targetY, targetZ; // target actor position (for fuzzy match)
     uint8_t damageType;         // damage type enum
     uint8_t _pad[3];
+    uint32_t targetNameHash;    // FNV-1a hash of target actor name
+};
+
+// ─── World Event Packet ────────────────────────────────────────────────
+
+struct WorldEventData {
+    uint8_t  eventType;         // 0=door, 1=trigger, 2=pickup, 3=button
+    uint8_t  state;             // new state (0=closed, 1=open, etc.)
+    uint8_t  _pad[2];
+    float    posX, posY, posZ;  // location of the actor (for matching)
+    uint32_t actorNameHash;     // FNV-1a hash of actor name
 };
 
 // ─── Chat Packet ───────────────────────────────────────────────────────

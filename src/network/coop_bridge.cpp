@@ -1,4 +1,6 @@
 #include "coop_bridge.h"
+#include "coop_render.h"
+#include "coop_sync.h"
 #include "net_manager.h"
 #include "net_common.h"
 #include "../core/log.h"
@@ -120,15 +122,25 @@ static PlayerStateData ReadLocalPlayerState()
 
 static void UpdatePuppet(const PlayerStateData& remoteState)
 {
-    // Phase 1: Just log the remote player's position
-    // Phase 2 will spawn an actual NPC and move it
-    // For now, the overlay can render a marker at the remote position
+    // Update the rendering system with remote state
+    const NetPeer* peer = GetRemotePeer();
+    SetRemoteRenderState(remoteState, peer ? peer->name.c_str() : "Partner");
 
-    // TODO: Phase 2 implementation
-    // - Find or spawn a Pawn/SkeletalMeshActor
-    // - Set its Location to (remoteState.posX, posY, posZ)
-    // - Set its Rotation to match remoteState
-    // - Set bHidden=false to make it visible
+    // Also try to move a puppet pawn if we have one
+    if (s_PuppetPawn && s_LocOffset > 0) {
+        uint8_t* raw = reinterpret_cast<uint8_t*>(s_PuppetPawn);
+        memcpy(raw + s_LocOffset, &remoteState.posX, 4);
+        memcpy(raw + s_LocOffset + 4, &remoteState.posY, 4);
+        memcpy(raw + s_LocOffset + 8, &remoteState.posZ, 4);
+
+        if (s_RotOffset > 0) {
+            // Convert float degrees back to UE2 rotator ints
+            int32_t pitch = (int32_t)(remoteState.rotPitch * (65536.0f / 360.0f));
+            int32_t yaw = (int32_t)(remoteState.rotYaw * (65536.0f / 360.0f));
+            memcpy(raw + s_RotOffset, &pitch, 4);
+            memcpy(raw + s_RotOffset + 4, &yaw, 4);
+        }
+    }
 }
 
 // ─── ProcessEvent Hook for Tick ────────────────────────────────────────
@@ -189,6 +201,21 @@ bool InitCoopBridge()
                             if (pi) s_HealthOffset = pi->Offset;
                         }
                     }
+
+                    // Update camera for rendering (use player pos + rotation as camera)
+                    if (s_LocOffset > 0 && s_RotOffset > 0) {
+                        const uint8_t* raw = reinterpret_cast<const uint8_t*>(obj);
+                        float px, py, pz;
+                        memcpy(&px, raw + s_LocOffset, 4);
+                        memcpy(&py, raw + s_LocOffset + 4, 4);
+                        memcpy(&pz, raw + s_LocOffset + 8, 4);
+                        int32_t rPitch, rYaw;
+                        memcpy(&rPitch, raw + s_RotOffset, 4);
+                        memcpy(&rYaw, raw + s_RotOffset + 4, 4);
+                        float pitchDeg = rPitch * (360.0f / 65536.0f);
+                        float yawDeg = rYaw * (360.0f / 65536.0f);
+                        SetLocalCamera(px, py, pz, pitchDeg, yawDeg, 90.0f);
+                    }
                 }
             }
             return false; // don't block
@@ -197,7 +224,9 @@ bool InitCoopBridge()
     }
 
     s_Initialized = true;
-    LOG_INFO("[Co-op] Bridge initialized");
+    InitCoopRender();
+    InitCoopSync();
+    LOG_INFO("[Co-op] Bridge initialized (render + sync)");
     return true;
 }
 
@@ -205,6 +234,7 @@ void ShutdownCoopBridge()
 {
     if (!s_Initialized) return;
     CoopDisconnect();
+    ShutdownCoopSync();
     if (s_HookId >= 0) {
         UnregisterProcessEventHook(s_HookId);
         s_HookId = -1;
@@ -250,6 +280,9 @@ void CoopTick(float deltaTime)
             auto state = ReadLocalPlayerState();
             NetSendPlayerState(state);
         }
+
+        // Process incoming damage/world events
+        CoopSyncProcessPackets();
     }
 }
 
