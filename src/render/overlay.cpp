@@ -1633,37 +1633,42 @@ void Overlay::RenderModMenu()
     }
 
     // ═══════════════════════════════════════════════════════
-    if (ImGui::CollapsingHeader("Teleport Plasmid", ImGuiTreeNodeFlags_DefaultOpen)) {
-        static bool plasmidInit = false;
+    if (ImGui::CollapsingHeader("Plasmid Hijacks", ImGuiTreeNodeFlags_DefaultOpen)) {
+        static bool hijacksActive = false;
 
-        if (!plasmidInit) {
-            if (ImGui::Button("Hijack Security Bullseye")) {
-                plasmidInit = InitTeleportPlasmid();
+        if (!hijacksActive) {
+            if (ImGui::Button("Activate Plasmid Hijacks")) {
+                hijacksActive = InitPlasmidHijacks();
             }
-            ImGui::SameLine();
-            ImGui::TextWrapped("Replaces Security Bullseye with Teleport");
+            ImGui::TextWrapped("Replaces Security Bullseye and Hypnotize Big Daddy with custom effects.");
         } else {
             ImGui::TextColored(ImVec4(0.4f, 1, 0.4f, 1), "%s",
-                               GetTeleportStatus().c_str());
+                               GetPlasmidHijackStatus().c_str());
         }
 
         ImGui::Separator();
+        ImGui::TextColored(ImVec4(0.6f, 0.8f, 1, 1), "Security Bullseye -> Teleport");
+        ImGui::TextWrapped("Throw the beacon — you teleport to where it lands.");
+
         float tpDist = GetTeleportDistance();
         ImGui::SetNextItemWidth(180);
-        if (ImGui::SliderFloat("Blink Distance##tp", &tpDist, 100.0f, 5000.0f, "%.0f")) {
+        if (ImGui::SliderFloat("Fallback Dist##tp", &tpDist, 100.0f, 5000.0f, "%.0f")) {
             SetTeleportDistance(tpDist);
         }
         ImGui::SameLine();
-        if (ImGui::Button("Teleport!")) {
+        if (ImGui::Button("Blink Fwd")) {
             DoTeleport(tpDist);
         }
 
-        if (plasmidInit) {
+        ImGui::Separator();
+        ImGui::TextColored(ImVec4(1, 0.6f, 0.3f, 1), "Hypnotize Big Daddy -> Summon");
+        ImGui::TextWrapped("Throw the dart — a friendly Big Daddy appears where it hits.");
+
+        if (hijacksActive) {
+            ImGui::Separator();
             ImGui::TextColored(ImVec4(1, 1, 0.4f, 1),
-                "Equip Security Bullseye and fire to teleport!");
+                "Buy these at any Gatherer's Garden, equip, and fire!");
         }
-        ImGui::TextWrapped("Also: 'tp [dist]' / 'tpdist <n>' in console, "
-                           "or sdk.teleport(dist) in Lua.");
     }
 
     // ═══════════════════════════════════════════════════════

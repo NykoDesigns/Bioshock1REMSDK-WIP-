@@ -4,26 +4,29 @@
 
 namespace bs1sdk {
 
-/// Initialize the custom Teleport plasmid.
-/// - Clones an existing plasmid class
-/// - Registers ProcessEvent hook for activation
-/// - Implements aim-based teleportation
-/// Returns true on success.
-bool InitTeleportPlasmid();
+// ─── Teleport Plasmid (hijacks Security Bullseye) ───────────────────────
 
-/// Give the teleport plasmid to the player.
-/// This attempts to call AddAvailablePlasmid on the player's PlasmidManager.
-bool GivePlayerTeleportPlasmid();
+/// Initialize the plasmid hijack system.
+/// Hooks ProcessEvent to intercept Security Bullseye and Hypnotize Big Daddy.
+bool InitPlasmidHijacks();
 
 /// Execute a teleport (can be called directly from console/Lua).
 /// Moves the player forward by 'distance' units in their look direction.
-bool DoTeleport(float distance = 1000.0f);
+bool DoTeleport(float distance = 800.0f);
 
-/// Set/get teleport distance.
+/// Teleport to a specific world position.
+bool DoTeleportTo(float x, float y, float z);
+
+/// Set/get teleport distance (for forward-blink fallback).
 void SetTeleportDistance(float dist);
 float GetTeleportDistance();
 
-/// Get status string for the teleport plasmid system.
-std::string GetTeleportStatus();
+/// Get status string for the plasmid hijack system.
+std::string GetPlasmidHijackStatus();
+
+// ─── Legacy aliases ─────────────────────────────────────────────────────
+inline bool InitTeleportPlasmid() { return InitPlasmidHijacks(); }
+inline bool GivePlayerTeleportPlasmid() { return InitPlasmidHijacks(); }
+inline std::string GetTeleportStatus() { return GetPlasmidHijackStatus(); }
 
 } // namespace bs1sdk
