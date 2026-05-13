@@ -116,60 +116,79 @@ bool DoTeleportTo(float x, float y, float z)
     return true;
 }
 
+// ─── Class Hierarchy Check ──────────────────────────────────────────────
+// Walk the SuperField chain of an object's Class to check if it inherits
+// from a given base class name (like UE's IsA).
+
+static bool IsA(UObject* obj, const std::string& baseClassName)
+{
+    if (!obj) return false;
+
+    // Get the object's Class (which is a UClass/UStruct)
+    UObject* cls = obj->GetClass();
+    if (!cls) return false;
+
+    // Walk the SuperField chain: Class → State → Struct → Field → Object
+    UField* current = reinterpret_cast<UField*>(cls);
+    int safety = 64;
+    while (current && safety-- > 0) {
+        if (current->GetName() == baseClassName)
+            return true;
+        current = current->GetSuperField();
+    }
+    return false;
+}
+
 // ─── Big Daddy Summoning ────────────────────────────────────────────────
-// We spawn a friendly Bouncer at the impact position by finding an existing
-// Protector in the level and moving it to the target, or by using the
-// engine's ConsoleCommand to summon one.
+// Find an existing Protector (Bouncer/Rosie) in the level by walking
+// the class hierarchy, move it to the target location, make it friendly.
 
 static void SummonBigDaddyAt(float x, float y, float z)
 {
-    // Strategy: Find an existing ShockPlayerController and use ConsoleCommand
-    // "summon ShockAI.Bouncer" — but this spawns at player position.
-    // Instead, we find ALL Protector-type objects in the level.
-    // If one exists, teleport it to the target and make it friendly.
-    // If none exist, we use the forward-spawn trick.
-
     auto& globals = GetEngineGlobals();
     if (!globals.IsValid()) return;
 
     if (!CachePropertyOffsets()) return;
 
-    // Look for any Bouncer or Rosie in the level
     uintptr_t objData = *reinterpret_cast<uintptr_t*>(globals.GObjects);
     int32_t objCount = *reinterpret_cast<int32_t*>(globals.GObjects + 4);
 
+    // Find a Protector instance by walking class hierarchy (IsA check)
     UObject* protector = nullptr;
     for (int i = 0; i < objCount && !protector; i++) {
         uintptr_t ptr = *reinterpret_cast<uintptr_t*>(objData + i * 4);
         if (!ptr) continue;
         UObject* obj = reinterpret_cast<UObject*>(ptr);
-        std::string cls = obj->GetObjClassName();
-        // Look for concrete Bouncer/Rosie instances (not class objects)
-        if (cls == "Bouncer" || cls == "Rosie" ||
-            cls == "BouncerElite" || cls == "RosieElite") {
+
+        // Skip Class objects themselves — we want instances
+        if (obj->GetObjClassName() == "Class") continue;
+
+        // Check if this object inherits from Protector
+        if (IsA(obj, "Protector")) {
             protector = obj;
+            LOG_INFO("[BigDaddy] Found Protector instance: {} (class: {})",
+                     obj->GetName(), obj->GetObjClassName());
         }
     }
 
     if (protector) {
-        // Move an existing Big Daddy to the target location and make it friendly
+        // Move it to the target location
         FVector targetLoc = { x, y, z };
         protector->SetField<FVector>(s_LocationOffset, targetLoc);
 
-        // Try to set DispositionToPlayer to kFriendlyToPlayer (2)
-        // DispositionToPlayer is on the Protector class
-        UStruct* protClass = FindClass(protector->GetObjClassName());
-        if (protClass) {
-            auto props = WalkProperties(protClass);
+        // Walk properties to set friendly disposition
+        UObject* clsObj = protector->GetClass();
+        if (clsObj) {
+            auto props = WalkProperties(reinterpret_cast<UStruct*>(clsObj));
             for (auto& p : props) {
                 if (p.Name == "DispositionToPlayer") {
                     // EDispositionToPlayer: 0=None, 1=Hostile, 2=Friendly
                     protector->SetField<int32_t>(p.Offset, 2);
-                    break;
+                    LOG_INFO("[BigDaddy] Set DispositionToPlayer = Friendly");
                 }
                 if (p.Name == "bProtectingPlayer") {
-                    protector->SetField<int32_t>(p.Offset, 1);
-                    break;
+                    protector->SetField<uint8_t>(p.Offset, 1);
+                    LOG_INFO("[BigDaddy] Set bProtectingPlayer = true");
                 }
             }
         }
@@ -177,9 +196,9 @@ static void SummonBigDaddyAt(float x, float y, float z)
         LOG_INFO("[BigDaddy] Summoned friendly {} at ({:.0f}, {:.0f}, {:.0f})",
                  protector->GetObjClassName(), x, y, z);
     } else {
-        // No existing Big Daddy found — teleport player there and log
-        LOG_WARN("[BigDaddy] No Bouncer/Rosie found in level to relocate!");
-        LOG_INFO("[BigDaddy] Tip: There must be a Big Daddy spawned in the level.");
+        LOG_WARN("[BigDaddy] No Protector-derived object found in GObjects!");
+        LOG_INFO("[BigDaddy] The Big Daddy may not be in the object table yet.");
+        LOG_INFO("[BigDaddy] Try approaching one to get it loaded, then fire again.");
     }
 }
 
@@ -198,81 +217,90 @@ bool InitPlasmidHijacks()
         return false;
     }
 
+    // Diagnostic: track what events fire on projectiles
+    static bool s_beaconDiagDone = false;
+    static bool s_dartDiagDone = false;
+
     ProcessEventHook hook;
     hook.Name = "PlasmidHijacks";
     hook.FunctionFilter = "";
     hook.Callback = [](UObject* obj, UFunction* func, void* parms) -> bool {
-        std::string className = obj->GetObjClassName();
         std::string funcName = func->GetName();
 
         // ─── SECURITY BULLSEYE → TELEPORT ─────────────────────────
-        // Track the BeaconProjectile. When it hits something (HitWall/Touch/Landed),
-        // read its Location and teleport the player there.
-        if (className == "BeaconProjectile") {
+        // Log ALL events on BeaconProjectile to diagnose which ones fire
+        if (IsA(obj, "BeaconProjectile") || obj->GetObjClassName() == "BeaconProjectile") {
+            FVector projLoc = obj->GetField<FVector>(s_LocationOffset);
+
+            if (!s_beaconDiagDone) {
+                LOG_INFO("[Teleport][DIAG] BeaconProjectile event: {} @ ({:.0f}, {:.0f}, {:.0f})",
+                         funcName, projLoc.X, projLoc.Y, projLoc.Z);
+            }
+
+            // Detect impact: any collision/touch/hit event
             if (funcName == "HitWall" || funcName == "Touch" ||
                 funcName == "Landed" || funcName == "ProcessLanded" ||
                 funcName == "OnAttached" || funcName == "EncroachingOn" ||
-                funcName == "EncroachedBy") {
-                // Projectile hit something — read its location
-                FVector impactLoc = obj->GetField<FVector>(s_LocationOffset);
+                funcName == "EncroachedBy" || funcName == "PhysicsVolumeChange" ||
+                funcName == "TriggerEffectEvent" || funcName == "WeaponImpacted" ||
+                funcName == "OnDetached") {
 
-                // Sanity check — skip if location is zero (uninitialized)
-                if (impactLoc.X != 0.0f || impactLoc.Y != 0.0f || impactLoc.Z != 0.0f) {
-                    LOG_INFO("[Teleport] Beacon hit at ({:.0f}, {:.0f}, {:.0f}) — teleporting!",
-                             impactLoc.X, impactLoc.Y, impactLoc.Z);
-                    // Teleport player to impact point (slightly above to avoid clipping)
-                    DoTeleportTo(impactLoc.X, impactLoc.Y, impactLoc.Z + 50.0f);
+                if (projLoc.X != 0.0f || projLoc.Y != 0.0f || projLoc.Z != 0.0f) {
+                    LOG_INFO("[Teleport] Beacon impact ({}) at ({:.0f}, {:.0f}, {:.0f})!",
+                             funcName, projLoc.X, projLoc.Y, projLoc.Z);
+                    DoTeleportTo(projLoc.X, projLoc.Y, projLoc.Z + 80.0f);
+                    s_beaconDiagDone = true; // Only teleport once per throw
                 }
-                return true; // Block original beacon behavior
+                return true; // Block original
             }
 
-            // Block all other BeaconProjectile events to prevent tagging enemies
-            if (funcName == "PostBeginPlay" || funcName == "Tick") {
-                // Let these through so the projectile actually moves
-                return false;
+            // Don't block movement/tick events — projectile needs to fly
+            return false;
+        }
+
+        // ─── SECURITY BULLSEYE ABILITY FIRE ──────────────────────
+        if (obj->GetObjClassName() == "SecurityBeaconAbility") {
+            if (funcName == "UseAbility" || funcName == "StartedUsingAbility") {
+                LOG_INFO("[Teleport] Security Bullseye fired — waiting for beacon impact...");
+                s_beaconDiagDone = false; // Reset for this throw
+                return false; // Let it fire the projectile
             }
         }
 
         // ─── HYPNOTIZE BIG DADDY → SUMMON ────────────────────────
-        // Track the SummonGathererDartProjectile. When it hits, summon a
-        // friendly Big Daddy at that location.
-        if (className == "SummonGathererDartProjectile" ||
-            className == "CrossbowProjectile") {
-            // Check if this is the hypnotize dart specifically
-            // CrossbowProjectile is parent class, but we only want the summon dart
-            if (className == "SummonGathererDartProjectile") {
-                if (funcName == "HitWall" || funcName == "Touch" ||
-                    funcName == "Landed" || funcName == "ProcessLanded" ||
-                    funcName == "OnAttached") {
-                    FVector impactLoc = obj->GetField<FVector>(s_LocationOffset);
+        if (IsA(obj, "SummonGathererDartProjectile") ||
+            obj->GetObjClassName() == "SummonGathererDartProjectile") {
+            FVector projLoc = obj->GetField<FVector>(s_LocationOffset);
 
-                    if (impactLoc.X != 0.0f || impactLoc.Y != 0.0f || impactLoc.Z != 0.0f) {
-                        LOG_INFO("[BigDaddy] Dart hit at ({:.0f}, {:.0f}, {:.0f}) — summoning!",
-                                 impactLoc.X, impactLoc.Y, impactLoc.Z);
-                        SummonBigDaddyAt(impactLoc.X, impactLoc.Y, impactLoc.Z + 50.0f);
-                    }
-                    return true; // Block original hypnotize behavior
+            if (!s_dartDiagDone) {
+                LOG_INFO("[BigDaddy][DIAG] Dart event: {} @ ({:.0f}, {:.0f}, {:.0f})",
+                         funcName, projLoc.X, projLoc.Y, projLoc.Z);
+            }
+
+            if (funcName == "HitWall" || funcName == "Touch" ||
+                funcName == "Landed" || funcName == "ProcessLanded" ||
+                funcName == "OnAttached" || funcName == "TriggerEffectEvent" ||
+                funcName == "WeaponImpacted" || funcName == "OnDetached") {
+
+                if (projLoc.X != 0.0f || projLoc.Y != 0.0f || projLoc.Z != 0.0f) {
+                    LOG_INFO("[BigDaddy] Dart impact ({}) at ({:.0f}, {:.0f}, {:.0f})!",
+                             funcName, projLoc.X, projLoc.Y, projLoc.Z);
+                    SummonBigDaddyAt(projLoc.X, projLoc.Y, projLoc.Z + 80.0f);
+                    s_dartDiagDone = true;
                 }
+                return true;
             }
+
+            return false;
         }
 
-        // ─── Block the original ability effects ──────────────────
-        // Prevent SecurityBeaconAbility from applying its security tag
-        if (className == "SecurityBeaconAbility") {
-            if (funcName == "UseAbility") {
-                // Let it fire the projectile (we need the projectile to track)
-                // but log it
-                LOG_INFO("[Teleport] Security Bullseye fired — tracking projectile...");
-                return false; // Don't block, let projectile spawn
-            }
-        }
-
-        // Prevent SummonProtectorAbility from doing its normal thing
-        if (className == "SummonProtectorAbility" ||
-            className == "SummonProtectorTwoAbility") {
-            if (funcName == "UseAbility") {
-                LOG_INFO("[BigDaddy] Hypnotize fired — tracking dart...");
-                return false; // Don't block, let dart spawn
+        // ─── HYPNOTIZE ABILITY FIRE ──────────────────────────────
+        if (obj->GetObjClassName() == "SummonProtectorAbility" ||
+            obj->GetObjClassName() == "SummonProtectorTwoAbility") {
+            if (funcName == "UseAbility" || funcName == "StartedUsingAbility") {
+                LOG_INFO("[BigDaddy] Hypnotize fired — waiting for dart impact...");
+                s_dartDiagDone = false;
+                return false;
             }
         }
 
