@@ -1,4 +1,5 @@
 #include "coop_sync.h"
+#include "coop_puppet.h"
 #include "net_manager.h"
 #include "net_common.h"
 #include "../core/log.h"
@@ -106,38 +107,141 @@ static UObject* FindActorByHashAndPos(uint32_t nameHash, float tx, float ty, flo
 
 // ─── Damage Sync ───────────────────────────────────────────────────────
 
+// Cached pointers for calling TakeDamage via ProcessEvent
+static UFunction* s_TakeDamageFunc = nullptr;
+static UObject*   s_DefaultDamageStimuli = nullptr;
+
+/// Find a DamageStimuliSet object from GObjects for reuse in remote damage calls.
+static UObject* FindDamageStimuliSet()
+{
+    if (s_DefaultDamageStimuli) return s_DefaultDamageStimuli;
+
+    const auto& globals = GetEngineGlobals();
+    if (!globals.IsValid()) return nullptr;
+
+    uintptr_t objData = *reinterpret_cast<uintptr_t*>(globals.GObjects);
+    int32_t objCount = *reinterpret_cast<int32_t*>(globals.GObjects + 4);
+
+    for (int i = 0; i < objCount && i < 100000; i++) {
+        uintptr_t ptr = *reinterpret_cast<uintptr_t*>(objData + i * 4);
+        if (!ptr) continue;
+        UObject* obj = reinterpret_cast<UObject*>(ptr);
+        if (obj->GetObjClassName() == "DamageStimuliSet") {
+            s_DefaultDamageStimuli = obj;
+            LOG_INFO("[Co-op Sync] Found DamageStimuliSet: {}", obj->GetName());
+            return obj;
+        }
+    }
+    return nullptr;
+}
+
+/// Find TakeDamage function on a class, caching for reuse.
+static UFunction* FindTakeDamageFunc(UStruct* cls)
+{
+    if (s_TakeDamageFunc) return s_TakeDamageFunc;
+    UField* child = cls->GetChildren();
+    int limit = 4000;
+    while (child && limit-- > 0) {
+        if (child->GetObjClassName() == "Function" && child->GetName() == "TakeDamage") {
+            s_TakeDamageFunc = reinterpret_cast<UFunction*>(child);
+            return s_TakeDamageFunc;
+        }
+        child = child->GetNext();
+    }
+    // Walk super
+    UField* super = cls->GetSuperField();
+    if (super && limit > 0)
+        return FindTakeDamageFunc(reinterpret_cast<UStruct*>(super));
+    return nullptr;
+}
+
 /// Apply damage from remote peer to a local actor.
+/// Calls TakeDamage via ProcessEvent so the enemy flinches, plays hit
+/// animation, blood effects, etc. Falls back to raw HP write if needed.
 static void ApplyRemoteDamage(const DamageData& dmg)
 {
     UObject* target = FindActorByHashAndPos(dmg.targetNameHash,
                                             dmg.targetX, dmg.targetY, dmg.targetZ);
     if (!target) return;
 
-    // Find the TakeDamage function on the target
     UStruct* cls = reinterpret_cast<UStruct*>(target->GetClass());
     if (!cls) return;
 
-    // We'll directly modify the Health property as a fallback
-    // since calling TakeDamage via ProcessEvent requires parameter struct knowledge
-    std::vector<PropertyInfo> props = WalkProperties(cls);
-    PropertyInfo* healthPi = FindProperty(cls, "Health", props);
-    if (!healthPi) return;
-
-    float currentHealth;
-    const uint8_t* raw = reinterpret_cast<const uint8_t*>(target);
-    memcpy(&currentHealth, raw + healthPi->Offset, 4);
-
-    float newHealth = currentHealth - dmg.amount;
-    if (newHealth < 0.0f) newHealth = 0.0f;
-
-    // Apply
     s_ApplyingRemoteDamage = true;
-    uint8_t* rawW = reinterpret_cast<uint8_t*>(target);
-    memcpy(rawW + healthPi->Offset, &newHealth, 4);
-    s_ApplyingRemoteDamage = false;
 
-    LOG_INFO("[Co-op Sync] Applied {:.0f} damage to '{}' (HP: {:.0f} -> {:.0f})",
-             dmg.amount, target->GetName(), currentHealth, newHealth);
+    // Try to call TakeDamage via ProcessEvent for full hit reaction
+    ProcessEventFn origPE = GetOriginalProcessEvent();
+    UFunction* takeDmg = FindTakeDamageFunc(cls);
+    UObject* stimSet = FindDamageStimuliSet();
+
+    if (origPE && takeDmg && stimSet) {
+        // TakeDamage(DamageStimuliSet DamageStimuli, float CritChance,
+        //            Actor Damager, Vector HitLocation, Vector HitNormal,
+        //            Vector HitImpulseDirection, name EffectEventName,
+        //            float DamageAttenuation, ...)
+        //
+        // Parms layout:
+        //   +0x00: UObject* DamageStimuli          (4)
+        //   +0x04: float    CritChance             (4)
+        //   +0x08: UObject* Damager                (4)
+        //   +0x0C: FVector  HitLocation            (12)
+        //   +0x18: FVector  HitNormal              (12)
+        //   +0x24: FVector  HitImpulseDirection    (12)
+        //   +0x30: FName    EffectEventName        (8)
+        //   +0x38: float    DamageAttenuation      (4)
+        struct TakeDamageParms {
+            UObject* DamageStimuli;        // +0x00
+            float    CritChance;           // +0x04
+            UObject* Damager;              // +0x08
+            float    HitLocX, HitLocY, HitLocZ;     // +0x0C
+            float    HitNormX, HitNormY, HitNormZ;  // +0x18
+            float    HitImpX, HitImpY, HitImpZ;     // +0x24
+            uint32_t EffectEventName[2];   // +0x30 FName (None)
+            float    DamageAttenuation;    // +0x38
+        };
+
+        TakeDamageParms parms{};
+        parms.DamageStimuli = stimSet;
+        parms.CritChance = 0.0f;
+        parms.Damager = nullptr; // no specific damager (remote player isn't a local actor)
+        parms.HitLocX = dmg.hitX;
+        parms.HitLocY = dmg.hitY;
+        parms.HitLocZ = dmg.hitZ;
+        parms.HitNormX = 0; parms.HitNormY = 0; parms.HitNormZ = 1.0f;
+        parms.HitImpX = 0; parms.HitImpY = 0; parms.HitImpZ = 0;
+        parms.EffectEventName[0] = 0; parms.EffectEventName[1] = 0; // 'None'
+        parms.DamageAttenuation = 1.0f;
+
+        origPE(target, takeDmg, &parms, nullptr);
+
+        float newHP = 0;
+        if (s_SyncHealthOffset > 0) {
+            const uint8_t* raw = reinterpret_cast<const uint8_t*>(target);
+            memcpy(&newHP, raw + s_SyncHealthOffset, 4);
+        }
+        LOG_INFO("[Co-op Sync] TakeDamage on '{}' (HP now: {:.0f})",
+                 target->GetName(), newHP);
+    } else {
+        // Fallback: direct HP write (no hit reaction)
+        std::vector<PropertyInfo> props = WalkProperties(cls);
+        PropertyInfo* healthPi = FindProperty(cls, "Health", props);
+        if (healthPi) {
+            float currentHealth;
+            const uint8_t* raw = reinterpret_cast<const uint8_t*>(target);
+            memcpy(&currentHealth, raw + healthPi->Offset, 4);
+
+            float newHealth = currentHealth - dmg.amount;
+            if (newHealth < 0.0f) newHealth = 0.0f;
+
+            uint8_t* rawW = reinterpret_cast<uint8_t*>(target);
+            memcpy(rawW + healthPi->Offset, &newHealth, 4);
+
+            LOG_INFO("[Co-op Sync] Fallback: Applied {:.0f} damage to '{}' (HP: {:.0f} -> {:.0f})",
+                     dmg.amount, target->GetName(), currentHealth, newHealth);
+        }
+    }
+
+    s_ApplyingRemoteDamage = false;
 }
 
 /// Apply world event from remote peer.
@@ -303,6 +407,8 @@ static TriggerSyncData s_PendingTriggers[16];
 static int s_PendingTriggerCount = 0;
 static EnemyHPSyncData s_PendingEnemyHP[4];
 static int s_PendingEnemyHPCount = 0;
+static PlayerActionData s_PendingActions[8];
+static int s_PendingActionCount = 0;
 
 void QueueDamagePacket(const DamageData& dmg)
 {
@@ -350,6 +456,13 @@ void QueueEnemyHPSyncPacket(const EnemyHPSyncData& hpSync)
 {
     if (s_PendingEnemyHPCount < 4) {
         s_PendingEnemyHP[s_PendingEnemyHPCount++] = hpSync;
+    }
+}
+
+void QueuePlayerActionPacket(const PlayerActionData& action)
+{
+    if (s_PendingActionCount < 8) {
+        s_PendingActions[s_PendingActionCount++] = action;
     }
 }
 
@@ -604,6 +717,61 @@ static void InstallTriggerHook()
     s_TriggerHookId = RegisterProcessEventHook(hook);
 }
 
+// ─── Weapon Action Hook ───────────────────────────────────────────────
+
+static int s_ActionHookId = -1;
+
+static void InstallActionHook()
+{
+    ProcessEventHook hook;
+    hook.Name = "CoopActionSync";
+    hook.Callback = [](UObject* obj, UFunction* func, void* parms) -> bool {
+        std::string funcName = func->GetName();
+
+        // Detect weapon firing
+        if (funcName == "BeginFiring" || funcName == "OnFiringStarted" ||
+            funcName == "PendingFire") {
+            std::string cn = obj->GetObjClassName();
+            // Only player weapons (not AI weapons)
+            if (cn.find("Player") == std::string::npos &&
+                cn.find("Wrench") == std::string::npos &&
+                cn.find("Pistol") == std::string::npos &&
+                cn.find("Shotgun") == std::string::npos &&
+                cn.find("Launcher") == std::string::npos &&
+                cn.find("Thrower") == std::string::npos &&
+                cn.find("Crossbow") == std::string::npos)
+                return false;
+
+            PlayerActionData action{};
+            // Determine action type
+            if (cn.find("Wrench") != std::string::npos ||
+                cn.find("Melee") != std::string::npos) {
+                action.action = ActionType::MeleeSwing;
+            } else {
+                action.action = ActionType::WeaponFire;
+            }
+            action.weaponId = 0; // TODO: map weapon class to ID
+
+            NetSendRawPacket(PacketType::PlayerAction, &action, sizeof(action));
+            return false;
+        }
+
+        // Detect plasmid usage
+        if (funcName == "UseAbility") {
+            std::string cn = obj->GetObjClassName();
+            if (cn.find("Ability") != std::string::npos) {
+                PlayerActionData action{};
+                action.action = ActionType::PlasmidCast;
+                NetSendRawPacket(PacketType::PlayerAction, &action, sizeof(action));
+            }
+            return false;
+        }
+
+        return false;
+    };
+    s_ActionHookId = RegisterProcessEventHook(hook);
+}
+
 // ─── Public API ────────────────────────────────────────────────────────
 
 bool InitCoopSync()
@@ -628,6 +796,7 @@ bool InitCoopSync()
     InstallWorldHook();
     InstallDeathHook();
     InstallTriggerHook();
+    InstallActionHook();
 
     s_SyncInitialized = true;
     s_LocalPlayerDead = false;
@@ -642,10 +811,14 @@ void ShutdownCoopSync()
     if (s_WorldHookId >= 0) UnregisterProcessEventHook(s_WorldHookId);
     if (s_DeathHookId >= 0) UnregisterProcessEventHook(s_DeathHookId);
     if (s_TriggerHookId >= 0) UnregisterProcessEventHook(s_TriggerHookId);
+    if (s_ActionHookId >= 0) UnregisterProcessEventHook(s_ActionHookId);
     s_DamageHookId = -1;
     s_WorldHookId = -1;
     s_DeathHookId = -1;
     s_TriggerHookId = -1;
+    s_ActionHookId = -1;
+    s_TakeDamageFunc = nullptr;
+    s_DefaultDamageStimuli = nullptr;
     s_SyncInitialized = false;
 }
 
@@ -677,6 +850,12 @@ void CoopSyncProcessPackets(float deltaTime)
         ApplyRemoteDamage(s_PendingDamage[i]);
     }
     s_PendingDamageCount = 0;
+
+    // Process pending player actions (forward to puppet for visual effects)
+    for (int i = 0; i < s_PendingActionCount; i++) {
+        NotifyPuppetAction(s_PendingActions[i]);
+    }
+    s_PendingActionCount = 0;
 
     // Process pending world events
     for (int i = 0; i < s_PendingWorldEventCount; i++) {

@@ -238,6 +238,12 @@ static void ProcessIncoming()
                 QueueEnemyHPSyncPacket(*reinterpret_cast<const EnemyHPSyncData*>(payload));
             }
             break;
+        case PacketType::PlayerAction:
+            if (hdr->size >= sizeof(PlayerActionData)) {
+                s_RemotePeer.lastRecvTime = s_Uptime;
+                QueuePlayerActionPacket(*reinterpret_cast<const PlayerActionData*>(payload));
+            }
+            break;
         default:
             break;
         }

@@ -21,7 +21,7 @@ enum class PacketType : uint8_t {
     Handshake    = 0x01,  // Initial connection
     HandshakeAck = 0x02,  // Connection accepted
     PlayerState  = 0x10,  // Position, rotation, health, weapon
-    PlayerAction = 0x11,  // Discrete actions (fire, use, jump)
+    PlayerAction = 0x11,  // Discrete actions (fire, melee, plasmid)
     Damage       = 0x20,  // Damage event forwarding
     EnemyDeath   = 0x21,  // Enemy killed notification
     EnemyHPSync  = 0x22,  // Periodic enemy health snapshot
@@ -131,6 +131,22 @@ struct TriggerSyncData {
     float    posX, posY, posZ;    // trigger location
     uint8_t  state;               // 0=off, 1=on
     uint8_t  _pad[3];
+};
+
+// ─── Player Action Packet ─────────────────────────────────────────
+
+enum class ActionType : uint8_t {
+    MeleeSwing   = 0,   // Wrench or melee weapon swing
+    WeaponFire   = 1,   // Gun fired
+    PlasmidCast  = 2,   // Plasmid ability used
+    Reload       = 3,   // Weapon reload
+};
+
+struct PlayerActionData {
+    ActionType action;
+    uint8_t    weaponId;          // which weapon/plasmid
+    uint8_t    _pad[2];
+    float      dirX, dirY, dirZ;  // aim direction at time of action
 };
 
 // ─── Enemy HP Sync Packet ─────────────────────────────────────────

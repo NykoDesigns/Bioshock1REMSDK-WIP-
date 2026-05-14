@@ -33,6 +33,7 @@ struct PlayerDeathData;
 struct PlayerRespawnData;
 struct TriggerSyncData;
 struct EnemyHPSyncData;
+struct PlayerActionData;
 
 void QueueDamagePacket(const DamageData& dmg);
 void QueueWorldEventPacket(const WorldEventData& evt);
@@ -41,5 +42,6 @@ void QueuePlayerDeathPacket(const PlayerDeathData& death);
 void QueuePlayerRespawnPacket(const PlayerRespawnData& respawn);
 void QueueTriggerSyncPacket(const TriggerSyncData& trigger);
 void QueueEnemyHPSyncPacket(const EnemyHPSyncData& hpSync);
+void QueuePlayerActionPacket(const PlayerActionData& action);
 
 } // namespace bs1sdk

@@ -24,4 +24,13 @@ void DestroyGhostPuppet();
 /// Returns true if a puppet is currently alive in the world.
 bool HasGhostPuppet();
 
+/// Notify the puppet that the remote player performed an action.
+/// Used to display visual effects (melee swing, muzzle flash, etc.)
+struct PlayerActionData;
+void NotifyPuppetAction(const PlayerActionData& action);
+
+/// Get the puppet's last known action for rendering effects.
+/// Returns the action type or -1 if no recent action.
+int GetPuppetLastAction(float& timeSinceAction);
+
 } // namespace bs1sdk

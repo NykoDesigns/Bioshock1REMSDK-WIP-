@@ -1,4 +1,5 @@
 #include "coop_render.h"
+#include "coop_puppet.h"
 #include "../core/log.h"
 
 #include <imgui.h>
@@ -276,6 +277,49 @@ void RenderCoopOverlay()
 
     dl->AddRectFilled(barStart, ImVec2(barStart.x + barW * healthPct, barEnd.y), hpCol, 2.0f);
     dl->AddRect(barStart, barEnd, IM_COL32(200, 200, 200, 80), 2.0f);
+
+    // ─── Action effects ───
+    float actionTime;
+    int actionType = GetPuppetLastAction(actionTime);
+    if (actionType >= 0 && actionTime < 0.5f) {
+        float fade = 1.0f - (actionTime / 0.5f); // fade out over 0.5s
+        uint8_t alpha = (uint8_t)(fade * 220);
+
+        switch (actionType) {
+        case 0: { // MeleeSwing — draw arc sweep
+            float arcRadius = 30.0f * scale;
+            float startAngle = -0.8f + actionTime * 6.0f; // sweep animation
+            for (int seg = 0; seg < 8; seg++) {
+                float a1 = startAngle + seg * 0.2f;
+                float a2 = startAngle + (seg + 1) * 0.2f;
+                dl->AddLine(
+                    ImVec2(center.x + cosf(a1) * arcRadius, center.y + sinf(a1) * arcRadius),
+                    ImVec2(center.x + cosf(a2) * arcRadius, center.y + sinf(a2) * arcRadius),
+                    IM_COL32(255, 200, 50, alpha), 3.0f * fade
+                );
+            }
+            break;
+        }
+        case 1: { // WeaponFire — muzzle flash burst
+            float burstSize = 20.0f * scale * (1.0f - actionTime * 2.0f);
+            if (burstSize > 2.0f) {
+                ImVec2 muzzle(center.x, center.y - markerSize * 0.5f);
+                dl->AddCircleFilled(muzzle, burstSize, IM_COL32(255, 220, 100, alpha));
+                dl->AddCircleFilled(muzzle, burstSize * 0.5f, IM_COL32(255, 255, 200, alpha));
+            }
+            break;
+        }
+        case 2: { // PlasmidCast — blue/electric glow
+            float glowSize = 25.0f * scale * fade;
+            dl->AddCircleFilled(center, glowSize, IM_COL32(50, 150, 255, (uint8_t)(alpha * 0.4f)));
+            dl->AddCircle(center, glowSize, IM_COL32(100, 200, 255, alpha), 12, 2.0f);
+            dl->AddCircle(center, glowSize * 1.5f, IM_COL32(80, 180, 255, (uint8_t)(alpha * 0.3f)), 12, 1.0f);
+            break;
+        }
+        default:
+            break;
+        }
+    }
 }
 
 } // namespace bs1sdk

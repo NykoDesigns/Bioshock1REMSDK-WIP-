@@ -26,6 +26,10 @@ static float s_TargetX = 0, s_TargetY = 0, s_TargetZ = 0;
 static float s_TargetPitch = 0, s_TargetYaw = 0;
 static bool  s_HasTarget = false;
 
+// Action tracking for visual effects
+static int   s_LastAction = -1;       // ActionType or -1
+static float s_ActionTimer = 999.0f;  // time since last action
+
 // ─── Helpers ───────────────────────────────────────────────────────────
 
 /// Find a UFunction by name on a class, walking the Children linked list.
@@ -275,9 +279,12 @@ void UpdateGhostPuppet(const PlayerStateData& remoteState)
         return;
     }
 
+    // Tick the action timer
+    float dt = 1.0f / 60.0f; // approximate frame time
+    s_ActionTimer += dt;
+
     // Smooth interpolation toward target
     float lerpSpeed = 10.0f; // higher = snappier
-    float dt = 1.0f / 60.0f; // approximate; will use real dt when available
     float t = 1.0f - expf(-lerpSpeed * dt);
 
     s_InterpX += (s_TargetX - s_InterpX) * t;
@@ -330,6 +337,20 @@ void DestroyGhostPuppet()
 bool HasGhostPuppet()
 {
     return s_Puppet != nullptr;
+}
+
+void NotifyPuppetAction(const PlayerActionData& action)
+{
+    s_LastAction = static_cast<int>(action.action);
+    s_ActionTimer = 0.0f;
+    LOG_INFO("[Puppet] Remote player action: {}", s_LastAction);
+}
+
+int GetPuppetLastAction(float& timeSinceAction)
+{
+    timeSinceAction = s_ActionTimer;
+    if (s_ActionTimer > 1.0f) return -1; // expired after 1 second
+    return s_LastAction;
 }
 
 } // namespace bs1sdk
