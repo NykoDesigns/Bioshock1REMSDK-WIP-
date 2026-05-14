@@ -16,12 +16,20 @@ namespace bs1sdk {
 static bool s_SyncInitialized = false;
 static int  s_DamageHookId = -1;
 static int  s_WorldHookId = -1;
+static int  s_DeathHookId = -1;
+static int  s_TriggerHookId = -1;
 
 // Property offsets (shared with coop_bridge via extern or re-cached)
 static int s_SyncLocOffset = -1;
+static int s_SyncHealthOffset = -1;
 
 // Flag to prevent echo (don't re-send damage we received from remote)
 static bool s_ApplyingRemoteDamage = false;
+static bool s_ApplyingRemoteDeath = false;
+
+// Track player death state for respawn detection
+static bool s_LocalPlayerDead = false;
+static float s_DeathCheckTimer = 0.0f;
 
 // ─── Helpers ───────────────────────────────────────────────────────────
 
@@ -255,6 +263,14 @@ static DamageData s_PendingDamage[16];
 static int s_PendingDamageCount = 0;
 static WorldEventData s_PendingWorldEvents[16];
 static int s_PendingWorldEventCount = 0;
+static EnemyDeathData s_PendingEnemyDeaths[16];
+static int s_PendingEnemyDeathCount = 0;
+static PlayerDeathData s_PendingPlayerDeaths[4];
+static int s_PendingPlayerDeathCount = 0;
+static PlayerRespawnData s_PendingPlayerRespawns[4];
+static int s_PendingPlayerRespawnCount = 0;
+static TriggerSyncData s_PendingTriggers[16];
+static int s_PendingTriggerCount = 0;
 
 void QueueDamagePacket(const DamageData& dmg)
 {
@@ -270,13 +286,280 @@ void QueueWorldEventPacket(const WorldEventData& evt)
     }
 }
 
+void QueueEnemyDeathPacket(const EnemyDeathData& death)
+{
+    if (s_PendingEnemyDeathCount < 16) {
+        s_PendingEnemyDeaths[s_PendingEnemyDeathCount++] = death;
+    }
+}
+
+void QueuePlayerDeathPacket(const PlayerDeathData& death)
+{
+    if (s_PendingPlayerDeathCount < 4) {
+        s_PendingPlayerDeaths[s_PendingPlayerDeathCount++] = death;
+    }
+}
+
+void QueuePlayerRespawnPacket(const PlayerRespawnData& respawn)
+{
+    if (s_PendingPlayerRespawnCount < 4) {
+        s_PendingPlayerRespawns[s_PendingPlayerRespawnCount++] = respawn;
+    }
+}
+
+void QueueTriggerSyncPacket(const TriggerSyncData& trigger)
+{
+    if (s_PendingTriggerCount < 16) {
+        s_PendingTriggers[s_PendingTriggerCount++] = trigger;
+    }
+}
+
+// ─── IsA helper (check class inheritance) ────────────────────────────
+
+static bool IsA(UObject* obj, const std::string& baseClassName)
+{
+    if (!obj) return false;
+    UObject* cls = obj->GetClass();
+    if (!cls) return false;
+    UField* current = reinterpret_cast<UField*>(cls);
+    int safety = 64;
+    while (current && safety-- > 0) {
+        if (current->GetName() == baseClassName) return true;
+        current = current->GetSuperField();
+    }
+    return false;
+}
+
+// ─── Find actor by class name + position (improved matching) ─────────
+
+static UObject* FindActorByClassAndPos(const std::string& className, float tx, float ty, float tz, float tolerance = 500.0f)
+{
+    const auto& globals = GetEngineGlobals();
+    if (!globals.IsValid()) return nullptr;
+
+    uintptr_t objData = *reinterpret_cast<uintptr_t*>(globals.GObjects);
+    int32_t objCount = *reinterpret_cast<int32_t*>(globals.GObjects + 4);
+
+    UObject* bestMatch = nullptr;
+    float bestDist = tolerance;
+
+    for (int i = 0; i < objCount && i < 100000; i++) {
+        uintptr_t ptr = *reinterpret_cast<uintptr_t*>(objData + i * 4);
+        if (!ptr) continue;
+        UObject* obj = reinterpret_cast<UObject*>(ptr);
+
+        // Match by class name (exact or inheritance)
+        std::string cn = obj->GetObjClassName();
+        if (cn != className && !IsA(obj, className)) continue;
+        if (cn == "Class") continue; // skip class objects
+
+        // Position check
+        if (s_SyncLocOffset > 0) {
+            const uint8_t* raw = reinterpret_cast<const uint8_t*>(obj);
+            float ox, oy, oz;
+            memcpy(&ox, raw + s_SyncLocOffset, 4);
+            memcpy(&oy, raw + s_SyncLocOffset + 4, 4);
+            memcpy(&oz, raw + s_SyncLocOffset + 8, 4);
+
+            float dx = ox - tx, dy = oy - ty, dz = oz - tz;
+            float dist = sqrtf(dx * dx + dy * dy + dz * dz);
+            if (dist < bestDist) {
+                // Also check the enemy is alive
+                if (s_SyncHealthOffset > 0) {
+                    float hp;
+                    memcpy(&hp, raw + s_SyncHealthOffset, 4);
+                    if (hp <= 0.0f) continue; // already dead
+                }
+                bestDist = dist;
+                bestMatch = obj;
+            }
+        }
+    }
+
+    return bestMatch;
+}
+
+// ─── Apply Remote Enemy Death ────────────────────────────────────────
+
+static void ApplyRemoteEnemyDeath(const EnemyDeathData& death)
+{
+    UObject* target = FindActorByClassAndPos(death.className, death.posX, death.posY, death.posZ);
+    if (!target) {
+        LOG_WARN("[Co-op Sync] Could not find matching {} near ({:.0f},{:.0f},{:.0f}) to kill",
+                 death.className, death.posX, death.posY, death.posZ);
+        return;
+    }
+
+    // Kill by setting health to 0
+    if (s_SyncHealthOffset > 0) {
+        s_ApplyingRemoteDeath = true;
+        uint8_t* raw = reinterpret_cast<uint8_t*>(target);
+        float zero = 0.0f;
+        memcpy(raw + s_SyncHealthOffset, &zero, 4);
+        s_ApplyingRemoteDeath = false;
+
+        LOG_INFO("[Co-op Sync] Killed '{}' ({}) — partner got the kill!",
+                 target->GetName(), death.className);
+    }
+}
+
+// ─── Apply Remote Player Death/Respawn ───────────────────────────────
+
+static void ApplyRemotePlayerDeath(const PlayerDeathData& death)
+{
+    LOG_WARN("[Co-op] Partner died at ({:.0f},{:.0f},{:.0f}) — killed by {}",
+             death.posX, death.posY, death.posZ, death.killerClass);
+}
+
+static void ApplyRemotePlayerRespawn(const PlayerRespawnData& respawn)
+{
+    LOG_INFO("[Co-op] Partner respawned at ({:.0f},{:.0f},{:.0f})",
+             respawn.posX, respawn.posY, respawn.posZ);
+}
+
+// ─── Apply Remote Trigger ────────────────────────────────────────────
+
+static void ApplyRemoteTrigger(const TriggerSyncData& trigger)
+{
+    UObject* actor = FindActorByHashAndPos(trigger.triggerNameHash,
+                                            trigger.posX, trigger.posY, trigger.posZ, 200.0f);
+    if (!actor) return;
+
+    // Try to call Trigger() on the actor via ProcessEvent
+    UStruct* cls = reinterpret_cast<UStruct*>(actor->GetClass());
+    if (!cls) return;
+
+    UField* child = cls->GetChildren();
+    int limit = 2000;
+    while (child && limit-- > 0) {
+        if (child->GetObjClassName() == "Function" && child->GetName() == "Trigger") {
+            ProcessEventFn origPE = GetOriginalProcessEvent();
+            if (origPE) {
+                // Trigger(Actor Other, Pawn EventInstigator)
+                struct { UObject* Other; UObject* Instigator; } parms{};
+                parms.Other = FindObjectByClassName("ShockPlayer");
+                parms.Instigator = parms.Other;
+                origPE(actor, reinterpret_cast<UFunction*>(child), &parms, nullptr);
+                LOG_INFO("[Co-op Sync] Triggered '{}' from partner", actor->GetName());
+            }
+            break;
+        }
+        child = child->GetNext();
+    }
+}
+
+// ─── Death/Trigger Hooks ──────────────────────────────────────────────
+
+static void InstallDeathHook()
+{
+    ProcessEventHook hook;
+    hook.Name = "CoopDeathSync";
+    hook.Callback = [](UObject* obj, UFunction* func, void* parms) -> bool {
+        if (s_ApplyingRemoteDeath) return false;
+
+        std::string funcName = func->GetName();
+        if (funcName != "Died") return false;
+
+        std::string cn = obj->GetObjClassName();
+
+        // ─── Enemy died ───
+        if (cn != "ShockPlayer" && cn != "ShockPlayerController" &&
+            (IsA(obj, "ShockPawn") || IsA(obj, "Pawn"))) {
+
+            float px = 0, py = 0, pz = 0;
+            if (s_SyncLocOffset > 0) {
+                const uint8_t* raw = reinterpret_cast<const uint8_t*>(obj);
+                memcpy(&px, raw + s_SyncLocOffset, 4);
+                memcpy(&py, raw + s_SyncLocOffset + 4, 4);
+                memcpy(&pz, raw + s_SyncLocOffset + 8, 4);
+            }
+
+            EnemyDeathData death{};
+            strncpy(death.className, cn.c_str(), sizeof(death.className) - 1);
+            death.nameHash = FnvHash(obj->GetName());
+            death.posX = px; death.posY = py; death.posZ = pz;
+
+            NetSendRawPacket(PacketType::EnemyDeath, &death, sizeof(death));
+            LOG_INFO("[Co-op Sync] Sent enemy death: {} at ({:.0f},{:.0f},{:.0f})",
+                     cn, px, py, pz);
+            return false;
+        }
+
+        // ─── Player died ───
+        if (cn == "ShockPlayer") {
+            float px = 0, py = 0, pz = 0;
+            if (s_SyncLocOffset > 0) {
+                const uint8_t* raw = reinterpret_cast<const uint8_t*>(obj);
+                memcpy(&px, raw + s_SyncLocOffset, 4);
+                memcpy(&py, raw + s_SyncLocOffset + 4, 4);
+                memcpy(&pz, raw + s_SyncLocOffset + 8, 4);
+            }
+
+            PlayerDeathData death{};
+            death.posX = px; death.posY = py; death.posZ = pz;
+
+            // Try to get killer class from parms
+            // Died(Controller Killer, class DamageType, vector HitLoc)
+            if (parms) {
+                UObject* killer = *reinterpret_cast<UObject**>(parms);
+                if (killer) {
+                    std::string killerCn = killer->GetObjClassName();
+                    strncpy(death.killerClass, killerCn.c_str(), sizeof(death.killerClass) - 1);
+                }
+            }
+
+            NetSendRawPacket(PacketType::PlayerDeath, &death, sizeof(death));
+            s_LocalPlayerDead = true;
+            LOG_WARN("[Co-op] You died! Notifying partner...");
+            return false;
+        }
+
+        return false;
+    };
+    s_DeathHookId = RegisterProcessEventHook(hook);
+}
+
+static void InstallTriggerHook()
+{
+    ProcessEventHook hook;
+    hook.Name = "CoopTriggerSync";
+    hook.Callback = [](UObject* obj, UFunction* func, void* parms) -> bool {
+        std::string funcName = func->GetName();
+        if (funcName != "TriggerEvent" && funcName != "Trigger") return false;
+
+        std::string cn = obj->GetObjClassName();
+        // Only sync Trigger/TriggerVolume/SequenceAction actors
+        if (cn.find("Trigger") == std::string::npos &&
+            cn.find("Sequence") == std::string::npos &&
+            cn.find("Kismet") == std::string::npos)
+            return false;
+
+        float px = 0, py = 0, pz = 0;
+        if (s_SyncLocOffset > 0) {
+            const uint8_t* raw = reinterpret_cast<const uint8_t*>(obj);
+            memcpy(&px, raw + s_SyncLocOffset, 4);
+            memcpy(&py, raw + s_SyncLocOffset + 4, 4);
+            memcpy(&pz, raw + s_SyncLocOffset + 8, 4);
+        }
+
+        TriggerSyncData trigger{};
+        trigger.triggerNameHash = FnvHash(obj->GetName());
+        trigger.posX = px; trigger.posY = py; trigger.posZ = pz;
+        trigger.state = 1;
+
+        NetSendRawPacket(PacketType::TriggerSync, &trigger, sizeof(trigger));
+        return false;
+    };
+    s_TriggerHookId = RegisterProcessEventHook(hook);
+}
+
 // ─── Public API ────────────────────────────────────────────────────────
 
 bool InitCoopSync()
 {
     if (s_SyncInitialized) return true;
 
-    // Cache Location offset
+    // Cache property offsets
     const auto& globals = GetEngineGlobals();
     if (globals.IsValid()) {
         UStruct* cls = FindClass("ShockPawn");
@@ -285,14 +568,19 @@ bool InitCoopSync()
             std::vector<PropertyInfo> props = WalkProperties(cls);
             PropertyInfo* pi = FindProperty(cls, "Location", props);
             if (pi) s_SyncLocOffset = pi->Offset;
+            PropertyInfo* hp = FindProperty(cls, "Health", props);
+            if (hp) s_SyncHealthOffset = hp->Offset;
         }
     }
 
     InstallDamageHook();
     InstallWorldHook();
+    InstallDeathHook();
+    InstallTriggerHook();
 
     s_SyncInitialized = true;
-    LOG_INFO("[Co-op Sync] Damage + world state sync initialized (LocOffset={})", s_SyncLocOffset);
+    s_LocalPlayerDead = false;
+    LOG_INFO("[Co-op Sync] Full sync initialized (Loc={}, Health={})", s_SyncLocOffset, s_SyncHealthOffset);
     return true;
 }
 
@@ -301,8 +589,12 @@ void ShutdownCoopSync()
     if (!s_SyncInitialized) return;
     if (s_DamageHookId >= 0) UnregisterProcessEventHook(s_DamageHookId);
     if (s_WorldHookId >= 0) UnregisterProcessEventHook(s_WorldHookId);
+    if (s_DeathHookId >= 0) UnregisterProcessEventHook(s_DeathHookId);
+    if (s_TriggerHookId >= 0) UnregisterProcessEventHook(s_TriggerHookId);
     s_DamageHookId = -1;
     s_WorldHookId = -1;
+    s_DeathHookId = -1;
+    s_TriggerHookId = -1;
     s_SyncInitialized = false;
 }
 
@@ -319,6 +611,53 @@ void CoopSyncProcessPackets()
         ApplyRemoteWorldEvent(s_PendingWorldEvents[i]);
     }
     s_PendingWorldEventCount = 0;
+
+    // Process pending enemy deaths
+    for (int i = 0; i < s_PendingEnemyDeathCount; i++) {
+        ApplyRemoteEnemyDeath(s_PendingEnemyDeaths[i]);
+    }
+    s_PendingEnemyDeathCount = 0;
+
+    // Process pending player deaths
+    for (int i = 0; i < s_PendingPlayerDeathCount; i++) {
+        ApplyRemotePlayerDeath(s_PendingPlayerDeaths[i]);
+    }
+    s_PendingPlayerDeathCount = 0;
+
+    // Process pending player respawns
+    for (int i = 0; i < s_PendingPlayerRespawnCount; i++) {
+        ApplyRemotePlayerRespawn(s_PendingPlayerRespawns[i]);
+    }
+    s_PendingPlayerRespawnCount = 0;
+
+    // Process pending triggers
+    for (int i = 0; i < s_PendingTriggerCount; i++) {
+        ApplyRemoteTrigger(s_PendingTriggers[i]);
+    }
+    s_PendingTriggerCount = 0;
+
+    // Check for player respawn (health went from 0 to >0)
+    if (s_LocalPlayerDead && s_SyncHealthOffset > 0) {
+        UObject* player = FindObjectByClassName("ShockPlayer");
+        if (player) {
+            float hp;
+            const uint8_t* raw = reinterpret_cast<const uint8_t*>(player);
+            memcpy(&hp, raw + s_SyncHealthOffset, 4);
+            if (hp > 0.0f) {
+                s_LocalPlayerDead = false;
+                float px = 0, py = 0, pz = 0;
+                if (s_SyncLocOffset > 0) {
+                    memcpy(&px, raw + s_SyncLocOffset, 4);
+                    memcpy(&py, raw + s_SyncLocOffset + 4, 4);
+                    memcpy(&pz, raw + s_SyncLocOffset + 8, 4);
+                }
+                PlayerRespawnData respawn{};
+                respawn.posX = px; respawn.posY = py; respawn.posZ = pz;
+                NetSendRawPacket(PacketType::PlayerRespawn, &respawn, sizeof(respawn));
+                LOG_INFO("[Co-op] Respawned! Notifying partner...");
+            }
+        }
+    }
 }
 
 void CoopSendDamage(float amount, float hitX, float hitY, float hitZ,

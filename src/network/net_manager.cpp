@@ -208,6 +208,30 @@ static void ProcessIncoming()
                 if (s_OnChat) s_OnChat(s_RemotePeer.name, chatData->message);
             }
             break;
+        case PacketType::EnemyDeath:
+            if (hdr->size >= sizeof(EnemyDeathData)) {
+                s_RemotePeer.lastRecvTime = s_Uptime;
+                QueueEnemyDeathPacket(*reinterpret_cast<const EnemyDeathData*>(payload));
+            }
+            break;
+        case PacketType::PlayerDeath:
+            if (hdr->size >= sizeof(PlayerDeathData)) {
+                s_RemotePeer.lastRecvTime = s_Uptime;
+                QueuePlayerDeathPacket(*reinterpret_cast<const PlayerDeathData*>(payload));
+            }
+            break;
+        case PacketType::PlayerRespawn:
+            if (hdr->size >= sizeof(PlayerRespawnData)) {
+                s_RemotePeer.lastRecvTime = s_Uptime;
+                QueuePlayerRespawnPacket(*reinterpret_cast<const PlayerRespawnData*>(payload));
+            }
+            break;
+        case PacketType::TriggerSync:
+            if (hdr->size >= sizeof(TriggerSyncData)) {
+                s_RemotePeer.lastRecvTime = s_Uptime;
+                QueueTriggerSyncPacket(*reinterpret_cast<const TriggerSyncData*>(payload));
+            }
+            break;
         default:
             break;
         }

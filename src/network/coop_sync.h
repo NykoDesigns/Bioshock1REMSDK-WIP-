@@ -5,13 +5,13 @@
 namespace bs1sdk {
 
 /// Initialize co-op damage and world state synchronization.
-/// Hooks ProcessEvent for TakeDamage, doors, triggers, pickups.
+/// Hooks ProcessEvent for TakeDamage, Died, doors, triggers, pickups.
 bool InitCoopSync();
 
 /// Shutdown sync hooks.
 void ShutdownCoopSync();
 
-/// Process incoming damage/world packets (called from NetTick).
+/// Process incoming packets (called from CoopTick on game thread).
 void CoopSyncProcessPackets();
 
 /// Send a damage event to remote peer.
@@ -27,7 +27,16 @@ void CoopSendWorldEvent(uint8_t eventType, uint8_t state,
 /// Queue incoming packets for processing on game thread.
 struct DamageData;
 struct WorldEventData;
+struct EnemyDeathData;
+struct PlayerDeathData;
+struct PlayerRespawnData;
+struct TriggerSyncData;
+
 void QueueDamagePacket(const DamageData& dmg);
 void QueueWorldEventPacket(const WorldEventData& evt);
+void QueueEnemyDeathPacket(const EnemyDeathData& death);
+void QueuePlayerDeathPacket(const PlayerDeathData& death);
+void QueuePlayerRespawnPacket(const PlayerRespawnData& respawn);
+void QueueTriggerSyncPacket(const TriggerSyncData& trigger);
 
 } // namespace bs1sdk

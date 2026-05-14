@@ -23,7 +23,11 @@ enum class PacketType : uint8_t {
     PlayerState  = 0x10,  // Position, rotation, health, weapon
     PlayerAction = 0x11,  // Discrete actions (fire, use, jump)
     Damage       = 0x20,  // Damage event forwarding
+    EnemyDeath   = 0x21,  // Enemy killed notification
+    PlayerDeath  = 0x23,  // Local player died
+    PlayerRespawn= 0x24,  // Local player respawned
     WorldEvent   = 0x30,  // Door, trigger, pickup sync
+    TriggerSync  = 0x31,  // Story/script trigger sync
     Chat         = 0x40,  // Text chat
     Ping         = 0xF0,  // Keepalive
     Pong         = 0xF1,  // Keepalive response
@@ -96,6 +100,36 @@ struct WorldEventData {
 
 struct ChatData {
     char message[256];          // null-terminated
+};
+
+// ─── Enemy Death Packet ────────────────────────────────────────────
+
+struct EnemyDeathData {
+    char     className[32];       // e.g. "MeleeThug"
+    uint32_t nameHash;            // FNV-1a of full actor name
+    float    posX, posY, posZ;    // location at time of death
+};
+
+// ─── Player Death Packet ───────────────────────────────────────────
+
+struct PlayerDeathData {
+    float posX, posY, posZ;       // where player died
+    char  killerClass[32];        // what killed them
+};
+
+// ─── Player Respawn Packet ─────────────────────────────────────────
+
+struct PlayerRespawnData {
+    float posX, posY, posZ;       // where player respawned
+};
+
+// ─── Trigger Sync Packet ───────────────────────────────────────────
+
+struct TriggerSyncData {
+    uint32_t triggerNameHash;     // FNV-1a of trigger actor name
+    float    posX, posY, posZ;    // trigger location
+    uint8_t  state;               // 0=off, 1=on
+    uint8_t  _pad[3];
 };
 
 #pragma pack(pop)
