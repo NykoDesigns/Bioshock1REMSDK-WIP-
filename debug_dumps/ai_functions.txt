@@ -1,0 +1,2754 @@
+=== AI/Tick/Spawn Function Catalog === 2026-05-14 12:25:15
+Total matching functions: 1883
+
+
+── AIAttachment ──
+  ActionBlockedByPawns                     flags=0x0000 idx=1454
+  DestroyManagedAIAttachmentObjects        flags=0x0000 idx=25863
+  GetContainer                             flags=0x0000 idx=2212
+  GetHUDMessageForFocusAttained            flags=0x0000 idx=1846
+  GetTargetType                            flags=0x0000 idx=1523
+  InitializeContainer                      flags=0x0000 idx=25284
+  TakeDamage                               flags=0x0000 idx=1644
+  TakeScriptedDamage                       flags=0x0000 idx=1645
+
+── AIContainerInfo ──
+  DisplayAITypeName                        flags=0x0000 idx=19436
+  DisplayAllAITypes                        flags=0x0000 idx=24987
+
+── AIController ──
+  WaitForMover                             flags=0x0000 idx=3341
+
+── AIEventNotification ──
+  CreateAIEventNotification                flags=0x0000 idx=3784
+
+── AIScript ──
+  GetMoveTarget                            flags=0x0000 idx=3644
+  SpawnControllerFor                       flags=0x0000 idx=4965
+
+── AIWeapon ──
+  ActionBlockedByPawns                     flags=0x0000 idx=1454
+  AddWeaponAttackInfo                      flags=0x0000 idx=25786
+  CanHitTarget                             flags=0x0000 idx=25098
+  CreateAttackInfo                         flags=0x0000 idx=25788
+  DestroyManagedAIWeaponObjects            flags=0x0000 idx=25802
+  GetAppropriateInitiateDamageTimeForAnimation flags=0x0000 idx=25789
+  GetAttackAnimationsTranslationRange      flags=0x0000 idx=25782
+  GetAverageAttackAnimationInitiateDamageTime flags=0x0000 idx=25783
+  GetContainer                             flags=0x0000 idx=2212
+  GetHUDMessageForFocusAttained            flags=0x0000 idx=1846
+  GetInitiateDamageTimeForAnimation        flags=0x0000 idx=25508
+  GetNextWeaponAttackInfo                  flags=0x0000 idx=25801
+  GetTargetType                            flags=0x0000 idx=1523
+  GetWeaponAttackOffset                    flags=0x0000 idx=25795
+  InitializeContainer                      flags=0x0000 idx=25284
+  SaveAttackInfoIntoDefault                flags=0x0000 idx=25797
+  SetNextUsableAttackInfo                  flags=0x0000 idx=25071
+  SetupAttackInfos                         flags=0x0000 idx=25505
+  SortWeaponAttackInfos                    flags=0x0000 idx=25796
+  TakeDamage                               flags=0x0000 idx=1644
+  TakeScriptedDamage                       flags=0x0000 idx=1645
+
+── AI_Action ──
+  fail                                     flags=0x0000 idx=17050
+  instantFail                              flags=0x0000 idx=1880
+  waitForAllGoals                          flags=0x0000 idx=17262
+  waitForAllGoalsConsidered                flags=0x0000 idx=17026
+  waitForAnyGoal                           flags=0x0000 idx=17253
+  waitForGoal                              flags=0x0000 idx=17027
+  waitForGoal_AI_Goal                      flags=0x0000 idx=17027
+  waitForGoal_AI_GoalBool                  flags=0x0000 idx=17027
+  waitForResourcesAvailable                flags=0x0000 idx=17252
+
+── AI_CharacterAction ──
+  clearDummyMovementGoal                   flags=0x0000 idx=17036
+  movementResource                         flags=0x0000 idx=17023
+
+── AI_CharacterResource ──
+  Pawn                                     flags=0x0000 idx=1283
+  requiredResourcesAvailable               flags=0x0000 idx=16983
+
+── AI_DummyHeadGoal ──
+  construct_AI_ResourceInt                 flags=0x0000 idx=715
+
+── AI_DummyMovementGoal ──
+  construct_AI_ResourceInt                 flags=0x0000 idx=715
+
+── AI_DummyWeaponGoal ──
+  construct_AI_ResourceInt                 flags=0x0000 idx=715
+
+── AI_Goal ──
+  construct_AI_Resource                    flags=0x0000 idx=715
+  construct_AI_ResourceInt                 flags=0x0000 idx=715
+  handleGoalFailure                        flags=0x0000 idx=17078
+  markGoalAsFailed                         flags=0x0000 idx=17034
+
+── AI_HeadResource ──
+  Pawn                                     flags=0x0000 idx=1283
+  requiredResourcesAvailable               flags=0x0000 idx=16983
+
+── AI_MovementAction ──
+  movementResource                         flags=0x0000 idx=17023
+
+── AI_MovementResource ──
+  Pawn                                     flags=0x0000 idx=1283
+  requiredResourcesAvailable               flags=0x0000 idx=16983
+
+── AI_Resource ──
+  Pawn                                     flags=0x0000 idx=1283
+  PawnDied                                 flags=0x0000 idx=3315
+  requiredResourcesAvailable               flags=0x0000 idx=16983
+
+── AI_RunnableAction ──
+  Tick                                     flags=0x0000 idx=336
+
+── AI_Sensor ──
+  construct_AI_SensorAction                flags=0x0000 idx=715
+  sendMessageOnNextValueUpdate             flags=0x0000 idx=17159
+
+── AI_SensorAction ──
+  construct_AI_Resource                    flags=0x0000 idx=715
+  instantFail                              flags=0x0000 idx=1880
+
+── AI_SquadResource ──
+  Pawn                                     flags=0x0000 idx=1283
+  requiredResourcesAvailable               flags=0x0000 idx=16983
+
+── AI_TestCharacterGoalA ──
+  construct_AI_ResourceIntInt              flags=0x0000 idx=715
+
+── AI_TestCharacterGoalB ──
+  construct_AI_ResourceInt                 flags=0x0000 idx=715
+
+── AI_TestCharacterGoalC ──
+  construct_AI_ResourceInt                 flags=0x0000 idx=715
+
+── AI_TestInactiveAchievableGoal ──
+  construct_AI_ResourceInt                 flags=0x0000 idx=715
+
+── AI_TestMovementGoalA ──
+  construct_AI_ResourceInt                 flags=0x0000 idx=715
+
+── AI_TestWeaponGoalA ──
+  construct_AI_ResourceInt                 flags=0x0000 idx=715
+
+── AI_WeaponResource ──
+  Pawn                                     flags=0x0000 idx=1283
+  requiredResourcesAvailable               flags=0x0000 idx=16983
+
+── Ability ──
+  GetFinishFireWithEveAnimationName        flags=0x0000 idx=18606
+  GetFinishFireWithoutEveAnimationName     flags=0x0000 idx=18605
+
+── AchievementManager ──
+  GameCompletionProgressUpdate             flags=0x0000 idx=5036
+  UpdateUniqueProgressAchievement          flags=0x0000 idx=5028
+
+── Action ──
+  PrecacheGetSkinChangeTarget              flags=0x0000 idx=1917
+
+── ActionBase ──
+  PawnDied                                 flags=0x0000 idx=3315
+  instantFail                              flags=0x0000 idx=1880
+  wasTicked                                flags=0x0000 idx=17235
+
+── ActionChangeAnimationRate ──
+  GetTargetAndAnimHandles                  flags=0x0000 idx=18582
+  SetAnimsToTargetRateGradually            flags=0x0000 idx=19162
+  SetAnimsToTargetRateImmediately          flags=0x0000 idx=18580
+
+── ActionChangeSkinAtIndex ──
+  PrecacheGetSkinChangeTarget              flags=0x0000 idx=1917
+
+── ActionDestroyAIs ──
+  DisplayAbstractAITypes                   flags=0x0000 idx=25268
+
+── ActionGathererCrawlThroughDoor ──
+  OnOtherPawnDied                          flags=0x0000 idx=1564
+  waitForGoal                              flags=0x0000 idx=17027
+
+── ActionGetNumAIsInSpawnZone ──
+  DisplayAITypeName                        flags=0x0000 idx=19436
+  DisplayAITypes                           flags=0x0000 idx=25003
+
+── ActionManipulateSpawnZoneRepopulation ──
+  OutputSpawnZonesToBox                    flags=0x0000 idx=25278
+
+── ActionPlayAnimation ──
+  StartAnimationOnTarget                   flags=0x0000 idx=18733
+  StoreTargetActors                        flags=0x0000 idx=18724
+
+── ActionSpawnAI ──
+  DisplayAITypeName                        flags=0x0000 idx=19436
+  DisplayAITypes                           flags=0x0000 idx=25003
+
+── ActionSpawnActor ──
+  SpawnActorAtLocation                     flags=0x0000 idx=17632
+
+── ActionSpawnActorAtActorLocation ──
+  SpawnActor                               flags=0x0000 idx=17766
+
+── ActionSpawnLinkedGathererAndProtector ──
+  DisplayAITypeName                        flags=0x0000 idx=19436
+
+── ActionSpawnSecurityBot ──
+  DisplaySpawnerName                       flags=0x0000 idx=25270
+  DisplaySpawners                          flags=0x0000 idx=25271
+
+── ActionSpawnTurret ──
+  DisplaySpawnerName                       flags=0x0000 idx=25270
+  DisplaySpawners                          flags=0x0000 idx=25271
+
+── ActionStartSecurityAlarm ──
+  DisplayAITypeName                        flags=0x0000 idx=19436
+
+── ActionToggleAIWeaponVisibility ──
+  ToggleAIWeaponVisibility                 flags=0x0000 idx=26123
+
+── ActionTweakAIHearing ──
+  DisplayAITypeName                        flags=0x0000 idx=19436
+  DisplayAITypes                           flags=0x0000 idx=25003
+  TweakAIHearing                           flags=0x0000 idx=25511
+
+── ActionTweakAIVision ──
+  DisplayAITypeName                        flags=0x0000 idx=19436
+  DisplayAITypes                           flags=0x0000 idx=25003
+  TweakAIVision                            flags=0x0000 idx=25517
+
+── Actor ──
+  AutonomousPhysics                        flags=0x0000 idx=4353
+  BecomeViewTarget                         flags=0x0000 idx=3280
+  ForcePoseUpdate                          flags=0x0000 idx=4518
+  GainedChild                              flags=0x0000 idx=302
+  GetActiveChainControlIndex               flags=0x0000 idx=4465
+  GetAimIKTargetTracker                    flags=0x0000 idx=3624
+  GetAimPoseTargetTracker                  flags=0x0000 idx=3620
+  GetAnimationChainControlFlags            flags=0x0000 idx=4469
+  GetHeadTargetTracker                     flags=0x0000 idx=3619
+  GetNumberOfAnimationsInChain             flags=0x0000 idx=4464
+  GetTargetTrackingLocation                flags=0x0000 idx=4369
+  IsAreaClearForMovement                   flags=0x0000 idx=4345
+  IsAreaClearOfPawns                       flags=0x0000 idx=4348
+  IsInPain                                 flags=0x0000 idx=3947
+  OnlyAffectPawns                          flags=0x0000 idx=4496
+  PhysicsVolumeChange                      flags=0x0000 idx=312
+  PlayAnimationChainOnChannel              flags=0x0000 idx=4473
+  PlayAnimationChainOnChannelFlatEaseIn    flags=0x0000 idx=4477
+  PlayAnimationChainOnChannelInstantEaseIn flags=0x0000 idx=4479
+  SetAnimationChainControlFlags            flags=0x0000 idx=4466
+  SetPhysics                               flags=0x0000 idx=4494
+  SetTimer                                 flags=0x0000 idx=4570
+  Spawn                                    flags=0x0000 idx=730
+  Tick                                     flags=0x0000 idx=336
+  Timer                                    flags=0x0000 idx=308
+  UpdateAttachmentLocations                flags=0x0000 idx=4400
+  UpdatePhysicalAttachmentLocation         flags=0x0000 idx=4395
+  UpdateRenderRevision                     flags=0x0000 idx=4640
+
+── Aggressor ──
+  CharacterAICreated                       flags=0x0000 idx=17043
+  GetPoisonedDamageAmount                  flags=0x0000 idx=26023
+  GetTargetType                            flags=0x0000 idx=1523
+  IsSuspectingAttackFrom                   flags=0x0000 idx=19371
+  MovementAICreated                        flags=0x0000 idx=17077
+  OnAIIntentionallyDamaged                 flags=0x0000 idx=2613
+
+── AggressorAttackAction ──
+  AttackFromMimic                          flags=0x0000 idx=26182
+  GetMimicAttackAnimation                  flags=0x0000 idx=26183
+  NotifyBeginningAttack                    flags=0x0000 idx=24950
+  NotifyGoingToStartAttacking              flags=0x0000 idx=25194
+  PlayMimicAttackAnimation                 flags=0x0000 idx=26184
+
+── AggressorCommanderAction ──
+  IsSuspectingAttackFrom                   flags=0x0000 idx=19371
+  SearchForTarget                          flags=0x0000 idx=25166
+  ShouldHandleDamageEvents                 flags=0x0000 idx=24966
+
+── AimPoseTargetTracker ──
+  ApplyAimPoseSetup                        flags=0x0000 idx=5720
+
+── AlertAction ──
+  GetRotationToAlertedPawn                 flags=0x0000 idx=26245
+  GetUpdatedDestination                    flags=0x0000 idx=2599
+  RemoveMovementGoal                       flags=0x0000 idx=25299
+  StartRotationTowardsAlertedPawn          flags=0x0000 idx=25640
+  StopRotationTowardsAlertedPawn           flags=0x0000 idx=25648
+
+── AlertGoal ──
+  construct_AI_ResourceShockPawn           flags=0x0000 idx=715
+
+── AlertSensor ──
+  HandleDeathOrDestructionMessage          flags=0x0000 idx=25694
+  OnOtherPawnDied                          flags=0x0000 idx=1564
+
+── Ammunition ──
+  GetAttackRange                           flags=0x0000 idx=2209
+  GetDamageStimuliSetName                  flags=0x0000 idx=2220
+  ModifyDamageStimuli                      flags=0x0000 idx=2300
+
+── AnimatedContainer ──
+  GetContainer                             flags=0x0000 idx=2212
+  GetHUDMessageForFocusAttained            flags=0x0000 idx=1846
+
+── AnimationTargetTracker ──
+  GetLocationOffsetOnTarget                flags=0x0000 idx=5699
+  GetReferenceNameOnTarget                 flags=0x0000 idx=5698
+  GetTargetingOriginWS                     flags=0x0000 idx=5691
+  GetTrackedTarget                         flags=0x0000 idx=5697
+  IsCurrentTargetWithinTrackingArea        flags=0x0000 idx=5700
+  IsLockedOnTarget                         flags=0x0000 idx=5703
+  IsTargetDirectionWithinTrackingAreaMS    flags=0x0000 idx=5702
+  IsTargetWithinTrackingAreaWS             flags=0x0000 idx=5701
+  TrackTarget                              flags=0x0000 idx=5696
+  UntrackTarget                            flags=0x0000 idx=3391
+
+── Assassin ──
+  CharacterAICreated                       flags=0x0000 idx=17043
+
+── AssassinAttackAction ──
+  AttackTarget                             flags=0x0000 idx=24007
+  CanAttackTarget                          flags=0x0000 idx=24919
+  CanAttackWithRangedWeapon                flags=0x0000 idx=24900
+  GetUpdatedDestination                    flags=0x0000 idx=2599
+  HasAttackedEnoughTimesToTeleport         flags=0x0000 idx=26271
+  IsTargetTooClose                         flags=0x0000 idx=25675
+  NotifyCannotAttackTarget                 flags=0x0000 idx=25038
+  NotifyFinishedAttackingTarget            flags=0x0000 idx=24964
+  NotifyGoingToStartAttacking              flags=0x0000 idx=25194
+  ResetNumAttacksToCauseTeleport           flags=0x0000 idx=25671
+  ShouldStopMovingToTarget                 flags=0x0000 idx=24880
+  ShouldTeleportDueToDamage                flags=0x0000 idx=27818
+
+── Atlas ──
+  CanBeDamaged                             flags=0x0000 idx=26280
+  CharacterAICreated                       flags=0x0000 idx=17043
+  ChargeAttackPush                         flags=0x0000 idx=2583
+  GetAtlasChair                            flags=0x0000 idx=26277
+  GetPlayerDrainPosition                   flags=0x0000 idx=26279
+  GetTargetType                            flags=0x0000 idx=1523
+  IsAtDrainingPosition                     flags=0x0000 idx=25670
+  MovementAICreated                        flags=0x0000 idx=17077
+  Tick                                     flags=0x0000 idx=336
+  UpdateNeedleHUD_VisualDrainEffect        flags=0x0000 idx=25667
+  UpdateNeedleHUD_VisualFlashEffect        flags=0x0000 idx=25668
+
+── AtlasAttackAction ──
+  AttackTarget                             flags=0x0000 idx=24007
+  CanAttackTarget                          flags=0x0000 idx=24919
+  CanAttackWithMeleeWeapon                 flags=0x0000 idx=24909
+  CanAttackWithRangedWeapon                flags=0x0000 idx=24900
+  ChargeAttack                             flags=0x0000 idx=26314
+  GetMinDistanceToApproachTarget           flags=0x0000 idx=27747
+  GetUpdatedDestination                    flags=0x0000 idx=2599
+  NotifyAttackCompleted                    flags=0x0000 idx=25211
+  NotifyBeginningAttack                    flags=0x0000 idx=24950
+  NotifyFinishedAttackingTarget            flags=0x0000 idx=24964
+  NotifyGoingToStartAttacking              flags=0x0000 idx=25194
+  ShouldStopMovingToTarget                 flags=0x0000 idx=24880
+
+── AtlasCommanderAction ──
+  AtlasGetsOutOfChair                      flags=0x0000 idx=26321
+  ClearAttackTarget                        flags=0x0000 idx=26315
+  SetAttackTarget                          flags=0x0000 idx=2636
+  ShouldHandleDamageEvents                 flags=0x0000 idx=24966
+  StopAttack                               flags=0x0000 idx=26322
+  WaitForAdamDrainBasedOnAdamLevel         flags=0x0000 idx=27736
+  WaitForAdamDrainBasedOnHealth            flags=0x0000 idx=25624
+  WaitForDeath                             flags=0x0000 idx=26316
+
+── AttackAbility ──
+  GetAttackRange                           flags=0x0000 idx=2209
+  GetDamageStimuliSetName                  flags=0x0000 idx=2220
+  GetPerfectFireStart                      flags=0x0000 idx=19190
+  InitiateDamage                           flags=0x0000 idx=2280
+  ModifyDamageStimuli                      flags=0x0000 idx=2300
+
+── AttackReactionAction ──
+  RespondToAttack                          flags=0x0000 idx=26323
+
+── AttackReactionGoal ──
+  construct_AI_ResourceActorFloatByte      flags=0x0000 idx=715
+
+── AttackTargetGoal ──
+  OnDamagedByTarget                        flags=0x0000 idx=25014
+  OnDamagedTarget                          flags=0x0000 idx=25178
+  construct_AI_Resource                    flags=0x0000 idx=715
+  construct_AI_ResourceShockPawn           flags=0x0000 idx=715
+
+── AwardAchievementsManager ──
+  EventShockAIinWater                      flags=0x0000 idx=19435
+  PlayerHitTarget                          flags=0x0000 idx=2358
+  ShockedAIinWater                         flags=0x0000 idx=2396
+  SpawnedDLCMinimumSecurityTurretWasDestroyedInDLC1Level flags=0x0000 idx=20655
+  UpdateUniqueProgressAchievement          flags=0x0000 idx=5028
+
+── BaseGUIController ──
+  InitializeController                     flags=0x0000 idx=1534
+  SetControllerStatus                      flags=0x0000 idx=5938
+
+── BaseResurrectionStation ──
+  GetHUDMessageForFocusAttained            flags=0x0000 idx=1846
+  IsAvailable                              flags=0x0000 idx=18564
+
+── BaseShockAI ──
+  GetShockPawnEscort                       flags=0x0000 idx=19356
+  IsSuspectingAttackFrom                   flags=0x0000 idx=19371
+  NotifyEscortIsAttacking                  flags=0x0000 idx=19361
+  UpdateEscortedGathererHealth             flags=0x0000 idx=19343
+  UpdateTimeToLive                         flags=0x0000 idx=19347
+
+── BioshockCharacterAction ──
+  ShockAI                                  flags=0x0000 idx=2432
+
+── BioshockMovementAction ──
+  ShockAI                                  flags=0x0000 idx=2432
+
+── BioshockWeaponAction ──
+  ShockAI                                  flags=0x0000 idx=2432
+
+── BioweaponRepellantVolume ──
+  SetDamageDuration                        flags=0x0000 idx=2385
+  SetDamager                               flags=0x0000 idx=2386
+  SetInnerDamageRadius                     flags=0x0000 idx=2392
+  SetOuterDamageRadius                     flags=0x0000 idx=2393
+
+── Booty ──
+  ClaimBooty                               flags=0x0000 idx=2584
+  GetContainer                             flags=0x0000 idx=2212
+  GetHUDMessageForFocusAttained            flags=0x0000 idx=1846
+  GetUpdatedGatherPointLocation            flags=0x0000 idx=2600
+  GetUpdatedRigidBodyLocation              flags=0x0000 idx=2601
+
+── BootyImpl ──
+  ClaimBooty                               flags=0x0000 idx=2584
+  GetUpdatedGatherPointLocation            flags=0x0000 idx=2600
+  GetUpdatedRigidBodyLocation              flags=0x0000 idx=2601
+
+── BotAttackTargetAction ──
+  AttackTargetIsAlive                      flags=0x0000 idx=25611
+  AttackUntilTargetIsLost                  flags=0x0000 idx=26330
+  InitializeMovement                       flags=0x0000 idx=24870
+  StopAllMovement                          flags=0x0000 idx=24849
+  TargetCanBeDetected                      flags=0x0000 idx=25344
+
+── BotAttackTargetGoal ──
+  TargetCanBeDetected                      flags=0x0000 idx=25344
+  construct_AI_Resource                    flags=0x0000 idx=715
+  construct_AI_ResourceShockPawn           flags=0x0000 idx=715
+
+── BotAttackTargetMovementAction ──
+  CloseEnoughToTarget                      flags=0x0000 idx=26339
+  GetUpdatedDestination                    flags=0x0000 idx=2599
+  InitializeMovement                       flags=0x0000 idx=24870
+
+── BotAttackTargetMovementGoal ──
+  construct_AI_Resource                    flags=0x0000 idx=715
+  construct_AI_ResourceShockPawnRange      flags=0x0000 idx=715
+
+── BotBaseAction ──
+  AddAlternateDamager                      flags=0x0000 idx=25113
+  AttackTargetCanBeDetected                flags=0x0000 idx=25364
+  AttackTargetIsVisible                    flags=0x0000 idx=25049
+  CanTraceToTarget                         flags=0x0000 idx=26360
+  GetAttackTarget                          flags=0x0000 idx=24902
+  GetMostThreateningAlternateDamager       flags=0x0000 idx=25596
+  IsValidAttackTarget                      flags=0x0000 idx=24984
+  OnViewerLostPawn                         flags=0x0000 idx=1866
+  OnViewerSawPawn                          flags=0x0000 idx=1867
+  StartAttackTargetSubGoal                 flags=0x0000 idx=25587
+  TargetIsVisible                          flags=0x0000 idx=2644
+
+── BotBaseGun ──
+  FireWeapon                               flags=0x0000 idx=6514
+  WeaponHandlesOwnAttack                   flags=0x0000 idx=25652
+
+── BotBaseNavigateToTargetMovementAction ──
+  GetUpdatedDestination                    flags=0x0000 idx=2599
+  InitializeMovement                       flags=0x0000 idx=24870
+
+── BotBeDormantGoal ──
+  construct_AI_Resource                    flags=0x0000 idx=715
+  construct_AI_ResourceBool                flags=0x0000 idx=715
+
+── BotBeFriendlyAction ──
+  AttackNewTargetIfNecessary               flags=0x0000 idx=25091
+  AttackSpecifiedTarget                    flags=0x0000 idx=2173
+  AttackTargetCanBeDetected                flags=0x0000 idx=25364
+  CanDetectAttackTarget                    flags=0x0000 idx=25695
+  GetProtectTarget                         flags=0x0000 idx=25684
+  OnAttackSpecifiedTarget                  flags=0x0000 idx=25202
+  OnControllerDamaged                      flags=0x0000 idx=2304
+  OnControllerDealtDamage                  flags=0x0000 idx=2305
+  OnIntentionallyDamaged                   flags=0x0000 idx=24878
+  OnOtherPawnDied                          flags=0x0000 idx=1564
+  OnViewerLostPawn                         flags=0x0000 idx=1866
+  OnViewerSawPawn                          flags=0x0000 idx=1867
+
+── BotBeFriendlyGoal ──
+  construct_AI_Resource                    flags=0x0000 idx=715
+  construct_AI_ResourceShockPawn           flags=0x0000 idx=715
+
+── BotBeMeanAction ──
+  AttackTargetCanBeDetected                flags=0x0000 idx=25364
+  GetMostThreateningTarget                 flags=0x0000 idx=25037
+  NotifySecuritySystemCanSeeTarget         flags=0x0000 idx=25302
+  NotifySecuritySystemCannotSeeTarget      flags=0x0000 idx=25026
+  OnBotDamaged                             flags=0x0000 idx=25311
+  OnIntentionallyDamaged                   flags=0x0000 idx=24878
+  OnViewerLostPawn                         flags=0x0000 idx=1866
+  OnViewerSawPawn                          flags=0x0000 idx=1867
+  StartGoingToAlarmTargetGoal              flags=0x0000 idx=26377
+  StartSearchForAlarmTargetGoal            flags=0x0000 idx=26378
+
+── BotBehaviorActionInterface ──
+  OnAttackSpecifiedTarget                  flags=0x0000 idx=25202
+  OnControllerDamaged                      flags=0x0000 idx=2304
+  OnControllerDealtDamage                  flags=0x0000 idx=2305
+  OnIntentionallyDamaged                   flags=0x0000 idx=24878
+  OnKilledOtherPawn                        flags=0x0000 idx=19417
+
+── BotBehaviorGoalInterface ──
+  OnAttackSpecifiedTarget                  flags=0x0000 idx=25202
+  OnControllerDamaged                      flags=0x0000 idx=2304
+  OnControllerDealtDamage                  flags=0x0000 idx=2305
+  OnIntentionallyDamaged                   flags=0x0000 idx=24878
+  OnKilledOtherPawn                        flags=0x0000 idx=19417
+
+── BotCommanderAction ──
+  AttackSpecifiedTarget                    flags=0x0000 idx=2173
+  BeFriendly                               flags=0x0000 idx=25607
+  FakeAttackPawn                           flags=0x0000 idx=25216
+  GetAttackTarget                          flags=0x0000 idx=24902
+  GetProtectTarget                         flags=0x0000 idx=25684
+  IsFriendly                               flags=0x0000 idx=24988
+  MovementTestMode                         flags=0x0000 idx=26392
+  OnAlarmTargetChanged                     flags=0x0000 idx=2616
+  OnControllerDamaged                      flags=0x0000 idx=2304
+  OnControllerDealtDamage                  flags=0x0000 idx=2305
+  OnControllerDestroyed                    flags=0x0000 idx=2306
+  OnControllerKilled                       flags=0x0000 idx=2307
+  OnIntentionallyDamaged                   flags=0x0000 idx=24878
+  OnKilledOtherPawn                        flags=0x0000 idx=19417
+  ShouldHandleDamageEvents                 flags=0x0000 idx=24966
+
+── BotGoToActorAction ──
+  InitializeMovement                       flags=0x0000 idx=24870
+  StopAllMovement                          flags=0x0000 idx=24849
+
+── BotGoToActorGoal ──
+  construct_AI_Resource                    flags=0x0000 idx=715
+  construct_AI_ResourceActorFloat          flags=0x0000 idx=715
+
+── BotGoToAlarmTargetAction ──
+  InitializeMovement                       flags=0x0000 idx=24870
+  StopAllMovement                          flags=0x0000 idx=24849
+
+── BotGoToAlarmTargetGoal ──
+  construct_AI_Resource                    flags=0x0000 idx=715
+  construct_AI_ResourceSecurityManagerFloat flags=0x0000 idx=715
+
+── BotMovementTestAction ──
+  InitializeFakeAttackMovement             flags=0x0000 idx=26417
+  InitializeNavigateToPointMovement        flags=0x0000 idx=26416
+  StopAllMovement                          flags=0x0000 idx=24849
+  TestFakeAttackPawn                       flags=0x0000 idx=26414
+
+── BotNavigateToActorLocationMovementAction ──
+  GetUpdatedDestination                    flags=0x0000 idx=2599
+
+── BotNavigateToActorLocationMovementGoal ──
+  construct_AI_Resource                    flags=0x0000 idx=715
+  construct_AI_ResourceActorFloat          flags=0x0000 idx=715
+
+── BotNavigateToAlarmTargetLocationMovementAction ──
+  GetFailsafeDestination                   flags=0x0000 idx=26423
+  GetUpdatedDestination                    flags=0x0000 idx=2599
+  TargetIsInDetectRange                    flags=0x0000 idx=25195
+
+── BotNavigateToAlarmTargetLocationMovementGoal ──
+  construct_AI_Resource                    flags=0x0000 idx=715
+  construct_AI_ResourceSecurityManagerFloat flags=0x0000 idx=715
+
+── BotNavigateToPointLocationMovementAction ──
+  GetUpdatedDestination                    flags=0x0000 idx=2599
+
+── BotNavigateToPointLocationMovementGoal ──
+  construct_AI_Resource                    flags=0x0000 idx=715
+  construct_AI_ResourceVector              flags=0x0000 idx=715
+
+── BotProtectTargetAction ──
+  InitializeMovement                       flags=0x0000 idx=24870
+  StopAllMovement                          flags=0x0000 idx=24849
+
+── BotProtectTargetGoal ──
+  construct_AI_Resource                    flags=0x0000 idx=715
+  construct_AI_ResourceShockPawn           flags=0x0000 idx=715
+
+── BotProtectTargetMovementAction ──
+  GetAdditionalProtectTargetVelocityModifier flags=0x0000 idx=26428
+  GetUpdatedDestination                    flags=0x0000 idx=2599
+  InitializeMovement                       flags=0x0000 idx=24870
+  PerformLookAtProtectTargetSillyAction    flags=0x0000 idx=26440
+  PointIsInValidProtectTargetRange         flags=0x0000 idx=25238
+  StayWithTarget                           flags=0x0000 idx=26441
+  UpdateBotRotation                        flags=0x0000 idx=25229
+
+── BotProtectTargetMovementGoal ──
+  construct_AI_Resource                    flags=0x0000 idx=715
+  construct_AI_ResourceShockPawn           flags=0x0000 idx=715
+
+── BotReturnHomeAction ──
+  GetUpdatedDestination                    flags=0x0000 idx=2599
+  InitializeMovement                       flags=0x0000 idx=24870
+
+── BotSearchForAlarmTargetAction ──
+  InitializeMovement                       flags=0x0000 idx=24870
+  StopAllMovement                          flags=0x0000 idx=24849
+
+── BotSearchForAlarmTargetGoal ──
+  construct_AI_Resource                    flags=0x0000 idx=715
+  construct_AI_ResourceSecurityManager     flags=0x0000 idx=715
+
+── BotSearchForAlarmTargetMovementAction ──
+  TargetIsInDetectRange                    flags=0x0000 idx=25195
+
+── BotSearchForAlarmTargetMovementGoal ──
+  construct_AI_Resource                    flags=0x0000 idx=715
+  construct_AI_ResourceSecurityManager     flags=0x0000 idx=715
+
+── BotShockGun ──
+  FireWeapon                               flags=0x0000 idx=6514
+  WeaponHandlesOwnAttack                   flags=0x0000 idx=25652
+
+── Bouncer ──
+  CharacterAICreated                       flags=0x0000 idx=17043
+  GetNextTimeCanUseStunAttack              flags=0x0000 idx=26569
+  HitTargetWithShoulderWeapon              flags=0x0000 idx=26572
+  NotifyHitTarget                          flags=0x0000 idx=2301
+  SetNextTimeCanUseStunAttack              flags=0x0000 idx=26570
+  ShouldDamageTarget                       flags=0x0000 idx=2398
+
+── BouncerAttackAction ──
+  AttackTarget                             flags=0x0000 idx=24007
+  CanAttackTarget                          flags=0x0000 idx=24919
+  CanAttackWithHands                       flags=0x0000 idx=26565
+  CanAttackWithShoulder                    flags=0x0000 idx=26566
+  CanDoStunAttack                          flags=0x0000 idx=26549
+  DoStunAttack                             flags=0x0000 idx=26548
+  GetAttackThreatenAnimation               flags=0x0000 idx=26560
+  GetUpdatedDestination                    flags=0x0000 idx=2599
+  NotifyBeginningAttack                    flags=0x0000 idx=24950
+  NotifyCannotAttackTarget                 flags=0x0000 idx=25038
+  NotifyFinishedAttackingTarget            flags=0x0000 idx=24964
+  OnDamagedTarget                          flags=0x0000 idx=25178
+  PlayAttackThreatenAnimation              flags=0x0000 idx=25475
+  ShouldStopMovingToTarget                 flags=0x0000 idx=24880
+
+── BroadcastHandler ──
+  UpdateSentText                           flags=0x0000 idx=4000
+
+── CameraAlertedAction ──
+  NotifySecuritySystemCanSeeTarget         flags=0x0000 idx=25302
+  NotifySecuritySystemCannotSeeTarget      flags=0x0000 idx=25026
+  OnIntentionallyDamaged                   flags=0x0000 idx=24878
+  OnPawnLost                               flags=0x0000 idx=24953
+  OnPawnSeen                               flags=0x0000 idx=24912
+  OnViewerLostPawn                         flags=0x0000 idx=1866
+  OnViewerSawPawn                          flags=0x0000 idx=1867
+  StartSearchMovement                      flags=0x0000 idx=25149
+  StartTrackMovement                       flags=0x0000 idx=25472
+  StopAllMovement                          flags=0x0000 idx=24849
+  WatchForAlarmTarget                      flags=0x0000 idx=26525
+
+── CameraAlertedGoal ──
+  construct_AI_Resource                    flags=0x0000 idx=715
+  construct_AI_ResourceShockPawn           flags=0x0000 idx=715
+
+── CameraCommanderAction ──
+  GetHighestPriorityPawn                   flags=0x0000 idx=25031
+  GetVisiblePawns                          flags=0x0000 idx=26517
+  InitiateMovement                         flags=0x0000 idx=24951
+  NotifyChildLostPawn                      flags=0x0000 idx=25227
+  NotifyChildSawPawn                       flags=0x0000 idx=25222
+  OnIntentionallyDamaged                   flags=0x0000 idx=24878
+  OnMovementEnded                          flags=0x0000 idx=24876
+  OnMovementStarted                        flags=0x0000 idx=24901
+  OnNotifyAlarmTargetChanged               flags=0x0000 idx=26514
+  OnViewerLostPawn                         flags=0x0000 idx=1866
+  OnViewerSawPawn                          flags=0x0000 idx=1867
+  RegisterMovementController               flags=0x0000 idx=25215
+  UnregisterMovementController             flags=0x0000 idx=25220
+
+── CameraDormantAction ──
+  StartDormantMovement                     flags=0x0000 idx=25089
+  StopAllMovement                          flags=0x0000 idx=24849
+
+── CameraDormantMovementAction ──
+  UpdateDesiredRotation                    flags=0x0000 idx=25080
+
+── CameraDormantMovementGoal ──
+  construct_AI_Resource                    flags=0x0000 idx=715
+  construct_AI_ResourceNameIntIntRotator   flags=0x0000 idx=715
+
+── CameraInspectAction ──
+  OnTargetLost                             flags=0x0000 idx=26511
+  OnTargetSeen                             flags=0x0000 idx=26512
+
+── CameraInspectGoal ──
+  construct_AI_Resource                    flags=0x0000 idx=715
+  construct_AI_ResourceShockPawnFloatFloat flags=0x0000 idx=715
+
+── CameraInspectPawnMovementAction ──
+  OnPawnLost                               flags=0x0000 idx=24953
+  OnPawnSeen                               flags=0x0000 idx=24912
+  TrackUnseenTarget                        flags=0x0000 idx=26509
+  UpdateDesiredRotation                    flags=0x0000 idx=25080
+
+── CameraMovementAction ──
+  OnMovementEnded                          flags=0x0000 idx=24876
+  OnMovementStarted                        flags=0x0000 idx=24901
+  RunCameraMovement                        flags=0x0000 idx=26506
+
+── CameraMovementGoal ──
+  OnMovementEnded                          flags=0x0000 idx=24876
+  OnMovementStarted                        flags=0x0000 idx=24901
+  construct_AI_Resource                    flags=0x0000 idx=715
+  construct_AI_ResourceIntInt              flags=0x0000 idx=715
+
+── CameraPanMovementAction ──
+  UpdateDesiredRotation                    flags=0x0000 idx=25080
+
+── CameraPanMovementGoal ──
+  construct_AI_Resource                    flags=0x0000 idx=715
+  construct_AI_ResourceNameIntInt          flags=0x0000 idx=715
+
+── CameraSearchAction ──
+  GetHighestPriorityPawn                   flags=0x0000 idx=25031
+  OnIntentionallyDamaged                   flags=0x0000 idx=24878
+  OnPawnLost                               flags=0x0000 idx=24953
+  OnPawnSeen                               flags=0x0000 idx=24912
+  OnViewerLostPawn                         flags=0x0000 idx=1866
+  OnViewerSawPawn                          flags=0x0000 idx=1867
+  StartInspectMovement                     flags=0x0000 idx=26504
+  StartSearchMovement                      flags=0x0000 idx=25149
+  StopAllMovement                          flags=0x0000 idx=24849
+  WaitForInspection                        flags=0x0000 idx=26502
+
+── CameraShockedAction ──
+  StartDormantMovement                     flags=0x0000 idx=25089
+  StopAllMovement                          flags=0x0000 idx=24849
+
+── CameraTrackPawnMovementAction ──
+  CalculateRotationToTarget                flags=0x0000 idx=25403
+  UpdateDesiredRotation                    flags=0x0000 idx=25080
+  UpdateTargetLocation                     flags=0x0000 idx=25402
+
+── CameraTrackPawnMovementGoal ──
+  construct_AI_Resource                    flags=0x0000 idx=715
+  construct_AI_ResourceNameShockPawnIntInt flags=0x0000 idx=715
+
+── CascadingWaterVolume ──
+  OnOtherPawnDied                          flags=0x0000 idx=1564
+
+── CeilingCrawler ──
+  AddAttackAbility                         flags=0x0000 idx=26500
+  CanAttackTargetWithRangedWeapon          flags=0x0000 idx=25118
+  CharacterAICreated                       flags=0x0000 idx=17043
+  CrushPawn                                flags=0x0000 idx=3703
+  OnDealtDamage                            flags=0x0000 idx=2310
+  SetCanAttackWithRangedWeapon             flags=0x0000 idx=26498
+
+── CeilingCrawlerAttackAction ──
+  AttackTarget                             flags=0x0000 idx=24007
+  AttackWithKickWeapon                     flags=0x0000 idx=25495
+  AttackWithMeleeWeapon                    flags=0x0000 idx=26490
+  AttackWithRangedWeapon                   flags=0x0000 idx=26483
+  AttackWithSlashWeapon                    flags=0x0000 idx=26491
+  CanAttackTarget                          flags=0x0000 idx=24919
+  CanAttackWithHandWeapon                  flags=0x0000 idx=25121
+  CanAttackWithKickWeapon                  flags=0x0000 idx=25044
+  CanAttackWithRangedWeapon                flags=0x0000 idx=24900
+  CanJumpAttackWithSlashWeapon             flags=0x0000 idx=25125
+  CannotMeleeAttackTarget                  flags=0x0000 idx=25477
+  GetEndAttackWithRangedWeaponTime         flags=0x0000 idx=26487
+  GetUpdatedDestination                    flags=0x0000 idx=2599
+  IsDoingJumpAttack                        flags=0x0000 idx=26497
+  NotifyBeginningAttack                    flags=0x0000 idx=24950
+  ShouldStopMovingToTarget                 flags=0x0000 idx=24880
+
+── CharacterAnimTestActor ──
+  TakeDamage                               flags=0x0000 idx=1644
+
+── CharacterAttackAction ──
+  AttackTarget                             flags=0x0000 idx=24007
+  CanAttackTarget                          flags=0x0000 idx=24919
+  CanTargetHitUs                           flags=0x0000 idx=27778
+  FaceTarget                               flags=0x0000 idx=25018
+  GetRotationToTarget                      flags=0x0000 idx=25008
+  GetTarget                                flags=0x0000 idx=19212
+  GetUpdatedDestination                    flags=0x0000 idx=2599
+  HasBeenDamagedByTargetRecently           flags=0x0000 idx=25564
+  InternalCanAttackTarget                  flags=0x0000 idx=25059
+  IsAttackingTarget                        flags=0x0000 idx=24890
+  IsAttackingTargetWith                    flags=0x0000 idx=27775
+  IsRotatedForAttack                       flags=0x0000 idx=24960
+  IsTargetFleeing                          flags=0x0000 idx=26170
+  MoveToAttack                             flags=0x0000 idx=26157
+  NotifyAttackCompleted                    flags=0x0000 idx=25211
+  NotifyBeginningAttack                    flags=0x0000 idx=24950
+  NotifyCannotAttackTarget                 flags=0x0000 idx=25038
+  NotifyFinishedAttackingTarget            flags=0x0000 idx=24964
+  NotifyGoingToStartAttacking              flags=0x0000 idx=25194
+  NotifyReadyToAttackTarget                flags=0x0000 idx=26166
+  OnDamagedByTarget                        flags=0x0000 idx=25014
+  OnDamagedTarget                          flags=0x0000 idx=25178
+  ResetMovementBehavior                    flags=0x0000 idx=26158
+  SendAttackEventNotification              flags=0x0000 idx=26173
+  ShouldInterruptAttack                    flags=0x0000 idx=26142
+  ShouldStopMovingToTarget                 flags=0x0000 idx=24880
+  ShouldTellBotTargetToStayLow             flags=0x0000 idx=25185
+  TellBotTargetToStayLow                   flags=0x0000 idx=25186
+  TriggerAttackingSpeech                   flags=0x0000 idx=26129
+
+── CharacterMoveToGoal ──
+  construct_AI_Resource                    flags=0x0000 idx=715
+  construct_AI_ResourceIntActorBoolBoolBoolRotatorBoolActorBool flags=0x0000 idx=715
+
+── ChargeAttackAction ──
+  FacingTarget                             flags=0x0000 idx=27506
+  HaveHitTarget                            flags=0x0000 idx=27507
+  IsRotationAlignedtoTarget                flags=0x0000 idx=27504
+
+── ChargeAttackGoal ──
+  construct_AI_ResourceActorNameNameNameNameName flags=0x0000 idx=715
+
+── ChargedBurst ──
+  GetDamageStimuliSet                      flags=0x0000 idx=6614
+
+── CheatManager ──
+  EditObjectAtCrosshair                    flags=0x0000 idx=3791
+  KillAllPawns                             flags=0x0000 idx=3556
+  KillPawns                                flags=0x0000 idx=6671
+  ShowSpawnZone                            flags=0x0000 idx=6646
+
+── CommanderAction ──
+  CanReactToAttack                         flags=0x0000 idx=25198
+  CheckForVisiblePawnsToAttack             flags=0x0000 idx=26192
+  HandleAIAttackNotification               flags=0x0000 idx=25076
+  HandleAIEventNotification                flags=0x0000 idx=25036
+  HandleDamageEvents                       flags=0x0000 idx=26189
+  IsBeingAttackedByInsectSwarm             flags=0x0000 idx=25175
+  IsReactingToDamage                       flags=0x0000 idx=26191
+  NotifyDamaged                            flags=0x0000 idx=25188
+  NotifyReactToDamage                      flags=0x0000 idx=25581
+  OnDamaged                                flags=0x0000 idx=2309
+  OnDealtDamage                            flags=0x0000 idx=2310
+  ScriptedAttackTarget                     flags=0x0000 idx=24954
+  ScriptedWait                             flags=0x0000 idx=25019
+  ShouldHandleDamageEvents                 flags=0x0000 idx=24966
+  StartAttackedByInsectSwarmBehavior       flags=0x0000 idx=25266
+  StopAttackedByInsectSwarmBehavior        flags=0x0000 idx=25265
+
+── CommanderGoal ──
+  ScriptedAttackTarget                     flags=0x0000 idx=24954
+  ScriptedWait                             flags=0x0000 idx=25019
+
+── Commandlet ──
+  Main                                     flags=0x0000 idx=827
+
+── Container ──
+  DumpContainer                            flags=0x0000 idx=18652
+
+── Controller ──
+  AIHearSound                              flags=0x0000 idx=350
+  AddController                            flags=0x0000 idx=4819
+  AvoidCertainDeath                        flags=0x0000 idx=3870
+  EnemyNotVisible                          flags=0x0000 idx=341
+  FireWeaponAt                             flags=0x0000 idx=4886
+  MonitoredPawnAlert                       flags=0x0000 idx=1543
+  NotifyPhysicsVolumeChange                flags=0x0000 idx=349
+  PawnDied                                 flags=0x0000 idx=3315
+  PawnIsInPain                             flags=0x0000 idx=4848
+  PickAnyTarget                            flags=0x0000 idx=4826
+  PickTarget                               flags=0x0000 idx=4821
+  RemoveController                         flags=0x0000 idx=4820
+  ServerGivePawn                           flags=0x0000 idx=3528
+  SetPawnClass                             flags=0x0000 idx=3830
+  WaitForLanding                           flags=0x0000 idx=4818
+  WaitForMover                             flags=0x0000 idx=3341
+  damageAttitudeTo                         flags=0x0000 idx=3511
+
+── CorpseManager ──
+  OnOtherPawnDied                          flags=0x0000 idx=1564
+
+── CrawlThroughDoorGoal ──
+  construct_AI_ResourceThreeStateDoorBool  flags=0x0000 idx=715
+
+── CrossbowProjectile ──
+  ActionBlockedByPawns                     flags=0x0000 idx=1454
+  GetHUDMessageForFocusAttained            flags=0x0000 idx=1846
+  GetTargetType                            flags=0x0000 idx=1523
+
+── Crossbow_ArmorPiercingBolt ──
+  ModifyDamageStimuli                      flags=0x0000 idx=2300
+
+── Crossbow_Bolt ──
+  ModifyDamageStimuli                      flags=0x0000 idx=2300
+
+── Crossbow_DiseaseBolt ──
+  ModifyDamageStimuli                      flags=0x0000 idx=2300
+
+── DamageEmitter ──
+  GetFireInstigator                        flags=0x0000 idx=1514
+
+── DamageFactory ──
+  DealRadiusDamage                         flags=0x0000 idx=18734
+  DealRadiusDamage_ActorVectorFloatFloatByteFloatFloat flags=0x0000 idx=18734
+  DealRadiusDamage_ActorVectorFloatFloatNameFloat flags=0x0000 idx=18734
+  DealSimpleDamage                         flags=0x0000 idx=20546
+  InitiateDamage                           flags=0x0000 idx=2280
+
+── DamageResistanceSet ──
+  ModifyDamageStimuli                      flags=0x0000 idx=2300
+
+── DamageStimuliSet ──
+  CausesPain                               flags=0x0000 idx=6603
+  GetDamageStimuliSet                      flags=0x0000 idx=6614
+  GetDamageStrength                        flags=0x0000 idx=6611
+  GetDamageType                            flags=0x0000 idx=6610
+  HasDamageStimulusType                    flags=0x0000 idx=6602
+  ShouldCauseInstantRagdollsToAIs          flags=0x0000 idx=6612
+  StimulusCausesPain                       flags=0x0000 idx=6606
+
+── DamageType ──
+  DeathMessage                             flags=0x0000 idx=6563
+  GetPawnDamageEffect                      flags=0x0000 idx=6560
+  GetPawnDamageEmitter                     flags=0x0000 idx=6558
+  GetPawnDamageSound                       flags=0x0000 idx=6557
+
+── DamageVolume ──
+  SetDamageDuration                        flags=0x0000 idx=2385
+  SetDamager                               flags=0x0000 idx=2386
+  SetInnerDamageRadius                     flags=0x0000 idx=2392
+  SetOuterDamageRadius                     flags=0x0000 idx=2393
+  SetTouchingWhenSpawned                   flags=0x0000 idx=19237
+
+── Decoration ──
+  PhysicsVolumeChange                      flags=0x0000 idx=312
+  Timer                                    flags=0x0000 idx=308
+
+── DecoyHumanAI ──
+  CharacterAICreated                       flags=0x0000 idx=17043
+  GetTargetType                            flags=0x0000 idx=1523
+  MovementAICreated                        flags=0x0000 idx=17077
+  OnDamaged                                flags=0x0000 idx=2309
+
+── DecoyHumanCommanderAction ──
+  GetRotationToRotationTarget              flags=0x0000 idx=26468
+  NotifyDamaged                            flags=0x0000 idx=25188
+
+── DifficultyManager ──
+  ModifyContainer                          flags=0x0000 idx=2299
+  Tick                                     flags=0x0000 idx=336
+  UpdateActiveAdjustments                  flags=0x0000 idx=19600
+  UpdateAdvisors                           flags=0x0000 idx=19604
+  UpdatePlayerState                        flags=0x0000 idx=2421
+
+── DifficultyStatsManager ──
+  Tick                                     flags=0x0000 idx=336
+
+── DiseasedExcretion ──
+  GetDamageStimuliSet                      flags=0x0000 idx=6614
+  IsValidTarget                            flags=0x0000 idx=18561
+
+── DodgeGoal ──
+  construct_AI_ResourceBool                flags=0x0000 idx=715
+
+── DoorButtonControl ──
+  ActionBlockedByPawns                     flags=0x0000 idx=1454
+  GetHUDMessageForFocusAttained            flags=0x0000 idx=1846
+  GetTargetType                            flags=0x0000 idx=1523
+
+── DoorKeypadControl ──
+  ActionBlockedByPawns                     flags=0x0000 idx=1454
+  GetHUDMessageForFocusAttained            flags=0x0000 idx=1846
+  GetTargetType                            flags=0x0000 idx=1523
+  OnHackFailed                             flags=0x0000 idx=2315
+
+── DouseGoal ──
+  construct_AI_ResourceShockPawn           flags=0x0000 idx=715
+
+── EcologyAI ──
+  CharacterAICreated                       flags=0x0000 idx=17043
+  GetAttackReactionAnimation               flags=0x0000 idx=25997
+
+── EcologyCommanderAction ──
+  HandleAIAttackNotification               flags=0x0000 idx=25076
+  HandleAIEventNotification                flags=0x0000 idx=25036
+
+── EcologyFighter ──
+  AddDamager                               flags=0x0000 idx=27548
+  AddForcedEnemy                           flags=0x0000 idx=24894
+  AddTargetToAttackOnSight                 flags=0x0000 idx=25474
+  AddUnreachableTarget                     flags=0x0000 idx=25407
+  CanAttack                                flags=0x0000 idx=27536
+  CharacterAICreated                       flags=0x0000 idx=17043
+  GetLastTimeDamagedByDamager              flags=0x0000 idx=27549
+  HasTargetBeenUnreachableForACertainAmountOfTime flags=0x0000 idx=27552
+  IsAtSpawnPoint                           flags=0x0000 idx=25412
+  IsForcedEnemy                            flags=0x0000 idx=27541
+  IsTargetToAttackOnSight                  flags=0x0000 idx=26006
+  NotifyAboutToBeAttackedByAnotherAI       flags=0x0000 idx=26008
+  OnAttackTargetReset                      flags=0x0000 idx=25409
+  OnHitByAirBlast                          flags=0x0000 idx=25207
+  RemoveForcedEnemy                        flags=0x0000 idx=26004
+  RemoveUnreachableTarget                  flags=0x0000 idx=25406
+  ResetAttackTarget                        flags=0x0000 idx=25301
+  SetCanAttack                             flags=0x0000 idx=27537
+  UpdateIntentionalDamage                  flags=0x0000 idx=25439
+
+── EcologyFighterCommanderAction ──
+  AddVisiblePawn                           flags=0x0000 idx=26216
+  AttackCurrentTarget                      flags=0x0000 idx=27889
+  CanReactToAttack                         flags=0x0000 idx=25198
+  GetCurrentlyVisiblePawns                 flags=0x0000 idx=26219
+  GetSpawnPoint                            flags=0x0000 idx=26232
+  HandleFinishedAttackTargetGoal           flags=0x0000 idx=25292
+  HasSpawnPoint                            flags=0x0000 idx=26231
+  IsVisiblePawn                            flags=0x0000 idx=25280
+  MoveToSpawnPoint                         flags=0x0000 idx=25160
+  NotifyDamaged                            flags=0x0000 idx=25188
+  NotifyFinishedAttacking                  flags=0x0000 idx=25634
+  OnAttackTargetSet                        flags=0x0000 idx=25633
+  OnDealtDamage                            flags=0x0000 idx=2310
+  OnLostPawn                               flags=0x0000 idx=25276
+  OnSawPawn                                flags=0x0000 idx=25168
+  OnSuspiciousTargetViewed                 flags=0x0000 idx=26220
+  RemoveVisiblePawn                        flags=0x0000 idx=25617
+  ResetAttackTarget                        flags=0x0000 idx=25301
+  ScriptedAttackTarget                     flags=0x0000 idx=24954
+  SearchForTarget                          flags=0x0000 idx=25166
+  SetAttackTarget                          flags=0x0000 idx=2636
+  ShouldUpdateInvestigateLocation          flags=0x0000 idx=26223
+  TestEnrageFailure                        flags=0x0000 idx=26226
+  UpdateAttackTargets                      flags=0x0000 idx=27891
+
+── EcologyFighterSpawner ──
+  DisplayAITypeName                        flags=0x0000 idx=19436
+
+── EscapeFromRepellantAction ──
+  GetUpdatedDestination                    flags=0x0000 idx=2599
+  GetUpdatedMovementLocation               flags=0x0000 idx=25537
+  StartMovement                            flags=0x0000 idx=25246
+
+── EscortAction ──
+  FindClosestTarget                        flags=0x0000 idx=26390
+  FindTargetToLookAtWhileGuarding          flags=0x0000 idx=26388
+  NotifyGathererThatWeAreAttacking         flags=0x0000 idx=25065
+  NotifyGathererThatWeStoppedAttacking     flags=0x0000 idx=25025
+  RemoveMovementGoalForGathererEnter       flags=0x0000 idx=26419
+  SpawnGatherer                            flags=0x0000 idx=25032
+
+── EscortGoal ──
+  NotifyGathererThatWeAreAttacking         flags=0x0000 idx=25065
+  NotifyGathererThatWeStoppedAttacking     flags=0x0000 idx=25025
+
+── EventReactionAction ──
+  RemoveMovementGoal                       flags=0x0000 idx=25299
+  StartMovement                            flags=0x0000 idx=25246
+
+── EventReactionGoal ──
+  construct_AI_ResourceAIEventNotification flags=0x0000 idx=715
+
+── ExplosiveProjectile ──
+  ExplodeOnNextTick                        flags=0x0000 idx=18761
+
+── ExplosiveProjectileAmmo ──
+  GetDamageDuration                        flags=0x0000 idx=2219
+  GetExplodeNearOtherPawnsRadius           flags=0x0000 idx=2224
+  GetExplodeOnPawnImpact                   flags=0x0000 idx=2226
+  GetInnerDamageRadius                     flags=0x0000 idx=2241
+  GetOuterDamageRadius                     flags=0x0000 idx=2247
+  GetSpawnableDamageSourceClass            flags=0x0000 idx=2257
+
+── ExplosiveProjectileAttackAbility ──
+  GetDamageDuration                        flags=0x0000 idx=2219
+  GetExplodeNearOtherPawnsRadius           flags=0x0000 idx=2224
+  GetExplodeOnPawnImpact                   flags=0x0000 idx=2226
+  GetInnerDamageRadius                     flags=0x0000 idx=2241
+  GetOuterDamageRadius                     flags=0x0000 idx=2247
+  GetSpawnableDamageSourceClass            flags=0x0000 idx=2257
+
+── ExplosiveTraceAttackAbility ──
+  GetExplosiveDamageStimuliSetName         flags=0x0000 idx=2227
+  GetInnerExplosiveDamageRadius            flags=0x0000 idx=2242
+  GetOuterExplosiveDamageRadius            flags=0x0000 idx=2248
+
+── FailedConnect ──
+  GetFailSwitch                            flags=0x0000 idx=3993
+
+── FallDownReactionAction ──
+  CanFlail                                 flags=0x0000 idx=25686
+  IsFlailing                               flags=0x0000 idx=26366
+  StartFlail                               flags=0x0000 idx=26365
+  StopFlail                                flags=0x0000 idx=25679
+
+── FlashGUIController ──
+  EnteredMainMenu                          flags=0x0000 idx=6180
+  GetSavedGameAvailable                    flags=0x0000 idx=6169
+  GetUseXBoxController                     flags=0x0000 idx=6170
+  LaunchMainMenu                           flags=0x0000 idx=3940
+  LeftMainMenu                             flags=0x0000 idx=6179
+  UpdateBrightnessValues                   flags=0x0000 idx=6207
+  UpdateCountdownTimer                     flags=0x0000 idx=6225
+  UpdateInputConfigGUIList                 flags=0x0000 idx=6208
+  UpdateInputConfigMovie                   flags=0x0000 idx=1656
+  UpdateIsWindowed                         flags=0x0000 idx=6241
+  UpdateMovieCommandName                   flags=0x0000 idx=3943
+
+── FleeGoal ──
+  construct_AI_ResourceVector              flags=0x0000 idx=715
+
+── FluidVolume ──
+  OnOtherPawnDied                          flags=0x0000 idx=1564
+
+── FollowPanicAction ──
+  GetUpdatedDestination                    flags=0x0000 idx=2599
+  OnOtherPawnDied                          flags=0x0000 idx=1564
+  StartMovementBehavior                    flags=0x0000 idx=26361
+
+── FuseBox ──
+  ActionBlockedByPawns                     flags=0x0000 idx=1454
+  GetHUDMessageForFocusAttained            flags=0x0000 idx=1846
+  GetTargetType                            flags=0x0000 idx=1523
+
+── GPSArrow ──
+  Tick                                     flags=0x0000 idx=336
+  UpdateAnimation                          flags=0x0000 idx=19208
+
+── GameInfo ──
+  BroadcastDeathMessage                    flags=0x0000 idx=3863
+  DetailChange                             flags=0x0000 idx=1490
+  GetCurrentTelekinesisTarget              flags=0x0000 idx=1510
+  GetSecuritySystemTarget                  flags=0x0000 idx=5934
+  GetServerDetails                         flags=0x0000 idx=3309
+  PreventDeath                             flags=0x0000 idx=3465
+  ReduceDamage                             flags=0x0000 idx=5740
+  Timer                                    flags=0x0000 idx=308
+
+── GameReplicationInfo ──
+  Timer                                    flags=0x0000 idx=308
+
+── GameRules ──
+  GetServerDetails                         flags=0x0000 idx=3309
+  NetDamage                                flags=0x0000 idx=3540
+  PreventDeath                             flags=0x0000 idx=3465
+
+── GamepadPlayerInput ──
+  PostPlayerPawnMovement                   flags=0x0000 idx=1582
+  SetStickyTarget                          flags=0x0000 idx=5584
+  StickyTargeting                          flags=0x0000 idx=3711
+  ToggleAutoAim                            flags=0x0000 idx=5583
+  UpdateSensitivityScale                   flags=0x0000 idx=1657
+  UpdateTargets                            flags=0x0000 idx=3712
+  UpdateZoomedLookModifier                 flags=0x0000 idx=5576
+
+── GatherResourceAction ──
+  GetUpdatedDestination                    flags=0x0000 idx=2599
+  IsResourceOnFire                         flags=0x0000 idx=25592
+  RemoveMovementBehavior                   flags=0x0000 idx=26331
+
+── GatherResourceGoal ──
+  construct_AI_ResourceActorBool           flags=0x0000 idx=715
+
+── Gatherer ──
+  ActionBlockedByPawns                     flags=0x0000 idx=1454
+  CharacterAICreated                       flags=0x0000 idx=17043
+  GetShockPawnEscort                       flags=0x0000 idx=19356
+  GetTargetType                            flags=0x0000 idx=1523
+  MovementAICreated                        flags=0x0000 idx=17077
+  NotifyEscortIsAttacking                  flags=0x0000 idx=19361
+  NotifyEscortOfDamage                     flags=0x0000 idx=26084
+  NotifyEscortStoppedAttacking             flags=0x0000 idx=25138
+  NotifyProtectorFinishedLookingAtTarget   flags=0x0000 idx=26113
+  NotifyProtectorLookingAtTarget           flags=0x0000 idx=26111
+  OnAIIntentionallyDamaged                 flags=0x0000 idx=2613
+  OnDamaged                                flags=0x0000 idx=2309
+  OnHackFailed                             flags=0x0000 idx=2315
+  OnHitByAirBlast                          flags=0x0000 idx=25207
+  UpdateEscortedGathererHealth             flags=0x0000 idx=19343
+
+── GathererCommanderAction ──
+  NotifyDamaged                            flags=0x0000 idx=25188
+  NotifyEscortIsAttacking                  flags=0x0000 idx=19361
+  NotifyEscortStoppedAttacking             flags=0x0000 idx=25138
+  OnOtherPawnDied                          flags=0x0000 idx=1564
+  PEGShouldStopWaiting                     flags=0x0000 idx=26292
+  PEGShouldWait                            flags=0x0000 idx=26294
+  SetDistanceForPEGToWait                  flags=0x0000 idx=26291
+  ShouldHandleDamageEvents                 flags=0x0000 idx=24966
+
+── GathererLookAtTargetAction ──
+  GetRotationToTarget                      flags=0x0000 idx=25008
+  LookAtTarget                             flags=0x0000 idx=26258
+  MoveToViewTarget                         flags=0x0000 idx=26270
+  SetRequiredDistanceToTarget              flags=0x0000 idx=26272
+  ShouldStopMovingToTarget                 flags=0x0000 idx=24880
+
+── GathererLookAtTargetGoal ──
+  construct_AI_ResourceActor               flags=0x0000 idx=715
+
+── GathererVent ──
+  ActionBlockedByPawns                     flags=0x0000 idx=1454
+  GetCurrentAI                             flags=0x0000 idx=25304
+  GetGathererSpawnLocation                 flags=0x0000 idx=27488
+  GetHUDMessageForFocusAttained            flags=0x0000 idx=1846
+  GetTargetType                            flags=0x0000 idx=1523
+  HasCurrentAI                             flags=0x0000 idx=25653
+  ResetCurrentAI                           flags=0x0000 idx=25029
+  SetCurrentAI                             flags=0x0000 idx=25306
+  SetPlayerCanSpawn                        flags=0x0000 idx=26254
+  SpawnGatherer                            flags=0x0000 idx=25032
+  TakeDamage                               flags=0x0000 idx=1644
+  TakeScriptedDamage                       flags=0x0000 idx=1645
+
+── Ghost ──
+  CharacterAICreated                       flags=0x0000 idx=17043
+  MovementAICreated                        flags=0x0000 idx=17077
+
+── Grenadier ──
+  CharacterAICreated                       flags=0x0000 idx=17043
+  IsReadyForSuicideAttack                  flags=0x0000 idx=27582
+  OnDamaged                                flags=0x0000 idx=2309
+  ShouldDropWeaponsOnDeath                 flags=0x0000 idx=25248
+
+── GrenadierAttackAction ──
+  AttackTarget                             flags=0x0000 idx=24007
+  CanAttackTarget                          flags=0x0000 idx=24919
+  CanAttackWithGrenadeWeapon               flags=0x0000 idx=25053
+  CanAttackWithMeleeWeapon                 flags=0x0000 idx=24909
+  CanAttackWithSuicideWeapon               flags=0x0000 idx=26251
+  GetUpdatedDestination                    flags=0x0000 idx=2599
+  IsShortMovement                          flags=0x0000 idx=27484
+  NotifyFinishedAttackingTarget            flags=0x0000 idx=24964
+  OnDamagedByTarget                        flags=0x0000 idx=25014
+  ShouldStopMovingToTarget                 flags=0x0000 idx=24880
+
+── HUD ──
+  ConnectFailure                           flags=0x0000 idx=832
+  DisplayPortrait                          flags=0x0000 idx=5496
+  SpawnScoreBoard                          flags=0x0000 idx=3757
+
+── Hands ──
+  FireWeapon                               flags=0x0000 idx=6514
+  OnSpawnedDamageEmitter                   flags=0x0000 idx=2336
+  UpdateAbilityUsability                   flags=0x0000 idx=2416
+  UpdateHandBobAnimationParameters         flags=0x0000 idx=19362
+  UpdateHandValues                         flags=0x0000 idx=2417
+  UpdateLocation                           flags=0x0000 idx=19359
+
+── HavokConstraint ──
+  RecreateConstraint                       flags=0x0000 idx=5420
+  UpdateConstraintDetails                  flags=0x0000 idx=3245
+
+── HavokVehicle ──
+  HavokUpdateState                         flags=0x0000 idx=1526
+  Tick                                     flags=0x0000 idx=336
+  UpdateVehicle                            flags=0x0000 idx=1658
+
+── Head ──
+  UpdateLocationAndRotation                flags=0x0000 idx=2418
+
+── HeadTrackingAction ──
+  OnOtherPawnDied                          flags=0x0000 idx=1564
+
+── HealAtHealthStationAction ──
+  MoveToTargetHealthStation                flags=0x0000 idx=26236
+  UseTargetHealthStation                   flags=0x0000 idx=26235
+
+── HealAtHealthStationGoal ──
+  construct_AI_ResourceShockPawn           flags=0x0000 idx=715
+
+── HealthStation ──
+  CanInteractWithAI                        flags=0x0000 idx=18643
+  OnAIInteract                             flags=0x0000 idx=21276
+  SetUsableByAIs                           flags=0x0000 idx=20223
+  SpawnHypos                               flags=0x0000 idx=19201
+  TakeDamage                               flags=0x0000 idx=1644
+  TakeScriptedDamage                       flags=0x0000 idx=1645
+
+── HelloWorldCommandlet ──
+  Main                                     flags=0x0000 idx=827
+
+── Holdable ──
+  IsAvailable                              flags=0x0000 idx=18564
+
+── IBooty ──
+  ClaimBooty                               flags=0x0000 idx=2584
+  GetUpdatedGatherPointLocation            flags=0x0000 idx=2600
+  GetUpdatedRigidBodyLocation              flags=0x0000 idx=2601
+
+── ICameraMovementController ──
+  UpdateDesiredRotation                    flags=0x0000 idx=25080
+
+── ICanBeControlled ──
+  AttackSpecifiedTarget                    flags=0x0000 idx=2173
+  OnControllerDamaged                      flags=0x0000 idx=2304
+  OnControllerDealtDamage                  flags=0x0000 idx=2305
+  OnControllerDestroyed                    flags=0x0000 idx=2306
+  OnControllerKilled                       flags=0x0000 idx=2307
+
+── ICanBeFocused ──
+  GetHUDMessageForFocusAttained            flags=0x0000 idx=1846
+
+── ICanBeHacked ──
+  GetHUDMessageForHackFocusAttained        flags=0x0000 idx=2230
+  OnHackFailed                             flags=0x0000 idx=2315
+
+── ICanBeUsed ──
+  GetHUDMessageForUseFocusAttained         flags=0x0000 idx=1847
+
+── ICanPropagateFire ──
+  GetFireInstigator                        flags=0x0000 idx=1514
+
+── IDamagee ──
+  TakeDamage                               flags=0x0000 idx=1644
+  TakeScriptedDamage                       flags=0x0000 idx=1645
+
+── IDamager ──
+  InitiateDamage                           flags=0x0000 idx=2280
+
+── IFilterDamageTargets ──
+  NotifyHitTarget                          flags=0x0000 idx=2301
+  ShouldDamageTarget                       flags=0x0000 idx=2398
+
+── IHaveAContainer ──
+  GetContainer                             flags=0x0000 idx=2212
+
+── IInterestedPawnDied ──
+  OnOtherPawnDied                          flags=0x0000 idx=1564
+
+── ILocomotionListener ──
+  OnLocomotionMovementRequestCompleted     flags=0x0000 idx=1561
+
+── ILootDifficultyAdjustment ──
+  ModifyContainer                          flags=0x0000 idx=2299
+
+── IPhotographTarget ──
+  RegisterPhotographTarget                 flags=0x0000 idx=2372
+  UnregisterPhotographTarget               flags=0x0000 idx=2415
+
+── IPotentialAimOrActionTarget ──
+  ActionBlockedByPawns                     flags=0x0000 idx=1454
+  GetTargetType                            flags=0x0000 idx=1523
+
+── IProvideDamageData ──
+  GetAttackRange                           flags=0x0000 idx=2209
+  GetDamageStimuliSetName                  flags=0x0000 idx=2220
+  ModifyDamageStimuli                      flags=0x0000 idx=2300
+
+── IProvideExplosiveProjectileDamageData ──
+  GetDamageDuration                        flags=0x0000 idx=2219
+  GetExplodeNearOtherPawnsRadius           flags=0x0000 idx=2224
+  GetExplodeOnPawnImpact                   flags=0x0000 idx=2226
+  GetInnerDamageRadius                     flags=0x0000 idx=2241
+  GetOuterDamageRadius                     flags=0x0000 idx=2247
+  GetSpawnableDamageSourceClass            flags=0x0000 idx=2257
+
+── IProvideExplosiveTraceDamageData ──
+  GetExplosiveDamageStimuliSetName         flags=0x0000 idx=2227
+  GetInnerExplosiveDamageRadius            flags=0x0000 idx=2242
+  GetOuterExplosiveDamageRadius            flags=0x0000 idx=2248
+
+── IProvideInsectSwarmProjectileDamageData ──
+  GetClassToSpawn                          flags=0x0000 idx=2211
+
+── IProvideMeleeDamageData ──
+  GetAIvsAIMeleeRange                      flags=0x0000 idx=2202
+  GetAttackAngle                           flags=0x0000 idx=2208
+
+── IProvideProjectileDamageData ──
+  GetNumProjectilesToFire                  flags=0x0000 idx=2245
+  GetSpreadAngleOfFire                     flags=0x0000 idx=2258
+
+── IProvideRadialDamageData ──
+  ShouldDamageDamager                      flags=0x0000 idx=2397
+
+── IProvideTraceDamageData ──
+  GetNumTracesToFire                       flags=0x0000 idx=2246
+  GetSpreadOfFire                          flags=0x0000 idx=2259
+
+── IShotNotification ──
+  OnShooterFiredShot                       flags=0x0000 idx=17073
+
+── ISpawnableDamageSource ──
+  SetDamageDuration                        flags=0x0000 idx=2385
+  SetDamager                               flags=0x0000 idx=2386
+  SetInnerDamageRadius                     flags=0x0000 idx=2392
+  SetOuterDamageRadius                     flags=0x0000 idx=2393
+
+── ISpawningManager ──
+  DisableAllAIsExcept                      flags=0x0000 idx=1492
+  EnableAllAIs                             flags=0x0000 idx=1494
+  GetNumSpawnZones                         flags=0x0000 idx=1519
+  GetSpawnZoneByIndex                      flags=0x0000 idx=1522
+  NotifyAISpawned                          flags=0x0000 idx=1547
+  NotifyNearbyProtectorsOfAttackOnPerceivedGatherer flags=0x0000 idx=1552
+  PostAIEventNotification                  flags=0x0000 idx=1574
+  ResetAIAggressionTowards                 flags=0x0000 idx=1611
+  RetainRequiredAnimationGroups            flags=0x0000 idx=1614
+  SendPawnTookDamageMessages               flags=0x0000 idx=1615
+
+── ITakeCollisionDamage ──
+  TakeCollisionDamage                      flags=0x0000 idx=1876
+
+── IVisionNotification ──
+  OnViewerLostPawn                         flags=0x0000 idx=1866
+  OnViewerSawPawn                          flags=0x0000 idx=1867
+
+── IWatchForPlayerAttacks ──
+  OnPlayerAttacks                          flags=0x0000 idx=19174
+
+── IWatchForPlayerBeingAttackedByProtector ──
+  OnPlayerAttacked                         flags=0x0000 idx=19173
+
+── IcicleAssaultAbility ──
+  GetNumTracesToFire                       flags=0x0000 idx=2246
+
+── InsectSwarm ──
+  CharacterAICreated                       flags=0x0000 idx=17043
+  GetAttackRange                           flags=0x0000 idx=2209
+  GetAttackTimeDelta                       flags=0x0000 idx=27459
+  GetDamagePerSecond                       flags=0x0000 idx=26224
+  GetDamageStimuliSetName                  flags=0x0000 idx=2220
+  GetRandomAttackTimeDelta                 flags=0x0000 idx=26225
+  MovementAICreated                        flags=0x0000 idx=17077
+  ScriptedAttackTarget                     flags=0x0000 idx=24954
+  SpawnSwarm                               flags=0x0000 idx=26230
+  UpdateTimeToLive                         flags=0x0000 idx=19347
+
+── InsectSwarmAttackAction ──
+  Attack                                   flags=0x0000 idx=25288
+  DoDamage                                 flags=0x0000 idx=26217
+  GetUpdatedDestination                    flags=0x0000 idx=2599
+  InitiateMovement                         flags=0x0000 idx=24951
+  IsValidTarget                            flags=0x0000 idx=18561
+  IsWithinAttackRange                      flags=0x0000 idx=25626
+  NotifyTargetNotBeingAttacked             flags=0x0000 idx=25612
+  NotifyTargetOfAttack                     flags=0x0000 idx=26215
+  TargetLocation                           flags=0x0000 idx=23641
+
+── InsectSwarmAttackGoal ──
+  construct_AI_Resource                    flags=0x0000 idx=715
+  construct_AI_ResourceShockPawnRotator    flags=0x0000 idx=715
+
+── InsectSwarmCommanderAction ──
+  AttackAvailableTargets                   flags=0x0000 idx=26206
+  AttackSpecifiedTarget                    flags=0x0000 idx=2173
+  FindNewAttackTarget                      flags=0x0000 idx=26210
+  GetRandomTarget                          flags=0x0000 idx=26209
+  IsValidAttackTarget                      flags=0x0000 idx=24984
+  OnViewerLostPawn                         flags=0x0000 idx=1866
+  OnViewerSawPawn                          flags=0x0000 idx=1867
+  ShouldHandleDamageEvents                 flags=0x0000 idx=24966
+
+── InsectSwarmProjectile ──
+  SpawnInsectSwarm                         flags=0x0000 idx=2642
+
+── InsectSwarmSearchAction ──
+  GetUpdatedDestination                    flags=0x0000 idx=2599
+  InitiateMovement                         flags=0x0000 idx=24951
+
+── InsectSwarmSearchGoal ──
+  construct_AI_Resource                    flags=0x0000 idx=715
+  construct_AI_ResourceRotator             flags=0x0000 idx=715
+
+── Interaction ──
+  Tick                                     flags=0x0000 idx=336
+
+── InteractionMaster ──
+  Process_Tick                             flags=0x0000 idx=1601
+
+── InventoryManager ──
+  CloseContainer                           flags=0x0000 idx=2186
+  GetCurrentContainer                      flags=0x0000 idx=18152
+  OpenContainer                            flags=0x0000 idx=18337
+  ReRollContainer                          flags=0x0000 idx=6495
+  RecycleOrDestroyContainerSlot            flags=0x0000 idx=18306
+  SelectAllContainerSlots                  flags=0x0000 idx=20158
+  SelectContainerSlot                      flags=0x0000 idx=19156
+
+── InvestigateAction ──
+  GetUpdatedDestination                    flags=0x0000 idx=2599
+  NotifyInvestigateLocationUpdated         flags=0x0000 idx=26203
+  StopAnyMovementOrAnimation               flags=0x0000 idx=26176
+
+── InvestigateGoal ──
+  UpdateInvestigationLocation              flags=0x0000 idx=26169
+  construct_AI_ResourceVectorVectorName    flags=0x0000 idx=715
+
+── JumpToCeilingGoal ──
+  construct_AI_ResourceIntVector           flags=0x0000 idx=715
+
+── JumpToFloorGoal ──
+  construct_AI_ResourceIntVector           flags=0x0000 idx=715
+
+── LevelInfo ──
+  AT_Tick                                  flags=0x0000 idx=1451
+  DetailChange                             flags=0x0000 idx=1490
+  FlashGUIControllerExists                 flags=0x0000 idx=5297
+  GetFlashGUIController                    flags=0x0000 idx=5296
+  GetFlashLiaison                          flags=0x0000 idx=1515
+  GetGlobalTravelContainer                 flags=0x0000 idx=1516
+  GetLocalPlayerController                 flags=0x0000 idx=5322
+  RegisterNotifyPawnDied                   flags=0x0000 idx=5315
+  StartHackingTimer                        flags=0x0000 idx=5327
+  StopHackingTimer                         flags=0x0000 idx=5326
+  UnRegisterNotifyPawnDied                 flags=0x0000 idx=5317
+
+── MachineGun_FrozenBullet ──
+  ModifyDamageStimuli                      flags=0x0000 idx=2300
+
+── MeleeAmmo ──
+  GetAIvsAIMeleeRange                      flags=0x0000 idx=2202
+  GetAttackAngle                           flags=0x0000 idx=2208
+
+── MeleeAttackAbility ──
+  GetAIvsAIMeleeRange                      flags=0x0000 idx=2202
+  GetAttackAngle                           flags=0x0000 idx=2208
+  GetAttackRange                           flags=0x0000 idx=2209
+
+── MeleeThug ──
+  CharacterAICreated                       flags=0x0000 idx=17043
+
+── MeleeThugAttackAction ──
+  AttackTarget                             flags=0x0000 idx=24007
+  CanAttackTarget                          flags=0x0000 idx=24919
+  CanPushTarget                            flags=0x0000 idx=25129
+  GetProjectedTargetPosition               flags=0x0000 idx=25486
+  GetUpdatedDestination                    flags=0x0000 idx=2599
+  IsAnimatingWhileAttacking                flags=0x0000 idx=27286
+  IsTooCloseToTarget                       flags=0x0000 idx=26070
+  NotifyBeginningAttack                    flags=0x0000 idx=24950
+  NotifyCannotAttackTarget                 flags=0x0000 idx=25038
+  NotifyFinishedAttackingTarget            flags=0x0000 idx=24964
+  OnDamagedByTarget                        flags=0x0000 idx=25014
+  PushTarget                               flags=0x0000 idx=25124
+  ShouldStopMovingToTarget                 flags=0x0000 idx=24880
+
+── MessageAIBecamePassive ──
+  construct_ShockAI                        flags=0x0000 idx=715
+
+── MessageAISpawned ──
+  construct_ShockAI                        flags=0x0000 idx=715
+
+── MessageAIWeaponFired ──
+  construct_ShockAIWeapon                  flags=0x0000 idx=715
+
+── MessageObjectPhotographed ──
+  construct_IPhotographTargetInt           flags=0x0000 idx=715
+
+── MessagePawnAquiredState ──
+  construct_ShockPawnNameBool              flags=0x0000 idx=715
+
+── MessagePawnDied ──
+  construct_ShockPawn                      flags=0x0000 idx=715
+
+── MessagePawnShattered ──
+  construct_ShockPawn                      flags=0x0000 idx=715
+
+── MessagePawnTookDamage ──
+  construct_ShockPawnActor                 flags=0x0000 idx=715
+
+── MessagePlayerCollectedGatherer ──
+  construct_BaseShockAI                    flags=0x0000 idx=715
+
+── MessagePlayerPacifiedGatherer ──
+  construct_BaseShockAI                    flags=0x0000 idx=715
+
+── MessagePlayerSavedGatherer ──
+  construct_BaseShockAI                    flags=0x0000 idx=715
+
+── MessagePlayerStartedPacifyingGatherer ──
+  construct_BaseShockAI                    flags=0x0000 idx=715
+
+── MessagePlayerStartedSavingGatherer ──
+  construct_BaseShockAI                    flags=0x0000 idx=715
+
+── MessageSoundStopped ──
+  GetSoundCategoryFriendlyName             flags=0x0000 idx=11963
+
+── MinimumSecurityBot ──
+  DisableMovement                          flags=0x0000 idx=23609
+  EnableMovement                           flags=0x0000 idx=25231
+
+── MovableSpotlight ──
+  DisplayAITypeName                        flags=0x0000 idx=19436
+
+── MoveToAction ──
+  IsMovementSatisfied                      flags=0x0000 idx=24955
+  OnLocomotionMovementRequestCompleted     flags=0x0000 idx=1561
+  UpdateDestination                        flags=0x0000 idx=26059
+  UpdateRotation                           flags=0x0000 idx=3243
+
+── MoveToGoal ──
+  GetUpdatedDestination                    flags=0x0000 idx=2599
+  IsMovementSatisfied                      flags=0x0000 idx=24955
+  SetMovementType                          flags=0x0000 idx=2637
+  construct_AI_Resource                    flags=0x0000 idx=715
+  construct_AI_ResourceIntActor            flags=0x0000 idx=715
+  construct_AI_ResourceIntVectorBool       flags=0x0000 idx=715
+
+── MoveToSpawnPointAction ──
+  MoveToSpawnPoint                         flags=0x0000 idx=25160
+
+── MoveToSpawnPointGoal ──
+  construct_AI_Resource                    flags=0x0000 idx=715
+  construct_AI_ResourceActor               flags=0x0000 idx=715
+
+── Mover ──
+  Timer                                    flags=0x0000 idx=308
+
+── Mutator ──
+  GetServerDetails                         flags=0x0000 idx=3309
+
+── NavigationPoint ──
+  GetPawnUsageLocation                     flags=0x0000 idx=4951
+
+── Object ──
+  ChopTrailingWhitespace                   flags=0x0000 idx=2783
+  InterpCurveGetInputDomain                flags=0x0000 idx=2777
+  StopWaiting                              flags=0x0000 idx=2753
+
+── PanicGoal ──
+  construct_AI_ResourceShockPawn           flags=0x0000 idx=715
+
+── ParticleEmitter ──
+  SpawnParticle                            flags=0x0000 idx=6226
+
+── PatrolGoal ──
+  construct_AI_Resource                    flags=0x0000 idx=715
+  construct_AI_ResourcePatrolList          flags=0x0000 idx=715
+
+── Pawn ──
+  AddPawn                                  flags=0x0000 idx=3728
+  BecomeViewTarget                         flags=0x0000 idx=3280
+  BreathTimer                              flags=0x0000 idx=1467
+  CrushPawn                                flags=0x0000 idx=3703
+  GetKillerController                      flags=0x0000 idx=5142
+  GetMoveTarget                            flags=0x0000 idx=3644
+  IsInPain                                 flags=0x0000 idx=3947
+  IsPlayerPawn                             flags=0x0000 idx=3213
+  JumpOffPawn                              flags=0x0000 idx=3704
+  NearMoveTarget                           flags=0x0000 idx=5177
+  NotifyPawnDeathListeners                 flags=0x0000 idx=3699
+  PlayWaiting                              flags=0x0000 idx=3286
+  PressingAltFire                          flags=0x0000 idx=5174
+  PressingFire                             flags=0x0000 idx=5176
+  RemovePawn                               flags=0x0000 idx=3726
+  SetMoveTarget                            flags=0x0000 idx=3710
+  SetMovementPhysics                       flags=0x0000 idx=5144
+  TakeDrowningDamage                       flags=0x0000 idx=3694
+  TakeFallingDamage                        flags=0x0000 idx=3707
+  UpdateEyeHeight                          flags=0x0000 idx=343
+  UpdateRocketAcceleration                 flags=0x0000 idx=3690
+  WasPlayerPawn                            flags=0x0000 idx=5182
+
+── PhysicsVolume ──
+  PawnEnteredVolume                        flags=0x0000 idx=332
+  PawnLeavingVolume                        flags=0x0000 idx=335
+  PhysicsChangedFor                        flags=0x0000 idx=359
+  TimerPop                                 flags=0x0000 idx=3609
+
+── PickedUpPanicAction ──
+  OnOtherPawnDied                          flags=0x0000 idx=1564
+
+── Pickup ──
+  GetTargetType                            flags=0x0000 idx=1523
+
+── Pistol ──
+  GetFireRate                              flags=0x0000 idx=18413
+  ResetBurstShotsRemaining                 flags=0x0000 idx=18586
+
+── PlasmidManager ──
+  GetAvailablePlasmidNameByIndex           flags=0x0000 idx=18548
+  GetNumAvailablePlasmids                  flags=0x0000 idx=18560
+
+── PlayerController ──
+  AskForPawn                               flags=0x0000 idx=3434
+  ChangeStairLook                          flags=0x0000 idx=5660
+  ClientSetViewTarget                      flags=0x0000 idx=1482
+  ClientUpdatePosition                     flags=0x0000 idx=3697
+  FindStairRotation                        flags=0x0000 idx=5524
+  ForceDeathUpdate                         flags=0x0000 idx=5561
+  GetCameraFocusTarget                     flags=0x0000 idx=1507
+  GivePawn                                 flags=0x0000 idx=3613
+  PawnDied                                 flags=0x0000 idx=3315
+  PlayerTick                               flags=0x0000 idx=337
+  ServerGivePawn                           flags=0x0000 idx=3528
+  ServerUpdatePing                         flags=0x0000 idx=3701
+  ServerVerifyViewTarget                   flags=0x0000 idx=3732
+  SetViewTarget                            flags=0x0000 idx=5521
+  SpawnDefaultHUD                          flags=0x0000 idx=3730
+  TurnTowardNearestEnemy                   flags=0x0000 idx=3645
+  UpdateFlashComponent                     flags=0x0000 idx=5533
+  UpdateRotation                           flags=0x0000 idx=3243
+  UpdateURL                                flags=0x0000 idx=5522
+  damageAttitudeTo                         flags=0x0000 idx=3511
+
+── PlayerEscortedGatherer ──
+  NotifyEscortIsAttacking                  flags=0x0000 idx=19361
+  OnAIIntentionallyDamaged                 flags=0x0000 idx=2613
+
+── PlayerInput ──
+  PostPlayerPawnMovement                   flags=0x0000 idx=1582
+  UpdateAccel                              flags=0x0000 idx=3689
+  UpdateSensitivity                        flags=0x0000 idx=3687
+  UpdateSmoothing                          flags=0x0000 idx=3696
+
+── PlayerReplicationInfo ──
+  GetPortrait                              flags=0x0000 idx=4249
+  SetWaitingPlayer                         flags=0x0000 idx=3630
+  Timer                                    flags=0x0000 idx=308
+  UpdateCharacter                          flags=0x0000 idx=1655
+  UpdatePlayerLocation                     flags=0x0000 idx=4031
+
+── PlayerStatsManager ──
+  DryFire                                  flags=0x0000 idx=18371
+  EnrageFailure                            flags=0x0000 idx=18270
+  PlayerAbilityFired                       flags=0x0000 idx=18470
+  PlayerDamaged                            flags=0x0000 idx=18316
+  PlayerDealtDamage                        flags=0x0000 idx=18317
+  PlayerHitTarget                          flags=0x0000 idx=2358
+  PlayerMaxBioAmmoUpdated                  flags=0x0000 idx=18452
+  PlayerMaxHealthUpdated                   flags=0x0000 idx=18456
+  PlayerMovement                           flags=0x0000 idx=18489
+  PlayerWeaponFired                        flags=0x0000 idx=18474
+  ShockedAIinWater                         flags=0x0000 idx=2396
+
+── PlayerWeapon ──
+  GetIdlingAltFireAttachmentAnim           flags=0x0000 idx=18631
+  GiveAltFireMod                           flags=0x0000 idx=2268
+  HasAltFireMod                            flags=0x0000 idx=2272
+  PendingFire                              flags=0x0000 idx=18382
+  PostFired                                flags=0x0000 idx=18644
+  Timer                                    flags=0x0000 idx=308
+
+── ProjectileAmmo ──
+  GetNumProjectilesToFire                  flags=0x0000 idx=2245
+  GetSpreadAngleOfFire                     flags=0x0000 idx=2258
+
+── ProjectileAttackAbility ──
+  GetNumProjectilesToFire                  flags=0x0000 idx=2245
+  GetSpreadAngleOfFire                     flags=0x0000 idx=2258
+
+── ProtectPlayerAction ──
+  ShouldStopMovingToTarget                 flags=0x0000 idx=24880
+
+── ProtectPlayerGoal ──
+  construct_AI_ResourceShockPlayer         flags=0x0000 idx=715
+
+── Protector ──
+  AttackSpecifiedTarget                    flags=0x0000 idx=2173
+  BecomeFriendlyTowardsPlayer              flags=0x0000 idx=2579
+  CharacterAICreated                       flags=0x0000 idx=17043
+  GetBashTargetAnimationName               flags=0x0000 idx=26539
+  GetGathererDeathReactionAnimation        flags=0x0000 idx=26541
+  GetLastThreatenTarget                    flags=0x0000 idx=26518
+  GetSubsequentWaitingForGathererGestureAnimationName flags=0x0000 idx=26538
+  GetTargetType                            flags=0x0000 idx=1523
+  GetWaitToPickUpGathererAnimation         flags=0x0000 idx=26556
+  GetWaitingForGathererGestureAnimationName flags=0x0000 idx=26537
+  IsMoveOutOfTheWayTargetWithinRange       flags=0x0000 idx=26459
+  IsSuspectingAttackFrom                   flags=0x0000 idx=19371
+  MovementAICreated                        flags=0x0000 idx=17077
+  NotifyAttackDamagerOfPerceivedGatherer   flags=0x0000 idx=25329
+  NotifyEscortedGathererDamaged            flags=0x0000 idx=25340
+  NotifyGathererFinishedLookingAtTarget    flags=0x0000 idx=25355
+  NotifyGathererLookingAtTarget            flags=0x0000 idx=25358
+  NotifyRemoveThreatenTarget               flags=0x0000 idx=25339
+  NotifyThreatenTarget                     flags=0x0000 idx=25331
+  OnAttackTargetReset                      flags=0x0000 idx=25409
+  OnControllerDamaged                      flags=0x0000 idx=2304
+  OnControllerDealtDamage                  flags=0x0000 idx=2305
+  OnControllerDestroyed                    flags=0x0000 idx=2306
+  OnControllerKilled                       flags=0x0000 idx=2307
+  OnDamaged                                flags=0x0000 idx=2309
+  ResetAttackTargets                       flags=0x0000 idx=25179
+  SetLastThreatenTarget                    flags=0x0000 idx=26519
+  ShouldAttackThreateningPlayer            flags=0x0000 idx=26564
+
+── ProtectorAttackAction ──
+  GetRotationTowardsAttackTarget           flags=0x0000 idx=26579
+  NotifyAttackCompleted                    flags=0x0000 idx=25211
+  NotifyBeginningAttack                    flags=0x0000 idx=24950
+  ScreamAtTarget                           flags=0x0000 idx=26578
+
+── ProtectorCommanderAction ──
+  AddUniqueEscortDamager                   flags=0x0000 idx=25400
+  HasDamagedGatherer                       flags=0x0000 idx=27260
+  InvestigateGathererDamage                flags=0x0000 idx=26010
+  IsSuspectingAttackFrom                   flags=0x0000 idx=19371
+  NotifyAttackDamagerOfPerceivedGatherer   flags=0x0000 idx=25329
+  NotifyEscortedGathererDamaged            flags=0x0000 idx=25340
+  NotifyFinishedAttacking                  flags=0x0000 idx=25634
+  NotifyGathererFinishedLookingAtTarget    flags=0x0000 idx=25355
+  NotifyGathererLookingAtTarget            flags=0x0000 idx=25358
+  NotifyGathererThatWeAreAttacking         flags=0x0000 idx=25065
+  NotifyGathererThatWeStoppedAttacking     flags=0x0000 idx=25025
+  NotifyRemoveThreatenTarget               flags=0x0000 idx=25339
+  NotifyThreatenTarget                     flags=0x0000 idx=25331
+  OnAttackTargetSet                        flags=0x0000 idx=25633
+  RemoveEscortDamager                      flags=0x0000 idx=26011
+  ResetAttackTarget                        flags=0x0000 idx=25301
+  ResetAttackTargets                       flags=0x0000 idx=25179
+  SearchForTarget                          flags=0x0000 idx=25166
+  StopThreateningTarget                    flags=0x0000 idx=25151
+  ThreatenTarget                           flags=0x0000 idx=26492
+
+── QuestManager ──
+  FailQuest                                flags=0x0000 idx=18391
+
+── RadialAmmo ──
+  ModifyDamageStimuli                      flags=0x0000 idx=2300
+  ShouldDamageDamager                      flags=0x0000 idx=2397
+
+── RadialAttackAbility ──
+  GetAttackRange                           flags=0x0000 idx=2209
+  ShouldDamageDamager                      flags=0x0000 idx=2397
+
+── RadiusDamageEffectVolume ──
+  GetDamageStimuliSet                      flags=0x0000 idx=6614
+  IsValidTarget                            flags=0x0000 idx=18561
+
+── RadiusEffectVolume ──
+  IsValidTarget                            flags=0x0000 idx=18561
+  PlaySpawnAnimationSequence               flags=0x0000 idx=19321
+
+── Ragdoll ──
+  SwapInFixedConstraints                   flags=0x0000 idx=4617
+  SwapOutFixedConstraints                  flags=0x0000 idx=4619
+
+── RangedAggressorAttackAction ──
+  AttackTarget                             flags=0x0000 idx=24007
+  CanAttackTarget                          flags=0x0000 idx=24919
+  CanAttackWithMeleeWeapon                 flags=0x0000 idx=24909
+  CanAttackWithRangedWeapon                flags=0x0000 idx=24900
+  CanPushTarget                            flags=0x0000 idx=25129
+  GetUpdatedDestination                    flags=0x0000 idx=2599
+  IsCloseToTarget                          flags=0x0000 idx=26005
+  NotifyCannotAttackTarget                 flags=0x0000 idx=25038
+  NotifyFinishedAttackingTarget            flags=0x0000 idx=24964
+  OnDamagedByTarget                        flags=0x0000 idx=25014
+  PushTarget                               flags=0x0000 idx=25124
+  ShouldMoveToTargetForMeleeAttack         flags=0x0000 idx=25100
+  ShouldStopMovingToTarget                 flags=0x0000 idx=24880
+
+── RangedAggressorChargedBurstWeapon ──
+  Tick                                     flags=0x0000 idx=336
+
+── RangedAggressorPistol ──
+  CharacterAICreated                       flags=0x0000 idx=17043
+
+── RangedAggressorSMG ──
+  CharacterAICreated                       flags=0x0000 idx=17043
+
+── ReactToAlertGathererAction ──
+  FaceTarget                               flags=0x0000 idx=25018
+  GetRotationToTarget                      flags=0x0000 idx=25008
+  OnOtherPawnDied                          flags=0x0000 idx=1564
+
+── ReactToAlertGathererGoal ──
+  construct_AI_Resource                    flags=0x0000 idx=715
+  construct_AI_ResourceGathererProtector   flags=0x0000 idx=715
+
+── ReactToDamageGoal ──
+  construct_AI_ResourceByteVectorVectorVectorFloatDamageStimuliSetNameName flags=0x0000 idx=715
+
+── ReactToGathererDeathAction ──
+  MoveToReactionTarget                     flags=0x0000 idx=25980
+
+── ReactToGathererDeathGoal ──
+  construct_AI_ResourceGathererShockPawn   flags=0x0000 idx=715
+
+── ReactToTiredGathererAction ──
+  OnOtherPawnDied                          flags=0x0000 idx=1564
+  WaitForGathererToRotate                  flags=0x0000 idx=25968
+
+── ReactiveActor ──
+  ActionBlockedByPawns                     flags=0x0000 idx=1454
+  GetFireInstigator                        flags=0x0000 idx=1514
+  GetHUDMessageForFocusAttained            flags=0x0000 idx=1846
+  GetTargetType                            flags=0x0000 idx=1523
+  OnDamaged                                flags=0x0000 idx=2309
+  TakeCollisionDamage                      flags=0x0000 idx=1876
+  TakeDamage                               flags=0x0000 idx=1644
+  TakeScriptedDamage                       flags=0x0000 idx=1645
+  editDamageTypeList                       flags=0x0000 idx=17094
+  editMobilityRestoringDamageType          flags=0x0000 idx=17095
+
+── ReactiveAnimatedMesh ──
+  Tick                                     flags=0x0000 idx=336
+
+── RemoveItemsAdjustment ──
+  ModifyContainer                          flags=0x0000 idx=2299
+
+── ResearchCamera ──
+  GiveAltFireMod                           flags=0x0000 idx=2268
+
+── ResurrectionStationModel ──
+  ActionBlockedByPawns                     flags=0x0000 idx=1454
+  GetHUDMessageForFocusAttained            flags=0x0000 idx=1846
+  GetTargetType                            flags=0x0000 idx=1523
+
+── ReturnToVentGoal ──
+  construct_AI_ResourceBoolBool            flags=0x0000 idx=715
+
+── Rosie ──
+  CharacterAICreated                       flags=0x0000 idx=17043
+
+── RosieAttackAction ──
+  AttackTarget                             flags=0x0000 idx=24007
+  CanAttackTarget                          flags=0x0000 idx=24919
+  CanAttackWithGrenadeWeapon               flags=0x0000 idx=25053
+  CanAttackWithMeleeWeapon                 flags=0x0000 idx=24909
+  CanAttackWithRangedWeapon                flags=0x0000 idx=24900
+  CanAttackWithThreeSixtyWeapon            flags=0x0000 idx=25927
+  GetUpdatedDestination                    flags=0x0000 idx=2599
+  NotifyBeginningAttack                    flags=0x0000 idx=24950
+  ShouldMoveToTargetForMeleeAttack         flags=0x0000 idx=25100
+  ShouldStopMovingToTarget                 flags=0x0000 idx=24880
+
+── RumbleManager ──
+  Update                                   flags=0x0000 idx=3574
+
+── SPF ──
+  CharacterAICreated                       flags=0x0000 idx=17043
+
+── SPFAttackAction ──
+  AttackTarget                             flags=0x0000 idx=24007
+  CanAttackTarget                          flags=0x0000 idx=24919
+  CanAttackWithMeleeWeapon                 flags=0x0000 idx=24909
+  CanAttackWithRangedWeapon                flags=0x0000 idx=24900
+  NotifyBeginningAttack                    flags=0x0000 idx=24950
+  NotifyCannotAttackTarget                 flags=0x0000 idx=25038
+  NotifyFinishedAttackingTarget            flags=0x0000 idx=24964
+  OnDamagedByTarget                        flags=0x0000 idx=25014
+  ShouldStopMovingToTarget                 flags=0x0000 idx=24880
+
+── SavedMove ──
+  PostUpdate                               flags=0x0000 idx=4674
+
+── ScoopUpGathererAction ──
+  OnOtherPawnDied                          flags=0x0000 idx=1564
+  WaitToScoopUpGatherer                    flags=0x0000 idx=25903
+
+── ScoopUpGathererGoal ──
+  construct_AI_ResourceShockPawn           flags=0x0000 idx=715
+
+── ScoreBoard ──
+  UpdateGRI                                flags=0x0000 idx=3918
+  UpdateScoreBoard                         flags=0x0000 idx=3910
+
+── Script ──
+  Timer                                    flags=0x0000 idx=308
+
+── ScriptedAI ──
+  CharacterAICreated                       flags=0x0000 idx=17043
+  MovementAICreated                        flags=0x0000 idx=17077
+
+── ScriptedAICommanderAction ──
+  ShouldHandleDamageEvents                 flags=0x0000 idx=24966
+
+── SeaSlugPickup ──
+  GetContainer                             flags=0x0000 idx=2212
+
+── SearchAction ──
+  UpdateSuspiciousLocation                 flags=0x0000 idx=25190
+
+── SearchGoal ──
+  GetSearchTarget                          flags=0x0000 idx=25881
+  UpdateSuspiciousLocation                 flags=0x0000 idx=25190
+  construct_AI_ResourceShockPawnVectorVectorVector flags=0x0000 idx=715
+
+── SecurityBot ──
+  AttackSpecifiedTarget                    flags=0x0000 idx=2173
+  CanDetectProtectTarget                   flags=0x0000 idx=26140
+  CancelDyingTimer                         flags=0x0000 idx=26143
+  CharacterAICreated                       flags=0x0000 idx=17043
+  DisableMovement                          flags=0x0000 idx=23609
+  EnableMovement                           flags=0x0000 idx=25231
+  FakeAttackPawn                           flags=0x0000 idx=25216
+  FireWeapon                               flags=0x0000 idx=6514
+  GetFrozenMovementStopDelay               flags=0x0000 idx=26124
+  GetHUDMessageForFocusAttained            flags=0x0000 idx=1846
+  GetHackedMovementStartDelay              flags=0x0000 idx=26128
+  GetMaximumAttackRange                    flags=0x0000 idx=26134
+  GetMinRandomPointDistanceFromTarget      flags=0x0000 idx=27331
+  GetMoveWhileAttackingAngleRange          flags=0x0000 idx=27333
+  GetProtectTarget                         flags=0x0000 idx=25684
+  GetRandomDesiredHeightWhileAttacking     flags=0x0000 idx=27339
+  GetTargetType                            flags=0x0000 idx=1523
+  HitByAirBlast                            flags=0x0000 idx=2276
+  IsFriendly                               flags=0x0000 idx=24988
+  IsSuspectingAttackFrom                   flags=0x0000 idx=19371
+  MovementAICreated                        flags=0x0000 idx=17077
+  OnAlarmTargetChanged                     flags=0x0000 idx=2616
+  OnControllerDamaged                      flags=0x0000 idx=2304
+  OnControllerDealtDamage                  flags=0x0000 idx=2305
+  OnControllerDestroyed                    flags=0x0000 idx=2306
+  OnControllerKilled                       flags=0x0000 idx=2307
+  OnDamaged                                flags=0x0000 idx=2309
+  OnHackFailed                             flags=0x0000 idx=2315
+  OnKilledOtherPawn                        flags=0x0000 idx=19417
+  PawnIsFriendly                           flags=0x0000 idx=24904
+  ShouldDropWeaponsOnDeath                 flags=0x0000 idx=25248
+  Tick                                     flags=0x0000 idx=336
+
+── SecurityBotSpawner ──
+  DisplayAITypeName                        flags=0x0000 idx=19436
+  SpawnScriptedSecurityBot                 flags=0x0000 idx=25880
+
+── SecurityCamera ──
+  CharacterAICreated                       flags=0x0000 idx=17043
+  ClearSpecificTarget                      flags=0x0000 idx=25847
+  GetAlarmTarget                           flags=0x0000 idx=18467
+  GetAlertedTargetLostPauseTime            flags=0x0000 idx=25861
+  GetInspectLostTargetDuration             flags=0x0000 idx=25457
+  GetInspectLostTargetTestPeriod           flags=0x0000 idx=25856
+  GetSpecificTarget                        flags=0x0000 idx=25460
+  GetTargetPriority                        flags=0x0000 idx=24854
+  GetTargetType                            flags=0x0000 idx=1523
+  InspectionTargetNotVisibleStart          flags=0x0000 idx=25826
+  InspectionTargetNotVisibleStop           flags=0x0000 idx=25305
+  InspectionTargetVisibleStart             flags=0x0000 idx=25829
+  InspectionTargetVisibleStop              flags=0x0000 idx=25303
+  IsPossibleToSeeTarget                    flags=0x0000 idx=25870
+  OnAlarmTargetChanged                     flags=0x0000 idx=2616
+  OnDamaged                                flags=0x0000 idx=2309
+  OnHackFailed                             flags=0x0000 idx=2315
+  OnPlayerAttacked                         flags=0x0000 idx=19173
+  SetSpecificTarget                        flags=0x0000 idx=25851
+  SetSpecificTargetIgnoreResetTime         flags=0x0000 idx=25848
+
+── SecurityCameraSpawner ──
+  DisplayAITypeName                        flags=0x0000 idx=19436
+
+── SecurityCrate ──
+  GetTargetType                            flags=0x0000 idx=1523
+  OnHackFailed                             flags=0x0000 idx=2315
+  TakeDamage                               flags=0x0000 idx=1644
+  TakeScriptedDamage                       flags=0x0000 idx=1645
+
+── SecurityElement ──
+  OnAlarmTargetChanged                     flags=0x0000 idx=2616
+  ShouldBeAttackedByControllablesWhenAttacked flags=0x0000 idx=18777
+
+── SecurityManager ──
+  AlarmTargetIsVisible                     flags=0x0000 idx=20703
+  GetAlarmTarget                           flags=0x0000 idx=18467
+  GetLastAlarmTargetLocation               flags=0x0000 idx=20700
+  GetLastAlarmTargetLocationAsSeenByBots   flags=0x0000 idx=20701
+  GetLastAlarmTargetVelocity               flags=0x0000 idx=20702
+  GetTargetPriority                        flags=0x0000 idx=24854
+  LastAlarmTargetWasPlayer                 flags=0x0000 idx=20699
+  NotifyLostTarget                         flags=0x0000 idx=25467
+  NotifyNewTargetSeen                      flags=0x0000 idx=25152
+  NotifySawTarget                          flags=0x0000 idx=25466
+  OnOtherPawnDied                          flags=0x0000 idx=1564
+  UpdateAlarmUIState                       flags=0x0000 idx=19533
+  construct_LevelInfoSpawningManagerBase   flags=0x0000 idx=715
+
+── SecurityManagerBase ──
+  AlarmTargetIsVisible                     flags=0x0000 idx=20703
+  GetAlarmTarget                           flags=0x0000 idx=18467
+  GetLastAlarmTargetLocation               flags=0x0000 idx=20700
+  GetLastAlarmTargetLocationAsSeenByBots   flags=0x0000 idx=20701
+  GetLastAlarmTargetVelocity               flags=0x0000 idx=20702
+  LastAlarmTargetWasPlayer                 flags=0x0000 idx=20699
+  SpawnTestBot                             flags=0x0000 idx=18589
+  UpdateAlarmUIState                       flags=0x0000 idx=19533
+  construct_LevelInfoSpawningManagerBase   flags=0x0000 idx=715
+
+── SecurityStation ──
+  OnHackFailed                             flags=0x0000 idx=2315
+
+── ShockAI ──
+  AddTargetToAttackOnSight                 flags=0x0000 idx=25474
+  AimWeaponAtTarget                        flags=0x0000 idx=24897
+  ApplyAirBlastMomentum                    flags=0x0000 idx=25957
+  ApplyDamageMomentum                      flags=0x0000 idx=25962
+  AreAIsOnLevelSurface                     flags=0x0000 idx=25191
+  CanAimWeapon                             flags=0x0000 idx=25056
+  CanAttackTargetAtPoint                   flags=0x0000 idx=27454
+  CanReactToAttack                         flags=0x0000 idx=25198
+  CharacterAICreated                       flags=0x0000 idx=17043
+  ClaimBooty                               flags=0x0000 idx=2584
+  CreateAIWeapon                           flags=0x0000 idx=24858
+  DestroyManagedAIObjects                  flags=0x0000 idx=25810
+  DisableAI                                flags=0x0000 idx=27291
+  DropDamagedAttachments                   flags=0x0000 idx=25950
+  EnableAI                                 flags=0x0000 idx=27290
+  FindLocalPointToAttackTarget             flags=0x0000 idx=27448
+  FindPointToAttackTarget                  flags=0x0000 idx=25062
+  FindPointToAvoidTarget                   flags=0x0000 idx=25259
+  FreezeAiming                             flags=0x0000 idx=25456
+  GetAimPoseRangeCenterToTarget            flags=0x0000 idx=27345
+  GetAttackTarget                          flags=0x0000 idx=24902
+  GetContainer                             flags=0x0000 idx=2212
+  GetDeathHitAnimation                     flags=0x0000 idx=25905
+  GetFlailingAnimation                     flags=0x0000 idx=25928
+  GetFriendlyName                          flags=0x0000 idx=27375
+  GetHUDMessageForFocusAttained            flags=0x0000 idx=1846
+  GetLastTimeIntentionallyDamaged          flags=0x0000 idx=25953
+  GetPointToApproachTarget                 flags=0x0000 idx=25192
+  GetTargetType                            flags=0x0000 idx=1523
+  GetUpdatedGatherPointLocation            flags=0x0000 idx=2600
+  GetUpdatedRigidBodyLocation              flags=0x0000 idx=2601
+  GetWeaponAimPoseOriginOffset             flags=0x0000 idx=25850
+  HandleAIAttackNotification               flags=0x0000 idx=25076
+  HandleAIEventNotification                flags=0x0000 idx=25036
+  HasFlailingAnimation                     flags=0x0000 idx=25929
+  HasRangedAttack                          flags=0x0000 idx=27326
+  HideAIAttachments                        flags=0x0000 idx=25392
+  HitByAirBlast                            flags=0x0000 idx=2276
+  IsAbleToAttackTarget                     flags=0x0000 idx=27447
+  IsAimingWeapon                           flags=0x0000 idx=24845
+  IsAttacking                              flags=0x0000 idx=24929
+  IsBeingAttackedByInsectSwarm             flags=0x0000 idx=25175
+  IsEnemy                                  flags=0x0000 idx=25016
+  IsEnrageFailure                          flags=0x0000 idx=25979
+  IsHeadTrackingTargetWithinTrackingArea   flags=0x0000 idx=25855
+  IsUsingLowDetailMovement                 flags=0x0000 idx=25097
+  IsWeaponLockedOnTarget                   flags=0x0000 idx=25027
+  IsWeaponTargetWithinTrackingArea         flags=0x0000 idx=24938
+  MovementAICreated                        flags=0x0000 idx=17077
+  MuteAI                                   flags=0x0000 idx=25057
+  NotifyAttackingVisionDesired             flags=0x0000 idx=25831
+  NotifyAttackingVisionNoLongerDesired     flags=0x0000 idx=25832
+  OnAIIntentionallyDamaged                 flags=0x0000 idx=2613
+  OnDamaged                                flags=0x0000 idx=2309
+  OnDealtDamage                            flags=0x0000 idx=2310
+  OnHitByAirBlast                          flags=0x0000 idx=25207
+  OnLocomotionMovementRequestCompleted     flags=0x0000 idx=1561
+  PrefersRangedAttack                      flags=0x0000 idx=27327
+  ReactToDeath                             flags=0x0000 idx=25942
+  RegisterPhotographTarget                 flags=0x0000 idx=2372
+  ScriptedAttackTarget                     flags=0x0000 idx=24954
+  ScriptedWait                             flags=0x0000 idx=25019
+  SetAvoidTarget                           flags=0x0000 idx=24889
+  SetInitialAIState                        flags=0x0000 idx=25452
+  SetMotionModifier_MeleeAttack            flags=0x0000 idx=25444
+  SetNormalAILODOverrideTime               flags=0x0000 idx=25482
+  SetWeaponFireMessage                     flags=0x0000 idx=25849
+  SetupWeaponAimPoses                      flags=0x0000 idx=2640
+  ShouldDropWeaponsOnDeath                 flags=0x0000 idx=25248
+  ShouldSeePawn                            flags=0x0000 idx=27323
+  ShowAIAttachments                        flags=0x0000 idx=25417
+  StartAttackedByInsectSwarmBehavior       flags=0x0000 idx=25266
+  StopAimingWeapon                         flags=0x0000 idx=24865
+  StopAttackedByInsectSwarmBehavior        flags=0x0000 idx=25265
+  StopWeaponFire                           flags=0x0000 idx=25291
+  ToggleOptimizedPhysics                   flags=0x0000 idx=27289
+  UnfreezeAiming                           flags=0x0000 idx=25455
+  UnregisterPhotographTarget               flags=0x0000 idx=2415
+  UpdateIntentionalDamage                  flags=0x0000 idx=25439
+  WeaponAICreated                          flags=0x0000 idx=17091
+
+── ShockCheatManager ──
+  BotFakeAttackPawn                        flags=0x0000 idx=4828
+  DebugAIAttacking                         flags=0x0000 idx=20945
+  DebugAISpeech                            flags=0x0000 idx=20764
+  DebugAimPoses                            flags=0x0000 idx=20805
+  DebugAimPosesNative                      flags=0x0000 idx=19595
+  DumpAllContainers                        flags=0x0000 idx=19551
+  DumpModsOnPawn                           flags=0x0000 idx=20857
+  GetDebugAimPosesActor                    flags=0x0000 idx=19596
+  MakeAIGod                                flags=0x0000 idx=20734
+  MakeAIsGod                               flags=0x0000 idx=19560
+  MaxAIHealth                              flags=0x0000 idx=20875
+  PlayAIAnim                               flags=0x0000 idx=20866
+  SpawnProtector                           flags=0x0000 idx=4803
+  SpawnSecurityBot                         flags=0x0000 idx=4776
+  SpawnTestBot                             flags=0x0000 idx=18589
+  ToggleAIDebug                            flags=0x0000 idx=20747
+  ToggleCertaintyVC                        flags=0x0000 idx=20817
+  ToggleShowAIs                            flags=0x0000 idx=20867
+  TriggerSwapImmediateFire                 flags=0x0000 idx=20726
+
+── ShockDamageVolume ──
+  ApplyDamage                              flags=0x0000 idx=18721
+  TimerPop                                 flags=0x0000 idx=3609
+
+── ShockDoor ──
+  AddUniquePawnToPawnsInsideDoor           flags=0x0000 idx=18762
+  AlivePawnsInsideDoor                     flags=0x0000 idx=18509
+  OpenForLowDetailAI                       flags=0x0000 idx=2345
+  PawnInDoorWasDestroyed                   flags=0x0000 idx=19459
+  PlayAnimAndWaitForFinish                 flags=0x0000 idx=18254
+  UpdateDoorOperationalStatus              flags=0x0000 idx=18241
+
+── ShockGameDriver ──
+  GetTrainingMessageManager                flags=0x0000 idx=2265
+
+── ShockGameInfo ──
+  GetCurrentTelekinesisTarget              flags=0x0000 idx=1510
+  GetDamageFactory                         flags=0x0000 idx=18633
+  GetPhotographTargets                     flags=0x0000 idx=20759
+  GetSecuritySystemTarget                  flags=0x0000 idx=5934
+  MakeAllPawnsInvincible                   flags=0x0000 idx=18627
+  RegisterPhotographTarget                 flags=0x0000 idx=2372
+  SetUITimer                               flags=0x0000 idx=20745
+  SpawnCorpseManager                       flags=0x0000 idx=19577
+  SpawnSecurityManager                     flags=0x0000 idx=19582
+  SpawnSpeechManager                       flags=0x0000 idx=19578
+  UnregisterPhotographTarget               flags=0x0000 idx=2415
+  UpdateUITimer                            flags=0x0000 idx=20744
+
+── ShockHUD ──
+  ShowStickyRadius                         flags=0x0000 idx=21074
+  UpdateUIChallengeTimer                   flags=0x0000 idx=18807
+
+── ShockMachine ──
+  ActionBlockedByPawns                     flags=0x0000 idx=1454
+  GetHUDMessageForFocusAttained            flags=0x0000 idx=1846
+  GetTargetType                            flags=0x0000 idx=1523
+  HasUsesRemaining                         flags=0x0000 idx=20414
+  OnHackFailed                             flags=0x0000 idx=2315
+
+── ShockPawn ──
+  ActionBlockedByPawns                     flags=0x0000 idx=1454
+  AddAvailableHoldable                     flags=0x0000 idx=2166
+  AddIntentionalAttacker                   flags=0x0000 idx=19383
+  AssignDamageLocationMultipliers          flags=0x0000 idx=19507
+  AttackTargetWithBots                     flags=0x0000 idx=2174
+  AttackTargetWithControllables            flags=0x0000 idx=2175
+  AttackerShouldBeConsideredIntentional    flags=0x0000 idx=19380
+  CanBeAttacked                            flags=0x0000 idx=19376
+  ClearIntentionalAttackers                flags=0x0000 idx=21020
+  CreateFireRepeller                       flags=0x0000 idx=19500
+  FillWeaponClipWithAvailableAmmunition    flags=0x0000 idx=18748
+  GetAvailableHoldables                    flags=0x0000 idx=18714
+  GetAvailableSector                       flags=0x0000 idx=21042
+  GetDamageEvent                           flags=0x0000 idx=20927
+  GetDamageResistanceTo                    flags=0x0000 idx=18519
+  GetFireInstigator                        flags=0x0000 idx=1514
+  GetTargetType                            flags=0x0000 idx=1523
+  HandleCriticalDamageEffects              flags=0x0000 idx=18786
+  HasAmmoRemaining                         flags=0x0000 idx=18253
+  HasTargetAttackedUsIntentionally         flags=0x0000 idx=21017
+  HitByAirBlast                            flags=0x0000 idx=2276
+  IsValidBotAttackTarget                   flags=0x0000 idx=21021
+  KillFireRepeller                         flags=0x0000 idx=20939
+  NotifyControllablesControllerDamaged     flags=0x0000 idx=19333
+  NotifyControllablesControllerDealtDamage flags=0x0000 idx=19332
+  OnDamaged                                flags=0x0000 idx=2309
+  OnDealtDamage                            flags=0x0000 idx=2310
+  OnKilledOtherPawn                        flags=0x0000 idx=19417
+  OnSpawnedDamageEmitter                   flags=0x0000 idx=2336
+  PlayerAddAvailableHoldable               flags=0x0000 idx=18718
+  PlayerRemoveAvailableHoldable            flags=0x0000 idx=18720
+  RemoveAvailableHoldable                  flags=0x0000 idx=18087
+  RemoveCriticalDamageEffects              flags=0x0000 idx=19434
+  RemoveIntentionalAttacker                flags=0x0000 idx=21019
+  SetDoorPawnIsIn                          flags=0x0000 idx=19331
+  ShouldBeAttackedByControllablesWhenAttacked flags=0x0000 idx=18777
+  ShouldTreatAsIntentionalDamage           flags=0x0000 idx=2404
+  TakeCollisionDamage                      flags=0x0000 idx=1876
+  TakeDamage                               flags=0x0000 idx=1644
+  TakeFallingDamage                        flags=0x0000 idx=3707
+  TakeScriptedDamage                       flags=0x0000 idx=1645
+  TakeSimpleDamage                         flags=0x0000 idx=18344
+  UntriggerEffectsOnDeath                  flags=0x0000 idx=18782
+  UpdateGroundSpeed                        flags=0x0000 idx=19493
+  UpdateMaxHealth                          flags=0x0000 idx=2420
+  UpdateUIStats                            flags=0x0000 idx=18225
+
+── ShockPlayer ──
+  AddAvailableAbilityClass                 flags=0x0000 idx=19256
+  AddAvailableAmmo                         flags=0x0000 idx=18441
+  AddAvailablePlasmid                      flags=0x0000 idx=18568
+  AddTextToTraining                        flags=0x0000 idx=18779
+  AddTextToTrainingModal                   flags=0x0000 idx=20995
+  AttachTrainingScript                     flags=0x0000 idx=19592
+  CanHitMagicBulletTarget                  flags=0x0000 idx=18649
+  CanUseContainer                          flags=0x0000 idx=18599
+  ClearTargetIndicator                     flags=0x0000 idx=19249
+  CloseContainer                           flags=0x0000 idx=2186
+  DismissTraining                          flags=0x0000 idx=18771
+  DismissTrainingModal                     flags=0x0000 idx=20994
+  EnableTrainingLogs                       flags=0x0000 idx=20666
+  ExtinguishPlayerFires                    flags=0x0000 idx=19534
+  FailQuest                                flags=0x0000 idx=18391
+  FillWeaponClipWithAvailableAmmunition    flags=0x0000 idx=18748
+  GatherPersistentTrainingInfo             flags=0x0000 idx=2201
+  GetAvailablePlasmidNameByIndex           flags=0x0000 idx=18548
+  GetCurrentContainer                      flags=0x0000 idx=18152
+  GetDamagePotential                       flags=0x0000 idx=18603
+  GetHarvestingTarget                      flags=0x0000 idx=18027
+  GetNumAvailableAbilities                 flags=0x0000 idx=19250
+  GetNumAvailablePlasmids                  flags=0x0000 idx=18560
+  GetQuestFriendlyName                     flags=0x0000 idx=18334
+  GetWeaponFromDamageData                  flags=0x0000 idx=18657
+  HarvestTarget                            flags=0x0000 idx=19402
+  HasAmmoRemaining                         flags=0x0000 idx=18253
+  IsPlasmidAvailable                       flags=0x0000 idx=18346
+  NotifyPlayerAttacksWatcherThatPlayerAttacked flags=0x0000 idx=19611
+  NotifyWatchersPlayerIsBeingAttacked      flags=0x0000 idx=19520
+  NumAvailableNonDLCPlasmids               flags=0x0000 idx=21033
+  NumAvailablePlasmids                     flags=0x0000 idx=19339
+  OnDamaged                                flags=0x0000 idx=2309
+  OnDealtDamage                            flags=0x0000 idx=2310
+  OnDeathPrevented                         flags=0x0000 idx=2311
+  OnSpawnedDamageEmitter                   flags=0x0000 idx=2336
+  OpenContainer                            flags=0x0000 idx=18337
+  PlayerAddAvailableHoldable               flags=0x0000 idx=18718
+  PlayerRemoveAvailableHoldable            flags=0x0000 idx=18720
+  ReRollContainer                          flags=0x0000 idx=6495
+  RecycleOrDestroyContainerSlot            flags=0x0000 idx=18306
+  RegisterPlayerAttacksWatcher             flags=0x0000 idx=20795
+  RemoveAvailableAbilityClass              flags=0x0000 idx=19263
+  RemoveAvailableAmmo                      flags=0x0000 idx=18410
+  RemoveAvailablePlasmid                   flags=0x0000 idx=18709
+  ResetPawnDeathListenersNotification      flags=0x0000 idx=19531
+  RestorePersistentTrainingInfo            flags=0x0000 idx=18642
+  SetTargetIndicator                       flags=0x0000 idx=19247
+  SmoothTeleportMovement                   flags=0x0000 idx=18595
+  StartChallengeTimer                      flags=0x0000 idx=19606
+  StopChallengeTimer                       flags=0x0000 idx=19605
+  TakeAllTimerDelegate                     flags=0x0000 idx=18614
+  TestAddAvailablePlasmid                  flags=0x0000 idx=19540
+  TestRemoveAvailablePlasmid               flags=0x0000 idx=20874
+  Timer                                    flags=0x0000 idx=308
+  TrainingInitialization                   flags=0x0000 idx=19588
+  TriggerDamageIndicatorsFromActor         flags=0x0000 idx=19527
+  UnregisterPlayerAttacksWatcher           flags=0x0000 idx=20794
+  UpdateAmmoStatusForGroup                 flags=0x0000 idx=18012
+  UpdateInventorySize                      flags=0x0000 idx=18596
+  UpdateMaxBioAmmo                         flags=0x0000 idx=2419
+  UpdateMaxHealth                          flags=0x0000 idx=2420
+  UpdateUIAmmoTotals                       flags=0x0000 idx=19224
+  UpdateUIBioAmmoBank                      flags=0x0000 idx=21117
+  UpdateUIStats                            flags=0x0000 idx=18225
+
+── ShockPlayerController ──
+  AddTextToTraining                        flags=0x0000 idx=18779
+  ClearCameraAnimationModifier_HeadbobContextController flags=0x0000 idx=18740
+  CloseContainer                           flags=0x0000 idx=2186
+  CollectAllContainerItems                 flags=0x0000 idx=20511
+  CollectContainerItemInSlot               flags=0x0000 idx=20510
+  DismissTraining                          flags=0x0000 idx=18771
+  GetCameraFocusTarget                     flags=0x0000 idx=1507
+  GetTrainingMessageManager                flags=0x0000 idx=2265
+  LeftStickChanging                        flags=0x0000 idx=20441
+  PlayerTick                               flags=0x0000 idx=337
+  ReactToDamage                            flags=0x0000 idx=18493
+  RecycleOrDestroyContainerSlot            flags=0x0000 idx=18306
+  RightStickChanging                       flags=0x0000 idx=20442
+  SetCameraAnimationModifier_HeadbobContextController flags=0x0000 idx=18741
+  ShouldUseController                      flags=0x0000 idx=18187
+  ShowEnemyInfoHud                         flags=0x0000 idx=19284
+  ShowTrainingHelp                         flags=0x0000 idx=19303
+  UpdateAnalogControl                      flags=0x0000 idx=20443
+  UpdateFocus                              flags=0x0000 idx=18849
+  UpdateRadialMenu                         flags=0x0000 idx=18303
+  UpdateRadialMenu_LX                      flags=0x0000 idx=20437
+  UpdateRadialMenu_LY                      flags=0x0000 idx=20438
+  UpdateRadialMenu_RX                      flags=0x0000 idx=20439
+  UpdateRadialMenu_RY                      flags=0x0000 idx=20440
+
+── ShockProjectile ──
+  GetDamager                               flags=0x0000 idx=20379
+
+── ShockedGoal ──
+  construct_AI_ResourceBool                flags=0x0000 idx=715
+
+── ShotNotifier ──
+  NotifyShotFired                          flags=0x0000 idx=17061
+  OnShotFired                              flags=0x0000 idx=17139
+
+── Shotgun_00Buck ──
+  ModifyDamageStimuli                      flags=0x0000 idx=2300
+
+── SimpleCommandlet ──
+  Main                                     flags=0x0000 idx=827
+
+── SimpleDamageData ──
+  GetAttackRange                           flags=0x0000 idx=2209
+  GetDamageStimuliSetName                  flags=0x0000 idx=2220
+  ModifyDamageStimuli                      flags=0x0000 idx=2300
+
+── SoundEffectSpecification ──
+  GetAISoundRadius                         flags=0x0000 idx=12032
+
+── SpawnAdjustment ──
+  GetSpawnParameters                       flags=0x0000 idx=18330
+  ModifyContainer                          flags=0x0000 idx=2299
+
+── SpawnAmmoAdjustment ──
+  CalculateSpawnWeight                     flags=0x0000 idx=19277
+  GetSpawnParameters                       flags=0x0000 idx=18330
+
+── SpawnBioAmmoAdjustment ──
+  GetSpawnParameters                       flags=0x0000 idx=18330
+
+── SpawnMedHypoAdjustment ──
+  GetSpawnParameters                       flags=0x0000 idx=18330
+
+── SpawningManager ──
+  AssignLootContainerToAI                  flags=0x0000 idx=25790
+  BotFakeAttackPawn                        flags=0x0000 idx=4828
+  CanSpawnNewGatherer                      flags=0x0000 idx=25792
+  DisableAllAIsExcept                      flags=0x0000 idx=1492
+  DisplayAITypeName                        flags=0x0000 idx=19436
+  DisplayAbstractAITypes                   flags=0x0000 idx=25268
+  DisplayAllAITypes                        flags=0x0000 idx=24987
+  DisplaySpawningZones                     flags=0x0000 idx=25817
+  EnableAllAIs                             flags=0x0000 idx=1494
+  GetNumAIsInSpawnZone                     flags=0x0000 idx=25793
+  GetNumSpawnZones                         flags=0x0000 idx=1519
+  GetSpawnZoneByIndex                      flags=0x0000 idx=1522
+  GetSpawnZoneByName                       flags=0x0000 idx=25509
+  MaxOutAIHealth                           flags=0x0000 idx=4829
+  NotifyAISpawned                          flags=0x0000 idx=1547
+  NotifyAggressorIsAttacking               flags=0x0000 idx=25800
+  NotifyNearbyProtectorsOfAttackOnPerceivedGatherer flags=0x0000 idx=1552
+  NotifyProtectorIsAttacking               flags=0x0000 idx=27199
+  OnOtherPawnDied                          flags=0x0000 idx=1564
+  OutputSpawnZonesToBox                    flags=0x0000 idx=25278
+  PostAIEventNotification                  flags=0x0000 idx=1574
+  ResetAIAggressionTowards                 flags=0x0000 idx=1611
+  RetainRequiredAnimationGroups            flags=0x0000 idx=1614
+  RetainRequiredAnimationGroupsNative      flags=0x0000 idx=25806
+  SendPawnTookDamageMessages               flags=0x0000 idx=1615
+  SetAggressorRepopulationEnabledInSpawnZone flags=0x0000 idx=25519
+  SetProtectorRepopulationEnabledInSpawnZone flags=0x0000 idx=25491
+  SetSecurityBotSpawnLocationLabel         flags=0x0000 idx=25781
+  SpawnInitialAIs                          flags=0x0000 idx=25804
+  SpawnScriptedAI                          flags=0x0000 idx=25348
+  UpdateBootyZone                          flags=0x0000 idx=25507
+
+── SpawningManagerBase ──
+  BotFakeAttackPawn                        flags=0x0000 idx=4828
+  DisableAllAIsExcept                      flags=0x0000 idx=1492
+  EnableAllAIs                             flags=0x0000 idx=1494
+  MaxOutAIHealth                           flags=0x0000 idx=4829
+  SpawnProtector                           flags=0x0000 idx=4803
+  SpawnSecurityBot                         flags=0x0000 idx=4776
+
+── SpeechManager ──
+  OnOtherPawnDied                          flags=0x0000 idx=1564
+  RemoveAI                                 flags=0x0000 idx=18812
+
+── SquadInfo ──
+  CleanupAI                                flags=0x0000 idx=1838
+
+── StaticMeshCameraTarget ──
+  RegisterPhotographTarget                 flags=0x0000 idx=2372
+  UnregisterPhotographTarget               flags=0x0000 idx=2415
+
+── StaticMeshContainer ──
+  GetContainer                             flags=0x0000 idx=2212
+  GetHUDMessageForFocusAttained            flags=0x0000 idx=1846
+
+── StickyProjectile ──
+  ActionBlockedByPawns                     flags=0x0000 idx=1454
+  GetTargetType                            flags=0x0000 idx=1523
+  TakeDamage                               flags=0x0000 idx=1644
+  TakeScriptedDamage                       flags=0x0000 idx=1645
+
+── StunnedAction ──
+  GetUpdatedDestination                    flags=0x0000 idx=2599
+
+── TelekinesisAbility ──
+  GetFinishFireWithEveAnimationName        flags=0x0000 idx=18606
+  GetFinishFireWithoutEveAnimationName     flags=0x0000 idx=18605
+  GetTarget                                flags=0x0000 idx=19212
+
+── TeleportGoal ──
+  construct_AI_ResourceActorBoolBoolRotatorBool flags=0x0000 idx=715
+  construct_AI_ResourceVectorBoolBoolRotatorBool flags=0x0000 idx=715
+
+── ThreatenAction ──
+  AimWeaponAtTarget                        flags=0x0000 idx=24897
+  CanBashTarget                            flags=0x0000 idx=25223
+  CanReachBashTarget                       flags=0x0000 idx=26155
+  CanThreatenTarget                        flags=0x0000 idx=26160
+  GetThreatenTarget                        flags=0x0000 idx=24847
+  GetUpdatedDestination                    flags=0x0000 idx=2599
+  IsInPositionToBashTarget                 flags=0x0000 idx=26156
+  IsRotatedToFaceTarget                    flags=0x0000 idx=25245
+  MoveToThreatenTarget                     flags=0x0000 idx=26152
+  ResetBashTargetTime                      flags=0x0000 idx=25561
+  SendBashTargetNotification               flags=0x0000 idx=26187
+  ShouldMoveToBashTarget                   flags=0x0000 idx=25562
+  StopAimingWeaponAtTarget                 flags=0x0000 idx=25034
+
+── ThreatenGoal ──
+  GetThreatenTarget                        flags=0x0000 idx=24847
+  StartThreateningTarget                   flags=0x0000 idx=25631
+  StopThreateningTarget                    flags=0x0000 idx=25151
+  construct_AI_Resource                    flags=0x0000 idx=715
+  construct_AI_ResourceShockPawn           flags=0x0000 idx=715
+
+── Timer ──
+  StartTimer                               flags=0x0000 idx=3677
+  StartTimerHook                           flags=0x0000 idx=3662
+  StopTimer                                flags=0x0000 idx=3640
+  Timer                                    flags=0x0000 idx=308
+  TimerDelegate                            flags=0x0000 idx=3643
+  TimerHook                                flags=0x0000 idx=3641
+
+── TraceAmmo ──
+  GetNumTracesToFire                       flags=0x0000 idx=2246
+  GetSpreadOfFire                          flags=0x0000 idx=2259
+
+── TraceAttackAbility ──
+  GetAttackRange                           flags=0x0000 idx=2209
+  GetNumTracesToFire                       flags=0x0000 idx=2246
+  GetSpreadOfFire                          flags=0x0000 idx=2259
+
+── TrainingConcept ──
+  TrainingMessageClearedFromQueue          flags=0x0000 idx=2410
+  TrainingMessageDisplayed                 flags=0x0000 idx=2411
+
+── TrainingMessageManager ──
+  AvailableAmmoStateChanged                flags=0x0000 idx=18313
+  ClearTrainingMessage                     flags=0x0000 idx=18775
+  DryFire                                  flags=0x0000 idx=18371
+  EnrageFailure                            flags=0x0000 idx=18270
+  PlayerAbilityFired                       flags=0x0000 idx=18470
+  PlayerDamaged                            flags=0x0000 idx=18316
+  PlayerDealtDamage                        flags=0x0000 idx=18317
+  PlayerHitTarget                          flags=0x0000 idx=2358
+  PlayerMaxBioAmmoUpdated                  flags=0x0000 idx=18452
+  PlayerMaxHealthUpdated                   flags=0x0000 idx=18456
+  PlayerMovement                           flags=0x0000 idx=18489
+  PlayerWeaponFired                        flags=0x0000 idx=18474
+  ShouldUseController                      flags=0x0000 idx=18187
+  TriggerTrainingMessage                   flags=0x0000 idx=18776
+
+── TrainingMessageTrigger ──
+  TrainingMessageClearedFromQueue          flags=0x0000 idx=2410
+  TrainingMessageDisplayed                 flags=0x0000 idx=2411
+  enumTrainingMessages                     flags=0x0000 idx=19186
+
+── TrainingScript ──
+  TrainingMessageClearedFromQueue          flags=0x0000 idx=2410
+  TrainingMessageDisplayed                 flags=0x0000 idx=2411
+
+── TrapBoltProjectile ──
+  FireTripWire                             flags=0x0000 idx=19481
+  GetTargetType                            flags=0x0000 idx=1523
+  SpawnWireHook                            flags=0x0000 idx=18753
+  TakeDamage                               flags=0x0000 idx=1644
+  TakeScriptedDamage                       flags=0x0000 idx=1645
+
+── TriggerVolume ──
+  PawnEnteredVolume                        flags=0x0000 idx=332
+  PawnLeavingVolume                        flags=0x0000 idx=335
+
+── Turret ──
+  CharacterAICreated                       flags=0x0000 idx=17043
+  GetAttackDelay                           flags=0x0000 idx=26094
+  GetCurrentMovementDirection              flags=0x0000 idx=26091
+  GetNewTargetAcquisitionDelay             flags=0x0000 idx=25498
+  GetTargetDeadZone                        flags=0x0000 idx=26106
+  GetTargetPriority                        flags=0x0000 idx=24854
+  GetTargetType                            flags=0x0000 idx=1523
+  OnDamaged                                flags=0x0000 idx=2309
+  OnHackFailed                             flags=0x0000 idx=2315
+  OnPlayerAttacked                         flags=0x0000 idx=19173
+  OnPlayerAttacks                          flags=0x0000 idx=19174
+  PawnIsFriendly                           flags=0x0000 idx=24904
+  PostTurretAttackingNotification          flags=0x0000 idx=26085
+  ScriptedAttackTarget                     flags=0x0000 idx=24954
+  SetAttacking                             flags=0x0000 idx=26086
+  SetCurrentMovementDirection              flags=0x0000 idx=25490
+  SpawnDeadBody                            flags=0x0000 idx=26075
+
+── TurretAttackAction ──
+  GainedTargetLock                         flags=0x0000 idx=2592
+  LostTargetLock                           flags=0x0000 idx=2606
+  OnGainedTargetLock                       flags=0x0000 idx=25609
+  OnLostTarget                             flags=0x0000 idx=26328
+  OnLostTargetLock                         flags=0x0000 idx=25604
+  OnSawTarget                              flags=0x0000 idx=25619
+  OnViewerLostPawn                         flags=0x0000 idx=1866
+  OnViewerSawPawn                          flags=0x0000 idx=1867
+  StartAttackMovement                      flags=0x0000 idx=26326
+  StopAllMovement                          flags=0x0000 idx=24849
+  TargetIsVisible                          flags=0x0000 idx=2644
+
+── TurretAttackGoal ──
+  construct_AI_Resource                    flags=0x0000 idx=715
+  construct_AI_ResourceShockPawnBool       flags=0x0000 idx=715
+
+── TurretCommanderAction ──
+  AttackTargetIsVisible                    flags=0x0000 idx=25049
+  BeAttacking                              flags=0x0000 idx=24956
+  CheckForOtherAvailableTargets            flags=0x0000 idx=25589
+  ForceAttackTarget                        flags=0x0000 idx=25131
+  GetAttackAction                          flags=0x0000 idx=25588
+  GetAttackTarget                          flags=0x0000 idx=24902
+  GetHighestPriorityPawn                   flags=0x0000 idx=25031
+  GetVisiblePawns                          flags=0x0000 idx=26517
+  IsAttacking                              flags=0x0000 idx=24929
+  NotifyChildLostPawn                      flags=0x0000 idx=25227
+  NotifyChildSawPawn                       flags=0x0000 idx=25222
+  OnHackFailed                             flags=0x0000 idx=2315
+  OnIntentionallyDamaged                   flags=0x0000 idx=24878
+  OnLostPawn                               flags=0x0000 idx=25276
+  OnSawPawn                                flags=0x0000 idx=25168
+  OnViewerLostPawn                         flags=0x0000 idx=1866
+  OnViewerSawPawn                          flags=0x0000 idx=1867
+  ResumeAttackingIfPossible                flags=0x0000 idx=25641
+  ShouldHandleDamageEvents                 flags=0x0000 idx=24966
+
+── TurretDeadBody ──
+  GetContainer                             flags=0x0000 idx=2212
+  GetHUDMessageForFocusAttained            flags=0x0000 idx=1846
+
+── TurretDormantAction ──
+  StartDormantMovement                     flags=0x0000 idx=25089
+  StopAllMovement                          flags=0x0000 idx=24849
+
+── TurretFrozenAction ──
+  DetermineTargetRotation                  flags=0x0000 idx=26397
+  SlowMovementOverTime                     flags=0x0000 idx=26401
+
+── TurretFrozenGoal ──
+  construct_AI_Resource                    flags=0x0000 idx=715
+  construct_AI_ResourceByte                flags=0x0000 idx=715
+
+── TurretGoToLocationMovementAction ──
+  CleanupMovement                          flags=0x0000 idx=25210
+  InitiateMovement                         flags=0x0000 idx=24951
+  OnMovementEnded                          flags=0x0000 idx=24876
+  OnMovementStarted                        flags=0x0000 idx=24901
+
+── TurretGoToLocationMovementGoal ──
+  construct_AI_Resource                    flags=0x0000 idx=715
+  construct_AI_ResourceNameIntIntRotator   flags=0x0000 idx=715
+
+── TurretMovementAction ──
+  OnMovementEnded                          flags=0x0000 idx=24876
+  OnMovementStarted                        flags=0x0000 idx=24901
+  RunTurretMovement                        flags=0x0000 idx=26408
+
+── TurretMovementGoal ──
+  OnMovementEnded                          flags=0x0000 idx=24876
+  OnMovementStarted                        flags=0x0000 idx=24901
+  construct_AI_Resource                    flags=0x0000 idx=715
+  construct_AI_ResourceIntInt              flags=0x0000 idx=715
+
+── TurretSpawner ──
+  DisplayAITypeName                        flags=0x0000 idx=19436
+  SpawnScriptedTurret                      flags=0x0000 idx=26476
+
+── TurretStandbyAction ──
+  StartStandbyMovement                     flags=0x0000 idx=25504
+  StopAllMovement                          flags=0x0000 idx=24849
+
+── TurretTrackTargetMovementAction ──
+  CleanupMovement                          flags=0x0000 idx=25210
+  GainedTargetLock                         flags=0x0000 idx=2592
+  InitiateMovement                         flags=0x0000 idx=24951
+  LostTargetLock                           flags=0x0000 idx=2606
+  OnMovementEnded                          flags=0x0000 idx=24876
+  OnMovementStarted                        flags=0x0000 idx=24901
+  TargetIsVisible                          flags=0x0000 idx=2644
+  UpdateTargetRotation                     flags=0x0000 idx=25503
+  WatchForTargetLock                       flags=0x0000 idx=26499
+
+── TurretTrackTargetMovementGoal ──
+  GainedTargetLock                         flags=0x0000 idx=2592
+  LostTargetLock                           flags=0x0000 idx=2606
+  TargetIsVisible                          flags=0x0000 idx=2644
+  construct_AI_Resource                    flags=0x0000 idx=715
+  construct_AI_ResourceNameIntIntShockPawnFloatFloat flags=0x0000 idx=715
+
+── TyrionScriptAction ──
+  enumTyrionTargets                        flags=0x0000 idx=25077
+
+── TyrionUnitTest ──
+  Timer                                    flags=0x0000 idx=308
+  getPawn                                  flags=0x0000 idx=17924
+  signalFailed                             flags=0x0000 idx=17920
+
+── VPawn ──
+  CharacterAICreated                       flags=0x0000 idx=17043
+  CleanupAI                                flags=0x0000 idx=1838
+  HeadAICreated                            flags=0x0000 idx=17099
+  MovementAICreated                        flags=0x0000 idx=17077
+  WeaponAICreated                          flags=0x0000 idx=17091
+  setAILOD                                 flags=0x0000 idx=17098
+
+── VehiclePart ──
+  Update                                   flags=0x0000 idx=3574
+
+── VisionNotifier ──
+  OnOtherPawnDied                          flags=0x0000 idx=1564
+  RemoveAnyReferencesToPawn                flags=0x0000 idx=17031
+
+── VisionSensor ──
+  GetRecentlySeenTargets                   flags=0x0000 idx=27902
+  HasEverSeenTarget                        flags=0x0000 idx=26212
+  IsTargetRecognized                       flags=0x0000 idx=27898
+  OnOtherPawnDied                          flags=0x0000 idx=1564
+  OnViewerLostPawn                         flags=0x0000 idx=1866
+  OnViewerSawPawn                          flags=0x0000 idx=1867
+  UpdateVision                             flags=0x0000 idx=26208
+
+── Volume ──
+  TimerPop                                 flags=0x0000 idx=3609
+
+── VolumeTimer ──
+  Timer                                    flags=0x0000 idx=308
+
+── WaitForGathererAction ──
+  FaceTarget                               flags=0x0000 idx=25018
+  GetRotationToTarget                      flags=0x0000 idx=25008
+  MoveToGestureAtTarget                    flags=0x0000 idx=26520
+  MoveTowardTarget                         flags=0x0000 idx=26521
+  ShouldFaceTargetToPlayReaction           flags=0x0000 idx=25445
+  ShouldStopMovingToGestureAtTarget        flags=0x0000 idx=26513
+  ShouldStopMovingToTarget                 flags=0x0000 idx=24880
+
+── WaitForGathererGoal ──
+  construct_AI_ResourceGatherer            flags=0x0000 idx=715
+
+── Weapon ──
+  AddAvailableAmmo                         flags=0x0000 idx=18441
+  ApplyAimError                            flags=0x0000 idx=21153
+  CleanupOnFiredEmitters                   flags=0x0000 idx=18628
+  GetAmmoDamagePotential                   flags=0x0000 idx=19131
+  GetDamageDataClass                       flags=0x0000 idx=2218
+  GetDamagePotential                       flags=0x0000 idx=18603
+  GetFireRate                              flags=0x0000 idx=18413
+  GetPerfectFireStart                      flags=0x0000 idx=19190
+  GetRoundsRemaining                       flags=0x0000 idx=18257
+  GiveAltFireMod                           flags=0x0000 idx=2268
+  HasAltFireMod                            flags=0x0000 idx=2272
+  HasAnyInitiateDamageOccurredForAnimation flags=0x0000 idx=18581
+  HasAvailableAmmo                         flags=0x0000 idx=18351
+  HasInitiateDamageOccurred                flags=0x0000 idx=19171
+  InitiateDamage                           flags=0x0000 idx=2280
+  LogOnFiredEffectInstances                flags=0x0000 idx=2290
+  LogOnFiredEffectSpecifications           flags=0x0000 idx=2291
+  OnSpawnedDamageEmitter                   flags=0x0000 idx=2336
+  PendingFire                              flags=0x0000 idx=18382
+  RemoveAvailableAmmo                      flags=0x0000 idx=18410
+  ResetBurstShotsRemaining                 flags=0x0000 idx=18586
+  RespawnOnFiredEmitters                   flags=0x0000 idx=18348
+  RespawnTracerEmitters                    flags=0x0000 idx=18349
+  RunOnFiredEmitters                       flags=0x0000 idx=18567
+  SpawnOnFiredEmitters                     flags=0x0000 idx=19199
+  SpawnTracerEmitters                      flags=0x0000 idx=19198
+
+── WrenchAmmo ──
+  ModifyDamageStimuli                      flags=0x0000 idx=2300
+
+── ZoneInfo ──
+  OutputSpawnZoneNames                     flags=0x0000 idx=3670

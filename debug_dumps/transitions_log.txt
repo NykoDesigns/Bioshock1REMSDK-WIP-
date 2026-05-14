@@ -1,0 +1,2 @@
+[0.0] Transitions system initialized
+[0.0] Initial level: Entry.MyLevel

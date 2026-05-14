@@ -1,0 +1,2 @@
+P2 Inventory initialized
+Starting loadout: Wrench, Pistol (48), Electro Bolt, 100HP, 100EVE, $100

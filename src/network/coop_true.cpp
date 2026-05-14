@@ -120,6 +120,7 @@ bool FreezeClientSimulation()
     hook.Name = "TrueCoopFreeze";
     hook.Callback = [](UObject* obj, UFunction* func, void* parms) -> bool {
         if (!s_SimFrozen) return false;
+        if (!obj || !func) return false;
 
         std::string funcName = func->GetName();
         std::string className = obj->GetObjClassName();

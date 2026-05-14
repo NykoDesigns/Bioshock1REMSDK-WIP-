@@ -1,0 +1,242 @@
+=== Property Offset Table === 2026-05-14 12:25:15
+Classes discovered: 23
+
+AIController (size=0x59c):
+  Location        = +0x1d8
+  Rotation        = +0x1e4
+  Velocity        = +0x1f0
+  Physics         = +0x90
+  CollisionRadius = +0x2fc
+  bHidden         = +0xcc
+  bDeleteMe       = +0xcc
+  LifeSpan        = +0x100
+
+Actor (size=0x450):
+  Location        = +0x1d8
+  Rotation        = +0x1e4
+  Velocity        = +0x1f0
+  Physics         = +0x90
+  CollisionRadius = +0x2fc
+  bHidden         = +0xcc
+  bDeleteMe       = +0xcc
+  LifeSpan        = +0x100
+
+AggressorSpawner (size=0x4f4):
+  Location        = +0x1d8
+  Rotation        = +0x1e4
+  Velocity        = +0x1f0
+  Physics         = +0x90
+  CollisionRadius = +0x2fc
+  bHidden         = +0xcc
+  bDeleteMe       = +0xcc
+  LifeSpan        = +0x100
+
+Assassin (size=0x10d4):
+  Location        = +0x1d8
+  Rotation        = +0x1e4
+  Velocity        = +0x1f0
+  Health          = +0x57c
+  Physics         = +0x90
+  CollisionRadius = +0x2fc
+  bHidden         = +0xcc
+  bDeleteMe       = +0xcc
+  LifeSpan        = +0x100
+
+CeilingCrawler (size=0x10cc):
+  Location        = +0x1d8
+  Rotation        = +0x1e4
+  Velocity        = +0x1f0
+  Health          = +0x57c
+  Physics         = +0x90
+  CollisionRadius = +0x2fc
+  bHidden         = +0xcc
+  bDeleteMe       = +0xcc
+  LifeSpan        = +0x100
+
+Emitter (size=0x4fc):
+  Location        = +0x1d8
+  Rotation        = +0x1e4
+  Velocity        = +0x1f0
+  Physics         = +0x90
+  CollisionRadius = +0x2fc
+  bHidden         = +0xcc
+  bDeleteMe       = +0xcc
+  LifeSpan        = +0x100
+
+Grenadier (size=0x10c4):
+  Location        = +0x1d8
+  Rotation        = +0x1e4
+  Velocity        = +0x1f0
+  Health          = +0x57c
+  Physics         = +0x90
+  CollisionRadius = +0x2fc
+  bHidden         = +0xcc
+  bDeleteMe       = +0xcc
+  LifeSpan        = +0x100
+
+Light (size=0x48c):
+  Location        = +0x1d8
+  Rotation        = +0x1e4
+  Velocity        = +0x1f0
+  Physics         = +0x90
+  CollisionRadius = +0x2fc
+  bHidden         = +0xcc
+  bDeleteMe       = +0xcc
+  LifeSpan        = +0x100
+
+MeleeThug (size=0x10ac):
+  Location        = +0x1d8
+  Rotation        = +0x1e4
+  Velocity        = +0x1f0
+  Health          = +0x57c
+  Physics         = +0x90
+  CollisionRadius = +0x2fc
+  bHidden         = +0xcc
+  bDeleteMe       = +0xcc
+  LifeSpan        = +0x100
+
+Mover (size=0x7c0):
+  Location        = +0x1d8
+  Rotation        = +0x1e4
+  Velocity        = +0x1f0
+  Physics         = +0x90
+  CollisionRadius = +0x2fc
+  bHidden         = +0xcc
+  bDeleteMe       = +0xcc
+  LifeSpan        = +0x100
+
+NavigationPoint (size=0x4a8):
+  Location        = +0x1d8
+  Rotation        = +0x1e4
+  Velocity        = +0x1f0
+  Physics         = +0x90
+  CollisionRadius = +0x2fc
+  bHidden         = +0xcc
+  bDeleteMe       = +0xcc
+  LifeSpan        = +0x100
+
+Pawn (size=0x6a4):
+  Location        = +0x1d8
+  Rotation        = +0x1e4
+  Velocity        = +0x1f0
+  Health          = +0x57c
+  Physics         = +0x90
+  CollisionRadius = +0x2fc
+  bHidden         = +0xcc
+  bDeleteMe       = +0xcc
+  LifeSpan        = +0x100
+
+PhysicsVolume (size=0x558):
+  Location        = +0x1d8
+  Rotation        = +0x1e4
+  Velocity        = +0x1f0
+  Physics         = +0x90
+  CollisionRadius = +0x2fc
+  bHidden         = +0xcc
+  bDeleteMe       = +0xcc
+  LifeSpan        = +0x100
+
+PlayerStart (size=0x4b4):
+  Location        = +0x1d8
+  Rotation        = +0x1e4
+  Velocity        = +0x1f0
+  Physics         = +0x90
+  CollisionRadius = +0x2fc
+  bHidden         = +0xcc
+  bDeleteMe       = +0xcc
+  LifeSpan        = +0x100
+
+RangedAggressor (size=0x10a4):
+  Location        = +0x1d8
+  Rotation        = +0x1e4
+  Velocity        = +0x1f0
+  Health          = +0x57c
+  Physics         = +0x90
+  CollisionRadius = +0x2fc
+  bHidden         = +0xcc
+  bDeleteMe       = +0xcc
+  LifeSpan        = +0x100
+
+SecurityBot (size=0x115c):
+  Location        = +0x1d8
+  Rotation        = +0x1e4
+  Velocity        = +0x1f0
+  Health          = +0x57c
+  Physics         = +0x90
+  CollisionRadius = +0x2fc
+  bHidden         = +0xcc
+  bDeleteMe       = +0xcc
+  LifeSpan        = +0x100
+
+ShockAI (size=0xec8):
+  Location        = +0x1d8
+  Rotation        = +0x1e4
+  Velocity        = +0x1f0
+  Health          = +0x57c
+  Physics         = +0x90
+  CollisionRadius = +0x2fc
+  bHidden         = +0xcc
+  bDeleteMe       = +0xcc
+  LifeSpan        = +0x100
+
+ShockGameInfo (size=0x744):
+  Location        = +0x1d8
+  Rotation        = +0x1e4
+  Velocity        = +0x1f0
+  Physics         = +0x90
+  CollisionRadius = +0x2fc
+  bHidden         = +0xcc
+  bDeleteMe       = +0xcc
+  LifeSpan        = +0x100
+
+ShockPlayer (size=0xf54):
+  Location        = +0x1d8
+  Rotation        = +0x1e4
+  Velocity        = +0x1f0
+  Health          = +0x57c
+  Physics         = +0x90
+  CollisionRadius = +0x2fc
+  bHidden         = +0xcc
+  bDeleteMe       = +0xcc
+  LifeSpan        = +0x100
+
+ShockPlayerController (size=0xabc):
+  Location        = +0x1d8
+  Rotation        = +0x1e4
+  Velocity        = +0x1f0
+  Physics         = +0x90
+  CollisionRadius = +0x2fc
+  bHidden         = +0xcc
+  bDeleteMe       = +0xcc
+  LifeSpan        = +0x100
+
+ShockProjectile (size=0x4c4):
+  Location        = +0x1d8
+  Rotation        = +0x1e4
+  Velocity        = +0x1f0
+  Physics         = +0x90
+  CollisionRadius = +0x2fc
+  bHidden         = +0xcc
+  bDeleteMe       = +0xcc
+  LifeSpan        = +0x100
+
+Trigger (size=0x470):
+  Location        = +0x1d8
+  Rotation        = +0x1e4
+  Velocity        = +0x1f0
+  Physics         = +0x90
+  CollisionRadius = +0x2fc
+  bHidden         = +0xcc
+  bDeleteMe       = +0xcc
+  LifeSpan        = +0x100
+
+Volume (size=0x4dc):
+  Location        = +0x1d8
+  Rotation        = +0x1e4
+  Velocity        = +0x1f0
+  Physics         = +0x90
+  CollisionRadius = +0x2fc
+  bHidden         = +0xcc
+  bDeleteMe       = +0xcc
+  LifeSpan        = +0x100
+

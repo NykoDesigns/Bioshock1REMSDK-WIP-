@@ -73,14 +73,17 @@ void InitTransitions()
         ProcessEventHook levelHook;
         levelHook.Name = "TransitionLevel";
         levelHook.Callback = [](UObject* obj, UFunction* func, void* parms) -> bool {
-            std::string fn = func->GetName();
-            // Detect map change functions
-            if (fn == "ServerTravel" || fn == "ClientTravel" ||
-                fn == "LoadMap" || fn == "SwitchLevel") {
-                std::string cn = obj->GetObjClassName();
-                TransLog("LEVEL CHANGE detected: %s.%s", cn.c_str(), fn.c_str());
-                DebugSessionLogf("Level change: %s.%s", cn.c_str(), fn.c_str());
-            }
+            if (!obj || !func) return false;
+            if (GetTrueCoopRole() == TrueCoopRole::None) return false;
+            try {
+                std::string fn = func->GetName();
+                if (fn == "ServerTravel" || fn == "ClientTravel" ||
+                    fn == "LoadMap" || fn == "SwitchLevel") {
+                    std::string cn = obj->GetObjClassName();
+                    TransLog("LEVEL CHANGE detected: %s.%s", cn.c_str(), fn.c_str());
+                    DebugSessionLogf("Level change: %s.%s", cn.c_str(), fn.c_str());
+                }
+            } catch (...) { RegisterNullGuard("LevelHook PE crash"); }
             return false;
         };
         s_LevelHookId = RegisterProcessEventHook(levelHook);
@@ -89,16 +92,20 @@ void InitTransitions()
         ProcessEventHook cutsceneHook;
         cutsceneHook.Name = "TransitionCutscene";
         cutsceneHook.Callback = [](UObject* obj, UFunction* func, void* parms) -> bool {
-            std::string fn = func->GetName();
-            if (fn.find("Cutscene") != std::string::npos ||
-                fn.find("Cinematic") != std::string::npos ||
-                fn.find("Matinee") != std::string::npos) {
-                if (!s_Cutscene.Active) {
-                    std::string cn = obj->GetObjClassName();
-                    TransLog("CUTSCENE START: %s.%s", cn.c_str(), fn.c_str());
-                    OnCutsceneStart(fn);
+            if (!obj || !func) return false;
+            if (GetTrueCoopRole() == TrueCoopRole::None) return false;
+            try {
+                std::string fn = func->GetName();
+                if (fn.find("Cutscene") != std::string::npos ||
+                    fn.find("Cinematic") != std::string::npos ||
+                    fn.find("Matinee") != std::string::npos) {
+                    if (!s_Cutscene.Active) {
+                        std::string cn = obj->GetObjClassName();
+                        TransLog("CUTSCENE START: %s.%s", cn.c_str(), fn.c_str());
+                        OnCutsceneStart(fn);
+                    }
                 }
-            }
+            } catch (...) { RegisterNullGuard("CutsceneHook PE crash"); }
             return false;
         };
         s_CutsceneHookId = RegisterProcessEventHook(cutsceneHook);
@@ -107,26 +114,25 @@ void InitTransitions()
         ProcessEventHook bdHook;
         bdHook.Name = "TransitionBigDaddy";
         bdHook.Callback = [](UObject* obj, UFunction* func, void* parms) -> bool {
-            std::string fn = func->GetName();
-            if (fn == "TakeDamage") {
-                std::string cn = obj->GetObjClassName();
-                if (cn.find("BigDaddy") != std::string::npos ||
-                    cn.find("Rosie") != std::string::npos ||
-                    cn.find("Bouncer") != std::string::npos) {
-                    TransLog("BIG DADDY DAMAGE: %s.%s", cn.c_str(), fn.c_str());
-                    // Track damage source (P1 or P2)
-                    OnBigDaddyDamage(obj, 0, false); // TODO: parse damage from parms
+            if (!obj || !func) return false;
+            if (GetTrueCoopRole() == TrueCoopRole::None) return false;
+            try {
+                std::string fn = func->GetName();
+                if (fn == "TakeDamage" || fn == "Died") {
+                    std::string cn = obj->GetObjClassName();
+                    bool isBD = cn.find("BigDaddy") != std::string::npos ||
+                                cn.find("Rosie") != std::string::npos ||
+                                cn.find("Bouncer") != std::string::npos;
+                    if (isBD && fn == "TakeDamage") {
+                        TransLog("BIG DADDY DAMAGE: %s.%s", cn.c_str(), fn.c_str());
+                        OnBigDaddyDamage(obj, 0, false);
+                    }
+                    if (isBD && fn == "Died") {
+                        TransLog("BIG DADDY DIED: %s", cn.c_str());
+                        OnBigDaddyDeath(obj);
+                    }
                 }
-            }
-            if (fn == "Died") {
-                std::string cn = obj->GetObjClassName();
-                if (cn.find("BigDaddy") != std::string::npos ||
-                    cn.find("Rosie") != std::string::npos ||
-                    cn.find("Bouncer") != std::string::npos) {
-                    TransLog("BIG DADDY DIED: %s", cn.c_str());
-                    OnBigDaddyDeath(obj);
-                }
-            }
+            } catch (...) { RegisterNullGuard("BigDaddyHook PE crash"); }
             return false;
         };
         s_BigDaddyHookId = RegisterProcessEventHook(bdHook);
