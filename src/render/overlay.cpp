@@ -1811,9 +1811,27 @@ void Overlay::RenderConsole()
         // ─── truehost [port] ───
         else if (tokens[0] == "truehost") {
             uint16_t port = (tokens.size() >= 2) ? (uint16_t)std::atoi(tokens[1].c_str()) : 27015;
+            EnsureSubsystemsReady();
+
+            // Set current level name for host/client matching
+            auto level = GetCurrentLevel();
+            if (level.LevelName[0]) {
+                NetSetLocalLevel(level.LevelName);
+                LogInfo("Level: " + std::string(level.LevelName));
+            }
+
             SetTrueCoopRole(TrueCoopRole::TrueHost);
             if (CoopHost(port, "TrueHost")) {
                 LogGreen("True co-op HOST started on port " + std::to_string(port));
+                LogInfo("Waiting for client to join...");
+                LogInfo("Tick hook: " + std::string(IsTickHookActive() ? "active" : "NOT active"));
+
+                // Attempt P2 pawn spawn
+                if (P2SpawnPawn()) {
+                    LogGreen("P2 pawn ready: " + std::string(P2GetPawn() ? P2GetPawn()->GetName() : "unknown"));
+                } else {
+                    LogYellow("P2 pawn not available yet (will retry when client connects)");
+                }
             } else {
                 LogRed("Failed to start true co-op host");
             }
@@ -1822,11 +1840,21 @@ void Overlay::RenderConsole()
         else if (tokens[0] == "truejoin" && tokens.size() >= 2) {
             std::string ip = tokens[1];
             uint16_t port = (tokens.size() >= 3) ? (uint16_t)std::atoi(tokens[2].c_str()) : 27015;
+            EnsureSubsystemsReady();
+
+            // Set current level name for matching
+            auto level = GetCurrentLevel();
+            if (level.LevelName[0]) {
+                NetSetLocalLevel(level.LevelName);
+                LogInfo("Level: " + std::string(level.LevelName));
+            }
+
             SetTrueCoopRole(TrueCoopRole::TrueClient);
             if (CoopJoin(ip, port, "TrueClient")) {
                 LogGreen("True co-op CLIENT joining " + ip + ":" + std::to_string(port));
+                LogInfo("Tick hook: " + std::string(IsTickHookActive() ? "active" : "NOT active"));
                 FreezeClientSimulation();
-                LogYellow("Client simulation FROZEN");
+                LogYellow("Client simulation FROZEN — waiting for host world state");
             } else {
                 LogRed("Failed to join true co-op session");
             }

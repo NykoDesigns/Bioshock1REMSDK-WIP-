@@ -1,6 +1,6 @@
 P2 Inventory initialized
 Starting loadout: Wrench, Pistol (48), Electro Bolt, 100HP, 100EVE, $100
-PICKUP: +0 ammo for äﬁ (now 48/48)
+PICKUP: +0 ammo for êñ5P (now 48/48)
 VENDING: Bought 'First Aid Kit' for $20 (credits now $80)
 PICKUP: +0 health (now 100)
 VENDING: Cannot afford 'First Aid Kit' ($100, have $5)

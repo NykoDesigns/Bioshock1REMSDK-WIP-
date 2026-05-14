@@ -29,6 +29,7 @@ static bool s_Initialized = false;
 static bool s_SimFrozen = false;
 static int s_FreezeHookId = -1;
 static uint32_t s_HostFrameNum = 0;
+static int s_TickCallbackId = -1;
 
 // Functions being blocked on client
 static std::mutex s_FreezeMutex;
@@ -52,6 +53,20 @@ void SetTrueCoopRole(TrueCoopRole role)
     if (role != TrueCoopRole::None) {
         EnsureSubsystemsReady();
         ActivateTransitionHooks();
+
+        // Register tick callback so TrueCoopTick runs every frame
+        if (s_TickCallbackId < 0 && IsTickHookActive()) {
+            s_TickCallbackId = RegisterTickCallback([](float dt) {
+                TrueCoopTick(dt);
+            });
+            LOG_INFO("[TrueCoop] Tick callback registered (id={})", s_TickCallbackId);
+        }
+    } else {
+        // Role set to None — unregister tick callback
+        if (s_TickCallbackId >= 0) {
+            UnregisterTickCallback(s_TickCallbackId);
+            s_TickCallbackId = -1;
+        }
     }
 }
 

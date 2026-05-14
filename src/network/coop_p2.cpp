@@ -96,44 +96,54 @@ bool P2SpawnPawn()
     std::string bestClass;
 
     // Look for potential P2 bodies in priority order
+    // Prefer friendly/decoy types first, then fall back to any splicer NPC
     static const char* searchClasses[] = {
-        "DecoyHuman", "FriendlyNPC", "ShockPlayer", "ShockPawn", "Pawn", nullptr
+        "DecoyHuman", "FriendlyNPC",
+        "MeleeThug", "RangedAggressorPistol", "RangedAggressorSMG",
+        "SpawnedMeleeThug", "SpawnedRangedAggressorPistol",
+        "CeilingCrawler", "Assassin", "Grenadier",
+        "ShockPawn", "Pawn", nullptr
     };
 
-    for (int ci = 0; searchClasses[ci] && !bestCandidate; ci++) {
-        for (int i = 0; i < objCount && i < 200000; i++) {
-            uintptr_t ptr = *reinterpret_cast<uintptr_t*>(objData + i * 4);
-            if (!ptr) continue;
-            UObject* obj = reinterpret_cast<UObject*>(ptr);
-            std::string cn = obj->GetObjClassName();
-            if (cn == searchClasses[ci]) {
-                // Don't steal the actual player
-                if (cn == "ShockPlayer") {
-                    // Find a second one if it exists, or skip
-                    continue;
+    // First try to find a nearby pawn using the world system
+    FVec3 playerPos;
+    if (GetPlayerPosition(playerPos)) {
+        auto nearbyActors = GetActorsInRadius(playerPos, 5000.0f);
+        for (auto* actor : nearbyActors) {
+            std::string cn = actor->GetObjClassName();
+            for (int ci = 0; searchClasses[ci]; ci++) {
+                if (cn == searchClasses[ci]) {
+                    bestCandidate = actor;
+                    bestClass = cn;
+                    P2Log("Found nearby P2 candidate: [%s] %s", cn.c_str(), actor->GetName().c_str());
+                    break;
                 }
-                bestCandidate = obj;
-                bestClass = cn;
-                break;
+            }
+            if (bestCandidate) break;
+        }
+    }
+
+    // Fallback: scan all objects
+    if (!bestCandidate) {
+        for (int ci = 0; searchClasses[ci] && !bestCandidate; ci++) {
+            for (int i = 0; i < objCount && i < 200000; i++) {
+                uintptr_t ptr = *reinterpret_cast<uintptr_t*>(objData + i * 4);
+                if (!ptr) continue;
+                UObject* obj = reinterpret_cast<UObject*>(ptr);
+                std::string cn = obj->GetObjClassName();
+                if (cn == searchClasses[ci]) {
+                    bestCandidate = obj;
+                    bestClass = cn;
+                    break;
+                }
             }
         }
     }
 
     if (!bestCandidate) {
-        // Fallback: Try spawning via ProcessEvent on GameInfo
-        // Call GameInfo.Spawn(class'Pawn') — this may or may not work
-        P2Log("WARN: No candidate pawn found for P2. Attempting spawn via GameInfo...");
-
-        UObject* gameInfo = FindObjectByClassName("ShockGameInfo");
-        if (gameInfo) {
-            // For now, log and fail gracefully — spawn mechanism needs testing
-            P2Log("Found GameInfo at 0x%08X, spawn not yet implemented", (uint32_t)(uintptr_t)gameInfo);
-            LOG_WARN("[P2] No candidate pawn found. GameInfo spawn not yet implemented.");
-            DebugSessionLog("P2: No pawn candidate found, spawn needed");
-            return false;
-        }
-
-        LOG_ERROR("[P2] Cannot spawn P2 pawn — no candidate and no GameInfo");
+        P2Log("WARN: No candidate pawn found for P2 in this level");
+        LOG_WARN("[P2] No candidate pawn found (expected in some levels)");
+        DebugSessionLog("P2: No pawn candidate found");
         return false;
     }
 
@@ -141,7 +151,6 @@ bool P2SpawnPawn()
     s_P2PawnName = bestCandidate->GetName();
 
     // Move P2 pawn near the player
-    FVec3 playerPos;
     if (GetPlayerPosition(playerPos)) {
         FVec3 p2Pos = {playerPos.X + 100.0f, playerPos.Y + 100.0f, playerPos.Z};
         SetActorPosition(s_P2Pawn, p2Pos);

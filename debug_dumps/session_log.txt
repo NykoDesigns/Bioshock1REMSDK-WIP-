@@ -115,3 +115,59 @@
 [2026-05-14 12:56:23] Property offsets: 23 classes dumped
 [2026-05-14 12:56:23] AI function catalog: 1883 functions
 [2026-05-14 12:56:30] PE tracker started (10s)
+[2026-05-14 13:02:37] ═══ SESSION START ═══
+[2026-05-14 13:02:37] GObjects=0x10EF042C GNames=0x10EF04EC
+[2026-05-14 13:02:37] Full snapshot dumped: auto_init
+[2026-05-14 13:02:37] Actor census: 801 classes, 102207 objects
+[2026-05-14 13:02:37] Property offsets: 23 classes dumped
+[2026-05-14 13:02:37] AI function catalog: 1883 functions
+[2026-05-14 13:02:37] TrueCoop ready (deferred)
+[2026-05-14 13:02:53] TrueCoop subsystems initialized (all phases)
+[2026-05-14 13:02:53] TEST PASS: Engine globals valid - GObjects and GNames found
+[2026-05-14 13:02:53] TEST PASS: PE hooked - ProcessEvent intercepted
+[2026-05-14 13:02:53] TEST PASS: World ready - World system initialized
+[2026-05-14 13:02:53] TEST PASS: Tick hook - Engine tick hooked
+[2026-05-14 13:02:53] TEST PASS: Player accessible - At (-18748, 11803, 1195)
+[2026-05-14 13:02:58] TEST PASS: PE hook active - ProcessEvent hook is installed
+[2026-05-14 13:02:58] CLIENT SIMULATION FROZEN
+[2026-05-14 13:02:58] TEST PASS: Freeze activates - FreezeClientSimulation() returned true
+[2026-05-14 13:02:58] TEST PASS: Frozen state correct - IsSimulationFrozen() == true after freeze
+[2026-05-14 13:02:58] CLIENT SIMULATION UNFROZEN (blocked 0 calls)
+[2026-05-14 13:02:58] TEST PASS: Unfreeze works - IsSimulationFrozen() == false after unfreeze
+[2026-05-14 13:02:58] TEST PASS: World system ready - World system is initialized
+[2026-05-14 13:02:58] TEST PASS: Actors exist - Found 11 actors in level
+[2026-05-14 13:02:58] TEST PASS: Player position - Player at (-18744, 11816, 1223)
+[2026-05-14 13:02:58] TEST PASS: Tick hook active - Engine tick hook is installed
+[2026-05-14 13:02:58] TEST PASS: WorldSync init - InitWorldSync() succeeded
+[2026-05-14 13:02:58] TrueCoop role: TrueHost
+[2026-05-14 13:02:58] TEST FAIL: Actor registry builds - No actors tracked!
+[2026-05-14 13:02:58] TrueCoop role: None
+[2026-05-14 13:02:58] TEST PASS: Send rate valid - Send rate in range [1, 60] Hz
+[2026-05-14 13:02:58] TEST PASS: Sync radius valid - Sync radius > 0
+[2026-05-14 13:02:58] TEST PASS: UDP socket available - Winsock2 initialized (ws2_32 linked)
+[2026-05-14 13:02:58] TEST PASS: P2 system init - InitP2System() succeeded
+[2026-05-14 13:02:58] TrueCoop role: TrueHost
+[2026-05-14 13:02:58] P2: No pawn candidate found, spawn needed
+[2026-05-14 13:02:58] TEST FAIL: P2 pawn spawn - No candidate pawn found (expected in some levels)
+[2026-05-14 13:02:58] TrueCoop role: None
+[2026-05-14 13:02:58] TEST PASS: Combat event struct - P2CombatEvent defined correctly
+[2026-05-14 13:02:58] TEST SKIP: Enemies detectable - 0 enemies within 3000 units
+[2026-05-14 13:02:58] TEST PASS: Damage packet valid - DamageData struct defined
+[2026-05-14 13:02:58] TEST PASS: Combat actions complete - All 8 combat actions defined (0-7)
+[2026-05-14 13:02:58] TEST PASS: P2 inventory init - InitP2Inventory() succeeded
+[2026-05-14 13:02:58] TEST FAIL: Has wrench - No wrench!
+[2026-05-14 13:02:58] TEST FAIL: Has pistol - No pistol!
+[2026-05-14 13:02:58] TEST PASS: Has Electro Bolt - Electro Bolt in plasmid slot 0
+[2026-05-14 13:02:58] TEST PASS: Ammo pickup works - Added 12 ammo to pistol
+[2026-05-14 13:02:58] TEST PASS: Vending purchase - Spent $20, credits deducted correctly
+[2026-05-14 13:02:58] TEST PASS: Cannot overspend - Correctly rejected purchase exceeding credits
+[2026-05-14 13:02:58] TEST PASS: Ammo consumed - Magazine decremented on fire
+[2026-05-14 13:02:58] TEST PASS: EVE consumed - EVE deducted for plasmid use
+[2026-05-14 13:02:58] TEST PASS: Transitions init - InitTransitions() succeeded
+[2026-05-14 13:02:58] TEST PASS: Not in transition - No active transition
+[2026-05-14 13:02:58] TEST PASS: Not in cutscene - No active cutscene
+[2026-05-14 13:02:58] TEST PASS: Cutscene starts - Cutscene correctly detected as active
+[2026-05-14 13:02:58] TEST PASS: Cutscene ends - Cutscene correctly ended
+[2026-05-14 13:02:58] TEST PASS: Big Daddy tracking - Found 0 Big Daddies in level
+[2026-05-14 13:02:58] TEST PASS: Null guard counting - Null guard counter incremented
+[2026-05-14 13:02:58] TEST PASS: Level detected - Current level: Entry.MyLevel

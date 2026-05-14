@@ -1,5 +1,5 @@
-=== Actor Census === 2026-05-14 12:56:23
-Total classes: 817
+=== Actor Census === 2026-05-14 13:02:37
+Total classes: 801
 
 9593x Function
     Main
@@ -91,7 +91,7 @@ Total classes: 817
     InContextCommand
     OutOfContextCommand
     StrProperty_0
-2004x Sound
+2002x Sound
     GUI_shell_startGame_01
     GUI_shell_scroll_Ab
     GUI_shell_scroll_Bb
@@ -115,7 +115,7 @@ Total classes: 817
     used_drinking
     pickup_elementGas
     pickup_chemThrowe
-1707x SpriteEmitter
+1675x SpriteEmitter
     SpriteEmitter_232
     SpriteEmitter_2
     SpriteEmitter_3
@@ -199,36 +199,36 @@ Total classes: 817
     HkMeshProxy_4
     HkMeshProxy_2
     HkMeshProxy_8
-571x VariableBool
-    None
-    None
-    None
-    None
-    None
 570x Light
     Light_571
     Light_195
     Light_481
     Light_430
     Light_129
-517x Model
-    Model_1
-    Model_23
-    Model_628
-    Model_893
-    Model_707
+540x VariableBool
+    None
+    None
+    None
+    None
+    None
 517x Polys
     Polys_11
     Polys_50
     Polys_45
     Polys_46
     Polys_47
-449x SoundInstance
-    SoundInstance_909
-    SoundInstance_908
-    SoundInstance_910
+517x Model
+    Model_1
+    Model_23
+    Model_628
+    Model_893
+    Model_707
+435x SoundInstance
     SoundInstance_896
     SoundInstance_463
+    SoundInstance_462
+    SoundInstance_465
+    SoundInstance_499
 432x PathNode
     PathNode_88
     PathNode_64
@@ -283,18 +283,18 @@ Total classes: 817
     AnimNotify_PhotoScore_12
     AnimNotify_PhotoScore_6
     AnimNotify_PhotoScore_11
-272x ActionIf
-    ActionIf_662
-    ActionIf_644
-    ActionIf_656
-    ActionIf_665
-    ActionIf_648
 272x State
     Typing
     PlayerSpidering
     PlayerWalking
     PlayerDriving
     Dead
+272x ActionIf
+    ActionIf_662
+    ActionIf_644
+    ActionIf_656
+    ActionIf_665
+    ActionIf_648
 266x Package
     Core
     Editor
@@ -391,18 +391,18 @@ Total classes: 817
     ActionShowTrainingMessage_25
     ActionShowTrainingMessage_78
     ActionShowTrainingMessage_85
-154x MeshEmitter
-    MeshEmitter_2
-    MeshEmitter_9
-    MeshEmitter_10
-    MeshEmitter_28
-    MeshEmitter_0
 154x TexturePanner
     TexturePanner_0
     TexturePanner_1
     TexturePanner_2
     TexturePanner_3
     TexturePanner_3
+154x MeshEmitter
+    MeshEmitter_2
+    MeshEmitter_9
+    MeshEmitter_10
+    MeshEmitter_28
+    MeshEmitter_0
 151x AnimNotify_SpeechEvent
     AnimNotify_SpeechEvent_8
     AnimNotify_SpeechEvent_34
@@ -439,13 +439,13 @@ Total classes: 817
     ActionLog_92
     ActionLog_46
     ActionLog_66
-120x AI_SensorWithBounds
-    AI_SensorWithBounds_43
-    AI_SensorWithBounds_42
-    AI_SensorWithBounds_41
-    AI_SensorWithBounds_40
-    AI_SensorWithBounds_29
-115x VariableFloat
+116x AI_SensorWithBounds
+    AI_SensorWithBounds_1
+    AI_SensorWithBounds_0
+    AI_SensorWithBounds_48
+    AI_SensorWithBounds_10
+    AI_SensorWithBounds_45
+114x VariableFloat
     None
     None
     None
@@ -523,30 +523,24 @@ Total classes: 817
     TriggerVolume_26
     TriggerVolume_25
     TriggerVolume_17
-72x ActionSpawnAI
-    ActionSpawnAI_151
-    ActionSpawnAI_74
-    ActionSpawnAI_56
-    ActionSpawnAI_159
-    ActionSpawnAI_47
 72x AnimNotify_PoseMarker
     AnimNotify_PoseMarker_0
     AnimNotify_PoseMarker_7
     AnimNotify_PoseMarker_6
     AnimNotify_PoseMarker_5
     AnimNotify_PoseMarker_4
+72x ActionSpawnAI
+    ActionSpawnAI_151
+    ActionSpawnAI_74
+    ActionSpawnAI_56
+    ActionSpawnAI_159
+    ActionSpawnAI_47
 70x ActionScriptNote
     ActionScriptNote_24
     ActionScriptNote_1026
     ActionScriptNote_454
     ActionScriptNote_189
     ActionScriptNote_210
-69x MultipleRibbonEmitter
-    MultipleRibbonEmitter_5
-    MultipleRibbonEmitter_23
-    MultipleRibbonEmitter_1
-    MultipleRibbonEmitter_2
-    MultipleRibbonEmitter_39
 67x SkeletalMesh
     SimpleAnim
     WP_PistolMesh
@@ -577,6 +571,12 @@ Total classes: 817
     travel_seirehsiF-2_ActionSetConceptKnowledge_22
     travel_esuohthgiL-0_ActionSetConceptKnowledge_92
     travel_esuohthgiL-0_ActionSetConceptKnowledge_1
+63x MultipleRibbonEmitter
+    MultipleRibbonEmitter_5
+    MultipleRibbonEmitter_23
+    MultipleRibbonEmitter_1
+    MultipleRibbonEmitter_2
+    MultipleRibbonEmitter_39
 63x SharedSkeletonDataMetadata
     USharedSkeletonDataMetadata_SimpleAnim
     USharedSkeletonDataMetadata_WP_Pistol
@@ -625,18 +625,18 @@ Total classes: 817
     ActionSetLightProperties_32
     ActionSetLightProperties_100
     ActionSetLightProperties_118
-54x DoorModel
-    DoorModel_155
-    DoorModel_154
-    DoorModel_151
-    DoorModel_144
-    DoorModel_168
 54x TrainingScript
     travel_seirehsiF-2_TrainingScript_3
     travel_lacideM-1_TrainingScript_16
     travel_emocleW-1_TrainingScript_12
     travel_seirehsiF-2_TrainingScript_0
     travel_seirehsiF-2_TrainingScript_2
+54x DoorModel
+    DoorModel_155
+    DoorModel_154
+    DoorModel_151
+    DoorModel_144
+    DoorModel_168
 53x ActionGiveItemsToPlayer
     ActionGiveItemsToPlayer_24
     ActionGiveItemsToPlayer_16
@@ -679,12 +679,6 @@ Total classes: 817
     dyn_crate_box_30
     dyn_crate_box_0
     dyn_crate_box_6
-42x RibbonEmitter
-    RibbonEmitter_24
-    RibbonEmitter_26
-    RibbonEmitter_33
-    RibbonEmitter_13
-    RibbonEmitter_4
 42x SimpleDamageData
     SimpleDamageData_3
     SimpleDamageData_5
@@ -697,6 +691,12 @@ Total classes: 817
     Palette_87
     Palette_1
     Palette_0
+42x RibbonEmitter
+    RibbonEmitter_24
+    RibbonEmitter_26
+    RibbonEmitter_33
+    RibbonEmitter_13
+    RibbonEmitter_4
 40x ActionMuteAI
     ActionMuteAI_313
     ActionMuteAI_28
@@ -715,18 +715,24 @@ Total classes: 817
     LookOverLedge
     LookOverLedgeLoop
     BangDoorTurnAround
-37x Arc_GrassShiftB
-    Arc_GrassShiftB_27
-    Arc_GrassShiftB_24
-    Arc_GrassShiftB_11
-    Arc_GrassShiftB_34
-    Arc_GrassShiftB_12
 37x ActionAISpeech
     ActionAISpeech_292
     ActionAISpeech_15
     ActionAISpeech_37
     ActionAISpeech_154
     ActionAISpeech_13
+37x ActionDealDamage
+    ActionDealDamage_136
+    ActionDealDamage_34
+    ActionDealDamage_17
+    ActionDealDamage_8
+    ActionDealDamage_28
+37x Arc_GrassShiftB
+    Arc_GrassShiftB_27
+    Arc_GrassShiftB_24
+    Arc_GrassShiftB_11
+    Arc_GrassShiftB_34
+    Arc_GrassShiftB_12
 37x Arc_GrassShift
     Arc_GrassShift_34
     Arc_GrassShift_24
@@ -751,12 +757,6 @@ Total classes: 817
     ActionTweakAIHearing_27
     ActionTweakAIHearing_30
     ActionTweakAIHearing_124
-37x ActionDealDamage
-    ActionDealDamage_136
-    ActionDealDamage_34
-    ActionDealDamage_17
-    ActionDealDamage_8
-    ActionDealDamage_28
 36x AntiPortalActor
     AntiPortalActor_15
     AntiPortalActor_20
@@ -793,42 +793,48 @@ Total classes: 817
     ActionTweakAIVision_23
     ActionTweakAIVision_69
     ActionTweakAIVision_71
-32x InPlayerViewTrigger
-    InPlayerViewTrigger_18
-    InPlayerViewTrigger_16
-    InPlayerViewTrigger_9
-    InPlayerViewTrigger_8
-    InPlayerViewTrigger_19
-32x ActionVariableIncrement
-    ActionVariableIncrement_56
-    ActionVariableIncrement_95
-    ActionVariableIncrement_35
-    ActionVariableIncrement_36
-    ActionVariableIncrement_884
-32x ActionGetLevelLabel
-    ActionGetLevelLabel_46
-    ActionGetLevelLabel_69
-    ActionGetLevelLabel_145
-    ActionGetLevelLabel_72
-    ActionGetLevelLabel_146
-32x TrainingMessageTrigger
-    travel_esuohthgiL-0_TrainingMessageTrigger_12
-    travel_esuohthgiL-0_TrainingMessageTrigger_9
-    travel_esuohthgiL-0_TrainingMessageTrigger_8
-    travel_aidacrA-3_TrainingMessageTrigger_1
-    travel_emocleW-1_TrainingMessageTrigger_96
 32x Fireflies_Area
     Fireflies_Area_16
     Fireflies_Area_19
     Fireflies_Area_28
     Fireflies_Area_32
     Fireflies_Area_27
+32x ActionVariableIncrement
+    ActionVariableIncrement_56
+    ActionVariableIncrement_95
+    ActionVariableIncrement_35
+    ActionVariableIncrement_36
+    ActionVariableIncrement_884
+32x InPlayerViewTrigger
+    InPlayerViewTrigger_18
+    InPlayerViewTrigger_16
+    InPlayerViewTrigger_9
+    InPlayerViewTrigger_8
+    InPlayerViewTrigger_19
+32x TrainingMessageTrigger
+    travel_esuohthgiL-0_TrainingMessageTrigger_12
+    travel_esuohthgiL-0_TrainingMessageTrigger_9
+    travel_esuohthgiL-0_TrainingMessageTrigger_8
+    travel_aidacrA-3_TrainingMessageTrigger_1
+    travel_emocleW-1_TrainingMessageTrigger_96
 32x ActionSetPlayerInvincibility
     ActionSetPlayerInvincibility_15
     ActionSetPlayerInvincibility_131
     ActionSetPlayerInvincibility_209
     ActionSetPlayerInvincibility_9
     ActionSetPlayerInvincibility_3
+32x ActionGetLevelLabel
+    ActionGetLevelLabel_46
+    ActionGetLevelLabel_69
+    ActionGetLevelLabel_145
+    ActionGetLevelLabel_72
+    ActionGetLevelLabel_146
+31x MaterialCascadingWater
+    MaterialCascadingWater_82
+    MaterialCascadingWater_56
+    MaterialCascadingWater_57
+    MaterialCascadingWater_58
+    MaterialCascadingWater_59
 31x DelegateProperty
     __TimerDelegate__Delegate
     __OnAdminReply__Delegate
@@ -847,36 +853,30 @@ Total classes: 817
     ActionGetMessageValue_248
     ActionGetMessageValue_249
     ActionGetMessageValue_250
-31x MaterialCascadingWater
-    MaterialCascadingWater_82
-    MaterialCascadingWater_56
-    MaterialCascadingWater_57
-    MaterialCascadingWater_58
-    MaterialCascadingWater_59
-30x ActionGetConceptKnowledge
-    travel_aidacrA-3_ActionGetConceptKnowledge_0
-    travel_aidacrA-3_ActionGetConceptKnowledge_25
-    travel_esuohthgiL-0_ActionGetConceptKnowledge_0
-    travel_seirehsiF-2_ActionGetConceptKnowledge_22
-    travel_seirehsiF-2_ActionGetConceptKnowledge_23
-30x InputContext
-    Default
-    RadialActive
-    GathererChoice
-    InventoryUIActive
-    ContainerUIActive
 30x NonPhysicalReactiveActor
     NonPhysicalReactiveActor_8
     NonPhysicalReactiveActor_55
     NonPhysicalReactiveActor_23
     NonPhysicalReactiveActor_34
     NonPhysicalReactiveActor_12
+30x ActionGetConceptKnowledge
+    travel_aidacrA-3_ActionGetConceptKnowledge_0
+    travel_aidacrA-3_ActionGetConceptKnowledge_25
+    travel_esuohthgiL-0_ActionGetConceptKnowledge_0
+    travel_seirehsiF-2_ActionGetConceptKnowledge_22
+    travel_seirehsiF-2_ActionGetConceptKnowledge_23
 30x Arc_Sprinklers
     Arc_Sprinklers_19
     Arc_Sprinklers_13
     Arc_Sprinklers_18
     Arc_Sprinklers_10
     Arc_Sprinklers_35
+30x InputContext
+    Default
+    RadialActive
+    GathererChoice
+    InventoryUIActive
+    ContainerUIActive
 29x PathBlockingVolume
     PathBlockingVolume_26
     PathBlockingVolume_25
@@ -889,36 +889,36 @@ Total classes: 817
     vine7_leaves_plantshader
     grass_leaf_shader
     Mo_tree_Leaves_Shader
-28x HavokForceBoxMirrored
-    HavokForceBoxMirrored_3
-    HavokForceBoxMirrored_44
-    HavokForceBoxMirrored_56
-    HavokForceBoxMirrored_55
-    HavokForceBoxMirrored_45
-28x HavokForceTypePushFromDoor
-    HavokForceTypePushFromDoor_3
-    HavokForceTypePushFromDoor_56
-    HavokForceTypePushFromDoor_46
-    HavokForceTypePushFromDoor_55
-    HavokForceTypePushFromDoor_45
 28x ConvexVolume
     ConvexVolume_25
     ConvexVolume_7
     ConvexVolume_10
     ConvexVolume_15
     ConvexVolume_4
-27x DoorForceActor
-    DoorForceActor_20
-    DoorForceActor_22
-    DoorForceActor_8
-    DoorForceActor_11
-    DoorForceActor_7
+28x HavokForceTypePushFromDoor
+    HavokForceTypePushFromDoor_3
+    HavokForceTypePushFromDoor_56
+    HavokForceTypePushFromDoor_46
+    HavokForceTypePushFromDoor_55
+    HavokForceTypePushFromDoor_45
+28x HavokForceBoxMirrored
+    HavokForceBoxMirrored_3
+    HavokForceBoxMirrored_44
+    HavokForceBoxMirrored_56
+    HavokForceBoxMirrored_55
+    HavokForceBoxMirrored_45
 27x InventoryItemStack
     InventoryItemStack_10
     InventoryItemStack_19
     InventoryItemStack_65
     InventoryItemStack_21
     InventoryItemStack_114
+27x DoorForceActor
+    DoorForceActor_20
+    DoorForceActor_22
+    DoorForceActor_8
+    DoorForceActor_11
+    DoorForceActor_7
 27x ModManager
     ModManager_1
     ModManager_324
@@ -943,6 +943,12 @@ Total classes: 817
     AI_SensorData_743
     AI_SensorData_244
     AI_SensorData_744
+25x ActionHideOrShowActor
+    ActionHideOrShowActor_32
+    ActionHideOrShowActor_46
+    ActionHideOrShowActor_45
+    ActionHideOrShowActor_23
+    ActionHideOrShowActor_84
 25x HearingNotifier
     HearingNotifier_0
     HearingNotifier_387
@@ -955,12 +961,6 @@ Total classes: 817
     VisionNotifier_116
     VisionNotifier_27
     VisionNotifier_251
-25x ActionHideOrShowActor
-    ActionHideOrShowActor_32
-    ActionHideOrShowActor_46
-    ActionHideOrShowActor_45
-    ActionHideOrShowActor_23
-    ActionHideOrShowActor_84
 25x FluidShader
     DefaultFluidShader
     EnergySphereMesh_Shader
@@ -973,90 +973,78 @@ Total classes: 817
     ActionDisplayOnScreenDebugMessage_14
     ActionDisplayOnScreenDebugMessage_45
     ActionDisplayOnScreenDebugMessage_11
-23x Cubemap
-    DefaultSpecularCubemap
-    Cubemap_1
-    Cubemap_2
-    Cubemap_3
-    Cubemap_4
 23x ActionAttackTarget
     ActionAttackTarget_130
     ActionAttackTarget_121
     ActionAttackTarget_902
     ActionAttackTarget_22
     ActionAttackTarget_38
-23x ChameleonSort_1
-    ChameleonSort_178
-    ChameleonSort_176
-    ChameleonSort_180
-    ChameleonSort_152
-    ChameleonSort_138
+23x ChameleonOverAlpha
+    ChameleonOverAlpha_15
+    ChameleonOverAlpha_14
+    ChameleonOverAlpha_13
+    ChameleonOverAlpha_11
+    ChameleonOverAlpha_8
 23x BubblesRisingA
     BubblesRisingA_23
     BubblesRisingA_24
     BubblesRisingA_26
     BubblesRisingA_27
     BubblesRisingA_25
-23x ChameleonSort
-    ChameleonSort_135
-    ChameleonSort_157
-    ChameleonSort_153
-    ChameleonSort_179
-    ChameleonSort_159
-23x ChameleonOverAlpha
-    ChameleonOverAlpha_80
-    ChameleonOverAlpha_78
-    ChameleonOverAlpha_84
-    ChameleonOverAlpha_91
-    ChameleonOverAlpha_79
 23x ChameleonAlpha
-    ChameleonAlpha_135
-    ChameleonAlpha_179
-    ChameleonAlpha_153
-    ChameleonAlpha_159
-    ChameleonAlpha_175
+    ChameleonAlpha_30
+    ChameleonAlpha_28
+    ChameleonAlpha_18
+    ChameleonAlpha_16
+    ChameleonAlpha_26
 23x ChameleonAlpha_1
-    ChameleonAlpha_178
-    ChameleonAlpha_152
-    ChameleonAlpha_138
-    ChameleonAlpha_158
-    ChameleonAlpha_170
+    ChameleonAlpha_31
+    ChameleonAlpha_29
+    ChameleonAlpha_27
+    ChameleonAlpha_21
+    ChameleonAlpha_19
+23x ChameleonSort
+    ChameleonSort_26
+    ChameleonSort_30
+    ChameleonSort_28
+    ChameleonSort_22
+    ChameleonSort_24
+23x ChameleonSort_1
+    ChameleonSort_29
+    ChameleonSort_31
+    ChameleonSort_27
+    ChameleonSort_15
+    ChameleonSort_17
+23x Cubemap
+    DefaultSpecularCubemap
+    Cubemap_1
+    Cubemap_2
+    Cubemap_3
+    Cubemap_4
 22x Arc_LightBeamColor
     Arc_LightBeamColor_2
     Arc_LightBeamColor_8
     Arc_LightBeamColor_7
     Arc_LightBeamColor_12
     Arc_LightBeamColor_6
-22x ActionBlockingExecuteScript
-    ActionBlockingExecuteScript_23
-    ActionBlockingExecuteScript_8
-    ActionBlockingExecuteScript_64
-    ActionBlockingExecuteScript_19
-    ActionBlockingExecuteScript_473
 22x CubemapProbe
     CubemapProbe_10
     CubemapProbe_17
     CubemapProbe_1
     CubemapProbe_5
     CubemapProbe_6
+22x ActionBlockingExecuteScript
+    ActionBlockingExecuteScript_23
+    ActionBlockingExecuteScript_8
+    ActionBlockingExecuteScript_64
+    ActionBlockingExecuteScript_19
+    ActionBlockingExecuteScript_473
 21x TextureRotator
     TextureRotator_0
     TextureRotator_0
     TextureRotator_1
     TextureRotator_0
     TextureRotator_0
-21x TargetTrackerDestroyedActorListener
-    TargetTrackerDestroyedActorListener_0
-    TargetTrackerDestroyedActorListener_1
-    TargetTrackerDestroyedActorListener_2
-    TargetTrackerDestroyedActorListener_3
-    TargetTrackerDestroyedActorListener_4
-21x ActionSetAIPatrol
-    ActionSetAIPatrol_54
-    ActionSetAIPatrol_4
-    ActionSetAIPatrol_70
-    ActionSetAIPatrol_3
-    ActionSetAIPatrol_57
 21x ActionExitLoop
     ActionExitLoop_328
     ActionExitLoop_275
@@ -1075,66 +1063,114 @@ Total classes: 817
     ActionPlaceItemInContainerSlot_150
     ActionPlaceItemInContainerSlot_156
     ActionPlaceItemInContainerSlot_152
-20x MessagePawnDied
-    MessagePawnDied_0
-    MessagePawnDied_0
-    MessagePawnDied_2
-    MessagePawnDied_3
-    MessagePawnDied_0
-20x AndStatement
-    AndStatement_23
-    AndStatement_491
-    AndStatement_18
-    AndStatement_15
-    AndStatement_159
-20x ActionUnlockDoor
-    ActionUnlockDoor_289
-    ActionUnlockDoor_39
-    ActionUnlockDoor_27
-    ActionUnlockDoor_28
-    ActionUnlockDoor_26
+21x ActionSetAIPatrol
+    ActionSetAIPatrol_54
+    ActionSetAIPatrol_4
+    ActionSetAIPatrol_70
+    ActionSetAIPatrol_3
+    ActionSetAIPatrol_57
+21x TargetTrackerDestroyedActorListener
+    TargetTrackerDestroyedActorListener_0
+    TargetTrackerDestroyedActorListener_1
+    TargetTrackerDestroyedActorListener_2
+    TargetTrackerDestroyedActorListener_3
+    TargetTrackerDestroyedActorListener_4
 20x dyn_pot_single
     dyn_pot_single_2
     dyn_pot_single_28
     dyn_pot_single_3
     dyn_pot_single_4
     dyn_pot_single_0
-19x Lockbox
-    Lockbox_50
-    Lockbox_17
-    Lockbox_18
-    Lockbox_60
-    Lockbox_58
+20x MessagePawnDied
+    MessagePawnDied_0
+    MessagePawnDied_0
+    MessagePawnDied_2
+    MessagePawnDied_3
+    MessagePawnDied_0
+20x ActionUnlockDoor
+    ActionUnlockDoor_289
+    ActionUnlockDoor_39
+    ActionUnlockDoor_27
+    ActionUnlockDoor_28
+    ActionUnlockDoor_26
+20x AndStatement
+    AndStatement_23
+    AndStatement_491
+    AndStatement_18
+    AndStatement_15
+    AndStatement_159
 19x ActionManipulateSpawnZoneRepopulation
     ActionManipulateSpawnZoneRepopulation_21
     ActionManipulateSpawnZoneRepopulation_22
     ActionManipulateSpawnZoneRepopulation_39
     ActionManipulateSpawnZoneRepopulation_40
     ActionManipulateSpawnZoneRepopulation_41
-19x ActionOpenDoor
-    ActionOpenDoor_141
-    ActionOpenDoor_287
-    ActionOpenDoor_13
-    ActionOpenDoor_332
-    ActionOpenDoor_28
-19x AnimatedMeshAttachmentModel
-    AnimatedMeshAttachmentModel_65
-    AnimatedMeshAttachmentModel_67
-    AnimatedMeshAttachmentModel_70
-    AnimatedMeshAttachmentModel_73
-    AnimatedMeshAttachmentModel_74
 19x AggressorSpawner
     AggressorSpawner_7
     AggressorSpawner_13
     AggressorSpawner_6
     AggressorSpawner_12
     AggressorSpawner_17
+19x AnimatedMeshAttachmentModel
+    AnimatedMeshAttachmentModel_65
+    AnimatedMeshAttachmentModel_67
+    AnimatedMeshAttachmentModel_70
+    AnimatedMeshAttachmentModel_73
+    AnimatedMeshAttachmentModel_74
+19x ActionOpenDoor
+    ActionOpenDoor_141
+    ActionOpenDoor_287
+    ActionOpenDoor_13
+    ActionOpenDoor_332
+    ActionOpenDoor_28
+19x Lockbox
+    Lockbox_50
+    Lockbox_17
+    Lockbox_18
+    Lockbox_60
+    Lockbox_58
+18x OrMod
+    OrMod_1
+    OrMod_0
+    OrMod_71
+    OrMod_70
+    OrMod_35
+18x AnimNotify_FootIK
+    AnimNotify_FootIK_31
+    AnimNotify_FootIK_30
+    AnimNotify_FootIK_27
+    AnimNotify_FootIK_26
+    AnimNotify_FootIK_25
+18x ActionPostMovementGoal
+    ActionPostMovementGoal_3
+    ActionPostMovementGoal_4
+    ActionPostMovementGoal_208
+    ActionPostMovementGoal_22
+    ActionPostMovementGoal_24
+18x MistLow
+    MistLow_9
+    MistLow_11
+    MistLow_8
+    MistLow_10
+    MistLow_27
 18x ActionSetMaterialSwitchIndex
     ActionSetMaterialSwitchIndex_37
     ActionSetMaterialSwitchIndex_186
     ActionSetMaterialSwitchIndex_195
     ActionSetMaterialSwitchIndex_69
     ActionSetMaterialSwitchIndex_0
+18x AIArchetype
+    Rosie
+    ArcadiaBreadwinnerTELEPORT
+    ArcadiaDoctorMelee
+    ArcadiaBreadwinnerPISTOL
+    ArcadiaLadySmithPISTOL
+18x BootyImpl
+    BootyImpl_69
+    BootyImpl_193
+    BootyImpl_194
+    BootyImpl_195
+    BootyImpl_196
 18x StorageCrate
     StorageCrate_3
     StorageCrate_6
@@ -1147,42 +1183,24 @@ Total classes: 817
     dyn_Rake_15
     dyn_Rake_1
     dyn_Rake_11
-18x BootyImpl
-    BootyImpl_69
-    BootyImpl_193
-    BootyImpl_194
-    BootyImpl_195
-    BootyImpl_196
-18x ActionPostMovementGoal
-    ActionPostMovementGoal_3
-    ActionPostMovementGoal_4
-    ActionPostMovementGoal_208
-    ActionPostMovementGoal_22
-    ActionPostMovementGoal_24
-18x AnimNotify_FootIK
-    AnimNotify_FootIK_31
-    AnimNotify_FootIK_30
-    AnimNotify_FootIK_27
-    AnimNotify_FootIK_26
-    AnimNotify_FootIK_25
-18x OrMod
-    OrMod_1
-    OrMod_0
-    OrMod_71
-    OrMod_70
-    OrMod_35
-18x AIArchetype
-    Rosie
-    ArcadiaBreadwinnerTELEPORT
-    ArcadiaDoctorMelee
-    ArcadiaBreadwinnerPISTOL
-    ArcadiaLadySmithPISTOL
-18x MistLow
-    MistLow_9
-    MistLow_11
-    MistLow_8
-    MistLow_10
-    MistLow_27
+17x PlayerPathNode
+    PlayerPathNode_4
+    PlayerPathNode_3
+    PlayerPathNode_1
+    PlayerPathNode_7
+    PlayerPathNode_16
+17x WinePickup
+    WinePickup_2
+    WinePickup_9
+    WinePickup_0
+    WinePickup_13
+    WinePickup_12
+17x dyn_fis_pallette
+    dyn_fis_pallette_1
+    dyn_fis_pallette_2
+    dyn_fis_pallette_14
+    dyn_fis_pallette_11
+    dyn_fis_pallette_12
 17x ActionTeleportPawnToLocation
     ActionTeleportPawnToLocation_131
     ActionTeleportPawnToLocation_16
@@ -1195,36 +1213,36 @@ Total classes: 817
     DeadBodyContainer_17
     DeadBodyContainer_15
     DeadBodyContainer_6
-17x TriggerRadius
-    TriggerRadius_11
-    TriggerRadius_7
-    TriggerRadius_15
-    TriggerRadius_4
-    TriggerRadius_5
 17x ActionInitiateQuest
     ActionInitiateQuest_117
     ActionInitiateQuest_3
     ActionInitiateQuest_45
     ActionInitiateQuest_199
     ActionInitiateQuest_35
-17x dyn_fis_pallette
-    dyn_fis_pallette_1
-    dyn_fis_pallette_2
-    dyn_fis_pallette_14
-    dyn_fis_pallette_11
-    dyn_fis_pallette_12
-17x WinePickup
-    WinePickup_2
-    WinePickup_9
-    WinePickup_0
-    WinePickup_13
-    WinePickup_12
-17x PlayerPathNode
-    PlayerPathNode_4
-    PlayerPathNode_3
-    PlayerPathNode_1
-    PlayerPathNode_7
-    PlayerPathNode_16
+17x TriggerRadius
+    TriggerRadius_11
+    TriggerRadius_7
+    TriggerRadius_15
+    TriggerRadius_4
+    TriggerRadius_5
+16x QuickHitReaction
+    QuickHitReaction_0
+    QuickHitReaction_1
+    QuickHitReaction_2
+    QuickHitReaction_3
+    QuickHitReaction_4
+16x DistanceTraveledSensorAction
+    DistanceTraveledSensorAction_331
+    DistanceTraveledSensorAction_388
+    DistanceTraveledSensorAction_386
+    DistanceTraveledSensorAction_387
+    DistanceTraveledSensorAction_28
+16x DistanceTraveledSensor
+    DistanceTraveledSensor_0
+    DistanceTraveledSensor_28
+    DistanceTraveledSensor_309
+    DistanceTraveledSensor_308
+    DistanceTraveledSensor_307
 16x AIEventNotification
     AIEventNotification_5
     AIEventNotification_6
@@ -1237,6 +1255,12 @@ Total classes: 817
     AI_CharacterResource_302
     AI_CharacterResource_331
     AI_CharacterResource_299
+16x BurningLeg
+    BurningLeg_15
+    BurningLeg_9
+    BurningLeg_8
+    BurningLeg_4
+    BurningLeg_6
 16x AI_HeadResource
     AI_HeadResource_299
     AI_HeadResource_132
@@ -1249,54 +1273,30 @@ Total classes: 817
     AI_MovementResource_331
     AI_MovementResource_300
     AI_MovementResource_301
-16x DistanceTraveledSensor
-    DistanceTraveledSensor_0
-    DistanceTraveledSensor_28
-    DistanceTraveledSensor_309
-    DistanceTraveledSensor_308
-    DistanceTraveledSensor_307
-16x BurningLeg
-    BurningLeg_15
-    BurningLeg_9
-    BurningLeg_8
-    BurningLeg_4
-    BurningLeg_6
-16x AI_WeaponResource
-    AI_WeaponResource_132
-    AI_WeaponResource_0
-    AI_WeaponResource_388
-    AI_WeaponResource_387
-    AI_WeaponResource_386
-16x QuickHitReaction
-    QuickHitReaction_0
-    QuickHitReaction_1
-    QuickHitReaction_2
-    QuickHitReaction_3
-    QuickHitReaction_4
 16x ActionLoop
     ActionLoop_315
     ActionLoop_266
     ActionLoop_98
     ActionLoop_9
     ActionLoop_25
-16x CommanderGoal
-    CommanderGoal_331
-    CommanderGoal_387
-    CommanderGoal_386
-    CommanderGoal_388
-    CommanderGoal_28
 16x AnimNotify_AIEventNotification
     AnimNotify_AIEventNotification_5
     AnimNotify_AIEventNotification_6
     AnimNotify_AIEventNotification_8
     AnimNotify_AIEventNotification_4
     AnimNotify_AIEventNotification_22
-16x DistanceTraveledSensorAction
-    DistanceTraveledSensorAction_331
-    DistanceTraveledSensorAction_388
-    DistanceTraveledSensorAction_386
-    DistanceTraveledSensorAction_387
-    DistanceTraveledSensorAction_28
+16x CommanderGoal
+    CommanderGoal_331
+    CommanderGoal_387
+    CommanderGoal_386
+    CommanderGoal_388
+    CommanderGoal_28
+16x AI_WeaponResource
+    AI_WeaponResource_132
+    AI_WeaponResource_0
+    AI_WeaponResource_388
+    AI_WeaponResource_387
+    AI_WeaponResource_386
 15x ActionSpawnReactiveActor
     ActionSpawnReactiveActor_263
     ActionSpawnReactiveActor_3
@@ -1315,6 +1315,12 @@ Total classes: 817
     NotStatement_0
     NotStatement_1
     travel_emocleW-1_NotStatement_0
+14x dyn_Shovel
+    dyn_Shovel_8
+    dyn_Shovel_9
+    dyn_Shovel_1
+    dyn_Shovel_4
+    dyn_Shovel_2
 14x dyn_crate
     dyn_crate_1
     dyn_crate_2
@@ -1327,378 +1333,378 @@ Total classes: 817
     dyn_gas_cylinder_22
     dyn_gas_cylinder_17
     dyn_gas_cylinder_18
-14x dyn_Shovel
-    dyn_Shovel_8
-    dyn_Shovel_9
-    dyn_Shovel_1
-    dyn_Shovel_4
-    dyn_Shovel_2
-13x ProtectorFootstep_Default
-    ProtectorFootstep_Default_3
-    ProtectorFootstep_Default_1
-    ProtectorFootstep_Default_13
-    ProtectorFootstep_Default_10
-    ProtectorFootstep_Default_11
 13x ArithmeticStatement
     ArithmeticStatement_121
     ArithmeticStatement_106
     ArithmeticStatement_40
     ArithmeticStatement_421
     ArithmeticStatement_64
-12x HeadTargetTracker
-    HeadTargetTracker_0
-    HeadTargetTracker_1
-    HeadTargetTracker_2
-    HeadTargetTracker_3
-    HeadTargetTracker_4
-12x AnimNotify_SetAmmoVisible
-    AnimNotify_SetAmmoVisible_1
-    AnimNotify_SetAmmoVisible_0
-    AnimNotify_SetAmmoVisible_3
-    AnimNotify_SetAmmoVisible_2
-    AnimNotify_SetAmmoVisible_1
-12x BurningArm
-    BurningArm_17
-    BurningArm_16
-    BurningArm_19
-    BurningArm_18
-    BurningArm_8
-12x ActionCompleteQuest
-    ActionCompleteQuest_7
-    ActionCompleteQuest_81
-    ActionCompleteQuest_197
-    ActionCompleteQuest_395
-    ActionCompleteQuest_0
-12x ShojiDoors
-    ShojiDoors_9
-    ShojiDoors_1
-    ShojiDoors_7
-    ShojiDoors_0
-    ShojiDoors_11
-12x HitspangMG_Metal
-    HitspangMG_Metal_11
-    HitspangMG_Metal_10
-    HitspangMG_Metal_9
-    HitspangMG_Metal_8
-    HitspangMG_Metal_3
-12x PlacedGathererVent
-    PlacedGathererVent_10
-    PlacedGathererVent_1
-    PlacedGathererVent_2
-    PlacedGathererVent_0
-    PlacedGathererVent_6
-12x MaterialSequence
-    ElectricWater_Sequence
-    ElectroTouch_Sequence
-    ElectroBlast_Sequence
-    Wasps_Sequence
-    BeaconEmissive_Sequence
 12x ActionClearTrainingMessage
     travel_emocleW-1_ActionClearTrainingMessage_66
     travel_emocleW-1_ActionClearTrainingMessage_90
     travel_emocleW-1_ActionClearTrainingMessage_6
     travel_emocleW-1_ActionClearTrainingMessage_3
     travel_emocleW-1_ActionClearTrainingMessage_4
-12x ActionChangeCollision
-    ActionChangeCollision_42
-    ActionChangeCollision_33
-    ActionChangeCollision_24
-    ActionChangeCollision_49
-    ActionChangeCollision_7
-12x ProtectorSpawner
-    ProtectorSpawner_3
-    ProtectorSpawner_1
-    ProtectorSpawner_9
-    ProtectorSpawner_10
-    ProtectorSpawner_2
-12x ActionGetPawnHealth
-    ActionGetPawnHealth_23
-    ActionGetPawnHealth_358
-    ActionGetPawnHealth_391
-    ActionGetPawnHealth_41
-    ActionGetPawnHealth_58
-12x AnimNotify_RiseFromRagdollPose
-    AnimNotify_RiseFromRagdollPose_3
-    AnimNotify_RiseFromRagdollPose_2
-    AnimNotify_RiseFromRagdollPose_1
-    AnimNotify_RiseFromRagdollPose_0
-    AnimNotify_RiseFromRagdollPose_7
+12x HeadTargetTracker
+    HeadTargetTracker_0
+    HeadTargetTracker_1
+    HeadTargetTracker_2
+    HeadTargetTracker_3
+    HeadTargetTracker_4
 12x AnimNotify_SetOrUnsetInputContext
     AnimNotify_SetOrUnsetInputContext_5
     AnimNotify_SetOrUnsetInputContext_4
     AnimNotify_SetOrUnsetInputContext_7
     AnimNotify_SetOrUnsetInputContext_6
     AnimNotify_SetOrUnsetInputContext_9
-12x RosieGrenadeRadius
-    RosieGrenadeRadius_10
-    RosieGrenadeRadius_11
-    RosieGrenadeRadius_7
-    RosieGrenadeRadius_1
-    RosieGrenadeRadius_0
+12x ShojiDoors
+    ShojiDoors_9
+    ShojiDoors_1
+    ShojiDoors_7
+    ShojiDoors_0
+    ShojiDoors_11
+12x PlacedGathererVent
+    PlacedGathererVent_10
+    PlacedGathererVent_1
+    PlacedGathererVent_2
+    PlacedGathererVent_0
+    PlacedGathererVent_6
+12x ActionGetPawnHealth
+    ActionGetPawnHealth_23
+    ActionGetPawnHealth_358
+    ActionGetPawnHealth_391
+    ActionGetPawnHealth_41
+    ActionGetPawnHealth_58
 12x ActionToggleAIAttacking
     ActionToggleAIAttacking_24
     ActionToggleAIAttacking_1
     ActionToggleAIAttacking_6
     ActionToggleAIAttacking_3
     ActionToggleAIAttacking_4
-11x CascadingWaterVolume
-    CascadingWaterVolume_10
-    CascadingWaterVolume_6
-    CascadingWaterVolume_0
-    CascadingWaterVolume_11
-    CascadingWaterVolume_7
-11x Arc_VineClip
-    Arc_VineClip_3
-    Arc_VineClip_9
-    Arc_VineClip_7
-    Arc_VineClip_1
-    Arc_VineClip_6
-11x WaterSplash_SmallPP
-    WaterSplash_SmallPP_5
-    WaterSplash_SmallPP_4
-    WaterSplash_SmallPP_10
-    WaterSplash_SmallPP_12
-    WaterSplash_SmallPP_11
+12x RosieGrenadeRadius
+    RosieGrenadeRadius_10
+    RosieGrenadeRadius_11
+    RosieGrenadeRadius_7
+    RosieGrenadeRadius_1
+    RosieGrenadeRadius_0
+12x AnimNotify_RiseFromRagdollPose
+    AnimNotify_RiseFromRagdollPose_3
+    AnimNotify_RiseFromRagdollPose_2
+    AnimNotify_RiseFromRagdollPose_1
+    AnimNotify_RiseFromRagdollPose_0
+    AnimNotify_RiseFromRagdollPose_7
+12x ActionCompleteQuest
+    ActionCompleteQuest_7
+    ActionCompleteQuest_81
+    ActionCompleteQuest_197
+    ActionCompleteQuest_395
+    ActionCompleteQuest_0
+12x ProtectorSpawner
+    ProtectorSpawner_3
+    ProtectorSpawner_1
+    ProtectorSpawner_9
+    ProtectorSpawner_10
+    ProtectorSpawner_2
+12x ActionChangeCollision
+    ActionChangeCollision_42
+    ActionChangeCollision_33
+    ActionChangeCollision_24
+    ActionChangeCollision_49
+    ActionChangeCollision_7
+12x MaterialSequence
+    ElectricWater_Sequence
+    ElectroTouch_Sequence
+    ElectroBlast_Sequence
+    Wasps_Sequence
+    BeaconEmissive_Sequence
+12x BurningArm
+    BurningArm_17
+    BurningArm_16
+    BurningArm_19
+    BurningArm_18
+    BurningArm_8
+12x AnimNotify_SetAmmoVisible
+    AnimNotify_SetAmmoVisible_1
+    AnimNotify_SetAmmoVisible_0
+    AnimNotify_SetAmmoVisible_3
+    AnimNotify_SetAmmoVisible_2
+    AnimNotify_SetAmmoVisible_1
 11x VendingStationRigidBody
     VendingStationRigidBody_10
     VendingStationRigidBody_9
     VendingStationRigidBody_8
     VendingStationRigidBody_7
     VendingStationRigidBody_6
+11x Arc_VineClip
+    Arc_VineClip_3
+    Arc_VineClip_9
+    Arc_VineClip_7
+    Arc_VineClip_1
+    Arc_VineClip_6
 11x ItemStack
     ItemStack_2289
     ItemStack_389
     ItemStack_2676
     ItemStack_2678
     ItemStack_46
-11x ActionCloseDoor
-    ActionCloseDoor_128
-    ActionCloseDoor_23
-    ActionCloseDoor_14
-    ActionCloseDoor_13
-    ActionCloseDoor_66
-11x ActionSetAINormalLODOverrideTime
-    ActionSetAINormalLODOverrideTime_8
-    ActionSetAINormalLODOverrideTime_16
-    ActionSetAINormalLODOverrideTime_6
-    ActionSetAINormalLODOverrideTime_59
-    ActionSetAINormalLODOverrideTime_5
+11x CascadingWaterVolume
+    CascadingWaterVolume_10
+    CascadingWaterVolume_6
+    CascadingWaterVolume_0
+    CascadingWaterVolume_11
+    CascadingWaterVolume_7
 11x AIContainerInfo
     AIContainerInfo_2
     AIContainerInfo_4
     AIContainerInfo_0
     AIContainerInfo_9
     AIContainerInfo_5
+11x ActionSetAINormalLODOverrideTime
+    ActionSetAINormalLODOverrideTime_8
+    ActionSetAINormalLODOverrideTime_16
+    ActionSetAINormalLODOverrideTime_6
+    ActionSetAINormalLODOverrideTime_59
+    ActionSetAINormalLODOverrideTime_5
+11x WaterSplash_SmallPP
+    WaterSplash_SmallPP_5
+    WaterSplash_SmallPP_4
+    WaterSplash_SmallPP_10
+    WaterSplash_SmallPP_12
+    WaterSplash_SmallPP_11
+11x ActionCloseDoor
+    ActionCloseDoor_128
+    ActionCloseDoor_23
+    ActionCloseDoor_14
+    ActionCloseDoor_13
+    ActionCloseDoor_66
 10x UpgradeableWeaponStat
     ShotgunUpgrade_RateOfFire
     GrenadeLauncherUpgrade_Damage
     GrenadeLauncherUpgrade_Immunity
     ChemicalThrowerUpgrade_Range
     ShotgunUpgrade_Damage
-10x HavokForceSphere
-    HavokForceSphere_3
-    HavokForceSphere_7
-    HavokForceSphere_44
-    HavokForceSphere_45
-    HavokForceSphere_0
-10x DamageSendMessageSpecifier
-    DamageSendMessageSpecifier_8
-    DamageSendMessageSpecifier_0
-    DamageSendMessageSpecifier_3
-    DamageSendMessageSpecifier_1
-    DamageSendMessageSpecifier_4
-10x dyn_copper_bucket
-    dyn_copper_bucket_3
-    dyn_copper_bucket_0
-    dyn_copper_bucket_1
-    dyn_copper_bucket_8
-    dyn_copper_bucket_9
-10x ActionChangeLevel
-    ActionChangeLevel_66
-    ActionChangeLevel_69
-    ActionChangeLevel_67
-    ActionChangeLevel_68
-    ActionChangeLevel_70
-10x ScienceDoors
-    ScienceDoors_9
-    ScienceDoors_7
-    ScienceDoors_8
-    ScienceDoors_2
-    ScienceDoors_1
 10x AnimNotify_SetHandsVisible
     AnimNotify_SetHandsVisible_5
     AnimNotify_SetHandsVisible_4
     AnimNotify_SetHandsVisible_7
     AnimNotify_SetHandsVisible_6
     AnimNotify_SetHandsVisible_9
+10x dyn_copper_bucket
+    dyn_copper_bucket_3
+    dyn_copper_bucket_0
+    dyn_copper_bucket_1
+    dyn_copper_bucket_8
+    dyn_copper_bucket_9
+10x DamageSendMessageSpecifier
+    DamageSendMessageSpecifier_8
+    DamageSendMessageSpecifier_0
+    DamageSendMessageSpecifier_3
+    DamageSendMessageSpecifier_1
+    DamageSendMessageSpecifier_4
 10x dyn_Pumpkin_Mould_A
     dyn_Pumpkin_Mould_A_0
     dyn_Pumpkin_Mould_A_3
     dyn_Pumpkin_Mould_A_2
     dyn_Pumpkin_Mould_A_4
     dyn_Pumpkin_Mould_A_6
+10x HavokForceSphere
+    HavokForceSphere_3
+    HavokForceSphere_7
+    HavokForceSphere_44
+    HavokForceSphere_45
+    HavokForceSphere_0
+10x ScienceDoors
+    ScienceDoors_9
+    ScienceDoors_7
+    ScienceDoors_8
+    ScienceDoors_2
+    ScienceDoors_1
 10x ActionSetAIVulnerability
     ActionSetAIVulnerability_298
     ActionSetAIVulnerability_23
     ActionSetAIVulnerability_49
     ActionSetAIVulnerability_10
     ActionSetAIVulnerability_1
-9x ActionWaitForQuestLogToFinish
-    ActionWaitForQuestLogToFinish_9
-    ActionWaitForQuestLogToFinish_18
-    ActionWaitForQuestLogToFinish_13
-    ActionWaitForQuestLogToFinish_132
-    ActionWaitForQuestLogToFinish_134
-9x Wel_StairRapidA
-    Wel_StairRapidA_7
-    Wel_StairRapidA_0
-    Wel_StairRapidA_9
-    Wel_StairRapidA_2
-    Wel_StairRapidA_4
-9x DustHanging_400x_400
-    DustHanging_400x_19
-    DustHanging_400x_17
-    DustHanging_400x_11
-    DustHanging_400x_10
-    DustHanging_400x_9
-9x SmugglersCrateOpen
-    SmugglersCrateOpen_3
-    SmugglersCrateOpen_4
-    SmugglersCrateOpen_6
-    SmugglersCrateOpen_7
-    SmugglersCrateOpen_2
-9x ResurrectionStationModel
-    ResurrectionStationModel_51
-    ResurrectionStationModel_50
-    ResurrectionStationModel_45
-    ResurrectionStationModel_46
-    ResurrectionStationModel_47
-9x AimPoseTargetTracker
-    AimPoseTargetTracker_0
-    AimPoseTargetTracker_1
-    AimPoseTargetTracker_2
-    AimPoseTargetTracker_3
-    AimPoseTargetTracker_4
-9x EaseTable
-    HealthToEaseTable
-    BioAmmoToEaseTable
-    WeaponAverageToEaseTable
-    PistolAmmoToEaseTable
-    ShotgunAmmoToEaseTable
-9x MG_Tracer
-    MG_Tracer_19
-    MG_Tracer_18
-    MG_Tracer_17
-    MG_Tracer_15
-    MG_Tracer_14
+10x ActionChangeLevel
+    ActionChangeLevel_66
+    ActionChangeLevel_69
+    ActionChangeLevel_67
+    ActionChangeLevel_68
+    ActionChangeLevel_70
 9x DynamicLightEffect
     DynamicLightEffect_23
     DynamicLightEffect_25
     DynamicLightEffect_26
     DynamicLightEffect_29
     DynamicLightEffect_31
+9x DustHanging_400x_400
+    DustHanging_400x_19
+    DustHanging_400x_17
+    DustHanging_400x_11
+    DustHanging_400x_10
+    DustHanging_400x_9
 9x AnimNotify_UseAbility
     AnimNotify_UseAbility_12
     AnimNotify_UseAbility_16
     AnimNotify_UseAbility_14
     AnimNotify_UseAbility_10
     AnimNotify_UseAbility_9
+9x MG_Tracer
+    MG_Tracer_19
+    MG_Tracer_18
+    MG_Tracer_17
+    MG_Tracer_15
+    MG_Tracer_14
 9x TrashCan
     TrashCan_5
     TrashCan_0
     TrashCan_2
     TrashCan_4
     TrashCan_3
-8x HavokForceTypeConstantForce
-    HavokForceTypeConstantForce_3
-    HavokForceTypeConstantForce_7
-    HavokForceTypeConstantForce_39
-    HavokForceTypeConstantForce_36
-    HavokForceTypeConstantForce_35
-8x ActionEnableOrDisableLevelSaving
-    ActionEnableOrDisableLevelSaving_0
-    ActionEnableOrDisableLevelSaving_78
-    ActionEnableOrDisableLevelSaving_83
-    ActionEnableOrDisableLevelSaving_38
-    ActionEnableOrDisableLevelSaving_31
-8x SpawnZoneInfo
-    SpawnZoneInfo_7
-    SpawnZoneInfo_6
-    SpawnZoneInfo_5
-    SpawnZoneInfo_4
-    SpawnZoneInfo_0
-8x dyn_wheelbarrow
-    dyn_wheelbarrow_3
-    dyn_wheelbarrow_7
-    dyn_wheelbarrow_4
-    dyn_wheelbarrow_5
-    dyn_wheelbarrow_1
-8x ActionRunConsoleCommand
-    ActionRunConsoleCommand_169
-    ActionRunConsoleCommand_23
-    ActionRunConsoleCommand_258
-    ActionRunConsoleCommand_4
-    ActionRunConsoleCommand_58
-8x VisibleAmmoModel
-    VisibleAmmoModel_8
-    VisibleAmmoModel_11
-    VisibleAmmoModel_10
-    VisibleAmmoModel_9
-    VisibleAmmoModel_19
-8x ProximityArmedLight
-    ProximityArmedLight_11
-    ProximityArmedLight_8
-    ProximityArmedLight_6
-    ProximityArmedLight_4
-    ProximityArmedLight_1
-8x ActionChangePressure
-    ActionChangePressure_105
-    ActionChangePressure_9
-    ActionChangePressure_26
-    ActionChangePressure_3
-    ActionChangePressure_2
+9x Wel_StairRapidA
+    Wel_StairRapidA_7
+    Wel_StairRapidA_0
+    Wel_StairRapidA_9
+    Wel_StairRapidA_2
+    Wel_StairRapidA_4
+9x ResurrectionStationModel
+    ResurrectionStationModel_51
+    ResurrectionStationModel_50
+    ResurrectionStationModel_45
+    ResurrectionStationModel_46
+    ResurrectionStationModel_47
+9x SmugglersCrateOpen
+    SmugglersCrateOpen_3
+    SmugglersCrateOpen_4
+    SmugglersCrateOpen_6
+    SmugglersCrateOpen_7
+    SmugglersCrateOpen_2
+9x EaseTable
+    HealthToEaseTable
+    BioAmmoToEaseTable
+    WeaponAverageToEaseTable
+    PistolAmmoToEaseTable
+    ShotgunAmmoToEaseTable
+9x ActionWaitForQuestLogToFinish
+    ActionWaitForQuestLogToFinish_9
+    ActionWaitForQuestLogToFinish_18
+    ActionWaitForQuestLogToFinish_13
+    ActionWaitForQuestLogToFinish_132
+    ActionWaitForQuestLogToFinish_134
+9x AimPoseTargetTracker
+    AimPoseTargetTracker_0
+    AimPoseTargetTracker_1
+    AimPoseTargetTracker_2
+    AimPoseTargetTracker_3
+    AimPoseTargetTracker_4
 8x FishSchoolA
     FishSchoolA_10
     FishSchoolA_9
     FishSchoolA_8
     FishSchoolA_3
     FishSchoolA_4
-7x VisionSensorAction
-    VisionSensorAction_253
-    VisionSensorAction_252
-    VisionSensorAction_254
-    VisionSensorAction_12
-    VisionSensorAction_220
+8x SpawnZoneInfo
+    SpawnZoneInfo_7
+    SpawnZoneInfo_6
+    SpawnZoneInfo_5
+    SpawnZoneInfo_4
+    SpawnZoneInfo_0
+8x ActionRunConsoleCommand
+    ActionRunConsoleCommand_169
+    ActionRunConsoleCommand_23
+    ActionRunConsoleCommand_258
+    ActionRunConsoleCommand_4
+    ActionRunConsoleCommand_58
+8x dyn_wheelbarrow
+    dyn_wheelbarrow_3
+    dyn_wheelbarrow_7
+    dyn_wheelbarrow_4
+    dyn_wheelbarrow_5
+    dyn_wheelbarrow_1
+8x HavokForceTypeConstantForce
+    HavokForceTypeConstantForce_3
+    HavokForceTypeConstantForce_7
+    HavokForceTypeConstantForce_39
+    HavokForceTypeConstantForce_36
+    HavokForceTypeConstantForce_35
+8x ProtectorFootstep_Default
+    ProtectorFootstep_Default_13
+    ProtectorFootstep_Default_10
+    ProtectorFootstep_Default_11
+    ProtectorFootstep_Default_12
+    ProtectorFootstep_Default_29
+8x ActionChangePressure
+    ActionChangePressure_105
+    ActionChangePressure_9
+    ActionChangePressure_26
+    ActionChangePressure_3
+    ActionChangePressure_2
+8x ProximityArmedLight
+    ProximityArmedLight_11
+    ProximityArmedLight_8
+    ProximityArmedLight_6
+    ProximityArmedLight_4
+    ProximityArmedLight_1
+8x VisibleAmmoModel
+    VisibleAmmoModel_8
+    VisibleAmmoModel_11
+    VisibleAmmoModel_10
+    VisibleAmmoModel_9
+    VisibleAmmoModel_19
+8x ActionEnableOrDisableLevelSaving
+    ActionEnableOrDisableLevelSaving_0
+    ActionEnableOrDisableLevelSaving_78
+    ActionEnableOrDisableLevelSaving_83
+    ActionEnableOrDisableLevelSaving_38
+    ActionEnableOrDisableLevelSaving_31
+7x MessagePawnTookDamage
+    MessagePawnTookDamage_0
+    MessagePawnTookDamage_1
+    MessagePawnTookDamage_0
+    MessagePawnTookDamage_0
+    MessagePawnTookDamage_0
+7x ActionVariableDecrement
+    ActionVariableDecrement_62
+    ActionVariableDecrement_78
+    ActionVariableDecrement_187
+    ActionVariableDecrement_199
+    ActionVariableDecrement_8
+7x ActionReplaceQuest
+    ActionReplaceQuest_109
+    ActionReplaceQuest_6
+    ActionReplaceQuest_0
+    ActionReplaceQuest_74
+    ActionReplaceQuest_73
 7x CorpseFemaleBooty
     CorpseFemaleBooty_0
     CorpseFemaleBooty_6
     CorpseFemaleBooty_5
     CorpseFemaleBooty_1
     CorpseFemaleBooty_4
-7x AI_SensorRecipient
-    AI_SensorRecipient_0
-    AI_SensorRecipient_28
-    AI_SensorRecipient_29
-    AI_SensorRecipient_31
-    AI_SensorRecipient_30
-7x ActionActivateResurrectionStation
-    ActionActivateResurrectionStation_12
-    ActionActivateResurrectionStation_1
-    ActionActivateResurrectionStation_133
-    ActionActivateResurrectionStation_55
-    ActionActivateResurrectionStation_0
 7x Hyd_WoodenCrawlSpaceDoor
     Hyd_WoodenCrawlSpaceDoor_5
     Hyd_WoodenCrawlSpaceDoor_2
     Hyd_WoodenCrawlSpaceDoor_3
     Hyd_WoodenCrawlSpaceDoor_0
     Hyd_WoodenCrawlSpaceDoor_6
-7x dyn_FruitTray
-    dyn_FruitTray_5
-    dyn_FruitTray_3
-    dyn_FruitTray_1
-    dyn_FruitTray_4
-    dyn_FruitTray_2
+7x VisionSensorAction
+    VisionSensorAction_253
+    VisionSensorAction_252
+    VisionSensorAction_254
+    VisionSensorAction_12
+    VisionSensorAction_220
+7x RosieGrenadeWeaponProjectile
+    RosieGrenadeWeaponProjectile_7
+    RosieGrenadeWeaponProjectile_8
+    RosieGrenadeWeaponProjectile_9
+    RosieGrenadeWeaponProjectile_46
+    RosieGrenadeWeaponProjectile_49
+7x ActionCompleteQuestObjective
+    ActionCompleteQuestObjective_2
+    ActionCompleteQuestObjective_17
+    ActionCompleteQuestObjective_78
+    ActionCompleteQuestObjective_14
+    ActionCompleteQuestObjective_16
 7x Volume
     Volume_5
     Volume_2
@@ -1711,442 +1717,558 @@ Total classes: 817
     ActionFreezeHavokActor_73
     ActionFreezeHavokActor_161
     ActionFreezeHavokActor_46
-7x ActionReplaceQuest
-    ActionReplaceQuest_109
-    ActionReplaceQuest_6
-    ActionReplaceQuest_0
-    ActionReplaceQuest_74
-    ActionReplaceQuest_73
-7x ActionVariableDecrement
-    ActionVariableDecrement_62
-    ActionVariableDecrement_78
-    ActionVariableDecrement_187
-    ActionVariableDecrement_199
-    ActionVariableDecrement_8
-7x MessageReceivedInventory
-    MessageReceivedInventory_0
-    MessageReceivedInventory_0
-    MessageReceivedInventory_17
-    MessageReceivedInventory_16
-    MessageReceivedInventory_15
-7x TurretSpawner
-    TurretSpawner_6
-    TurretSpawner_4
-    TurretSpawner_7
-    TurretSpawner_0
-    TurretSpawner_2
-7x ActionCompleteQuestObjective
-    ActionCompleteQuestObjective_2
-    ActionCompleteQuestObjective_17
-    ActionCompleteQuestObjective_78
-    ActionCompleteQuestObjective_14
-    ActionCompleteQuestObjective_16
-7x VisionSensor
-    VisionSensor_254
-    VisionSensor_252
-    VisionSensor_253
-    VisionSensor_220
-    VisionSensor_90
+7x dyn_FruitTray
+    dyn_FruitTray_5
+    dyn_FruitTray_3
+    dyn_FruitTray_1
+    dyn_FruitTray_4
+    dyn_FruitTray_2
 7x ProjectileRigidBodyData
     ProjectileRigidBodyData_6
     ProjectileRigidBodyData_5
     ProjectileRigidBodyData_4
     ProjectileRigidBodyData_3
     ProjectileRigidBodyData_2
-7x RosieGrenadeWeaponProjectile
-    RosieGrenadeWeaponProjectile_7
-    RosieGrenadeWeaponProjectile_8
-    RosieGrenadeWeaponProjectile_9
-    RosieGrenadeWeaponProjectile_46
-    RosieGrenadeWeaponProjectile_49
-7x MessagePawnTookDamage
-    MessagePawnTookDamage_0
-    MessagePawnTookDamage_1
-    MessagePawnTookDamage_0
-    MessagePawnTookDamage_0
-    MessagePawnTookDamage_0
-6x Timer
-    Timer_2
-    Timer_1
-    Timer_0
-    Timer_20
-    Timer_19
-6x ActionFilterItem
-    ActionFilterItem_51
-    ActionFilterItem_17
-    ActionFilterItem_63
-    ActionFilterItem_1
-    ActionFilterItem_22
-6x dyn_WineCaskSmall
-    dyn_WineCaskSmall_3
-    dyn_WineCaskSmall_4
-    dyn_WineCaskSmall_7
-    dyn_WineCaskSmall_1
-    dyn_WineCaskSmall_0
-6x Steam_LightRising
-    Steam_LightRising_2
-    Steam_LightRising_3
-    Steam_LightRising_4
-    Steam_LightRising_5
-    Steam_LightRising_0
-6x SecBotLightBeam
-    SecBotLightBeam_41
-    SecBotLightBeam_40
-    SecBotLightBeam_39
-    SecBotLightBeam_3
-    SecBotLightBeam_4
-6x SecurityStationAlarm
-    SecurityStationAlarm_7
-    SecurityStationAlarm_3
-    SecurityStationAlarm_15
-    SecurityStationAlarm_8
-    SecurityStationAlarm_1
-6x MapUILayerScaleMarker
-    MapUILayerScaleMarker_4
-    MapUILayerScaleMarker_5
-    MapUILayerScaleMarker_3
-    MapUILayerScaleMarker_1
-    MapUILayerScaleMarker_0
-6x DynamicLight_MuzzleMGPulse
-    DynamicLight_MuzzleMGPulse_13
-    DynamicLight_MuzzleMGPulse_12
-    DynamicLight_MuzzleMGPulse_11
-    DynamicLight_MuzzleMGPulse_9
-    DynamicLight_MuzzleMGPulse_8
-6x dyn_fertilizer_01
-    dyn_fertilizer__54
-    dyn_fertilizer__57
-    dyn_fertilizer__55
-    dyn_fertilizer__15
-    dyn_fertilizer__53
+7x VisionSensor
+    VisionSensor_254
+    VisionSensor_252
+    VisionSensor_253
+    VisionSensor_220
+    VisionSensor_90
+7x MessageReceivedInventory
+    MessageReceivedInventory_0
+    MessageReceivedInventory_0
+    MessageReceivedInventory_17
+    MessageReceivedInventory_16
+    MessageReceivedInventory_15
+7x ActionActivateResurrectionStation
+    ActionActivateResurrectionStation_12
+    ActionActivateResurrectionStation_1
+    ActionActivateResurrectionStation_133
+    ActionActivateResurrectionStation_55
+    ActionActivateResurrectionStation_0
+7x AI_SensorRecipient
+    AI_SensorRecipient_0
+    AI_SensorRecipient_28
+    AI_SensorRecipient_29
+    AI_SensorRecipient_31
+    AI_SensorRecipient_30
+7x TurretSpawner
+    TurretSpawner_6
+    TurretSpawner_4
+    TurretSpawner_7
+    TurretSpawner_0
+    TurretSpawner_2
 6x ScriptableMover
     ScriptableMover_6
     ScriptableMover_8
     ScriptableMover_3
     ScriptableMover_0
     ScriptableMover_2
-6x MapUILayerMarker
-    MapUILayerMarker_1
-    MapUILayerMarker_4
-    MapUILayerMarker_5
-    MapUILayerMarker_3
-    MapUILayerMarker_0
-6x Wel_PlaneDrips
-    Wel_PlaneDrips_3
-    Wel_PlaneDrips_2
-    Wel_PlaneDrips_0
-    Wel_PlaneDrips_1
-    Wel_PlaneDrips_8
-6x ActionLockDoor
-    ActionLockDoor_117
-    ActionLockDoor_22
-    ActionLockDoor_87
-    ActionLockDoor_126
-    ActionLockDoor_12
+6x dyn_WineCaskSmall
+    dyn_WineCaskSmall_3
+    dyn_WineCaskSmall_4
+    dyn_WineCaskSmall_7
+    dyn_WineCaskSmall_1
+    dyn_WineCaskSmall_0
 6x dyn_bible
     dyn_bible_0
     dyn_bible_5
     dyn_bible_1
     dyn_bible_4
     dyn_bible_2
-6x DebugAnnotation
-    DebugAnnotation_8
-    DebugAnnotation_7
-    DebugAnnotation_3
-    DebugAnnotation_4
-    DebugAnnotation_6
+6x ActionFilterItem
+    ActionFilterItem_51
+    ActionFilterItem_17
+    ActionFilterItem_63
+    ActionFilterItem_1
+    ActionFilterItem_22
+6x Timer
+    Timer_2
+    Timer_1
+    Timer_0
+    Timer_20
+    Timer_19
 6x WaterSplash_Small
     WaterSplash_Small_11
     WaterSplash_Small_10
     WaterSplash_Small_9
     WaterSplash_Small_7
     WaterSplash_Small_6
-6x PlaceableSecurityStation
-    SecurityStation_4
-    SecurityStation_3
-    SecurityStation_6
-    SecurityStation_1
-    SecurityStation_2
-6x Caustic_Projector
-    Caustic_Projector_2
-    Caustic_Projector_4
-    Caustic_Projector_0
-    Caustic_Projector_3
-    Caustic_Projector_5
-6x dyn_lantern_pink
-    dyn_lantern_pink_2
-    dyn_lantern_pink_3
-    dyn_lantern_pink_4
-    dyn_lantern_pink_42
-    dyn_lantern_pink_6
+6x DynamicLight_MuzzleMGPulse
+    DynamicLight_MuzzleMGPulse_13
+    DynamicLight_MuzzleMGPulse_12
+    DynamicLight_MuzzleMGPulse_11
+    DynamicLight_MuzzleMGPulse_9
+    DynamicLight_MuzzleMGPulse_8
+6x Wel_PlaneDrips
+    Wel_PlaneDrips_3
+    Wel_PlaneDrips_2
+    Wel_PlaneDrips_0
+    Wel_PlaneDrips_1
+    Wel_PlaneDrips_8
 6x VendingLootTable
     DeckThreeVendingTable_2
     DeckThreeVendingTable_4
     DeckThreeVendingTable_1
     DeckThreeVendingTable_5
     DeckThreeBanditoTable
-5x ActionSetActorLabel
-    ActionSetActorLabel_22
-    ActionSetActorLabel_66
-    ActionSetActorLabel_85
-    ActionSetActorLabel_47
-    ActionSetActorLabel_589
-5x BulkheadDoors
-    BulkheadDoors_3
-    BulkheadDoors_1
-    BulkheadDoors_4
-    BulkheadDoors_0
-    BulkheadDoors_5
-5x dyn_cafe_chair
-    dyn_cafe_chair_3
-    dyn_cafe_chair_6
-    dyn_cafe_chair_11
-    dyn_cafe_chair_10
-    dyn_cafe_chair_5
-5x dyn_book01Open
-    dyn_book01Open_2
-    dyn_book01Open_1
-    dyn_book01Open_3
-    dyn_book01Open_4
-    dyn_book01Open_0
-5x AdamDrip
-    AdamDrip_4
-    AdamDrip_3
-    AdamDrip_0
-    AdamDrip_1
-    AdamDrip_2
-5x AdamPickup
-    AdamPickup_2
-    AdamPickup_1
-    AdamPickup_6
-    AdamPickup_7
-    AdamPickup_3
-5x AggressorCommanderAction
-    AggressorCommanderAction_101
-    AggressorCommanderAction_0
-    AggressorCommanderAction_20
-    AggressorCommanderAction_21
-    AggressorCommanderAction_22
-5x AnimNotify_PauseIfDead
-    AnimNotify_PauseIfDead_2
-    AnimNotify_PauseIfDead_3
-    AnimNotify_PauseIfDead_4
-    AnimNotify_PauseIfDead_1
-    AnimNotify_PauseIfDead_0
-5x dyn_Microscope
-    dyn_Microscope_0
-    dyn_Microscope_5
-    dyn_Microscope_7
-    dyn_Microscope_8
-    dyn_Microscope_1
-5x dyn_DeskChairB
-    dyn_DeskChairB_0
-    dyn_DeskChairB_5
-    dyn_DeskChairB_4
-    dyn_DeskChairB_11
-    dyn_DeskChairB_1
-5x WindowShader
-    GPS_arrow
-    tunnelset_window_shader
-    Exterior_Window_Glass_Shader
-    Exterior_Window_02_Glass_Shader
-    TestWindowShader
-5x TurretHacked
-    TurretHacked_4
-    TurretHacked_1
-    TurretHacked_3
-    TurretHacked_12
-    TurretHacked_7
-5x VariableName
-    Variable_WhereIsPlayer
-    Global_Peaches
-    Global_SteinmanObjectName
-    Variable_LastHUDRegionDisplayed
-    Variable_guy
-5x TurretStandbyGoal
-    TurretStandbyGoal_85
-    TurretStandbyGoal_1
-    TurretStandbyGoal_12
-    TurretStandbyGoal_2
-    TurretStandbyGoal_0
-5x TurretStandbyAction
-    TurretStandbyAction_2
-    TurretStandbyAction_0
-    TurretStandbyAction_81
-    TurretStandbyAction_12
-    TurretStandbyAction_1
-5x BulletPickupRigidBody
-    BulletPickupRigidBody_4
-    BulletPickupRigidBody_3
-    BulletPickupRigidBody_2
-    BulletPickupRigidBody_1
-    BulletPickupRigidBody_0
-5x TurretCommanderAction
-    TurretCommanderAction_21
-    TurretCommanderAction_22
-    TurretCommanderAction_20
-    TurretCommanderAction_24
-    TurretCommanderAction_25
-5x EVEHypoPickup
-    EVEHypoPickup_0
-    EVEHypoPickup_8
-    EVEHypoPickup_9
-    EVEHypoPickup_13
-    EVEHypoPickup_14
-5x EffectEventInfo
-    EffectEventInfo_53
-    EffectEventInfo_52
-    EffectEventInfo_8
-    EffectEventInfo_9
-    EffectEventInfo_21
-5x SpawnedRangedAggressorPistol
-    SpawnedRangedAggressorPistol_0
-    SpawnedRangedAggressorPistol_6
-    SpawnedRangedAggressorPistol_5
-    SpawnedRangedAggressorPistol_7
-    SpawnedRangedAggressorPistol_4
-5x SpawnedAssassin
-    SpawnedAssassin_1
-    SpawnedAssassin_2
-    SpawnedAssassin_3
-    SpawnedAssassin_0
-    SpawnedAssassin_4
-5x PlaceablePlasmidEquipStation
-    PlasmidEquipStation_1
-    PlasmidEquipStation_2
-    PlasmidEquipStation_5
-    PlasmidEquipStation_4
-    PlasmidEquipStation_0
+6x Caustic_Projector
+    Caustic_Projector_2
+    Caustic_Projector_4
+    Caustic_Projector_0
+    Caustic_Projector_3
+    Caustic_Projector_5
+6x MapUILayerMarker
+    MapUILayerMarker_1
+    MapUILayerMarker_4
+    MapUILayerMarker_5
+    MapUILayerMarker_3
+    MapUILayerMarker_0
+6x MapUILayerScaleMarker
+    MapUILayerScaleMarker_4
+    MapUILayerScaleMarker_5
+    MapUILayerScaleMarker_3
+    MapUILayerScaleMarker_1
+    MapUILayerScaleMarker_0
+6x dyn_lantern_pink
+    dyn_lantern_pink_2
+    dyn_lantern_pink_3
+    dyn_lantern_pink_4
+    dyn_lantern_pink_42
+    dyn_lantern_pink_6
+6x PlaceableSecurityStation
+    SecurityStation_4
+    SecurityStation_3
+    SecurityStation_6
+    SecurityStation_1
+    SecurityStation_2
+6x HitspangMG_Metal
+    HitspangMG_Metal_1
+    HitspangMG_Metal_2
+    HitspangMG_Metal_4
+    HitspangMG_Metal_5
+    HitspangMG_Metal_0
+6x ActionLockDoor
+    ActionLockDoor_117
+    ActionLockDoor_22
+    ActionLockDoor_87
+    ActionLockDoor_126
+    ActionLockDoor_12
+6x Steam_LightRising
+    Steam_LightRising_2
+    Steam_LightRising_3
+    Steam_LightRising_4
+    Steam_LightRising_5
+    Steam_LightRising_0
+6x DebugAnnotation
+    DebugAnnotation_8
+    DebugAnnotation_7
+    DebugAnnotation_3
+    DebugAnnotation_4
+    DebugAnnotation_6
+6x dyn_fertilizer_01
+    dyn_fertilizer__54
+    dyn_fertilizer__57
+    dyn_fertilizer__55
+    dyn_fertilizer__15
+    dyn_fertilizer__53
+6x SecurityStationAlarm
+    SecurityStationAlarm_7
+    SecurityStationAlarm_3
+    SecurityStationAlarm_15
+    SecurityStationAlarm_8
+    SecurityStationAlarm_1
+6x SecBotLightBeam
+    SecBotLightBeam_41
+    SecBotLightBeam_40
+    SecBotLightBeam_39
+    SecBotLightBeam_3
+    SecBotLightBeam_4
 5x AI_DummyWeapon
     AI_DummyWeapon_0
     AI_DummyWeapon_48
     AI_DummyWeapon_44
     AI_DummyWeapon_45
     AI_DummyWeapon_1
-5x Mover
-    Mover_0
-    Mover_2
-    Mover_1
-    Mover_4
-    Mover_3
 5x LightBeamShader
     Light_Beam_01
     CameraBeamRed_Shader
     CameraBeamGreen_Shader
     CameraBeamWhite_sHADER
     Lightbeams_arcadiadead
-5x AI_DummyWeaponGoal
-    AI_DummyWeaponGoal_1
-    AI_DummyWeaponGoal_0
-    AI_DummyWeaponGoal_46
-    AI_DummyWeaponGoal_49
-    AI_DummyWeaponGoal_45
-5x HeadTrackingGoal
-    HeadTrackingGoal_0
-    HeadTrackingGoal_109
-    HeadTrackingGoal_21
-    HeadTrackingGoal_22
-    HeadTrackingGoal_23
+5x dyn_Microscope
+    dyn_Microscope_0
+    dyn_Microscope_5
+    dyn_Microscope_7
+    dyn_Microscope_8
+    dyn_Microscope_1
 5x HeadTrackingAction
     HeadTrackingAction_22
     HeadTrackingAction_23
     HeadTrackingAction_109
     HeadTrackingAction_21
     HeadTrackingAction_0
-5x PlaceableCraftingStation
-    CraftingStation_1
-    CraftingStation_3
-    PlaceableCraftingStation_0
-    CraftingStation_2
-    CraftingStation_0
-5x ActionFadeVolumeOverride
-    ActionFadeVolumeOverride_65
-    ActionFadeVolumeOverride_4
-    ActionFadeVolumeOverride_64
-    ActionFadeVolumeOverride_62
-    ActionFadeVolumeOverride_63
+5x dyn_cafe_chair
+    dyn_cafe_chair_3
+    dyn_cafe_chair_6
+    dyn_cafe_chair_11
+    dyn_cafe_chair_10
+    dyn_cafe_chair_5
+5x EVEHypoPickup
+    EVEHypoPickup_0
+    EVEHypoPickup_8
+    EVEHypoPickup_9
+    EVEHypoPickup_13
+    EVEHypoPickup_14
 5x ActionHackTurret
     ActionHackTurret_17
     ActionHackTurret_8
     ActionHackTurret_16
     ActionHackTurret_94
     ActionHackTurret_71
+5x HeadTrackingGoal
+    HeadTrackingGoal_0
+    HeadTrackingGoal_109
+    HeadTrackingGoal_21
+    HeadTrackingGoal_22
+    HeadTrackingGoal_23
 5x ActionRandomNumber
     ActionRandomNumber_10
     ActionRandomNumber_475
     ActionRandomNumber_90
     ActionRandomNumber_73
     ActionRandomNumber_444
-4x BreakingGlassMesh_128x_128
-    BreakingGlassMesh_128x_1
-    BreakingGlassMesh_128x_2
-    BreakingGlassMesh_128x_0
-    BreakingGlassMesh_128x_3
-4x PlayerStart
-    PlayerStart_0
-    PlayerStart_3
-    PlayerStart_1
-    PlayerStart_4
-4x PlayerEnterWater
-    PlayerEnterWater_2
-    PlayerEnterWater_1
-    PlayerEnterWater_3
-    PlayerEnterWater_0
-4x RosieGrenadeWeapon
-    RosieGrenadeWeapon_7
-    RosieGrenadeWeapon_3
-    RosieGrenadeWeapon_4
-    RosieGrenadeWeapon_6
-4x Bubbles_512x_128
-    Bubbles_512x_1
-    Bubbles_512x_0
-    Bubbles_512x_3
-    Bubbles_512x_8
-4x ActionTellAIToSendWeaponFireMessage
-    ActionTellAIToSendWeaponFireMessage_153
-    ActionTellAIToSendWeaponFireMessage_316
-    ActionTellAIToSendWeaponFireMessage_267
-    ActionTellAIToSendWeaponFireMessage_28
-4x BulletDecalMetal
-    BulletDecalMetal_2
-    BulletDecalMetal_0
-    BulletDecalMetal_3
-    BulletDecalMetal_1
-4x ArmorPiercingBulletPickup
-    ArmorPiercingBulletPickup_1
-    ArmorPiercingBulletPickup_3
-    ArmorPiercingBulletPickup_4
-    ArmorPiercingBulletPickup_0
-4x PlaceableVendingStation
-    VendingStation_0
-    VendingStation_2
-    PlaceableVendingStation_0
-    VendingStation_1
-4x BurningBodyA
-    BurningBodyA_1
-    BurningBodyA_4
-    BurningBodyA_3
-    BurningBodyA_2
-4x MedHypoPickup
-    MedHypoPickup_7
-    MedHypoPickup_11
-    MedHypoPickup_2
-    MedHypoPickup_12
-4x BandagesPickup
-    BandagesPickup_4
-    BandagesPickup_3
-    BandagesPickup_1
-    BandagesPickup_2
-4x dyn_smugglerbox
-    dyn_smugglerbox_1
-    dyn_smugglerbox_3
-    dyn_smugglerbox_0
-    dyn_smugglerbox_2
+5x AdamDrip
+    AdamDrip_4
+    AdamDrip_3
+    AdamDrip_0
+    AdamDrip_1
+    AdamDrip_2
+5x SpawnedAssassin
+    SpawnedAssassin_1
+    SpawnedAssassin_2
+    SpawnedAssassin_3
+    SpawnedAssassin_0
+    SpawnedAssassin_4
+5x BulkheadDoors
+    BulkheadDoors_3
+    BulkheadDoors_1
+    BulkheadDoors_4
+    BulkheadDoors_0
+    BulkheadDoors_5
+5x AdamPickup
+    AdamPickup_2
+    AdamPickup_1
+    AdamPickup_6
+    AdamPickup_7
+    AdamPickup_3
+5x SpawnedRangedAggressorPistol
+    SpawnedRangedAggressorPistol_0
+    SpawnedRangedAggressorPistol_6
+    SpawnedRangedAggressorPistol_5
+    SpawnedRangedAggressorPistol_7
+    SpawnedRangedAggressorPistol_4
+5x BulletPickupRigidBody
+    BulletPickupRigidBody_4
+    BulletPickupRigidBody_3
+    BulletPickupRigidBody_2
+    BulletPickupRigidBody_1
+    BulletPickupRigidBody_0
+5x PlaceablePlasmidEquipStation
+    PlasmidEquipStation_1
+    PlasmidEquipStation_2
+    PlasmidEquipStation_5
+    PlasmidEquipStation_4
+    PlasmidEquipStation_0
+5x ActionFadeVolumeOverride
+    ActionFadeVolumeOverride_65
+    ActionFadeVolumeOverride_4
+    ActionFadeVolumeOverride_64
+    ActionFadeVolumeOverride_62
+    ActionFadeVolumeOverride_63
+5x ActionSetActorLabel
+    ActionSetActorLabel_22
+    ActionSetActorLabel_66
+    ActionSetActorLabel_85
+    ActionSetActorLabel_47
+    ActionSetActorLabel_589
+5x dyn_book01Open
+    dyn_book01Open_2
+    dyn_book01Open_1
+    dyn_book01Open_3
+    dyn_book01Open_4
+    dyn_book01Open_0
+5x PlaceableCraftingStation
+    CraftingStation_1
+    CraftingStation_3
+    PlaceableCraftingStation_0
+    CraftingStation_2
+    CraftingStation_0
+5x AggressorCommanderAction
+    AggressorCommanderAction_101
+    AggressorCommanderAction_0
+    AggressorCommanderAction_20
+    AggressorCommanderAction_21
+    AggressorCommanderAction_22
+5x WindowShader
+    GPS_arrow
+    tunnelset_window_shader
+    Exterior_Window_Glass_Shader
+    Exterior_Window_02_Glass_Shader
+    TestWindowShader
+5x TurretCommanderAction
+    TurretCommanderAction_21
+    TurretCommanderAction_22
+    TurretCommanderAction_20
+    TurretCommanderAction_24
+    TurretCommanderAction_25
+5x VariableName
+    Variable_WhereIsPlayer
+    Global_Peaches
+    Global_SteinmanObjectName
+    Variable_LastHUDRegionDisplayed
+    Variable_guy
+5x TurretHacked
+    TurretHacked_12
+    TurretHacked_23
+    TurretHacked_25
+    TurretHacked_7
+    TurretHacked_26
+5x dyn_DeskChairB
+    dyn_DeskChairB_0
+    dyn_DeskChairB_5
+    dyn_DeskChairB_4
+    dyn_DeskChairB_11
+    dyn_DeskChairB_1
+5x AnimNotify_PauseIfDead
+    AnimNotify_PauseIfDead_2
+    AnimNotify_PauseIfDead_3
+    AnimNotify_PauseIfDead_4
+    AnimNotify_PauseIfDead_1
+    AnimNotify_PauseIfDead_0
+5x AI_DummyWeaponGoal
+    AI_DummyWeaponGoal_1
+    AI_DummyWeaponGoal_0
+    AI_DummyWeaponGoal_46
+    AI_DummyWeaponGoal_49
+    AI_DummyWeaponGoal_45
+5x Mover
+    Mover_0
+    Mover_2
+    Mover_1
+    Mover_4
+    Mover_3
+4x AIController
+    AIController_17
+    AIController_10
+    AIController_32
+    AIController_15
+4x CameraSearchGoal
+    CameraSearchGoal_44
+    CameraSearchGoal_45
+    CameraSearchGoal_46
+    CameraSearchGoal_47
+4x DefaultSecurityCameraSpotlight
+    DefaultSecurityCameraSpotlight_0
+    DefaultSecurityCameraSpotlight_3
+    DefaultSecurityCameraSpotlight_6
+    DefaultSecurityCameraSpotlight_4
 4x DynamicLightMuzzleFlash
     DynamicLightMuzzleFlash_7
     DynamicLightMuzzleFlash_6
     DynamicLightMuzzleFlash_5
     DynamicLightMuzzleFlash_4
+4x Font
+    MediumFont
+    Res_DefaultFont
+    SmallFont
+    ConsoleFont
+4x GatherSaveStreamClip
+    GatherSaveStreamClip_1
+    GatherSaveStreamClip_3
+    GatherSaveStreamClip_2
+    GatherSaveStreamClip_0
+4x GoreLight_Decal
+    GoreLight_Decal_0
+    GoreLight_Decal_1
+    GoreLight_Decal_3
+    GoreLight_Decal_2
+4x HitSpangMetal
+    HitSpangMetal_6
+    HitSpangMetal_7
+    HitSpangMetal_5
+    HitSpangMetal_4
+4x SecurityCameraSpawner
+    SecurityCameraSpawner_1
+    SecurityCameraSpawner_0
+    SecurityCameraSpawner_7
+    SecurityCameraSpawner_5
+4x LangfordRosePickup
+    LangfordRosePickup_4
+    LangfordRosePickup_2
+    LangfordRosePickup_0
+    LangfordRosePickup_3
+4x ActionChangeAnimationRate
+    ActionChangeAnimationRate_105
+    ActionChangeAnimationRate_128
+    ActionChangeAnimationRate_142
+    ActionChangeAnimationRate_80
+4x ActionCinematicFadeView
+    ActionCinematicFadeView_59
+    ActionCinematicFadeView_1
+    ActionCinematicFadeView_4
+    ActionCinematicFadeView_5
+4x MaterialSwitch
+    grass_switch
+    lightbeam_arcadiaswitch
+    LangScreenSwitch
+    Resurrection_Switch
+4x MedHypoPickup
+    MedHypoPickup_7
+    MedHypoPickup_11
+    MedHypoPickup_2
+    MedHypoPickup_12
+4x MessageAIWeaponFired
+    MessageAIWeaponFired_1
+    MessageAIWeaponFired_0
+    MessageAIWeaponFired_2
+    MessageAIWeaponFired_0
+4x MoveToAction
+    MoveToAction_0
+    MoveToAction_12
+    MoveToAction_15
+    MoveToAction_6
+4x MoveToGoal
+    MoveToGoal_0
+    MoveToGoal_15
+    MoveToGoal_12
+    MoveToGoal_6
+4x PlaceableHealthStation
+    HealthStation_3
+    PlaceableHealthStation_0
+    HealthStation_4
+    HealthStation_6
+4x PlaceableVendingStation
+    VendingStation_0
+    VendingStation_2
+    PlaceableVendingStation_0
+    VendingStation_1
+4x PlasmidTrack
+    PlasmidTrack_6
+    PlasmidTrack_5
+    PlasmidTrack_4
+    PlasmidTrack_7
+4x PlayerStart
+    PlayerStart_0
+    PlayerStart_3
+    PlayerStart_1
+    PlayerStart_4
+4x RangedAggressorPistolMeleeWeapon
+    RangedAggressorPistolMeleeWeapon_27
+    RangedAggressorPistolMeleeWeapon_28
+    RangedAggressorPistolMeleeWeapon_0
+    RangedAggressorPistolMeleeWeapon_26
+4x RosieGrenadeWeapon
+    RosieGrenadeWeapon_7
+    RosieGrenadeWeapon_3
+    RosieGrenadeWeapon_4
+    RosieGrenadeWeapon_6
+4x RosieMeleeWeapon
+    RosieMeleeWeapon_6
+    RosieMeleeWeapon_4
+    RosieMeleeWeapon_7
+    RosieMeleeWeapon_3
+4x RosieThreeSixtyWeapon
+    RosieThreeSixtyWeapon_4
+    RosieThreeSixtyWeapon_6
+    RosieThreeSixtyWeapon_7
+    RosieThreeSixtyWeapon_3
+4x Sci_MistDrop
+    Sci_MistDrop_2
+    Sci_MistDrop_10
+    Sci_MistDrop_9
+    Sci_MistDrop_6
+4x SecCamLightG_Mesh
+    SecCamLightG_Mesh_20
+    SecCamLightG_Mesh_17
+    SecCamLightG_Mesh_19
+    SecCamLightG_Mesh_16
+4x SpawnedRosie
+    SpawnedRosie_0
+    SpawnedRosie_2
+    SpawnedRosie_1
+    SpawnedRosie_3
+4x TurretStandbyAction
+    TurretStandbyAction_89
+    TurretStandbyAction_81
+    TurretStandbyAction_91
+    TurretStandbyAction_12
+4x TurretStandbyGoal
+    TurretStandbyGoal_85
+    TurretStandbyGoal_93
+    TurretStandbyGoal_12
+    TurretStandbyGoal_95
+4x dyn_Pumpkin_Mould_B
+    dyn_Pumpkin_Mould_B_2
+    dyn_Pumpkin_Mould_B_1
+    dyn_Pumpkin_Mould_B_0
+    dyn_Pumpkin_Mould_B_4
+4x dyn_RopeBarrierPole
+    dyn_RopeBarrierPole_4
+    dyn_RopeBarrierPole_6
+    dyn_RopeBarrierPole_7
+    dyn_RopeBarrierPole_5
+4x dyn_cultmask
+    dyn_cultmask_2
+    dyn_cultmask_1
+    dyn_cultmask_0
+    dyn_cultmask_4
+4x dyn_fertilizer_02
+    dyn_fertilizer__50
+    dyn_fertilizer__52
+    dyn_fertilizer__49
+    dyn_fertilizer__51
+4x dyn_smugglerbox
+    dyn_smugglerbox_1
+    dyn_smugglerbox_3
+    dyn_smugglerbox_0
+    dyn_smugglerbox_2
+4x ActionTellAIToSendWeaponFireMessage
+    ActionTellAIToSendWeaponFireMessage_153
+    ActionTellAIToSendWeaponFireMessage_316
+    ActionTellAIToSendWeaponFireMessage_267
+    ActionTellAIToSendWeaponFireMessage_28
+4x AnimNotify_Push
+    AnimNotify_Push_1
+    AnimNotify_Push_0
+    AnimNotify_Push_2
+    AnimNotify_Push_1
+4x ArmorPiercingBulletPickup
+    ArmorPiercingBulletPickup_1
+    ArmorPiercingBulletPickup_3
+    ArmorPiercingBulletPickup_4
+    ArmorPiercingBulletPickup_0
+4x BandagesPickup
+    BandagesPickup_4
+    BandagesPickup_3
+    BandagesPickup_1
+    BandagesPickup_2
+4x BreakingGlassMesh_128x_128
+    BreakingGlassMesh_128x_1
+    BreakingGlassMesh_128x_2
+    BreakingGlassMesh_128x_0
+    BreakingGlassMesh_128x_3
+4x Bubbles_512x_128
+    Bubbles_512x_1
+    Bubbles_512x_0
+    Bubbles_512x_3
+    Bubbles_512x_8
+4x BurningBodyA
+    BurningBodyA_1
+    BurningBodyA_4
+    BurningBodyA_3
+    BurningBodyA_2
 4x CameraCommanderAction
     CameraCommanderAction_18
     CameraCommanderAction_17
@@ -2182,363 +2304,123 @@ Total classes: 817
     CameraPanMovementGoal_125
     CameraPanMovementGoal_124
     CameraPanMovementGoal_121
-4x TurretFlashlightBeam
-    TurretFlashlightBeam_3
-    TurretFlashlightBeam_1
-    TurretFlashlightBeam_0
-    TurretFlashlightBeam_2
 4x CameraSearchAction
     CameraSearchAction_42
     CameraSearchAction_43
     CameraSearchAction_45
     CameraSearchAction_44
-4x CameraSearchGoal
-    CameraSearchGoal_44
-    CameraSearchGoal_45
-    CameraSearchGoal_46
-    CameraSearchGoal_47
-4x MaterialSwitch
-    grass_switch
-    lightbeam_arcadiaswitch
-    LangScreenSwitch
-    Resurrection_Switch
-4x DefaultSecurityCameraSpotlight
-    DefaultSecurityCameraSpotlight_0
-    DefaultSecurityCameraSpotlight_3
-    DefaultSecurityCameraSpotlight_6
-    DefaultSecurityCameraSpotlight_4
-4x GoreLight_Decal
-    GoreLight_Decal_0
-    GoreLight_Decal_1
-    GoreLight_Decal_3
-    GoreLight_Decal_2
-4x dyn_cultmask
-    dyn_cultmask_2
-    dyn_cultmask_1
-    dyn_cultmask_0
-    dyn_cultmask_4
-4x PlasmidTrack
-    PlasmidTrack_6
-    PlasmidTrack_5
-    PlasmidTrack_4
-    PlasmidTrack_7
-4x ActionCinematicFadeView
-    ActionCinematicFadeView_59
-    ActionCinematicFadeView_1
-    ActionCinematicFadeView_4
-    ActionCinematicFadeView_5
-4x GatherSaveStreamClip
-    GatherSaveStreamClip_1
-    GatherSaveStreamClip_3
-    GatherSaveStreamClip_2
-    GatherSaveStreamClip_0
-4x ActionChangeAnimationRate
-    ActionChangeAnimationRate_105
-    ActionChangeAnimationRate_128
-    ActionChangeAnimationRate_142
-    ActionChangeAnimationRate_80
-4x PlaceableHealthStation
-    HealthStation_3
-    PlaceableHealthStation_0
-    HealthStation_4
-    HealthStation_6
-4x FlameThrower_Hit
-    FlameThrower_Hit_3
-    FlameThrower_Hit_2
-    FlameThrower_Hit_1
-    FlameThrower_Hit_0
-4x RangedAggressorPistolMeleeWeapon
-    RangedAggressorPistolMeleeWeapon_27
-    RangedAggressorPistolMeleeWeapon_28
-    RangedAggressorPistolMeleeWeapon_0
-    RangedAggressorPistolMeleeWeapon_26
-4x MessageAIWeaponFired
-    MessageAIWeaponFired_1
-    MessageAIWeaponFired_0
-    MessageAIWeaponFired_2
-    MessageAIWeaponFired_0
-4x HitSpangMetal
-    HitSpangMetal_6
-    HitSpangMetal_7
-    HitSpangMetal_5
-    HitSpangMetal_4
-4x Font
-    MediumFont
-    Res_DefaultFont
-    SmallFont
-    ConsoleFont
-4x SecurityCameraSpawner
-    SecurityCameraSpawner_1
-    SecurityCameraSpawner_0
-    SecurityCameraSpawner_7
-    SecurityCameraSpawner_5
-4x SecCamLightG_Mesh
-    SecCamLightG_Mesh_20
-    SecCamLightG_Mesh_17
-    SecCamLightG_Mesh_19
-    SecCamLightG_Mesh_16
-4x dyn_fertilizer_02
-    dyn_fertilizer__50
-    dyn_fertilizer__52
-    dyn_fertilizer__49
-    dyn_fertilizer__51
-4x AIController
-    AIController_17
-    AIController_10
-    AIController_32
-    AIController_15
-4x AnimNotify_Push
-    AnimNotify_Push_1
-    AnimNotify_Push_0
-    AnimNotify_Push_2
-    AnimNotify_Push_1
-4x Sci_MistDrop
-    Sci_MistDrop_2
-    Sci_MistDrop_10
-    Sci_MistDrop_9
-    Sci_MistDrop_6
-4x LangfordRosePickup
-    LangfordRosePickup_4
-    LangfordRosePickup_2
-    LangfordRosePickup_0
-    LangfordRosePickup_3
-4x RosieThreeSixtyWeapon
-    RosieThreeSixtyWeapon_4
-    RosieThreeSixtyWeapon_6
-    RosieThreeSixtyWeapon_7
-    RosieThreeSixtyWeapon_3
-4x SpawnedRosie
-    SpawnedRosie_0
-    SpawnedRosie_2
-    SpawnedRosie_1
-    SpawnedRosie_3
-4x dyn_Pumpkin_Mould_B
-    dyn_Pumpkin_Mould_B_2
-    dyn_Pumpkin_Mould_B_1
-    dyn_Pumpkin_Mould_B_0
-    dyn_Pumpkin_Mould_B_4
-4x RosieMeleeWeapon
-    RosieMeleeWeapon_6
-    RosieMeleeWeapon_4
-    RosieMeleeWeapon_7
-    RosieMeleeWeapon_3
-4x dyn_RopeBarrierPole
-    dyn_RopeBarrierPole_4
-    dyn_RopeBarrierPole_6
-    dyn_RopeBarrierPole_7
-    dyn_RopeBarrierPole_5
-3x dyn_Book01
-    dyn_book_4
-    dyn_book_1
-    dyn_book_0
-3x dyn_cafe_table
-    dyn_cafe_table_2
-    dyn_cafe_table_6
-    dyn_cafe_table_4
-3x QuestLightFX
-    QuestLightFX_9
-    QuestLightFX_11
-    QuestLightFX_12
-3x ActionSpawnSecurityBot
-    ActionSpawnSecurityBot_8
-    ActionSpawnSecurityBot_0
-    ActionSpawnSecurityBot_6
-3x ProtectorNeutral_Light
-    ProtectorNeutral_Light_1
-    ProtectorNeutral_Light_2
-    ProtectorNeutral_Light_0
-3x TurretFlashlightDynamicLight
-    TurretFlashlightDynamicLight_2
-    TurretFlashlightDynamicLight_0
-    TurretFlashlightDynamicLight_1
-3x AssassinExplosion
-    AssassinExplosion_17
-    AssassinExplosion_19
-    AssassinExplosion_18
-3x ActionSpawnPickup
-    ActionSpawnPickup_55
-    ActionSpawnPickup_171
-    ActionSpawnPickup_20
-3x Cabinet
-    Cabinet_4
-    Cabinet_2
-    Cabinet_0
-3x ActionSetSpawnerRepopulationState
-    ActionSetSpawnerRepopulationState_119
-    ActionSetSpawnerRepopulationState_41
-    ActionSetSpawnerRepopulationState_33
-3x DynamicLight_MuzzleMG
-    DynamicLight_MuzzleMG_5
-    DynamicLight_MuzzleMG_4
-    DynamicLight_MuzzleMG_3
-3x ActionControlPlant
-    ActionControlPlant_60
-    ActionControlPlant_0
-    ActionControlPlant_9
-3x HavokForceActor
-    HavokForceActor_1
-    HavokForceActor_3
-    HavokForceActor_0
-3x AssassinImplosion
-    AssassinImplosion_19
-    AssassinImplosion_17
-    AssassinImplosion_18
-3x ActionRemoveItemsFromPlayer
-    ActionRemoveItemsFromPlayer_35
-    ActionRemoveItemsFromPlayer_47
-    ActionRemoveItemsFromPlayer_41
-3x Arc_FlowMurk
-    Arc_FlowMurk_0
-    Arc_FlowMurk_2
-    Arc_FlowMurk_1
-3x ActionPlaceItemInContainer
-    ActionPlaceItemInContainer_219
-    ActionPlaceItemInContainer_41
-    ActionPlaceItemInContainer_51
-3x ActionInitiateDamage
-    ActionInitiateDamage_211
-    ActionInitiateDamage_87
-    ActionInitiateDamage_54
-3x ActionGetProperty
-    ActionGetProperty_64
-    ActionGetProperty_141
-    ActionGetProperty_489
-3x FinalBlend
-    FinalBlend_5
-    FinalBlend_4
-    FinalBlend_3
-3x Splash_Trickle
-    Splash_Trickle_7
-    Splash_Trickle_1
-    Splash_Trickle_2
-3x Cultmask
-    Cultmask_3
-    Cultmask_2
-    Cultmask_1
-3x SpawnedRangedAggressorPistolWeapon
-    SpawnedRangedAggressorPistolWeapon_0
-    SpawnedRangedAggressorPistolWeapon_6
-    SpawnedRangedAggressorPistolWeapon_7
-3x PistolAndStandardBulletPickup
-    PistolAndStandardBulletPickup_2
-    PistolAndStandardBulletPickup_0
-    PistolAndStandardBulletPickup_4
-3x WP_AIPistolFX
-    WP_AIPistolFX_7
-    WP_AIPistolFX_6
-    WP_AIPistolFX_5
-3x dyn_petri_dish_03
-    dyn_petri_dish__9
-    dyn_petri_dish__1
-    dyn_petri_dish__10
-3x ActionFailQuest
-    ActionFailQuest_47
-    ActionFailQuest_11
-    ActionFailQuest_21
-3x MoveToAction
-    MoveToAction_2
-    MoveToAction_3
-    MoveToAction_6
-3x SecurityBotSpawner
-    SecurityBotSpawner_1
-    SecurityBotSpawner_0
-    SecurityBotSpawner_2
-3x Desk
-    Desk_4
-    Desk_9
-    Desk_7
-3x SecBot_ShellEject
-    SecBot_ShellEject_5
-    SecBot_ShellEject_4
-    SecBot_ShellEject_3
-3x RenderConfig
-    RenderConfig_0
-    RenderConfig_5
-    RenderConfig_4
-3x HookCool
-    HookCool_19
-    HookCool_10
-    HookCool_25
-3x Arc_DoorFall
-    Arc_DoorFall_1
-    Arc_DoorFall_0
-    Arc_DoorFall_2
-3x ResurrectionStation
-    ResurrectionStation_2
-    ResurrectionStation_0
-    ResurrectionStation_3
-3x Shotgun_Steam
-    Shotgun_Steam_5
-    Shotgun_Steam_4
-    Shotgun_Steam_3
-3x OilSlick_Reactive
-    OilSlick_Reactive_5
-    OilSlick_Reactive_2
-    OilSlick_Reactive_0
-3x RumbleManager
-    RumbleManager_0
-    RumbleManager_1
-    RumbleManager_8
-3x Rubble_marble
-    Rubble_marble_3
-    Rubble_marble_2
-    Rubble_marble_0
-3x Shotgun_MuzzleSmoke
-    Shotgun_MuzzleSmoke_5
-    Shotgun_MuzzleSmoke_4
-    Shotgun_MuzzleSmoke_3
-3x Deck3TurretMiniGun
-    Deck3TurretMiniGun_1
-    Deck3TurretMiniGun_3
-    Deck3TurretMiniGun_4
-3x MoveToGoal
-    MoveToGoal_2
-    MoveToGoal_6
-    MoveToGoal_3
-3x MoveToSpawnPointAction
-    MoveToSpawnPointAction_9
-    MoveToSpawnPointAction_10
-    MoveToSpawnPointAction_11
-3x MoveToSpawnPointGoal
-    MoveToSpawnPointGoal_9
-    MoveToSpawnPointGoal_10
-    MoveToSpawnPointGoal_11
 3x AI_MuzzleFlash
     AI_MuzzleFlash_5
     AI_MuzzleFlash_4
     AI_MuzzleFlash_3
-3x SecurityCrate_Safe
-    SecurityCrate_Safe_3
-    SecurityCrate_Safe_0
-    SecurityCrate_Safe_2
-3x AnimNotify_DropAIAttachment
-    AnimNotify_DropAIAttachment_1
-    AnimNotify_DropAIAttachment_0
-    AnimNotify_DropAIAttachment_2
-3x SpawnedDeck3MinimumSecurityTurret
-    SpawnedDeck3MinimumSecurityTurret_4
-    SpawnedDeck3MinimumSecurityTurret_1
-    SpawnedDeck3MinimumSecurityTurret_3
-3x MovingInWaterNew
-    MovingInWaterNew_3
-    MovingInWaterNew_2
-    MovingInWaterNew_4
-3x MessagePawnShattered
-    MessagePawnShattered_1
-    MessagePawnShattered_0
-    MessagePawnShattered_5
-3x MessageTelekinesisStartedPullingActor
-    MessageTelekinesisStartedPullingActor_1
-    MessageTelekinesisStartedPullingActor_0
-    MessageTelekinesisStartedPullingActor_0
-3x BlastdoorDoor
-    BlastdoorDoor_0
-    BlastdoorDoor_2
-    BlastdoorDoor_1
+3x MoveToSpawnPointGoal
+    MoveToSpawnPointGoal_9
+    MoveToSpawnPointGoal_10
+    MoveToSpawnPointGoal_11
+3x Cabinet
+    Cabinet_4
+    Cabinet_2
+    Cabinet_0
 3x HealthStationHacked
     HealthStationHacked_0
     HealthStationHacked_1
     HealthStationHacked_2
+3x BlastdoorDoor
+    BlastdoorDoor_0
+    BlastdoorDoor_2
+    BlastdoorDoor_1
+3x ResStation_ActivateElec
+    ResStation_ActivateElec_0
+    ResStation_ActivateElec_1
+    ResStation_ActivateElec_2
+3x MovingInWaterNew
+    MovingInWaterNew_3
+    MovingInWaterNew_2
+    MovingInWaterNew_4
+3x AssassinImplosion
+    AssassinImplosion_19
+    AssassinImplosion_17
+    AssassinImplosion_18
+3x Rubble_marble
+    Rubble_marble_3
+    Rubble_marble_2
+    Rubble_marble_0
+3x ResurrectionStation
+    ResurrectionStation_2
+    ResurrectionStation_0
+    ResurrectionStation_3
+3x ActionControlPlant
+    ActionControlPlant_60
+    ActionControlPlant_0
+    ActionControlPlant_9
+3x HookCool
+    HookCool_19
+    HookCool_10
+    HookCool_25
+3x AssassinExplosion
+    AssassinExplosion_17
+    AssassinExplosion_19
+    AssassinExplosion_18
+3x Arc_FlowMurk
+    Arc_FlowMurk_0
+    Arc_FlowMurk_2
+    Arc_FlowMurk_1
+3x PistolAndStandardBulletPickup
+    PistolAndStandardBulletPickup_2
+    PistolAndStandardBulletPickup_0
+    PistolAndStandardBulletPickup_4
+3x Desk
+    Desk_4
+    Desk_9
+    Desk_7
+3x ActionFailQuest
+    ActionFailQuest_47
+    ActionFailQuest_11
+    ActionFailQuest_21
+3x SecBot_ShellEject
+    SecBot_ShellEject_5
+    SecBot_ShellEject_4
+    SecBot_ShellEject_3
+3x Arc_DoorFall
+    Arc_DoorFall_1
+    Arc_DoorFall_0
+    Arc_DoorFall_2
+3x ActionGetProperty
+    ActionGetProperty_64
+    ActionGetProperty_141
+    ActionGetProperty_489
+3x WP_AIPistolFX
+    WP_AIPistolFX_7
+    WP_AIPistolFX_6
+    WP_AIPistolFX_5
+3x AnimNotify_DropAIAttachment
+    AnimNotify_DropAIAttachment_1
+    AnimNotify_DropAIAttachment_0
+    AnimNotify_DropAIAttachment_2
+3x ActionInitiateDamage
+    ActionInitiateDamage_211
+    ActionInitiateDamage_87
+    ActionInitiateDamage_54
+3x dyn_Book01
+    dyn_book_4
+    dyn_book_1
+    dyn_book_0
+3x RenderConfig
+    RenderConfig_0
+    RenderConfig_5
+    RenderConfig_4
+3x ActionPlaceItemInContainer
+    ActionPlaceItemInContainer_219
+    ActionPlaceItemInContainer_41
+    ActionPlaceItemInContainer_51
+3x MessagePawnShattered
+    MessagePawnShattered_1
+    MessagePawnShattered_0
+    MessagePawnShattered_5
+3x ActionRemoveItemsFromPlayer
+    ActionRemoveItemsFromPlayer_35
+    ActionRemoveItemsFromPlayer_47
+    ActionRemoveItemsFromPlayer_41
 3x dyn_book02Down
     dyn_book02Down_0
     dyn_book02Down_1
@@ -2547,131 +2429,165 @@ Total classes: 817
     ActionTriggerHavokForceActor_88
     ActionTriggerHavokForceActor_1
     ActionTriggerHavokForceActor_184
+3x dyn_cafe_table
+    dyn_cafe_table_2
+    dyn_cafe_table_6
+    dyn_cafe_table_4
+3x ActionSpawnSecurityBot
+    ActionSpawnSecurityBot_8
+    ActionSpawnSecurityBot_0
+    ActionSpawnSecurityBot_6
+3x ActionSpawnPickup
+    ActionSpawnPickup_55
+    ActionSpawnPickup_171
+    ActionSpawnPickup_20
+3x dyn_petri_dish_03
+    dyn_petri_dish__9
+    dyn_petri_dish__1
+    dyn_petri_dish__10
+3x ActionSetSpawnerRepopulationState
+    ActionSetSpawnerRepopulationState_119
+    ActionSetSpawnerRepopulationState_41
+    ActionSetSpawnerRepopulationState_33
+3x MessageTelekinesisStartedPullingActor
+    MessageTelekinesisStartedPullingActor_1
+    MessageTelekinesisStartedPullingActor_0
+    MessageTelekinesisStartedPullingActor_0
+3x QuestLightFX
+    QuestLightFX_9
+    QuestLightFX_11
+    QuestLightFX_12
+3x OilSlick_Reactive
+    OilSlick_Reactive_5
+    OilSlick_Reactive_2
+    OilSlick_Reactive_0
+3x RumbleManager
+    RumbleManager_0
+    RumbleManager_1
+    RumbleManager_8
+3x PlayerEnterWater
+    PlayerEnterWater_2
+    PlayerEnterWater_1
+    PlayerEnterWater_3
+3x Deck3TurretMiniGun
+    Deck3TurretMiniGun_1
+    Deck3TurretMiniGun_3
+    Deck3TurretMiniGun_4
+3x MoveToSpawnPointAction
+    MoveToSpawnPointAction_9
+    MoveToSpawnPointAction_10
+    MoveToSpawnPointAction_11
+3x DynamicLight_MuzzleMG
+    DynamicLight_MuzzleMG_5
+    DynamicLight_MuzzleMG_4
+    DynamicLight_MuzzleMG_3
+3x SecurityBotSpawner
+    SecurityBotSpawner_1
+    SecurityBotSpawner_0
+    SecurityBotSpawner_2
+3x HavokForceActor
+    HavokForceActor_1
+    HavokForceActor_3
+    HavokForceActor_0
+3x SecurityCrate_Safe
+    SecurityCrate_Safe_3
+    SecurityCrate_Safe_0
+    SecurityCrate_Safe_2
+3x Cultmask
+    Cultmask_3
+    Cultmask_2
+    Cultmask_1
+3x Shotgun_MuzzleSmoke
+    Shotgun_MuzzleSmoke_5
+    Shotgun_MuzzleSmoke_4
+    Shotgun_MuzzleSmoke_3
+3x FinalBlend
+    FinalBlend_5
+    FinalBlend_4
+    FinalBlend_3
+3x Shotgun_Steam
+    Shotgun_Steam_5
+    Shotgun_Steam_4
+    Shotgun_Steam_3
 3x SpawnedAssassinRangedWeapon
     SpawnedAssassinRangedWeapon_3
     SpawnedAssassinRangedWeapon_2
     SpawnedAssassinRangedWeapon_1
-3x ResStation_ActivateElec
-    ResStation_ActivateElec_0
-    ResStation_ActivateElec_1
-    ResStation_ActivateElec_2
-2x dyn_Book02
-    dyn_book_3
-    dyn_book_2
-2x DoorSwitch
-    DoorSwitch_1
-    DoorSwitch_0
-2x dyn_foodcan_02
-    dyn_foodcan__1
-    dyn_foodcan__2
+3x SpawnedDeck3MinimumSecurityTurret
+    SpawnedDeck3MinimumSecurityTurret_4
+    SpawnedDeck3MinimumSecurityTurret_1
+    SpawnedDeck3MinimumSecurityTurret_3
+3x SpawnedRangedAggressorPistolWeapon
+    SpawnedRangedAggressorPistolWeapon_0
+    SpawnedRangedAggressorPistolWeapon_6
+    SpawnedRangedAggressorPistolWeapon_7
+3x Splash_Trickle
+    Splash_Trickle_7
+    Splash_Trickle_1
+    Splash_Trickle_2
 2x AccessControl
     AccessControl_1
     AccessControl_9
-2x dyn_oil_barrel
-    dyn_oil_barrel_10
-    dyn_oil_barrel_3
 2x ActionApplyImpulse
     ActionApplyImpulse_9
     ActionApplyImpulse_297
 2x ActionAssignNextProtectorVent
     ActionAssignNextProtectorVent_128
     ActionAssignNextProtectorVent_25
-2x dyn_sandwich_board_sign
-    dyn_sandwich_board_sign_1
-    dyn_sandwich_board_sign_0
-2x dyn_teddybear
-    dyn_teddybear_1
-    dyn_teddybear_0
+2x DeadCatContainer
+    DeadCatContainer_1
+    DeadCatContainer_0
 2x ActionCanChangeLevel
     ActionCanChangeLevel_15
     ActionCanChangeLevel_5
-2x dyn_workshop_saw
-    dyn_workshop_saw_1
-    dyn_workshop_saw_0
+2x Mutator
+    Mutator_1
+    Mutator_9
+2x FleshHit_Stand
+    FleshHit_Stand_0
+    FleshHit_Stand_14
+2x EffectsSystem
+    EffectsSystem
+    EffectsSystem
 2x ActionEnableOrDisableLevelSwitching
     ActionEnableOrDisableLevelSwitching_55
     ActionEnableOrDisableLevelSwitching_54
+2x EffectEventInfo
+    EffectEventInfo_1
+    EffectEventInfo_0
 2x ActionFactTotalDuration
     travel_esuohthgiL-0_ActionFactTotalDuration_0
     travel_esuohthgiL-0_ActionFactTotalDuration_50
 2x ActionGetPlayerMapRegion
     ActionGetPlayerMapRegion_68
     ActionGetPlayerMapRegion_3
+2x Rubble_Marble_Large
+    Rubble_Marble_Large_1
+    Rubble_Marble_Large_0
+2x ObjectPool
+    ObjectPool_1
+    ObjectPool_9
+2x EaseTableEvaluator
+    HealthEaseTableEvaluator
+    BioAmmoEaseTableEvaluator
 2x ActionRemoveGoal
     ActionRemoveGoal_40
     ActionRemoveGoal_158
 2x ActionSendTriggerMessage
     ActionSendTriggerMessage_21
     ActionSendTriggerMessage_38
+2x OilSlick03_Reactive
+    OilSlick03_Reactive_0
+    OilSlick03_Reactive_1
 2x ActionSetDoorBrokenState
     ActionSetDoorBrokenState_24
     ActionSetDoorBrokenState_108
 2x ActionSetNextAssassinTeleportPoint
     ActionSetNextAssassinTeleportPoint_250
     ActionSetNextAssassinTeleportPoint_495
-2x ActionStopSecurityAlarm
-    ActionStopSecurityAlarm_36
-    ActionStopSecurityAlarm_53
-2x ActionUnlockBathysphereDestination
-    ActionUnlockBathysphereDestination_38
-    ActionUnlockBathysphereDestination_0
-2x ActionVariableDivide
-    ActionVariableDivide_200
-    ActionVariableDivide_207
-2x ActionVariableSubtract
-    ActionVariableSubtract_202
-    ActionVariableSubtract_52
-2x ActorGroup
-    ActorGroup_1
-    ActorGroup_2
-2x AggDoctorBooty
-    AggDoctorBooty_1
-    AggDoctorBooty_0
-2x AlertSensor
-    AlertSensor_4
-    AlertSensor_45
-2x AlertSensorAction
-    AlertSensorAction_45
-    AlertSensorAction_4
-2x AnimNotify_FinishedInteractingWithGatherer
-    AnimNotify_FinishedInteractingWithGatherer_1
-    AnimNotify_FinishedInteractingWithGatherer_0
-2x AnimNotify_StartedInteractingWithGatherer
-    AnimNotify_StartedInteractingWithGatherer_0
-    AnimNotify_StartedInteractingWithGatherer_1
-2x Arc_ProgressLight
-    Arc_ProgressLight_1
-    Arc_ProgressLight_0
-2x ArcadiaGateDoor
-    ArcadiaGateDoor_1
-    ArcadiaGateDoor_0
-2x BlossomFalling
-    BlossomFalling_1
-    BlossomFalling_0
-2x BroadcastHandler
-    BroadcastHandler_1
-    BroadcastHandler_9
-2x CheapCigarettesPickup
-    CheapCigarettesPickup_1
-    CheapCigarettesPickup_0
-2x ChipsPickup
-    ChipsPickup_1
-    ChipsPickup_4
-2x CorpseMaleBooty
-    CorpseMaleBooty_1
-    CorpseMaleBooty_0
-2x DeadCatContainer
-    DeadCatContainer_1
-    DeadCatContainer_0
-2x DefaultPhysicsVolume
-    DefaultPhysicsVolume_0
-    DefaultPhysicsVolume_54
-2x DefaultTrapBoltWireHook
-    DefaultTrapBoltWireHook_6
-    DefaultTrapBoltWireHook_5
-2x Inventory
-    Inventory_3
-    Inventory_2
+2x OilSlickHalf_Reactive
+    OilSlickHalf_Reactive_1
+    OilSlickHalf_Reactive_0
 2x Level
     MyLevel
     MyLevel
@@ -2684,48 +2600,18 @@ Total classes: 817
 2x LevelSummary
     LevelSummary
     LevelSummary
-2x LoadRoomDoor
-    LoadRoomDoor_1
-    LoadRoomDoor_5
-2x MachineGun_MuzzleFX
-    MachineGun_MuzzleFX_3
-    MachineGun_MuzzleFX_2
-2x HavokForceTypeTriggeredImpulse
-    HavokForceTypeTriggeredImpulse_0
-    HavokForceTypeTriggeredImpulse_0
-2x MaterialAnimatedFloatFromStreamingState
-    MaterialAnimatedFloatFromStreamingState_2
-    MaterialAnimatedFloatFromStreamingState_6
-2x MeleeThugDrag
-    MeleeThugDrag_2
-    MeleeThugDrag_0
-2x MeleeThugThreeSixtyWeapon
-    MeleeThugThreeSixtyWeapon_51
-    MeleeThugThreeSixtyWeapon_52
-2x MessageDispatcher
-    MessageDispatcher_1
-    MessageDispatcher_9
-2x MessagePlayerRemovedItemFromContainer
-    MessagePlayerRemovedItemFromContainer_3
-    MessagePlayerRemovedItemFromContainer_2
-2x Mutator
-    Mutator_1
-    Mutator_9
-2x GathererTransWeight
-    GathererTransWeight_0
-    GathererTransWeight_1
-2x ObjectPool
-    ObjectPool_1
-    ObjectPool_9
-2x OilSlick03_Reactive
-    OilSlick03_Reactive_0
-    OilSlick03_Reactive_1
-2x OilSlickHalf_Reactive
-    OilSlickHalf_Reactive_1
-    OilSlickHalf_Reactive_0
+2x ProtectorCommanderAction
+    ProtectorCommanderAction_6
+    ProtectorCommanderAction_7
 2x OrStatement
     travel_emocleW-1_OrStatement_102
     travel_emocleW-1_OrStatement_101
+2x LoadRoomDoor
+    LoadRoomDoor_1
+    LoadRoomDoor_5
+2x HavokForceTypeTriggeredImpulse
+    HavokForceTypeTriggeredImpulse_0
+    HavokForceTypeTriggeredImpulse_0
 2x PI_UpgradeA
     PI_UpgradeA_3
     PI_UpgradeA_5
@@ -2735,141 +2621,256 @@ Total classes: 817
 2x PI_UpgradeBalt
     PI_UpgradeBalt_3
     PI_UpgradeBalt_5
-2x GameReplicationInfo
-    GameReplicationInfo_1
-    GameReplicationInfo_9
+2x Fire_Mid
+    Fire_Mid_0
+    Fire_Mid_2
+2x MachineGun_MuzzleFX
+    MachineGun_MuzzleFX_3
+    MachineGun_MuzzleFX_2
+2x ProtectorNeutralColor
+    ProtectorNeutralColor_2
+    ProtectorNeutralColor_1
+2x ProtectorNeutral_Light
+    ProtectorNeutral_Light_1
+    ProtectorNeutral_Light_2
 2x PatrolAction
     PatrolAction_1
     PatrolAction_0
 2x PatrolGoal
     PatrolGoal_0
     PatrolGoal_82
-2x GL_UpgradeB
-    GL_UpgradeB_1
-    GL_UpgradeB_3
-2x PlaceableCrossbowTrapBoltProjectile
-    PlaceableCrossbowTrapBoltProjectile_10
-    PlaceableCrossbowTrapBoltProjectile_11
-2x GL_UpgradeA
-    GL_UpgradeA_1
-    GL_UpgradeA_3
-2x ProtectorCommanderAction
-    ProtectorCommanderAction_6
-    ProtectorCommanderAction_7
-2x ProtectorNeutralColor
-    ProtectorNeutralColor_0
-    ProtectorNeutralColor_1
-2x Purse
-    Purse_1
-    Purse_0
-2x RangedIntProperty
-    NumStreaks
-    StartRotation
-2x ReactToDamageGoal
-    ReactToDamageGoal_1791
-    ReactToDamageGoal_581
+2x GathererTransWeight
+    GathererTransWeight_0
+    GathererTransWeight_1
+2x MaterialAnimatedFloatFromStreamingState
+    MaterialAnimatedFloatFromStreamingState_2
+    MaterialAnimatedFloatFromStreamingState_6
+2x GameReplicationInfo
+    GameReplicationInfo_1
+    GameReplicationInfo_9
+2x MeleeThugDrag
+    MeleeThugDrag_2
+    MeleeThugDrag_0
+2x MeleeThugThreeSixtyWeapon
+    MeleeThugThreeSixtyWeapon_51
+    MeleeThugThreeSixtyWeapon_52
+2x MessageDispatcher
+    MessageDispatcher_1
+    MessageDispatcher_9
+2x DefaultPhysicsVolume
+    DefaultPhysicsVolume_0
+    DefaultPhysicsVolume_54
 2x RippleShader
     RadialRippleMaterial
     DirectionalRippleMaterial
+2x PlaceableCrossbowTrapBoltProjectile
+    PlaceableCrossbowTrapBoltProjectile_10
+    PlaceableCrossbowTrapBoltProjectile_11
+2x GL_UpgradeB
+    GL_UpgradeB_1
+    GL_UpgradeB_3
+2x Purse
+    Purse_1
+    Purse_0
 2x RipplingContentInfo
     RipplingContentInfo_1
     RipplingContentInfo_2
-2x RosieGrenadeWeaponAmmo
-    RosieGrenadeWeaponAmmo_9
-    RosieGrenadeWeaponAmmo_4
-2x Rubble_Marble_Large
-    Rubble_Marble_Large_1
-    Rubble_Marble_Large_0
-2x SG_UpgradeA
-    SG_UpgradeA_2
-    SG_UpgradeA_4
-2x SG_UpgradeB
-    SG_UpgradeB_2
-    SG_UpgradeB_4
-2x TrapBoltBeam
-    TrapBoltBeam_6
-    TrapBoltBeam_5
-2x Setup
-    Setup_1
-    Setup_9
-2x FleshHit_Stand
-    FleshHit_Stand_0
-    FleshHit_Stand_14
-2x ShotgunAnd00BuckPickup
-    ShotgunAnd00BuckPickup_3
-    ShotgunAnd00BuckPickup_0
-2x ShotgunMuzzleFX
-    ShotgunMuzzleFX_3
-    ShotgunMuzzleFX_2
-2x Fire_Mid
-    Fire_Mid_0
-    Fire_Mid_2
-2x SpawnedDeck3SecurityCamera
-    SpawnedDeck3SecurityCamera_0
-    SpawnedDeck3SecurityCamera_1
-2x SpawnedDeck3SecurityCameraWall
-    SpawnedDeck3SecurityCameraWall_0
-    SpawnedDeck3SecurityCameraWall_1
-2x SpawnedMeleeThug
-    SpawnedMeleeThug_10
-    SpawnedMeleeThug_9
-2x SpawnedRosieRangedWeapon
-    SpawnedRosieRangedWeapon_0
-    SpawnedRosieRangedWeapon_2
-2x SpawnedTurretDeadBody
-    SpawnedTurretDeadBody_6
-    SpawnedTurretDeadBody_7
-2x SpawningManager
-    SpawningManager_17
-    SpawningManager_14
-2x SteamerTrunk
-    SteamerTrunk_0
-    SteamerTrunk_1
+2x MessagePlayerRemovedItemFromContainer
+    MessagePlayerRemovedItemFromContainer_3
+    MessagePlayerRemovedItemFromContainer_2
+2x GL_UpgradeA
+    GL_UpgradeA_1
+    GL_UpgradeA_3
 2x EscortGoal
     EscortGoal_7
     EscortGoal_6
 2x EscortAction
     EscortAction_7
     EscortAction_6
+2x SpawningManager
+    SpawningManager_17
+    SpawningManager_14
+2x CheapCigarettesPickup
+    CheapCigarettesPickup_1
+    CheapCigarettesPickup_0
+2x RangedIntProperty
+    NumStreaks
+    StartRotation
+2x Setup
+    Setup_1
+    Setup_9
+2x SteamerTrunk
+    SteamerTrunk_0
+    SteamerTrunk_1
+2x BroadcastHandler
+    BroadcastHandler_1
+    BroadcastHandler_9
 2x TG_upgradeA
     TG_upgradeA_2
     TG_upgradeA_4
 2x TG_upgradeB
     TG_upgradeB_2
     TG_upgradeB_4
-2x EffectsSystem
-    EffectsSystem
-    EffectsSystem
-2x EaseTableEvaluator
-    HealthEaseTableEvaluator
-    BioAmmoEaseTableEvaluator
+2x BlossomFalling
+    BlossomFalling_1
+    BlossomFalling_0
+2x SG_UpgradeA
+    SG_UpgradeA_2
+    SG_UpgradeA_4
 2x Tracer_RivetNEW
     Tracer_RivetNEW_3
     Tracer_RivetNEW_2
-1x AI_DummyMovement
-    AI_DummyMovement_0
-1x AI_DummyMovementGoal
-    AI_DummyMovementGoal_0
-1x AI_SensorResource
-    AI_SensorResource_0
-1x AchievementManager
-    AchievementManager_0
-1x ActionAwardAchievement
-    ActionAwardAchievement_4
-1x ActionCalcDistance
-    ActionCalcDistance_91
-1x ActionClearContainer
-    ActionClearContainer_130
-1x MessageSecurityAlarmStarted
-    MessageSecurityAlarmStarted_0
-1x OilSlick01_Reactive
-    OilSlick01_Reactive_0
-1x MessagePlayerFinishedHacking
-    MessagePlayerFinishedHacking_0
-1x MessagePlayerCraftedItem
-    MessagePlayerCraftedItem_5
-1x HavokForceFilterActorLabel
-    HavokForceFilterActorLabel_1
+2x dyn_Book02
+    dyn_book_3
+    dyn_book_2
+2x TrapBoltBeam
+    TrapBoltBeam_6
+    TrapBoltBeam_5
+2x DefaultTrapBoltWireHook
+    DefaultTrapBoltWireHook_6
+    DefaultTrapBoltWireHook_5
+2x ShotgunAnd00BuckPickup
+    ShotgunAnd00BuckPickup_3
+    ShotgunAnd00BuckPickup_0
+2x ShotgunMuzzleFX
+    ShotgunMuzzleFX_3
+    ShotgunMuzzleFX_2
+2x ArcadiaGateDoor
+    ArcadiaGateDoor_1
+    ArcadiaGateDoor_0
+2x TurretFlashlightBeam
+    TurretFlashlightBeam_0
+    TurretFlashlightBeam_2
+2x Arc_ProgressLight
+    Arc_ProgressLight_1
+    Arc_ProgressLight_0
+2x RosieGrenadeWeaponAmmo
+    RosieGrenadeWeaponAmmo_9
+    RosieGrenadeWeaponAmmo_4
+2x ReactToDamageGoal
+    ReactToDamageGoal_1791
+    ReactToDamageGoal_581
+2x AnimNotify_StartedInteractingWithGatherer
+    AnimNotify_StartedInteractingWithGatherer_0
+    AnimNotify_StartedInteractingWithGatherer_1
+2x CorpseMaleBooty
+    CorpseMaleBooty_1
+    CorpseMaleBooty_0
+2x AnimNotify_FinishedInteractingWithGatherer
+    AnimNotify_FinishedInteractingWithGatherer_1
+    AnimNotify_FinishedInteractingWithGatherer_0
+2x ChipsPickup
+    ChipsPickup_1
+    ChipsPickup_4
+2x AlertSensorAction
+    AlertSensorAction_45
+    AlertSensorAction_4
+2x AlertSensor
+    AlertSensor_4
+    AlertSensor_45
+2x DoorSwitch
+    DoorSwitch_1
+    DoorSwitch_0
+2x AggDoctorBooty
+    AggDoctorBooty_1
+    AggDoctorBooty_0
+2x ActorGroup
+    ActorGroup_1
+    ActorGroup_2
+2x ActionVariableSubtract
+    ActionVariableSubtract_202
+    ActionVariableSubtract_52
+2x ActionVariableDivide
+    ActionVariableDivide_200
+    ActionVariableDivide_207
+2x ActionUnlockBathysphereDestination
+    ActionUnlockBathysphereDestination_38
+    ActionUnlockBathysphereDestination_0
+2x SG_UpgradeB
+    SG_UpgradeB_2
+    SG_UpgradeB_4
+2x SpawnedDeck3SecurityCamera
+    SpawnedDeck3SecurityCamera_0
+    SpawnedDeck3SecurityCamera_1
+2x SpawnedDeck3SecurityCameraWall
+    SpawnedDeck3SecurityCameraWall_0
+    SpawnedDeck3SecurityCameraWall_1
+2x ActionStopSecurityAlarm
+    ActionStopSecurityAlarm_36
+    ActionStopSecurityAlarm_53
+2x SpawnedMeleeThug
+    SpawnedMeleeThug_10
+    SpawnedMeleeThug_9
+2x dyn_foodcan_02
+    dyn_foodcan__1
+    dyn_foodcan__2
+2x Inventory
+    Inventory_3
+    Inventory_2
+2x dyn_oil_barrel
+    dyn_oil_barrel_10
+    dyn_oil_barrel_3
+2x SpawnedRosieRangedWeapon
+    SpawnedRosieRangedWeapon_0
+    SpawnedRosieRangedWeapon_2
+2x dyn_sandwich_board_sign
+    dyn_sandwich_board_sign_1
+    dyn_sandwich_board_sign_0
+2x dyn_teddybear
+    dyn_teddybear_1
+    dyn_teddybear_0
+2x SpawnedTurretDeadBody
+    SpawnedTurretDeadBody_6
+    SpawnedTurretDeadBody_7
+2x dyn_workshop_saw
+    dyn_workshop_saw_1
+    dyn_workshop_saw_0
+1x FB_Farm
+    FB_Farm_0
+1x Pistol
+    Pistol_1
+1x Pistol_CylinderFX
+    Pistol_CylinderFX_1
+1x Pistol_MuzzleFX
+    Pistol_MuzzleFX_1
+1x ExpensiveCigarettesPickup
+    ExpensiveCigarettesPickup_3
+1x PlaceableGrowthStation
+    GrowthStation_1
+1x IncinerationAbility
+    IncinerationAbility_1
+1x Input
+    Input_0
+1x PlaceableVendingStationAlt
+    PlaceableVendingStationAlt_0
+1x PlaceableWeaponUpgradeStation
+    PlaceableWeaponUpgradeStation_0
+1x Eng_CoreSteamJet
+    Eng_CoreSteamJet_0
+1x ElectroBoltHandLight
+    ElectroBoltHandLight_1
+1x PlasmidManager
+    PlasmidManager_1
+1x HitSpangMetal_Gen
+    HitSpangMetal_Gen_2
+1x PlayerHands
+    PlayerHands
+1x ElectricBoltAbility
+    ElectricBoltAbility_1
+1x PlayerReplicationInfo
+    PlayerReplicationInfo_1
+1x PlayerStatsManager
+    PlayerStatsManager_0
+1x Present_3
+    Present_0
+1x Primitive
+    Primitive_0
+1x Projector
+    Projector_0
+1x DynamicLightMerger
+    DynamicLightMerger_7
+1x DrHeadMagnifyGlass
+    DrHeadMagnifyGlass_0
 1x ProximityArmingLight
     ProximityArmingLight_1
 1x ProximityGrenadePickup
@@ -2878,28 +2879,18 @@ Total classes: 817
     ProxyBitmapMaterial_1
 1x PseudoGatherer
     PseudoGatherer_2
-1x PCOptionsData
-    PCOptionsData_0
-1x FragGrenadeExplosionB
-    FragGrenadeExplosionB_0
-1x MessagePawnAquiredState
-    MessagePawnAquiredState_0
+1x DrHeadLamp
+    DrHeadLamp_3
 1x QuestManager
     QuestManager_1
-1x MessageKeypadContainerUsed
-    MessageKeypadContainerUsed_0
-1x HavokForceRay
-    HavokForceRay_1
-1x HavokForceTypeTriggeredVelocity
-    HavokForceTypeTriggeredVelocity_1
-1x FogBlend
-    FogBlend_1
-1x GPSArrow
-    GPSArrow_0
-1x FogApply
-    FogApply_1
-1x GamepadPlayerInput
-    GamepadPlayerInput_1
+1x DownloadableContentManager
+    DownloadableContentManager_0
+1x InteractionMaster
+    InteractionMaster_0
+1x DifficultyStatsManager
+    DifficultyStatsManager_0
+1x DifficultyManager
+    DifficultyManager_0
 1x ReactToTiredGathererGoal
     ReactToTiredGathererGoal_0
 1x RemoveAmmoAdjustment
@@ -2908,90 +2899,56 @@ Total classes: 817
     RemoveBioAmmoAdjustment_0
 1x RemoveMedHypoAdjustment
     RemoveMedHypoAdjustment_0
-1x MailTube
-    MailTube_0
-1x MachineGun_ColdMuzzleFX
-    MachineGun_ColdMuzzleFX_1
 1x ResearchCamera
     ResearchCamera_1
-1x KeypadWallsafe
-    KeypadWallsafe_0
-1x MachineGun
-    MachineGun_1
-1x FoamIntro
-    FoamIntro_0
-1x PauseDOF
-    PauseDOF_2
-1x PauseDOFSettings
-    PauseDOFSettings_2
 1x RivetGun_MuzzleFX
     RivetGun_MuzzleFX_2
 1x RosieGrenadeFuseFX
     RosieGrenadeFuseFX_1
-1x MG_ShellEject
-    MG_ShellEject_1
-1x Head
-    PlayerHead
-1x PauseDesaturate
-    PauseDesaturate_2
-1x LinkConfiguration
-    LinkConfigE
-1x HeadbobAnimSettings
-    HeadbobAnimSettings_0
-1x LangfordRoseTube
-    LangfordRoseTube_0
-1x Pistol
-    Pistol_1
-1x LangfordPainting
-    LangfordPainting_0
-1x LadySmithRedWig
-    LadySmithRedWig_0
-1x GhostDesaturateSettings
-    GhostDesaturateSettings_2
-1x Pistol_CylinderFX
-    Pistol_CylinderFX_1
-1x LadySmithBurnetteWig
-    LadySmithBurnetteWig_0
-1x LadySmithBlondeWig
-    LadySmithBlondeWig_3
-1x FluidSurfaceShader
-    WoodWaterSurface_Shader
-1x IonicBuckshotPickup
-    IonicBuckshotPickup_0
+1x Deck3TurretRPG
+    Deck3TurretRPG_0
+1x HealthAdvisor
+    HealthAdvisor_0
+1x InventoryManager
+    InventoryManager_1
+1x InvestigateAction
+    InvestigateAction_0
+1x Deck3TurretFlamethrower
+    Deck3TurretFlamethrower_0
+1x DeadBreadwinnerContainer
+    DeadBreadwinnerContainer_0
 1x SeaTurtle_Loop_1
     SeaTurtle_Loop_0
 1x SecBotExhaust
     SecBotExhaust_0
+1x Damage_Right
+    Damage_Right_0
 1x InvestigateGoal
     InvestigateGoal_0
-1x InvestigateAction
-    InvestigateAction_0
-1x InventoryManager
-    InventoryManager_1
 1x Security
     Security_1
-1x Pistol_MuzzleFX
-    Pistol_MuzzleFX_1
-1x HealthAdvisor
-    HealthAdvisor_0
-1x InteractionMaster
-    InteractionMaster_0
+1x SecurityBeaconAbility
+    SecurityBeaconAbility_0
+1x AI_SensorResource
+    AI_SensorResource_0
+1x DamageMultiplierSet
+    AggressorDamageMultiplierSet
 1x SecurityCamera_LightFlare
     SecurityCamera_LightFlare_13
-1x Input
-    Input_0
+1x AchievementManager
+    AchievementManager_0
 1x SecurityManager
     SecurityManager_6
-1x IncinerationAbility
-    IncinerationAbility_1
-1x Newsvendor
-    Newsvendor_0
-1x HitSpangWood_Gen
-    HitSpangWood_Gen_8
-1x FleshHit_HP
-    FleshHit_HP_0
-1x FlashLiaison
-    FlashLiaison_0
+1x D3DRenderDevice_11
+    D3DRenderDevice_0
+1x ActionAwardAchievement
+    ActionAwardAchievement_4
+1x ActionCalcDistance
+    ActionCalcDistance_91
+1x Crossbow_TrapBolt
+    Crossbow_TrapBolt_0
+1x CriticalMessageQueue
+    CriticalMessageQueue_6
 1x ShimmerShader
     LogShimmer_Shader
 1x ShockAIScout
@@ -3010,260 +2967,256 @@ Total classes: 817
     ShockPlayerController_0
 1x ShockUserSettings
     ShockUserSettings_0
-1x HitSpangMetal_Gen
-    HitSpangMetal_Gen_2
+1x CorpseManager
+    CorpseManager_6
 1x ShotGunMuzzleIon
     ShotGunMuzzleIon_1
 1x Shotgun
     Shotgun_1
-1x PlaceableGrowthStation
-    GrowthStation_1
-1x GlobalTempObjects
-    GlobalTempObjects_0
-1x InGameManualManager
-    InGameManualManager_1
-1x Hyd_Ry_FlavorC
-    Hyd_Ry_FlavorC_0
-1x FlashGUIController
-    FlashGUIController_0
+1x ActionClearContainer
+    ActionClearContainer_130
+1x ActionDestroyAIs
+    ActionDestroyAIs_124
+1x ActionDisplayMapHUDRegion
+    ActionDisplayMapHUDRegion_22
+1x ActionFactTimesAsserted
+    travel_emocleW-1_ActionFactTimesAsserted_0
+1x ActionGetNumItemsInContainer
+    ActionGetNumItemsInContainer_130
 1x SkeletalDecoration
     SkeletalDecoration_1
-1x FlameThrower_Turret
-    FlameThrower_Turret_0
-1x HitSpangWater
-    HitSpangWater_0
+1x Console
+    Console_0
+1x Concrete_Barrier_Ceiling
+    Concrete_Barrier_Ceiling_0
 1x SkyZoneInfo
     SkyZoneInfo_0
-1x DifficultyStatsManager
-    DifficultyStatsManager_0
-1x FishSchoolB_Scatter
-    FishSchoolB_Scatter_0
-1x DifficultyManager
-    DifficultyManager_0
+1x CoffeePickup
+    CoffeePickup_2
+1x CodeMinClipAnim
+    CodeMinClipAnim_0
+1x ChlorophyllPickup
+    ChlorophyllPickup_2
 1x SoundEffectsSubsystem
     SoundEffectsSubsystem_1
-1x Fire_OilSlickB
-    Fire_OilSlickB_0
-1x GlobalTravelContainer
-    GlobalTravelContainer_0
+1x ActionHackSecuritySystem
+    ActionHackSecuritySystem_37
+1x ChemicalThrower
+    ChemicalThrower_0
 1x SpawnAmmoAdjustment
     SpawnAmmoAdjustment_0
 1x SpawnBioAmmoAdjustment
     SpawnBioAmmoAdjustment_0
 1x SpawnMedHypoAdjustment
     SpawnMedHypoAdjustment_0
-1x Deck3TurretRPG
-    Deck3TurretRPG_0
-1x Deck3TurretMiniGunAmmo
-    Deck3TurretMiniGunAmmo_0
-1x Deck3TurretFlamethrowerAmmo
-    Deck3TurretFlamethrowerAmmo_0
+1x ChemThrowerSteam
+    ChemThrowerSteam_1
+1x ChemThrowerLeak
+    ChemThrowerLeak_1
+1x ActionHasQuestBeenAssigned
+    ActionHasQuestBeenAssigned_46
 1x SpawnedDeck3MaximumSecurityTurret
     SpawnedDeck3MaximumSecurityTurret_0
 1x SpawnedDeck3MediumSecurityTurret
     SpawnedDeck3MediumSecurityTurret_0
-1x Deck3TurretFlamethrower
-    Deck3TurretFlamethrower_0
-1x GrenadeLauncher
-    GrenadeLauncher_1
-1x GrimeHeavy_Decal
-    GrimeHeavy_Decal_0
-1x PlaceableVendingStationAlt
-    PlaceableVendingStationAlt_0
-1x DeadBreadwinnerContainer
-    DeadBreadwinnerContainer_0
-1x Damage_Right
-    Damage_Right_0
-1x DamageMultiplierSet
-    AggressorDamageMultiplierSet
-1x D3DRenderDevice_11
-    D3DRenderDevice_0
-1x PlaceableWeaponUpgradeStation
-    PlaceableWeaponUpgradeStation_0
-1x ModEffectsSubsystem
-    ModEffectsSubsystem_1
-1x GameInfo
-    GameInfo_1
+1x ActionKeypadContainerUsed
+    ActionKeypadContainerUsed_25
+1x ActionModifyLocomotionKeyword
+    ActionModifyLocomotionKeyword_365
+1x ActionSetAIState
+    ActionSetAIState_6
+1x LangfordRoseTube
+    LangfordRoseTube_0
+1x SpawnedMeleeThugHandCart
+    SpawnedMeleeThugHandCart_1
+1x ChemPilotLight
+    ChemPilotLight_2
+1x Head
+    PlayerHead
+1x IonicBuckshotPickup
+    IonicBuckshotPickup_0
+1x HavokForceTypeTriggeredVelocity
+    HavokForceTypeTriggeredVelocity_1
+1x LinkConfiguration
+    LinkConfigE
+1x HavokForceRay
+    HavokForceRay_1
 1x Special_InPlayerViewTrigger
     Special_InPlayerViewTrigger_0
 1x Special_InPlayerViewTriggerClose
     Special_InPlayerViewTriggerClose_0
-1x Fire_ChemThrower
-    Fire_ChemThrower_0
+1x HavokForceFilterActorLabel
+    HavokForceFilterActorLabel_1
 1x SpeechManager
     SpeechManager_6
-1x Crossbow_TrapBolt
-    Crossbow_TrapBolt_0
-1x CriticalMessageQueue
-    CriticalMessageQueue_6
+1x MG_ShellEject
+    MG_ShellEject_1
+1x CausticShader
+    CausticCheap_Shader
 1x StandardBuckshotPickup
     StandardBuckshotPickup_2
 1x StandardBulletPickup
     StandardBulletPickup_1
-1x FactDatabase
-    FactDatabase_0
-1x FMODAudioSubsystem
-    FMODAudioSubsystem_0
-1x FMODAudioSettings
-    FMODAudioSettings_0
-1x FB_Farm
-    FB_Farm_0
+1x Canvas
+    Canvas_0
+1x CameraPhoto
+    CameraPhoto_0
+1x GrimeHeavy_Decal
+    GrimeHeavy_Decal_0
+1x CT_UpgradeB
+    CT_UpgradeB_0
 1x SteamHanging_800x_800
     SteamHanging_800x_0
 1x SteamLeakBig
     SteamLeakBig_1
-1x CorpseManager
-    CorpseManager_6
-1x PlasmidManager
-    PlasmidManager_1
-1x Console
-    Console_0
-1x ExpensiveCigarettesPickup
-    ExpensiveCigarettesPickup_3
-1x MistingRelease
-    MistingRelease_0
-1x MistingMachine
-    MistingMachine_2
-1x Eng_CoreSteamJet
-    Eng_CoreSteamJet_0
+1x CT_UpgradeA
+    CT_UpgradeA_0
+1x MachineGun
+    MachineGun_1
+1x BrokenVendingMachine
+    BrokenVendingMachine_0
+1x MachineGun_ColdMuzzleFX
+    MachineGun_ColdMuzzleFX_1
+1x BrineOmni
+    BrineOmni_0
+1x BotPropellerWood
+    BotPropellerWood_3
+1x BotPropellerSpark
+    BotPropellerSpark_2
 1x SubtitleManager
     SubtitleManager_0
 1x SummonProtectorAbility
     SummonProtectorAbility_1
 1x System
     System_0
-1x PlayerHands
-    PlayerHands
-1x HitspangMG_Glass
-    HitspangMG_Glass_1
-1x EmitterDamageFactory
-    EmitterDamageFactory_0
+1x MailTube
+    MailTube_0
+1x GrenadeLauncher
+    GrenadeLauncher_1
+1x GlobalTravelContainer
+    GlobalTravelContainer_0
 1x TargetedShader
     FrobHighlight_Shader
 1x TelekinesisAbility
     TelekinesisAbility_1
-1x ElectroBoltHandLight
-    ElectroBoltHandLight_1
+1x GlobalTempObjects
+    GlobalTempObjects_0
 1x TenenbaumPresent
     TenenbaumPresent_0
-1x ElectricBoltAbility
-    ElectricBoltAbility_1
-1x PlayerReplicationInfo
-    PlayerReplicationInfo_1
-1x Concrete_Barrier_Ceiling
-    Concrete_Barrier_Ceiling_0
-1x MessageTypes
-    MessageTypes
-1x CoffeePickup
-    CoffeePickup_2
-1x ToMarketDoor
-    ToMarketDoor_0
-1x ToSubBayDoor
-    ToSubBayDoor_0
-1x TraceDamageFactory
-    TraceDamageFactory_0
-1x PlayerStatsManager
-    PlayerStatsManager_0
-1x CodeMinClipAnim
-    CodeMinClipAnim_0
-1x ChlorophyllPickup
-    ChlorophyllPickup_2
-1x TrainingMessageManager
-    TrainingMessageManager_0
-1x ChemicalThrower
-    ChemicalThrower_0
-1x ChemThrowerSteam
-    ChemThrowerSteam_1
-1x SecurityBeaconAbility
-    SecurityBeaconAbility_0
-1x ChemThrowerLeak
-    ChemThrowerLeak_1
-1x ChemPilotLight
-    ChemPilotLight_2
-1x CausticShader
-    CausticCheap_Shader
-1x Canvas
-    Canvas_0
-1x TurretExplosion_MG
-    TurretExplosion_MG_0
-1x TurretFlamePilot
-    TurretFlamePilot_0
-1x CameraPhoto
-    CameraPhoto_0
-1x CT_UpgradeB
-    CT_UpgradeB_0
-1x TurretGoToLocationMovementAction
-    TurretGoToLocationMovementAction_2
-1x TurretGoToLocationMovementGoal
-    TurretGoToLocationMovementGoal_2
-1x CT_UpgradeA
-    CT_UpgradeA_0
-1x TurretMovementGoal
-    TurretMovementGoal_5
-1x ActionStartSecurityAlarm
-    ActionStartSecurityAlarm_0
-1x BrokenVendingMachine
-    BrokenVendingMachine_0
-1x BrineOmni
-    BrineOmni_0
-1x TurretWreckageFX
-    TurretWreckageFX_0
-1x BotPropellerWood
-    BotPropellerWood_3
-1x DynamicLightMerger
-    DynamicLightMerger_7
-1x BotPropellerSpark
-    BotPropellerSpark_2
 1x BioAmmoHypoTool
     BioAmmoHypoTool_4
-1x VariableString
-    None
 1x BioAmmoAdvisor
     BioAmmoAdvisor_0
 1x BeaconBirthGoop
     BeaconBirthGoop_0
 1x BeaconBallLoop
     BeaconBallLoop_0
-1x SpawnedMeleeThugHandCart
-    SpawnedMeleeThugHandCart_1
 1x BeaconBallFX
     BeaconBallFX_0
+1x ToMarketDoor
+    ToMarketDoor_0
+1x ToSubBayDoor
+    ToSubBayDoor_0
+1x GamepadPlayerInput
+    GamepadPlayerInput_1
 1x BathysphereSwitch
     BathysphereSwitch_0
-1x DrHeadMagnifyGlass
-    DrHeadMagnifyGlass_0
-1x VisualEffectsSubsystem
-    VisualEffectsSubsystem_1
 1x BathysphereManager
     BioshockBathyspheres
+1x TrainingMessageManager
+    TrainingMessageManager_0
 1x AwardAchievementsManager
     AwardAchievementsManager_1
-1x WP_UpgradeDormant
-    WP_UpgradeDormant_0
-1x AutoHackDevicePickup
-    AutoHackDevicePickup_0
+1x GameInfo
+    GameInfo_1
+1x HitspangMG_Glass
+    HitspangMG_Glass_1
+1x GameEngine
+    GameEngine_0
+1x HitSpangWood_Gen
+    HitSpangWood_Gen_8
+1x MessageKeypadContainerUsed
+    MessageKeypadContainerUsed_0
+1x TurretAttackAction
+    TurretAttackAction_0
+1x TurretAttackGoal
+    TurretAttackGoal_0
+1x MessagePawnAquiredState
+    MessagePawnAquiredState_0
+1x TurretExplosion_MG
+    TurretExplosion_MG_0
+1x TurretFlamePilot
+    TurretFlamePilot_0
+1x GPSArrow
+    GPSArrow_0
+1x TurretFlashlightDynamicLight
+    TurretFlashlightDynamicLight_0
 1x Arc_TubeGas
     Arc_TubeGas_0
 1x Arc_RiverScum
     Arc_RiverScum_0
+1x HeadbobAnimSettings
+    HeadbobAnimSettings_0
+1x KeypadWallsafe
+    KeypadWallsafe_0
+1x TurretWreckageFX
+    TurretWreckageFX_0
+1x MessagePlayerCraftedItem
+    MessagePlayerCraftedItem_5
 1x Arc_ProgressClipC
     Arc_ProgressClipC_0
+1x Arc_ProgressClipB
+    Arc_ProgressClipB_0
+1x Arc_ProgressClip
+    Arc_ProgressClip_0
+1x VariableString
+    None
+1x Arc_LangGlass
+    Arc_LangGlass_0
+1x MessagePlayerFinishedHacking
+    MessagePlayerFinishedHacking_0
+1x MessageSecurityAlarmStarted
+    MessageSecurityAlarmStarted_0
+1x ArcSealDoorSwitch
+    ArcSealDoorSwitch_0
+1x AnimNotify_StopScriptedHandSequence
+    AnimNotify_StopScriptedHandSequence_6
+1x MessageSoundStopped
+    MessageSoundStopped_2
+1x AnimNotify_StartScriptedHandSequence
+    AnimNotify_StartScriptedHandSequence_7
+1x VisualEffectsSubsystem
+    VisualEffectsSubsystem_1
+1x AnimNotify_PlayMovie
+    AnimNotify_PlayMovie_2
+1x MessageTypes
+    MessageTypes
+1x WP_UpgradeDormant
+    WP_UpgradeDormant_0
+1x FrequentDeathAdvisor
+    FrequentDeathAdvisor_0
+1x AnimNotify_EffectEventOnPlayer
+    AnimNotify_EffectEventOnPlayer_2
+1x MistingMachine
+    MistingMachine_2
+1x AmmoEaseTablesEvaluator
+    AmmoEaseTablesEvaluator
 1x Whale_Loop_1
     Whale_Loop_0
 1x WindowManager
     WindowManager_0
-1x Arc_ProgressClipB
-    Arc_ProgressClipB_0
+1x AmmoAdvisor
+    AmmoAdvisor_0
 1x WindowsClient
     WindowsClient_0
 1x WindowsViewport
     WindowsViewport_0
-1x Arc_ProgressClip
-    Arc_ProgressClip_0
+1x MistingRelease
+    MistingRelease_0
 1x Wrench
     Wrench_1
-1x DrHeadLamp
-    DrHeadLamp_3
+1x FragGrenadePickup
+    FragGrenadePickup_1
 1x ZoneSoundPropagation
     ZoneSoundPropagation_3
 1x ashtray
@@ -3274,111 +3227,111 @@ Total classes: 817
     banner_OnlyMan_wall_lightair010
 1x banner_TiesUnties_wall_lightair01
     banner_TiesUnties_wall_lightair010
-1x Arc_LangGlass
-    Arc_LangGlass_0
-1x FrequentDeathAdvisor
-    FrequentDeathAdvisor_0
-1x ArcSealDoorSwitch
-    ArcSealDoorSwitch_0
-1x AnimNotify_StopScriptedHandSequence
-    AnimNotify_StopScriptedHandSequence_6
-1x AnimNotify_StartScriptedHandSequence
-    AnimNotify_StartScriptedHandSequence_7
+1x ModEffectsSubsystem
+    ModEffectsSubsystem_1
+1x AutoHackDevicePickup
+    AutoHackDevicePickup_0
+1x AirBlastAbility
+    AirBlastAbility_0
+1x FragGrenadeExplosionB
+    FragGrenadeExplosionB_0
+1x FogBlend
+    FogBlend_1
 1x dyn_Mop
     dyn_Mop_0
 1x dyn_Pallet
     dyn_Pallet_0
-1x AnimNotify_PlayMovie
-    AnimNotify_PlayMovie_2
-1x AnimNotify_EffectEventOnPlayer
-    AnimNotify_EffectEventOnPlayer_2
-1x HitspangMG_QuickConcrete
-    HitspangMG_QuickConcrete_1
-1x AmmoEaseTablesEvaluator
-    AmmoEaseTablesEvaluator
-1x AmmoAdvisor
-    AmmoAdvisor_0
-1x AirBlastAbility
-    AirBlastAbility_0
 1x ActorBank
     ActorBank_1
+1x LadySmithBlondeWig
+    LadySmithBlondeWig_3
 1x ActionWaitForGoal
     ActionWaitForGoal_150
+1x LadySmithBurnetteWig
+    LadySmithBurnetteWig_0
+1x FogApply
+    FogApply_1
+1x InGameManualManager
+    InGameManualManager_1
+1x HitSpangWater
+    HitSpangWater_0
 1x ActionUnHackSecuritySystem
     ActionUnHackSecuritySystem_33
+1x FoamIntro
+    FoamIntro_0
 1x dyn_book02Open
     dyn_book02Open_0
 1x dyn_bucket
     dyn_bucket_1
+1x FluidSurfaceShader
+    WoodWaterSurface_Shader
+1x Newsvendor
+    Newsvendor_0
 1x ActionTellAIToWait
     ActionTellAIToWait_6
 1x ActionTellAIToContinue
     ActionTellAIToContinue_33
-1x ActionSpawnPlayerEscortedGatherer
-    ActionSpawnPlayerEscortedGatherer_6
-1x ActionSpawnLinkedGathererAndProtector
-    ActionSpawnLinkedGathererAndProtector_7
-1x DownloadableContentManager
-    DownloadableContentManager_0
+1x FleshHit_HP
+    FleshHit_HP_0
 1x dyn_crucifix
     dyn_crucifix_0
-1x ActionShowBathysphereUI
-    ActionShowBathysphereUI_24
-1x ActionSetAIState
-    ActionSetAIState_6
-1x ActionModifyLocomotionKeyword
-    ActionModifyLocomotionKeyword_365
-1x FragGrenadePickup
-    FragGrenadePickup_1
-1x ActionKeypadContainerUsed
-    ActionKeypadContainerUsed_25
+1x LadySmithRedWig
+    LadySmithRedWig_0
+1x ActionStartSecurityAlarm
+    ActionStartSecurityAlarm_0
+1x LangfordPainting
+    LangfordPainting_0
+1x FlashLiaison
+    FlashLiaison_0
+1x ActionSpawnPlayerEscortedGatherer
+    ActionSpawnPlayerEscortedGatherer_6
 1x dyn_foodcan_01
     dyn_foodcan__0
-1x Present_3
-    Present_0
-1x ActionHasQuestBeenAssigned
-    ActionHasQuestBeenAssigned_46
+1x FlashGUIController
+    FlashGUIController_0
+1x FishSchoolB_Scatter
+    FishSchoolB_Scatter_0
 1x dyn_honey_pot
     dyn_honey_pot_3
-1x ActionHackSecuritySystem
-    ActionHackSecuritySystem_37
+1x ActionSpawnLinkedGathererAndProtector
+    ActionSpawnLinkedGathererAndProtector_7
 1x dyn_light_desk
     dyn_light_desk_0
-1x Primitive
-    Primitive_0
+1x OilSlick01_Reactive
+    OilSlick01_Reactive_0
 1x dyn_petri_dish_01
     dyn_petri_dish__5
 1x dyn_petri_dish_02
     dyn_petri_dish__7
-1x ActionGetNumItemsInContainer
-    ActionGetNumItemsInContainer_130
+1x Fire_OilSlickB
+    Fire_OilSlickB_0
 1x dyn_petri_dish_04
     dyn_petri_dish__8
-1x ActionFactTimesAsserted
-    travel_emocleW-1_ActionFactTimesAsserted_0
+1x ActionShowBathysphereUI
+    ActionShowBathysphereUI_24
 1x dyn_ropebarrierrope_256
     dyn_ropebarrierrope_3
 1x dyn_rubbish_meat_C
     dyn_rubbish_meat_C_0
-1x MessageSoundStopped
-    MessageSoundStopped_2
-1x ActionDisplayMapHUDRegion
-    ActionDisplayMapHUDRegion_22
+1x PCOptionsData
+    PCOptionsData_0
+1x HitspangMG_QuickConcrete
+    HitspangMG_QuickConcrete_1
 1x dyn_surgical_scalpel
     dyn_surgical_scalpel_0
-1x Projector
-    Projector_0
-1x ActionDestroyAIs
-    ActionDestroyAIs_124
+1x FactDatabase
+    FactDatabase_0
+1x FMODAudioSubsystem
+    FMODAudioSubsystem_0
 1x dyn_workshop_drill
     dyn_workshop_drill_0
 1x dyn_workshop_hammer
     dyn_workshop_hammer_0
-1x GameEngine
-    GameEngine_0
+1x FMODAudioSettings
+    FMODAudioSettings_0
 1x potComboA
     potComboA_0
 1x shark1_Loop_2
     shark1_Loop_0
 
-Total objects: 102339
+Total objects: 102207

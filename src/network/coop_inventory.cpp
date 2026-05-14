@@ -39,7 +39,7 @@ void InitP2Inventory()
     s_InvLog.open(logPath, std::ios::trunc);
     InvLog("P2 Inventory initialized");
 
-    memset(&s_Inventory, 0, sizeof(s_Inventory));
+    s_Inventory = P2InventoryState{}; // proper C++ zero-init (no memset on std::string!)
     P2GiveStartingLoadout();
 
     LOG_INFO("[P2Inv] Initialized with starting loadout");

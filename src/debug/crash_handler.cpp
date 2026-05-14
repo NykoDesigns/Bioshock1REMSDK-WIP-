@@ -234,6 +234,8 @@ static void WriteCrashReport(EXCEPTION_POINTERS* ep)
 
 // ─── VEH Handler ─────────────────────────────────────────────────────────
 
+static std::atomic<bool> s_ReportWritten{false};
+
 static LONG WINAPI CrashVEH(EXCEPTION_POINTERS* ep)
 {
     DWORD code = ep->ExceptionRecord->ExceptionCode;
@@ -247,8 +249,23 @@ static LONG WINAPI CrashVEH(EXCEPTION_POINTERS* ep)
         return EXCEPTION_CONTINUE_SEARCH;
     }
 
-    // Write crash report
-    WriteCrashReport(ep);
+    // Check if the exception has SEH handlers on the stack
+    // (i.e., if __try/__except will catch it). VEH fires BEFORE SEH,
+    // so we check if we're inside a known "safe" context where we use __try.
+    // Only write the report for the FIRST unhandled exception — if it gets
+    // handled by SEH, the flag resets naturally on next unhandled crash.
+    const char* ctx = s_Context;
+    bool isScanPhase = (strstr(ctx, "scanning") != nullptr);
+    
+    // During scanning, FindEngineGlobals uses __try — these are expected
+    if (isScanPhase) {
+        return EXCEPTION_CONTINUE_SEARCH;
+    }
+
+    // Write crash report (only once to avoid overwriting with cascading exceptions)
+    if (!s_ReportWritten.exchange(true)) {
+        WriteCrashReport(ep);
+    }
 
     // Let it crash normally after writing report
     return EXCEPTION_CONTINUE_SEARCH;

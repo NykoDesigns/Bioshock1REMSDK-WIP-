@@ -2,15 +2,56 @@
 ║  CO-OP TEST RESULTS                                         ║
 ╚══════════════════════════════════════════════════════════════╝
 
-PASSED: 4  |  FAILED: 1  |  SKIPPED: 0  |  TOTAL: 5
+PASSED: 31  |  FAILED: 4  |  SKIPPED: 1  |  TOTAL: 36
 
 
-─── Core ───
-  ✓ Engine globals valid                GObjects and GNames found
-  ✓ PE hooked                           ProcessEvent intercepted
-  ✓ World ready                         World system initialized
-  ✗ Tick hook                           Tick NOT hooked
-  ✓ Player accessible                   At (-18809, 11841, 1223)
+─── Phase1 ───
+  ✓ PE hook active                      ProcessEvent hook is installed
+  ✓ Freeze activates                    FreezeClientSimulation() returned true
+  ✓ Frozen state correct                IsSimulationFrozen() == true after freeze
+  ✓ Unfreeze works                      IsSimulationFrozen() == false after unfreeze
+  ✓ World system ready                  World system is initialized
+  ✓ Actors exist                        Found 11 actors in level
+  ✓ Player position                     Player at (-18744, 11816, 1223)
+  ✓ Tick hook active                    Engine tick hook is installed
+
+─── Phase2 ───
+  ✓ WorldSync init                      InitWorldSync() succeeded
+  ✗ Actor registry builds               No actors tracked!
+  ✓ Send rate valid                     Send rate in range [1, 60] Hz
+  ✓ Sync radius valid                   Sync radius > 0
+  ✓ UDP socket available                Winsock2 initialized (ws2_32 linked)
+
+─── Phase3 ───
+  ✓ P2 system init                      InitP2System() succeeded
+  ✗ P2 pawn spawn                       No candidate pawn found (expected in some levels)
+
+─── Phase4 ───
+  ✓ Combat event struct                 P2CombatEvent defined correctly
+  ○ Enemies detectable                  0 enemies within 3000 units
+  ✓ Damage packet valid                 DamageData struct defined
+  ✓ Combat actions complete             All 8 combat actions defined (0-7)
+
+─── Phase5 ───
+  ✓ P2 inventory init                   InitP2Inventory() succeeded
+  ✗ Has wrench                          No wrench!
+  ✗ Has pistol                          No pistol!
+  ✓ Has Electro Bolt                    Electro Bolt in plasmid slot 0
+  ✓ Ammo pickup works                   Added 12 ammo to pistol
+  ✓ Vending purchase                    Spent $20, credits deducted correctly
+  ✓ Cannot overspend                    Correctly rejected purchase exceeding credits
+  ✓ Ammo consumed                       Magazine decremented on fire
+  ✓ EVE consumed                        EVE deducted for plasmid use
+
+─── Phase6 ───
+  ✓ Transitions init                    InitTransitions() succeeded
+  ✓ Not in transition                   No active transition
+  ✓ Not in cutscene                     No active cutscene
+  ✓ Cutscene starts                     Cutscene correctly detected as active
+  ✓ Cutscene ends                       Cutscene correctly ended
+  ✓ Big Daddy tracking                  Found 0 Big Daddies in level
+  ✓ Null guard counting                 Null guard counter incremented
+  ✓ Level detected                      Current level: Entry.MyLevel
 
 ═══════════════════════════════════════════════════════════════
 RESULT: SOME TESTS FAILED - see details above
