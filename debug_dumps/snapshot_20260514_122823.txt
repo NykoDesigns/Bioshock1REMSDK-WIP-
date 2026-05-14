@@ -1,0 +1,76 @@
+╔══════════════════════════════════════════════════════════════╗
+║  BS1SDK Engine Snapshot                                     ║
+║  2026-05-14 12:28:23                                       ║
+║  Label: auto_init
+╚══════════════════════════════════════════════════════════════╝
+
+─── Engine Globals ───
+  GObjects = 0x10EF042C  GNames = 0x10EF04EC
+  GEngine  = 0x5078E370  GWorld = 0x11A87160
+  GNatives = 0x10A872BC (1654 populated)
+  Tick rate: 0.0 FPS  Hook: active
+
+─── World ───
+  Level: Entry.MyLevel
+  Actors: 16
+  Level ptr: 0x11A87160
+
+─── ProcessEvent ───
+  Total calls: 0  Blocked: 0
+  Last: .
+
+─── Network ───
+  Network: Not connected
+  Co-op: not active
+
+─── Player ───
+  Position: (-19456.0, 2150.3, 8187.2)
+
+─── Actor Census (top 40) ───
+   9593  Function
+   6344  ObjectProperty
+   5300  EventResponse_SoundEffectsSubsystem
+   4792  ReachSpec
+   3986  StaticMeshInstance
+   3911  BoolProperty
+   3906  Class
+   3697  StaticMeshActor
+   3686  FloatProperty
+   3303  NormalSoundRef
+   2828  StructProperty
+   2427  IntProperty
+   2231  NameProperty
+   2227  Texture
+   2107  StrProperty
+   2060  Sound
+   2032  SoundSet
+   1944  EventResponse_VisualEffectsSubsystem
+   1800  SoundEffectSpecification
+   1518  AnimNotify_FootStep
+   1432  SpriteEmitter
+   1093  StreamSoundRef
+   1023  SharedSkeletonAnimationMetadata
+    973  VisualEffectSpecification
+    945  ArrayProperty
+    854  AnimNotify_EffectEvent
+    831  Shader
+    797  LootSlot
+    765  Light
+    735  HavokRigidBody
+    716  SoundInstance
+    651  ByteProperty
+    651  StaticMesh
+    618  ClassProperty
+    610  HkMeshProxy
+    504  PathNode
+    487  Polys
+    487  Model
+    412  ModEffectSpecification
+    412  EventResponse_ModEffectsSubsystem
+  Total: 96542 objects in 721 classes
+
+─── Key Offsets ───
+  Actor: Loc=+0x1D8 Rot=+0x1E4 Vel=+0x1F0 HP=+0xFFFFFFFF (size=0x450)
+  Pawn: Loc=+0x1D8 Rot=+0x1E4 Vel=+0x1F0 HP=+0x57C (size=0x6A4)
+  ShockPlayer: Loc=+0x1D8 Rot=+0x1E4 Vel=+0x1F0 HP=+0x57C (size=0xF54)
+

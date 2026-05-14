@@ -56,6 +56,9 @@ struct BigDaddyState {
 void InitTransitions();
 void ShutdownTransitions();
 
+/// Activate PE hooks (call when co-op session starts, NOT at init)
+void ActivateTransitionHooks();
+
 /// Called every tick
 void TransitionsTick(float deltaTime);
 

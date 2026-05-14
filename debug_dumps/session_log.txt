@@ -12,3 +12,17 @@
 [2026-05-14 12:25:15] Property offsets: 23 classes dumped
 [2026-05-14 12:25:15] AI function catalog: 1883 functions
 [2026-05-14 12:25:15] TrueCoop initialized (all phases)
+[2026-05-14 12:28:23] ═══ SESSION START ═══
+[2026-05-14 12:28:23] GObjects=0x10EF042C GNames=0x10EF04EC
+[2026-05-14 12:28:23] Full snapshot dumped: auto_init
+[2026-05-14 12:28:23] Actor census: 721 classes, 96542 objects
+[2026-05-14 12:28:23] Property offsets: 23 classes dumped
+[2026-05-14 12:28:23] AI function catalog: 1883 functions
+[2026-05-14 12:28:23] TrueCoop initialized (all phases)
+[2026-05-14 12:29:15] ═══ SESSION START ═══
+[2026-05-14 12:29:15] GObjects=0x10EF042C GNames=0x10EF04EC
+[2026-05-14 12:29:15] Full snapshot dumped: auto_init
+[2026-05-14 12:29:15] Actor census: 721 classes, 96535 objects
+[2026-05-14 12:29:15] Property offsets: 23 classes dumped
+[2026-05-14 12:29:15] AI function catalog: 1883 functions
+[2026-05-14 12:29:15] TrueCoop initialized (all phases)

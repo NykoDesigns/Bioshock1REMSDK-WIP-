@@ -1,4 +1,4 @@
-=== Property Offset Table === 2026-05-14 12:25:15
+=== Property Offset Table === 2026-05-14 12:29:15
 Classes discovered: 23
 
 AIController (size=0x59c):

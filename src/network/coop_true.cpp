@@ -47,6 +47,11 @@ void SetTrueCoopRole(TrueCoopRole role)
     const char* names[] = {"None", "TrueHost", "TrueClient"};
     LOG_INFO("[TrueCoop] Role set to: {}", names[(int)role]);
     DebugSessionLogf("TrueCoop role: %s", names[(int)role]);
+
+    // Activate deferred PE hooks now that a co-op session is starting
+    if (role != TrueCoopRole::None) {
+        ActivateTransitionHooks();
+    }
 }
 
 bool IsTrueHost() { return s_Role == TrueCoopRole::TrueHost; }
