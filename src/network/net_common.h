@@ -10,7 +10,7 @@ namespace bs1sdk {
 constexpr uint16_t NET_DEFAULT_PORT = 27015;
 constexpr uint32_t NET_PROTOCOL_MAGIC = 0x42533153; // "BS1S"
 constexpr uint8_t  NET_PROTOCOL_VERSION = 1;
-constexpr int      NET_MAX_PACKET = 1024;
+constexpr int      NET_MAX_PACKET = 1400;  // bumped for save transfer chunks
 constexpr int      NET_TICK_RATE_HZ = 30;           // state updates per second
 constexpr float    NET_TICK_INTERVAL = 1.0f / NET_TICK_RATE_HZ;
 constexpr float    NET_TIMEOUT_SEC = 15.0f;          // peer timeout (generous for VPN/Hamachi)
@@ -31,6 +31,8 @@ enum class PacketType : uint8_t {
     TriggerSync  = 0x31,  // Story/script trigger sync
     LevelSync    = 0x35,  // Level transition notification
     EconomySync  = 0x36,  // ADAM/Credits sharing
+    SaveTransfer = 0x37,  // Chunked save file transfer
+    SaveTransferAck = 0x38, // Acknowledge save receipt
     Chat         = 0x40,  // Text chat
     Ping         = 0xF0,  // Keepalive
     Pong         = 0xF1,  // Keepalive response
@@ -183,6 +185,28 @@ struct LevelSyncData {
     char levelName[64];           // map name (e.g. "1-Medical")
     uint8_t isLoading;            // 1 = entering level, 0 = finished loading
     uint8_t _pad[3];
+};
+
+// ─── Save Transfer Packet ───────────────────────────────────────
+// Chunked file transfer for syncing save games between host/client.
+// Max payload per UDP packet is ~900 bytes to stay under MTU.
+
+constexpr int SAVE_CHUNK_SIZE = 900;
+
+struct SaveTransferData {
+    uint32_t totalSize;           // total file size in bytes
+    uint32_t chunkOffset;         // offset of this chunk in the file
+    uint16_t chunkSize;           // bytes in this chunk (<=SAVE_CHUNK_SIZE)
+    uint8_t  fileIndex;           // 0=mainSave.bsg, 1=.bsh header
+    uint8_t  flags;               // bit 0: final chunk of this file
+    uint8_t  data[SAVE_CHUNK_SIZE]; // chunk payload
+};
+
+struct SaveTransferAckData {
+    uint32_t bytesReceived;       // total bytes received so far
+    uint8_t  fileIndex;           // which file this ack is for
+    uint8_t  status;              // 0=ok/continue, 1=complete, 2=error
+    uint8_t  _pad[2];
 };
 
 #pragma pack(pop)

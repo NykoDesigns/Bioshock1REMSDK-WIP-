@@ -3,6 +3,7 @@
 #include "coop_sync.h"
 #include "coop_puppet.h"
 #include "coop_economy.h"
+#include "coop_save.h"
 #include "net_manager.h"
 #include "net_common.h"
 #include "../core/log.h"
@@ -394,6 +395,9 @@ void CoopTick(float deltaTime)
 
         // Economy sync (ADAM/Credits sharing)
         TickEconomySync(deltaTime);
+
+        // Tick save file transfer if active
+        TickSaveTransfer();
     }
 }
 

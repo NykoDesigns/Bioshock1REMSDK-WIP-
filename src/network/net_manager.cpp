@@ -1,6 +1,7 @@
 #include "net_manager.h"
 #include "coop_sync.h"
 #include "coop_economy.h"
+#include "coop_save.h"
 #include "udp_socket.h"
 #include "../core/log.h"
 
@@ -258,6 +259,14 @@ static void ProcessIncoming()
                 s_RemotePeer.lastRecvTime = s_Uptime;
                 QueueEconomySyncPacket(*reinterpret_cast<const EconomySyncData*>(payload));
             }
+            break;
+        case PacketType::SaveTransfer:
+            s_RemotePeer.lastRecvTime = s_Uptime;
+            OnSaveChunkReceived(payload, hdr->size);
+            break;
+        case PacketType::SaveTransferAck:
+            s_RemotePeer.lastRecvTime = s_Uptime;
+            OnSaveAckReceived(payload, hdr->size);
             break;
         default:
             break;

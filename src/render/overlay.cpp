@@ -11,6 +11,8 @@
 #include "../core/mod_config.h"
 #include "../network/coop_bridge.h"
 #include "../network/coop_render.h"
+#include "../network/coop_save.h"
+#include "../network/net_manager.h"
 
 #include <imgui.h>
 #include <imgui_impl_dx11.h>
@@ -908,6 +910,7 @@ void Overlay::RenderConsole()
             LogInfo("  netstatus               - Show network status");
             LogInfo("  disconnect              - Leave co-op session");
             LogInfo("  chat <msg>              - Send chat to co-op partner");
+            LogInfo("  syncsave                - Send your save to partner (world sync)");
             LogYellow("=== Lua Scripting ===");
             LogInfo("  lua <code>              - Execute Lua code inline");
             LogInfo("  luafile <path>          - Execute a Lua script file");
@@ -1485,6 +1488,20 @@ void Overlay::RenderConsole()
         else if (tokens[0] == "disconnect") {
             CoopDisconnect();
             LogInfo("Disconnected from co-op session");
+        }
+        // ─── syncsave ─── send your save to partner so they load into your world
+        else if (tokens[0] == "syncsave") {
+            if (GetNetRole() == NetRole::None) {
+                LogRed("Not connected. Host or join first.");
+            } else if (IsSaveTransferActive()) {
+                LogYellow("Save transfer already in progress (" +
+                          std::to_string((int)(GetSaveTransferProgress() * 100)) + "%)");
+            } else if (StartSaveTransfer()) {
+                LogGreen("Sending your save to partner...");
+                LogInfo("They will need to load 'CoopSync' from the menu after receiving.");
+            } else {
+                LogRed("Failed to start save transfer. Check logs.");
+            }
         }
         // ─── chat <msg> ─── send chat message
         else if (tokens[0] == "chat" && tokens.size() >= 2) {
