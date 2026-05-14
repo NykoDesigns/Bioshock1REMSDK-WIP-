@@ -37,6 +37,10 @@ constexpr float AGGRO_RANGE = 3000.0f;  // 30m radius
 static UFunction* s_AddForcedEnemyFunc = nullptr;
 static bool s_IsAIPuppet = false;       // true if puppet is a ShockPawn subclass
 
+// Spawn retry cooldown — don't spam every frame
+static float s_SpawnRetryTimer = 999.0f;  // start high so first attempt is immediate
+constexpr float SPAWN_RETRY_INTERVAL = 5.0f;
+
 // ─── Helpers ───────────────────────────────────────────────────────────
 
 /// Find a UFunction by name on a class, walking the Children linked list.
@@ -250,38 +254,17 @@ bool SpawnGhostPuppet(float x, float y, float z)
         return false;
     }
 
-    // Find the class to spawn. Try in order of visual quality:
-    //   1. SpawnedDecoyHumanAI — actual human model (from Decoy plasmid)
-    //   2. DecoyHumanAI — abstract but may work as a visual puppet
-    //   3. BasePlayerAttachment — simple visible StaticMesh actor (cube fallback)
-    //   4. StaticMeshActor — basic visible mesh
-    UObject* spawnClass = FindClassObject("SpawnedDecoyHumanAI");
-    if (!spawnClass) spawnClass = FindClassObject("DecoyHumanAI");
-    if (!spawnClass) spawnClass = FindClassObject("BasePlayerAttachment");
-    if (!spawnClass) spawnClass = FindClassObject("StaticMeshActor");
+    // Try each class in order of visual quality, falling through on failure.
+    // AI classes (SpawnedDecoyHumanAI, DecoyHumanAI) often fail because they
+    // need BSM archetype data. BasePlayerAttachment is the reliable fallback.
+    const char* classNames[] = {
+        "SpawnedDecoyHumanAI",     // human model (Decoy plasmid)
+        "DecoyHumanAI",            // abstract but might work
+        "BasePlayerAttachment",    // cube — always works
+        "StaticMeshActor",         // basic mesh
+    };
 
-    if (!spawnClass) {
-        LOG_WARN("[Puppet] Could not find any suitable class to spawn");
-        return false;
-    }
-
-    LOG_INFO("[Puppet] Spawning {} at ({:.0f}, {:.0f}, {:.0f})",
-             spawnClass->GetName(), x, y, z);
-
-    // Actor.Spawn(Class SpawnClass, optional Actor SpawnOwner,
-    //             optional name SpawnTag, optional Vector SpawnLocation,
-    //             optional Rotator SpawnRotation, optional bool bNoCollisionFail,
-    //             optional name SpawnLabel)
-    //
-    // Parms layout (UE2 packed for optionals):
-    //   +0x00: UObject* SpawnClass          (4)
-    //   +0x04: UObject* SpawnOwner          (4)  [optional]
-    //   +0x08: FName    SpawnTag            (8)  [optional]
-    //   +0x10: FVector  SpawnLocation       (12) [optional]
-    //   +0x1C: FRotator SpawnRotation       (12) [optional]
-    //   +0x28: uint32   bNoCollisionFail    (4)  [optional, bool stored as int32]
-    //   +0x2C: FName    SpawnLabel          (8)  [optional]
-    //   +0x34: UObject* ReturnValue         (4)
+    // Actor.Spawn parms layout (UE2):
     struct SpawnParms {
         UObject* SpawnClass;          // +0x00
         UObject* SpawnOwner;          // +0x04
@@ -297,26 +280,43 @@ bool SpawnGhostPuppet(float x, float y, float z)
         UObject* ReturnValue;         // +0x34
     };
 
-    SpawnParms parms{};
-    parms.SpawnClass = spawnClass;
-    parms.SpawnOwner = player;
-    parms.SpawnTag[0] = 0; parms.SpawnTag[1] = 0;  // 'None'
-    parms.SpawnLocX = x;
-    parms.SpawnLocY = y;
-    parms.SpawnLocZ = z;
-    parms.SpawnRotPitch = 0;
-    parms.SpawnRotYaw = 0;
-    parms.SpawnRotRoll = 0;
-    parms.bNoCollisionFail = 1; // true — don't fail on collision
-    parms.SpawnLabel[0] = 0; parms.SpawnLabel[1] = 0;
-    parms.ReturnValue = nullptr;
+    for (const char* className : classNames) {
+        UObject* spawnClass = FindClassObject(className);
+        if (!spawnClass) {
+            LOG_INFO("[Puppet] Class '{}' not found, trying next...", className);
+            continue;
+        }
 
-    // Call Actor.Spawn via ProcessEvent
-    origPE(player, s_SpawnFunc, &parms, nullptr);
+        LOG_INFO("[Puppet] Trying to spawn {} at ({:.0f}, {:.0f}, {:.0f})",
+                 className, x, y, z);
 
-    s_Puppet = parms.ReturnValue;
+        SpawnParms parms{};
+        parms.SpawnClass = spawnClass;
+        parms.SpawnOwner = player;
+        parms.SpawnTag[0] = 0; parms.SpawnTag[1] = 0;
+        parms.SpawnLocX = x;
+        parms.SpawnLocY = y;
+        parms.SpawnLocZ = z;
+        parms.SpawnRotPitch = 0;
+        parms.SpawnRotYaw = 0;
+        parms.SpawnRotRoll = 0;
+        parms.bNoCollisionFail = 1;
+        parms.SpawnLabel[0] = 0; parms.SpawnLabel[1] = 0;
+        parms.ReturnValue = nullptr;
+
+        origPE(player, s_SpawnFunc, &parms, nullptr);
+
+        if (parms.ReturnValue) {
+            s_Puppet = parms.ReturnValue;
+            LOG_INFO("[Puppet] SUCCESS — spawned '{}' as puppet", className);
+            break;
+        }
+
+        LOG_WARN("[Puppet] Spawn '{}' returned null, trying next...", className);
+    }
+
     if (!s_Puppet) {
-        LOG_WARN("[Puppet] Spawn returned null — actor creation failed");
+        LOG_WARN("[Puppet] All spawn classes failed — will retry in 5 seconds");
         return false;
     }
 
@@ -396,8 +396,12 @@ void UpdateGhostPuppet(const PlayerStateData& remoteState)
     s_HasTarget = true;
 
     if (!s_Puppet) {
-        // Try to spawn if we don't have one yet
-        SpawnGhostPuppet(s_TargetX, s_TargetY, s_TargetZ);
+        // Retry spawn with cooldown to avoid log spam
+        s_SpawnRetryTimer += (1.0f / 60.0f);
+        if (s_SpawnRetryTimer >= SPAWN_RETRY_INTERVAL) {
+            s_SpawnRetryTimer = 0.0f;
+            SpawnGhostPuppet(s_TargetX, s_TargetY, s_TargetZ);
+        }
         return;
     }
 

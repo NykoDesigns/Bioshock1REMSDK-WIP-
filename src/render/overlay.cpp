@@ -1492,6 +1492,76 @@ void Overlay::RenderConsole()
             NetSendChat(msg);
             LogInfo("[You] " + msg);
         }
+        // ─── coopdump ─── dump spawnable classes, actors, meshes for co-op debugging
+        else if (tokens[0] == "coopdump") {
+            const auto& g = GetEngineGlobals();
+            if (!g.IsValid()) { LogRed("Engine not ready"); }
+            else {
+                std::ofstream df("Z:\\Bioshock1SDK\\coop_dump.txt", std::ios::out | std::ios::trunc);
+                if (!df.is_open()) { LogRed("Can't write coop_dump.txt"); }
+                else {
+                    uintptr_t od = *reinterpret_cast<uintptr_t*>(g.GObjects);
+                    int32_t oc = *reinterpret_cast<int32_t*>(g.GObjects + 4);
+                    df << "=== Co-op Debug Dump ===\n";
+                    df << "GObjects count: " << oc << "\n\n";
+
+                    df << "--- CLASSES (UClass objects) ---\n";
+                    for (int i = 0; i < oc && i < 100000; i++) {
+                        uintptr_t p = *reinterpret_cast<uintptr_t*>(od + i * 4);
+                        if (!p) continue;
+                        UObject* o = reinterpret_cast<UObject*>(p);
+                        if (o->GetObjClassName() == "Class") {
+                            df << "  [" << i << "] " << o->GetName() << "\n";
+                        }
+                    }
+
+                    df << "\n--- ACTORS (instances in world) ---\n";
+                    std::map<std::string, int> actorCounts;
+                    for (int i = 0; i < oc && i < 100000; i++) {
+                        uintptr_t p = *reinterpret_cast<uintptr_t*>(od + i * 4);
+                        if (!p) continue;
+                        UObject* o = reinterpret_cast<UObject*>(p);
+                        std::string cn = o->GetObjClassName();
+                        // Skip pure data objects
+                        if (cn == "Class" || cn == "Function" || cn == "Package" ||
+                            cn == "Property" || cn == "Struct" || cn == "Const" ||
+                            cn == "Enum" || cn == "State" || cn == "ScriptStruct") continue;
+                        actorCounts[cn]++;
+                    }
+                    for (auto& kv : actorCounts) {
+                        df << "  " << kv.first << " x" << kv.second << "\n";
+                    }
+
+                    df << "\n--- MESH OBJECTS (StaticMesh/SkeletalMesh) ---\n";
+                    for (int i = 0; i < oc && i < 100000; i++) {
+                        uintptr_t p = *reinterpret_cast<uintptr_t*>(od + i * 4);
+                        if (!p) continue;
+                        UObject* o = reinterpret_cast<UObject*>(p);
+                        std::string cn = o->GetObjClassName();
+                        if (cn == "SkeletalMesh" || cn == "StaticMesh") {
+                            df << "  [" << i << "] " << cn << ": " << o->GetName() << "\n";
+                        }
+                    }
+
+                    df << "\n--- SPAWNER-RELATED ---\n";
+                    for (int i = 0; i < oc && i < 100000; i++) {
+                        uintptr_t p = *reinterpret_cast<uintptr_t*>(od + i * 4);
+                        if (!p) continue;
+                        UObject* o = reinterpret_cast<UObject*>(p);
+                        std::string cn = o->GetObjClassName();
+                        std::string nm = o->GetName();
+                        if (cn.find("Spawn") != std::string::npos || cn.find("Decoy") != std::string::npos ||
+                            cn.find("Puppet") != std::string::npos || nm.find("Spawn") != std::string::npos ||
+                            cn.find("Attachment") != std::string::npos) {
+                            df << "  [" << i << "] " << cn << ": " << nm << "\n";
+                        }
+                    }
+
+                    df.close();
+                    LogGreen("Co-op dump saved to coop_dump.txt (" + std::to_string(oc) + " objects scanned)");
+                }
+            }
+        }
         // ─── lua <code> ─── execute Lua code
         else if (tokens[0] == "lua" && tokens.size() >= 2) {
             if (!IsLuaInitialized()) InitLuaEngine();
