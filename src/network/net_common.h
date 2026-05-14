@@ -30,6 +30,7 @@ enum class PacketType : uint8_t {
     WorldEvent   = 0x30,  // Door, trigger, pickup sync
     TriggerSync  = 0x31,  // Story/script trigger sync
     LevelSync    = 0x35,  // Level transition notification
+    EconomySync  = 0x36,  // ADAM/Credits sharing
     Chat         = 0x40,  // Text chat
     Ping         = 0xF0,  // Keepalive
     Pong         = 0xF1,  // Keepalive response
@@ -163,6 +164,17 @@ struct EnemyHPSyncData {
     uint8_t      count;           // number of entries (1-8)
     uint8_t      _pad[3];
     EnemyHPEntry entries[8];
+};
+
+// ─── Economy Sync Packet ────────────────────────────────────────
+
+struct EconomySyncData {
+    int32_t adam;
+    int32_t credits;
+    int32_t maxCredits;
+    uint8_t  eventType;    // 0=periodic snapshot, 1=ADAM gained, 2=credits gained
+    uint8_t  _pad[3];
+    int32_t  eventAmount;  // amount gained (for event types 1,2)
 };
 
 // ─── Level Sync Packet ──────────────────────────────────────────

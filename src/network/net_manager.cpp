@@ -1,5 +1,6 @@
 #include "net_manager.h"
 #include "coop_sync.h"
+#include "coop_economy.h"
 #include "udp_socket.h"
 #include "../core/log.h"
 
@@ -250,6 +251,12 @@ static void ProcessIncoming()
                 auto* lvl = reinterpret_cast<const LevelSyncData*>(payload);
                 s_RemotePeer.levelName = lvl->levelName;
                 LOG_INFO("[Net] Partner moved to level: {}", lvl->levelName);
+            }
+            break;
+        case PacketType::EconomySync:
+            if (hdr->size >= sizeof(EconomySyncData)) {
+                s_RemotePeer.lastRecvTime = s_Uptime;
+                QueueEconomySyncPacket(*reinterpret_cast<const EconomySyncData*>(payload));
             }
             break;
         default:

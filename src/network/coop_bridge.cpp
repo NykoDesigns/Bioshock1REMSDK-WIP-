@@ -2,6 +2,7 @@
 #include "coop_render.h"
 #include "coop_sync.h"
 #include "coop_puppet.h"
+#include "coop_economy.h"
 #include "net_manager.h"
 #include "net_common.h"
 #include "../core/log.h"
@@ -262,7 +263,8 @@ bool InitCoopBridge()
     InitCoopRender();
     InitCoopSync();
     InitGhostPuppet();
-    LOG_INFO("[Co-op] Bridge initialized (render + sync + puppet)");
+    InitEconomySync();
+    LOG_INFO("[Co-op] Bridge initialized (render + sync + puppet + economy)");
     return true;
 }
 
@@ -272,6 +274,7 @@ void ShutdownCoopBridge()
     CoopDisconnect();
     DestroyGhostPuppet();
     ShutdownGhostPuppet();
+    ShutdownEconomySync();
     ShutdownCoopSync();
     if (s_HookId >= 0) {
         UnregisterProcessEventHook(s_HookId);
@@ -388,6 +391,9 @@ void CoopTick(float deltaTime)
 
         // Process incoming damage/world events + periodic enemy HP sync
         CoopSyncProcessPackets(deltaTime);
+
+        // Economy sync (ADAM/Credits sharing)
+        TickEconomySync(deltaTime);
     }
 }
 
