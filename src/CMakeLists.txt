@@ -22,6 +22,7 @@ add_library(BS1SDK SHARED
     network/coop_bridge.cpp
     network/coop_render.cpp
     network/coop_sync.cpp
+    network/coop_puppet.cpp
 )
 
 target_include_directories(BS1SDK PRIVATE

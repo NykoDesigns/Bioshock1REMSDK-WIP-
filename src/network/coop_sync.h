@@ -12,7 +12,8 @@ bool InitCoopSync();
 void ShutdownCoopSync();
 
 /// Process incoming packets (called from CoopTick on game thread).
-void CoopSyncProcessPackets();
+/// deltaTime is used for periodic enemy HP broadcasting.
+void CoopSyncProcessPackets(float deltaTime = 0.016f);
 
 /// Send a damage event to remote peer.
 void CoopSendDamage(float amount, float hitX, float hitY, float hitZ,
@@ -31,6 +32,7 @@ struct EnemyDeathData;
 struct PlayerDeathData;
 struct PlayerRespawnData;
 struct TriggerSyncData;
+struct EnemyHPSyncData;
 
 void QueueDamagePacket(const DamageData& dmg);
 void QueueWorldEventPacket(const WorldEventData& evt);
@@ -38,5 +40,6 @@ void QueueEnemyDeathPacket(const EnemyDeathData& death);
 void QueuePlayerDeathPacket(const PlayerDeathData& death);
 void QueuePlayerRespawnPacket(const PlayerRespawnData& respawn);
 void QueueTriggerSyncPacket(const TriggerSyncData& trigger);
+void QueueEnemyHPSyncPacket(const EnemyHPSyncData& hpSync);
 
 } // namespace bs1sdk

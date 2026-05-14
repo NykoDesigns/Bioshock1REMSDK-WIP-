@@ -24,6 +24,7 @@ enum class PacketType : uint8_t {
     PlayerAction = 0x11,  // Discrete actions (fire, use, jump)
     Damage       = 0x20,  // Damage event forwarding
     EnemyDeath   = 0x21,  // Enemy killed notification
+    EnemyHPSync  = 0x22,  // Periodic enemy health snapshot
     PlayerDeath  = 0x23,  // Local player died
     PlayerRespawn= 0x24,  // Local player respawned
     WorldEvent   = 0x30,  // Door, trigger, pickup sync
@@ -130,6 +131,21 @@ struct TriggerSyncData {
     float    posX, posY, posZ;    // trigger location
     uint8_t  state;               // 0=off, 1=on
     uint8_t  _pad[3];
+};
+
+// ─── Enemy HP Sync Packet ─────────────────────────────────────────
+// Batched: up to 8 enemies per packet for bandwidth efficiency.
+
+struct EnemyHPEntry {
+    uint32_t nameHash;            // FNV-1a of actor name
+    float    posX, posY, posZ;    // position for matching
+    float    health;              // current HP
+};
+
+struct EnemyHPSyncData {
+    uint8_t      count;           // number of entries (1-8)
+    uint8_t      _pad[3];
+    EnemyHPEntry entries[8];
 };
 
 #pragma pack(pop)

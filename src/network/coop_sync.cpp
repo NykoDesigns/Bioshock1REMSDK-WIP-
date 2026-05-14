@@ -31,6 +31,11 @@ static bool s_ApplyingRemoteDeath = false;
 static bool s_LocalPlayerDead = false;
 static float s_DeathCheckTimer = 0.0f;
 
+// Enemy HP sync timer (broadcast every ~0.5s to avoid spam)
+static float s_EnemyHPSyncAccum = 0.0f;
+constexpr float ENEMY_HP_SYNC_INTERVAL = 0.5f;
+constexpr float ENEMY_HP_SYNC_RANGE = 5000.0f; // sync enemies within 50m of player
+
 // Pending health snapshots for damage-delta calculation
 struct PendingDamageCapture {
     UObject* target;
@@ -296,6 +301,8 @@ static PlayerRespawnData s_PendingPlayerRespawns[4];
 static int s_PendingPlayerRespawnCount = 0;
 static TriggerSyncData s_PendingTriggers[16];
 static int s_PendingTriggerCount = 0;
+static EnemyHPSyncData s_PendingEnemyHP[4];
+static int s_PendingEnemyHPCount = 0;
 
 void QueueDamagePacket(const DamageData& dmg)
 {
@@ -336,6 +343,13 @@ void QueueTriggerSyncPacket(const TriggerSyncData& trigger)
 {
     if (s_PendingTriggerCount < 16) {
         s_PendingTriggers[s_PendingTriggerCount++] = trigger;
+    }
+}
+
+void QueueEnemyHPSyncPacket(const EnemyHPSyncData& hpSync)
+{
+    if (s_PendingEnemyHPCount < 4) {
+        s_PendingEnemyHP[s_PendingEnemyHPCount++] = hpSync;
     }
 }
 
@@ -635,7 +649,7 @@ void ShutdownCoopSync()
     s_SyncInitialized = false;
 }
 
-void CoopSyncProcessPackets()
+void CoopSyncProcessPackets(float deltaTime)
 {
     // Flush damage captures: compute health deltas and send to remote.
     // TakeDamage has already executed by now, so current HP reflects the hit.
@@ -693,6 +707,103 @@ void CoopSyncProcessPackets()
         ApplyRemoteTrigger(s_PendingTriggers[i]);
     }
     s_PendingTriggerCount = 0;
+
+    // Process pending enemy HP syncs
+    for (int i = 0; i < s_PendingEnemyHPCount; i++) {
+        const auto& hpSync = s_PendingEnemyHP[i];
+        for (int j = 0; j < hpSync.count && j < 8; j++) {
+            const auto& entry = hpSync.entries[j];
+            UObject* target = FindActorByHashAndPos(
+                entry.nameHash, entry.posX, entry.posY, entry.posZ, 300.0f);
+            if (target && s_SyncHealthOffset > 0) {
+                float localHP;
+                const uint8_t* raw = reinterpret_cast<const uint8_t*>(target);
+                memcpy(&localHP, raw + s_SyncHealthOffset, 4);
+                // Only sync if remote HP is lower (damage authority)
+                if (entry.health < localHP - 1.0f) {
+                    s_ApplyingRemoteDamage = true;
+                    uint8_t* rawW = reinterpret_cast<uint8_t*>(target);
+                    float newHP = entry.health;
+                    memcpy(rawW + s_SyncHealthOffset, &newHP, 4);
+                    s_ApplyingRemoteDamage = false;
+                }
+            }
+        }
+    }
+    s_PendingEnemyHPCount = 0;
+
+    // ─── Periodic enemy HP broadcast ───────────────────────────────
+    s_EnemyHPSyncAccum += deltaTime;
+    if (s_EnemyHPSyncAccum >= ENEMY_HP_SYNC_INTERVAL && IsNetConnected()) {
+        s_EnemyHPSyncAccum = 0.0f;
+
+        // Get local player position for range check
+        float playerX = 0, playerY = 0, playerZ = 0;
+        UObject* player = FindObjectByClassName("ShockPlayer");
+        if (player && s_SyncLocOffset > 0) {
+            const uint8_t* raw = reinterpret_cast<const uint8_t*>(player);
+            memcpy(&playerX, raw + s_SyncLocOffset, 4);
+            memcpy(&playerY, raw + s_SyncLocOffset + 4, 4);
+            memcpy(&playerZ, raw + s_SyncLocOffset + 8, 4);
+        }
+
+        // Scan all objects for nearby ShockPawn enemies
+        const auto& globals = GetEngineGlobals();
+        if (globals.IsValid() && s_SyncHealthOffset > 0 && s_SyncLocOffset > 0) {
+            uintptr_t objData = *reinterpret_cast<uintptr_t*>(globals.GObjects);
+            int32_t objCount = *reinterpret_cast<int32_t*>(globals.GObjects + 4);
+
+            EnemyHPSyncData hpPacket{};
+            hpPacket.count = 0;
+
+            for (int i = 0; i < objCount && i < 100000; i++) {
+                uintptr_t ptr = *reinterpret_cast<uintptr_t*>(objData + i * 4);
+                if (!ptr) continue;
+                UObject* obj = reinterpret_cast<UObject*>(ptr);
+
+                std::string cn = obj->GetObjClassName();
+                if (cn == "ShockPlayer" || cn == "ShockPlayerController" || cn == "Class")
+                    continue;
+
+                // Quick check: is this a ShockPawn subclass?
+                if (!IsA(obj, "ShockPawn")) continue;
+
+                const uint8_t* raw = reinterpret_cast<const uint8_t*>(obj);
+
+                // Read HP — skip if dead
+                float hp;
+                memcpy(&hp, raw + s_SyncHealthOffset, 4);
+                if (hp <= 0.0f) continue;
+
+                // Read position — skip if out of range
+                float ex, ey, ez;
+                memcpy(&ex, raw + s_SyncLocOffset, 4);
+                memcpy(&ey, raw + s_SyncLocOffset + 4, 4);
+                memcpy(&ez, raw + s_SyncLocOffset + 8, 4);
+
+                float dx = ex - playerX, dy = ey - playerY, dz = ez - playerZ;
+                float distSq = dx * dx + dy * dy + dz * dz;
+                if (distSq > ENEMY_HP_SYNC_RANGE * ENEMY_HP_SYNC_RANGE) continue;
+
+                auto& entry = hpPacket.entries[hpPacket.count];
+                entry.nameHash = FnvHash(obj->GetName());
+                entry.posX = ex; entry.posY = ey; entry.posZ = ez;
+                entry.health = hp;
+                hpPacket.count++;
+
+                if (hpPacket.count >= 8) {
+                    // Send this batch, start a new one
+                    NetSendRawPacket(PacketType::EnemyHPSync, &hpPacket, sizeof(hpPacket));
+                    hpPacket.count = 0;
+                }
+            }
+
+            // Send remaining
+            if (hpPacket.count > 0) {
+                NetSendRawPacket(PacketType::EnemyHPSync, &hpPacket, sizeof(hpPacket));
+            }
+        }
+    }
 
     // Check for player respawn (health went from 0 to >0)
     if (s_LocalPlayerDead && s_SyncHealthOffset > 0) {

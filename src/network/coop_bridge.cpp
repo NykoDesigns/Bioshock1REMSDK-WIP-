@@ -1,6 +1,7 @@
 #include "coop_bridge.h"
 #include "coop_render.h"
 #include "coop_sync.h"
+#include "coop_puppet.h"
 #include "net_manager.h"
 #include "net_common.h"
 #include "../core/log.h"
@@ -31,9 +32,6 @@ static int s_LocOffset = -1;     // Location (Vector)
 static int s_RotOffset = -1;     // Rotation (Rotator)
 static int s_HealthOffset = -1;  // Health (float)
 // static int s_EveOffset = -1;     // EVE (float) - TODO: find property name
-
-// Remote player puppet
-static UObject* s_PuppetPawn = nullptr;
 
 // Level tracking
 static std::string s_LocalLevelName;
@@ -159,25 +157,12 @@ static PlayerStateData ReadLocalPlayerState()
 
 static void UpdatePuppet(const PlayerStateData& remoteState)
 {
-    // Update the rendering system with remote state
+    // Update the rendering system with remote state (overlay marker)
     const NetPeer* peer = GetRemotePeer();
     SetRemoteRenderState(remoteState, peer ? peer->name.c_str() : "Partner");
 
-    // Also try to move a puppet pawn if we have one
-    if (s_PuppetPawn && s_LocOffset > 0) {
-        uint8_t* raw = reinterpret_cast<uint8_t*>(s_PuppetPawn);
-        memcpy(raw + s_LocOffset, &remoteState.posX, 4);
-        memcpy(raw + s_LocOffset + 4, &remoteState.posY, 4);
-        memcpy(raw + s_LocOffset + 8, &remoteState.posZ, 4);
-
-        if (s_RotOffset > 0) {
-            // Convert float degrees back to UE2 rotator ints
-            int32_t pitch = (int32_t)(remoteState.rotPitch * (65536.0f / 360.0f));
-            int32_t yaw = (int32_t)(remoteState.rotYaw * (65536.0f / 360.0f));
-            memcpy(raw + s_RotOffset, &pitch, 4);
-            memcpy(raw + s_RotOffset + 4, &yaw, 4);
-        }
-    }
+    // Update the in-world ghost puppet (3D model)
+    UpdateGhostPuppet(remoteState);
 }
 
 // ─── ProcessEvent Hook for Tick ────────────────────────────────────────
@@ -276,7 +261,8 @@ bool InitCoopBridge()
     s_Initialized = true;
     InitCoopRender();
     InitCoopSync();
-    LOG_INFO("[Co-op] Bridge initialized (render + sync)");
+    InitGhostPuppet();
+    LOG_INFO("[Co-op] Bridge initialized (render + sync + puppet)");
     return true;
 }
 
@@ -284,6 +270,8 @@ void ShutdownCoopBridge()
 {
     if (!s_Initialized) return;
     CoopDisconnect();
+    DestroyGhostPuppet();
+    ShutdownGhostPuppet();
     ShutdownCoopSync();
     if (s_HookId >= 0) {
         UnregisterProcessEventHook(s_HookId);
@@ -353,9 +341,9 @@ bool CoopJoin(const std::string& ip, uint16_t port, const std::string& name)
 void CoopDisconnect()
 {
     s_KeepAliveRunning = false;
+    DestroyGhostPuppet();
     NetDisconnect();
     s_Active = false;
-    s_PuppetPawn = nullptr;
 }
 
 void CoopTick(float deltaTime)
@@ -374,8 +362,8 @@ void CoopTick(float deltaTime)
             NetSendPlayerState(state);
         }
 
-        // Process incoming damage/world events
-        CoopSyncProcessPackets();
+        // Process incoming damage/world events + periodic enemy HP sync
+        CoopSyncProcessPackets(deltaTime);
     }
 }
 
