@@ -29,6 +29,7 @@ enum class PacketType : uint8_t {
     PlayerRespawn= 0x24,  // Local player respawned
     WorldEvent   = 0x30,  // Door, trigger, pickup sync
     TriggerSync  = 0x31,  // Story/script trigger sync
+    LevelSync    = 0x35,  // Level transition notification
     Chat         = 0x40,  // Text chat
     Ping         = 0xF0,  // Keepalive
     Pong         = 0xF1,  // Keepalive response
@@ -162,6 +163,14 @@ struct EnemyHPSyncData {
     uint8_t      count;           // number of entries (1-8)
     uint8_t      _pad[3];
     EnemyHPEntry entries[8];
+};
+
+// ─── Level Sync Packet ──────────────────────────────────────────
+
+struct LevelSyncData {
+    char levelName[64];           // map name (e.g. "1-Medical")
+    uint8_t isLoading;            // 1 = entering level, 0 = finished loading
+    uint8_t _pad[3];
 };
 
 #pragma pack(pop)

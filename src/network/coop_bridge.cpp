@@ -346,6 +346,8 @@ void CoopDisconnect()
     s_Active = false;
 }
 
+static float s_LevelCheckAccum = 0.0f;
+
 void CoopTick(float deltaTime)
 {
     if (!s_Active) return;
@@ -360,6 +362,28 @@ void CoopTick(float deltaTime)
             s_SendAccum -= NET_TICK_INTERVAL;
             auto state = ReadLocalPlayerState();
             NetSendPlayerState(state);
+        }
+
+        // Periodic level change detection (every 2s)
+        s_LevelCheckAccum += deltaTime;
+        if (s_LevelCheckAccum >= 2.0f) {
+            s_LevelCheckAccum = 0.0f;
+            std::string currentLevel = DetectCurrentLevel();
+            if (!currentLevel.empty() && currentLevel != s_LocalLevelName) {
+                std::string oldLevel = s_LocalLevelName;
+                s_LocalLevelName = currentLevel;
+
+                // Notify partner of level change
+                LevelSyncData lvl{};
+                strncpy(lvl.levelName, currentLevel.c_str(), sizeof(lvl.levelName) - 1);
+                lvl.isLoading = 0;
+                NetSendRawPacket(PacketType::LevelSync, &lvl, sizeof(lvl));
+
+                // Destroy old puppet (will respawn in new level)
+                DestroyGhostPuppet();
+
+                LOG_INFO("[Co-op] Level changed: {} -> {}", oldLevel, currentLevel);
+            }
         }
 
         // Process incoming damage/world events + periodic enemy HP sync

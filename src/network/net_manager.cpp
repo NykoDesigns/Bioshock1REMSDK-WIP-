@@ -244,6 +244,14 @@ static void ProcessIncoming()
                 QueuePlayerActionPacket(*reinterpret_cast<const PlayerActionData*>(payload));
             }
             break;
+        case PacketType::LevelSync:
+            if (hdr->size >= sizeof(LevelSyncData)) {
+                s_RemotePeer.lastRecvTime = s_Uptime;
+                auto* lvl = reinterpret_cast<const LevelSyncData*>(payload);
+                s_RemotePeer.levelName = lvl->levelName;
+                LOG_INFO("[Net] Partner moved to level: {}", lvl->levelName);
+            }
+            break;
         default:
             break;
         }

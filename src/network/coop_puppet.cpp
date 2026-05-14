@@ -30,6 +30,13 @@ static bool  s_HasTarget = false;
 static int   s_LastAction = -1;       // ActionType or -1
 static float s_ActionTimer = 999.0f;  // time since last action
 
+// AI aggro timer — make nearby enemies target the puppet
+static float s_AggroAccum = 0.0f;
+constexpr float AGGRO_INTERVAL = 2.0f;  // every 2 seconds
+constexpr float AGGRO_RANGE = 3000.0f;  // 30m radius
+static UFunction* s_AddForcedEnemyFunc = nullptr;
+static bool s_IsAIPuppet = false;       // true if puppet is a ShockPawn subclass
+
 // ─── Helpers ───────────────────────────────────────────────────────────
 
 /// Find a UFunction by name on a class, walking the Children linked list.
@@ -105,6 +112,86 @@ static bool SetPuppetProperty(const char* propName, const void* value, int size)
     return true;
 }
 
+/// Helper: check if an object inherits from a given base class name.
+static bool PuppetIsA(UObject* obj, const std::string& baseName)
+{
+    if (!obj) return false;
+    UObject* cls = obj->GetClass();
+    UField* current = reinterpret_cast<UField*>(cls);
+    int safety = 64;
+    while (current && safety-- > 0) {
+        if (current->GetName() == baseName) return true;
+        current = reinterpret_cast<UField*>(
+            reinterpret_cast<UStruct*>(current)->GetSuperField());
+    }
+    return false;
+}
+
+/// Make nearby enemies aggro the puppet by calling AddForcedEnemy.
+static void AggroNearbyEnemies()
+{
+    if (!s_Puppet || !s_IsAIPuppet) return;
+
+    ProcessEventFn origPE = GetOriginalProcessEvent();
+    if (!origPE) return;
+
+    const auto& globals = GetEngineGlobals();
+    if (!globals.IsValid() || s_PuppetLocOffset <= 0) return;
+
+    // Get puppet position
+    float px, py, pz;
+    const uint8_t* praw = reinterpret_cast<const uint8_t*>(s_Puppet);
+    memcpy(&px, praw + s_PuppetLocOffset, 4);
+    memcpy(&py, praw + s_PuppetLocOffset + 4, 4);
+    memcpy(&pz, praw + s_PuppetLocOffset + 8, 4);
+
+    uintptr_t objData = *reinterpret_cast<uintptr_t*>(globals.GObjects);
+    int32_t objCount = *reinterpret_cast<int32_t*>(globals.GObjects + 4);
+
+    int aggroCount = 0;
+    for (int i = 0; i < objCount && i < 100000; i++) {
+        uintptr_t ptr = *reinterpret_cast<uintptr_t*>(objData + i * 4);
+        if (!ptr) continue;
+        UObject* obj = reinterpret_cast<UObject*>(ptr);
+        if (obj == s_Puppet) continue;
+
+        std::string cn = obj->GetObjClassName();
+        if (cn == "ShockPlayer" || cn == "ShockPlayerController" || cn == "Class")
+            continue;
+
+        // Only aggro ShockPawn enemies (check class hierarchy)
+        if (!PuppetIsA(obj, "EcologyFighter") && !PuppetIsA(obj, "Aggressor"))
+            continue;
+
+        // Check if alive (needs Location offset — reuse puppet's cached offset)
+        float ex, ey, ez;
+        const uint8_t* eraw = reinterpret_cast<const uint8_t*>(obj);
+        memcpy(&ex, eraw + s_PuppetLocOffset, 4);
+        memcpy(&ey, eraw + s_PuppetLocOffset + 4, 4);
+        memcpy(&ez, eraw + s_PuppetLocOffset + 8, 4);
+
+        float dx = ex - px, dy = ey - py, dz = ez - pz;
+        float distSq = dx * dx + dy * dy + dz * dz;
+        if (distSq > AGGRO_RANGE * AGGRO_RANGE) continue;
+
+        // Find AddForcedEnemy if not cached
+        if (!s_AddForcedEnemyFunc) {
+            UStruct* ecls = reinterpret_cast<UStruct*>(obj->GetClass());
+            s_AddForcedEnemyFunc = FindFunctionOnClass(ecls, "AddForcedEnemy");
+            if (!s_AddForcedEnemyFunc) continue;
+        }
+
+        // Call AddForcedEnemy(puppet) on this enemy
+        // Parms: UObject* Target (ShockPawn)
+        struct { UObject* Target; } parms;
+        parms.Target = s_Puppet;
+        origPE(obj, s_AddForcedEnemyFunc, &parms, nullptr);
+        aggroCount++;
+
+        if (aggroCount >= 8) break; // limit per tick
+    }
+}
+
 // ─── Public API ────────────────────────────────────────────────────────
 
 bool InitGhostPuppet()
@@ -163,13 +250,15 @@ bool SpawnGhostPuppet(float x, float y, float z)
         return false;
     }
 
-    // Find the class to spawn. We'll try multiple options in order of preference:
-    //   1. BasePlayerAttachment — simple visible StaticMesh actor
-    //   2. StaticMeshActor — basic visible mesh
-    //   3. Actor — fallback (may not be visible)
-    UObject* spawnClass = FindClassObject("BasePlayerAttachment");
+    // Find the class to spawn. Try in order of visual quality:
+    //   1. SpawnedDecoyHumanAI — actual human model (from Decoy plasmid)
+    //   2. DecoyHumanAI — abstract but may work as a visual puppet
+    //   3. BasePlayerAttachment — simple visible StaticMesh actor (cube fallback)
+    //   4. StaticMeshActor — basic visible mesh
+    UObject* spawnClass = FindClassObject("SpawnedDecoyHumanAI");
+    if (!spawnClass) spawnClass = FindClassObject("DecoyHumanAI");
+    if (!spawnClass) spawnClass = FindClassObject("BasePlayerAttachment");
     if (!spawnClass) spawnClass = FindClassObject("StaticMeshActor");
-    if (!spawnClass) spawnClass = FindClassObject("Actor");
 
     if (!spawnClass) {
         LOG_WARN("[Puppet] Could not find any suitable class to spawn");
@@ -244,13 +333,46 @@ bool SpawnGhostPuppet(float x, float y, float z)
     SetPuppetProperty("bBlockActors", &bFalse, 4);
     SetPuppetProperty("bBlockPlayers", &bFalse, 4);
     SetPuppetProperty("bBlockHavok", &bFalse, 4);
+    SetPuppetProperty("bBlockNonZeroExtentTraces", &bFalse, 4);
+    SetPuppetProperty("bBlockZeroExtentTraces", &bFalse, 4);
     SetPuppetProperty("bHidden", &bFalse, 4);
     SetPuppetProperty("bInGameRenderable", &bTrue, 4);
 
-    // Set a reasonable draw scale so it's visible but not huge
-    // BasePlayerAttachment default is a 256-diameter cube; scale down to ~human size
-    float drawScale = 0.25f; // ~64 units ≈ human height ish
-    SetPuppetProperty("DrawScale", &drawScale, 4);
+    // Make invincible so enemies can't kill our puppet
+    float bigHP = 99999.0f;
+    SetPuppetProperty("Health", &bigHP, 4);
+    SetPuppetProperty("HealthMax", &bigHP, 4);
+    SetPuppetProperty("bIsInvincible", &bTrue, 4);
+
+    // Disable AI brain if this is a ShockAI/DecoyHuman subclass
+    std::string puppetClass = s_Puppet->GetObjClassName();
+    bool isAIPuppet = (puppetClass.find("Decoy") != std::string::npos ||
+                       puppetClass.find("ShockAI") != std::string::npos ||
+                       puppetClass.find("Aggressor") != std::string::npos);
+
+    s_IsAIPuppet = isAIPuppet;
+    if (isAIPuppet) {
+        // Prevent AI from running — set LifeSpan to 0 (infinite) and disable AI tick
+        float noLifeSpan = 0.0f;
+        SetPuppetProperty("LifeSpan", &noLifeSpan, 4);
+        // Make sure it doesn't try to pathfind or attack
+        SetPuppetProperty("bCanWalk", &bFalse, 4);
+        SetPuppetProperty("bCanFly", &bFalse, 4);
+        SetPuppetProperty("bCanSwim", &bFalse, 4);
+        // Human-scale draw for AI puppet
+        float drawScale = 1.0f;
+        SetPuppetProperty("DrawScale", &drawScale, 4);
+
+        // Cache AddForcedEnemy for enemy aggro
+        // We'll find it on EcologyFighter/Aggressor classes later when needed
+        s_AddForcedEnemyFunc = nullptr;
+
+        LOG_INFO("[Puppet] AI puppet configured: disabled movement/AI, set invincible");
+    } else {
+        // StaticMesh puppet — scale down the cube to human-ish size
+        float drawScale = 0.25f; // ~64 units
+        SetPuppetProperty("DrawScale", &drawScale, 4);
+    }
 
     // Make it glow / unlit so it's always visible
     SetPuppetProperty("bUnlit", &bTrue, 4);
@@ -282,6 +404,15 @@ void UpdateGhostPuppet(const PlayerStateData& remoteState)
     // Tick the action timer
     float dt = 1.0f / 60.0f; // approximate frame time
     s_ActionTimer += dt;
+
+    // Periodically make nearby enemies aggro the puppet
+    if (s_IsAIPuppet) {
+        s_AggroAccum += dt;
+        if (s_AggroAccum >= AGGRO_INTERVAL) {
+            s_AggroAccum = 0.0f;
+            AggroNearbyEnemies();
+        }
+    }
 
     // Smooth interpolation toward target
     float lerpSpeed = 10.0f; // higher = snappier
