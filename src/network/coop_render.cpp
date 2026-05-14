@@ -11,8 +11,11 @@ namespace bs1sdk {
 // ─── State ─────────────────────────────────────────────────────────────
 
 static PlayerStateData s_RemoteState{};
+static PlayerStateData s_InterpState{};   // smoothed state for rendering
 static char s_RemoteName[32] = "Partner";
 static bool s_HasRemoteState = false;
+static float s_LastUpdateTime = 0.0f;     // when we last got a real update
+static float s_InterpAlpha = 0.0f;        // interpolation progress
 
 // Camera state
 static float s_CamX = 0, s_CamY = 0, s_CamZ = 0;
@@ -91,9 +94,19 @@ void InitCoopRender()
 
 void SetRemoteRenderState(const PlayerStateData& state, const char* name)
 {
+    // Store previous interpolated position as new start point
+    if (s_HasRemoteState) {
+        s_InterpState = s_RemoteState; // keep old target as interp start
+    } else {
+        // First update — snap directly
+        s_InterpState.posX = state.posX;
+        s_InterpState.posY = state.posY;
+        s_InterpState.posZ = state.posZ;
+    }
     s_RemoteState = state;
     if (name) strncpy(s_RemoteName, name, sizeof(s_RemoteName) - 1);
     s_HasRemoteState = true;
+    s_InterpAlpha = 0.0f; // reset interpolation on new data
 }
 
 void SetLocalCamera(float camX, float camY, float camZ,
@@ -105,6 +118,8 @@ void SetLocalCamera(float camX, float camY, float camZ,
     s_HasCamera = true;
 }
 
+static float Lerp(float a, float b, float t) { return a + (b - a) * t; }
+
 void RenderCoopOverlay()
 {
     if (!s_HasRemoteState || !s_HasCamera) return;
@@ -114,7 +129,21 @@ void RenderCoopOverlay()
     s_ScreenW = io.DisplaySize.x;
     s_ScreenH = io.DisplaySize.y;
 
-    Vec3 remotePos = { s_RemoteState.posX, s_RemoteState.posY, s_RemoteState.posZ };
+    // ─── Interpolation ───
+    // Smoothly lerp from last known position to new position
+    // At 30Hz updates, we interpolate over ~33ms per update
+    s_InterpAlpha += io.DeltaTime * 15.0f; // reach target in ~66ms (smooth at 60fps)
+    if (s_InterpAlpha > 1.0f) s_InterpAlpha = 1.0f;
+
+    float t = s_InterpAlpha;
+    // Smooth step for nicer easing
+    t = t * t * (3.0f - 2.0f * t);
+
+    float rx = Lerp(s_InterpState.posX, s_RemoteState.posX, t);
+    float ry = Lerp(s_InterpState.posY, s_RemoteState.posY, t);
+    float rz = Lerp(s_InterpState.posZ, s_RemoteState.posZ, t);
+
+    Vec3 remotePos = { rx, ry, rz };
     Vec3 cam = { s_CamX, s_CamY, s_CamZ };
 
     // Distance to remote player
@@ -122,33 +151,73 @@ void RenderCoopOverlay()
 
     // Project to screen
     Vec2 screen;
-    if (!WorldToScreen(remotePos, screen)) return; // behind camera
-
-    // Clamp to screen bounds with margin
-    if (screen.x < -50 || screen.x > s_ScreenW + 50) return;
-    if (screen.y < -50 || screen.y > s_ScreenH + 50) return;
+    bool onScreen = WorldToScreen(remotePos, screen);
 
     ImDrawList* dl = ImGui::GetBackgroundDrawList();
+
+    // ─── Edge indicator when off-screen ───
+    if (!onScreen || screen.x < 0 || screen.x > s_ScreenW || screen.y < 0 || screen.y > s_ScreenH) {
+        // Show an arrow at the edge of the screen pointing toward the player
+        Vec3 delta = Sub(remotePos, cam);
+        float angle = atan2f(delta.y, delta.x) - s_CamYaw * DEG2RAD;
+        float edgeX = s_ScreenW * 0.5f + cosf(angle) * (s_ScreenW * 0.45f);
+        float edgeY = s_ScreenH * 0.5f + sinf(angle) * (s_ScreenH * 0.40f);
+        edgeX = fmaxf(30.0f, fminf(s_ScreenW - 30.0f, edgeX));
+        edgeY = fmaxf(30.0f, fminf(s_ScreenH - 30.0f, edgeY));
+
+        // Arrow triangle pointing outward
+        float arrowSize = 10.0f;
+        dl->AddTriangleFilled(
+            ImVec2(edgeX + cosf(angle) * arrowSize, edgeY + sinf(angle) * arrowSize),
+            ImVec2(edgeX + cosf(angle + 2.3f) * arrowSize, edgeY + sinf(angle + 2.3f) * arrowSize),
+            ImVec2(edgeX + cosf(angle - 2.3f) * arrowSize, edgeY + sinf(angle - 2.3f) * arrowSize),
+            IM_COL32(0, 200, 255, 180)
+        );
+
+        // Distance label near arrow
+        char distLabel[32];
+        snprintf(distLabel, sizeof(distLabel), "%.0fm", dist / 100.0f);
+        ImVec2 ts = ImGui::CalcTextSize(distLabel);
+        dl->AddText(ImVec2(edgeX - ts.x * 0.5f, edgeY + 12), IM_COL32(0, 200, 255, 200), distLabel);
+        return;
+    }
 
     // Scale marker by distance (closer = bigger)
     float scale = 1.0f;
     if (dist > 500.0f) scale = 500.0f / dist;
     if (scale < 0.3f) scale = 0.3f;
+    if (scale > 2.0f) scale = 2.0f;
 
-    float markerSize = 12.0f * scale;
+    float markerSize = 14.0f * scale;
 
-    // ─── Draw diamond marker ───
+    // ─── Draw diamond marker with glow ───
     ImVec2 center(screen.x, screen.y);
-    ImU32 colOuter = IM_COL32(0, 200, 255, 220);  // cyan outline
-    ImU32 colInner = IM_COL32(0, 150, 255, 120);  // cyan fill
 
+    // Outer glow
+    ImU32 colGlow = IM_COL32(0, 180, 255, 50);
+    for (int i = 3; i >= 1; i--) {
+        float gs = markerSize + i * 3.0f;
+        dl->AddQuadFilled(
+            ImVec2(center.x, center.y - gs),
+            ImVec2(center.x + gs * 0.7f, center.y),
+            ImVec2(center.x, center.y + gs),
+            ImVec2(center.x - gs * 0.7f, center.y),
+            colGlow
+        );
+    }
+
+    // Filled diamond
+    ImU32 colInner = IM_COL32(0, 160, 255, 160);
     dl->AddQuadFilled(
-        ImVec2(center.x, center.y - markerSize),       // top
-        ImVec2(center.x + markerSize * 0.7f, center.y), // right
-        ImVec2(center.x, center.y + markerSize),       // bottom
-        ImVec2(center.x - markerSize * 0.7f, center.y), // left
+        ImVec2(center.x, center.y - markerSize),
+        ImVec2(center.x + markerSize * 0.7f, center.y),
+        ImVec2(center.x, center.y + markerSize),
+        ImVec2(center.x - markerSize * 0.7f, center.y),
         colInner
     );
+
+    // Outline
+    ImU32 colOuter = IM_COL32(0, 220, 255, 240);
     dl->AddQuad(
         ImVec2(center.x, center.y - markerSize),
         ImVec2(center.x + markerSize * 0.7f, center.y),
@@ -157,24 +226,39 @@ void RenderCoopOverlay()
         colOuter, 2.0f
     );
 
-    // ─── Name tag ───
-    char label[64];
-    snprintf(label, sizeof(label), "%s [%.0fm]", s_RemoteName, dist / 100.0f);
-    ImVec2 textSize = ImGui::CalcTextSize(label);
-    ImVec2 textPos(center.x - textSize.x * 0.5f, center.y - markerSize - textSize.y - 4);
-
-    // Background for readability
-    dl->AddRectFilled(
-        ImVec2(textPos.x - 3, textPos.y - 1),
-        ImVec2(textPos.x + textSize.x + 3, textPos.y + textSize.y + 1),
-        IM_COL32(0, 0, 0, 160), 3.0f
+    // ─── Vertical line from marker to floor (depth cue) ───
+    float lineLen = 30.0f * scale;
+    dl->AddLine(
+        ImVec2(center.x, center.y + markerSize),
+        ImVec2(center.x, center.y + markerSize + lineLen),
+        IM_COL32(0, 180, 255, 60), 1.0f
     );
-    dl->AddText(textPos, IM_COL32(0, 220, 255, 255), label);
+
+    // ─── Name tag + distance ───
+    char label[64];
+    snprintf(label, sizeof(label), "%s  %.0fm", s_RemoteName, dist / 100.0f);
+    ImVec2 textSize = ImGui::CalcTextSize(label);
+    ImVec2 textPos(center.x - textSize.x * 0.5f, center.y - markerSize - textSize.y - 6);
+
+    // Background pill
+    dl->AddRectFilled(
+        ImVec2(textPos.x - 6, textPos.y - 2),
+        ImVec2(textPos.x + textSize.x + 6, textPos.y + textSize.y + 2),
+        IM_COL32(0, 0, 0, 180), 6.0f
+    );
+    // Cyan border on pill
+    dl->AddRect(
+        ImVec2(textPos.x - 6, textPos.y - 2),
+        ImVec2(textPos.x + textSize.x + 6, textPos.y + textSize.y + 2),
+        IM_COL32(0, 180, 255, 100), 6.0f, 0, 1.0f
+    );
+    dl->AddText(textPos, IM_COL32(255, 255, 255, 240), label);
 
     // ─── Health bar ───
-    float barW = 50.0f * scale;
-    float barH = 5.0f;
-    float healthPct = s_RemoteState.health / 100.0f; // assume max 100
+    float barW = 60.0f * scale;
+    if (barW < 30.0f) barW = 30.0f;
+    float barH = 4.0f;
+    float healthPct = s_RemoteState.health / 200.0f; // BioShock max HP is 200
     if (healthPct > 1.0f) healthPct = 1.0f;
     if (healthPct < 0.0f) healthPct = 0.0f;
 
@@ -182,11 +266,16 @@ void RenderCoopOverlay()
     ImVec2 barEnd(barStart.x + barW, barStart.y + barH);
 
     // Background
-    dl->AddRectFilled(barStart, barEnd, IM_COL32(40, 40, 40, 180), 2.0f);
-    // Health fill (green → red gradient)
-    ImU32 hpCol = healthPct > 0.5f ? IM_COL32(0, 220, 80, 220) : IM_COL32(220, 60, 0, 220);
+    dl->AddRectFilled(barStart, barEnd, IM_COL32(0, 0, 0, 160), 2.0f);
+
+    // Health fill — gradient from green to yellow to red
+    ImU32 hpCol;
+    if (healthPct > 0.6f)      hpCol = IM_COL32(40, 220, 80, 230);   // green
+    else if (healthPct > 0.3f) hpCol = IM_COL32(220, 200, 40, 230);  // yellow
+    else                       hpCol = IM_COL32(220, 50, 30, 230);   // red
+
     dl->AddRectFilled(barStart, ImVec2(barStart.x + barW * healthPct, barEnd.y), hpCol, 2.0f);
-    dl->AddRect(barStart, barEnd, IM_COL32(200, 200, 200, 120), 2.0f);
+    dl->AddRect(barStart, barEnd, IM_COL32(200, 200, 200, 80), 2.0f);
 }
 
 } // namespace bs1sdk
