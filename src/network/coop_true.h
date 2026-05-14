@@ -93,6 +93,9 @@ bool IsTrueClient();
 /// Initialize the true co-op system
 bool InitTrueCoop();
 
+/// Lazily initialize all co-op subsystems (safe to call multiple times)
+void EnsureSubsystemsReady();
+
 /// Shutdown and cleanup
 void ShutdownTrueCoop();
 

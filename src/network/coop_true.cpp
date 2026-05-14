@@ -48,8 +48,9 @@ void SetTrueCoopRole(TrueCoopRole role)
     LOG_INFO("[TrueCoop] Role set to: {}", names[(int)role]);
     DebugSessionLogf("TrueCoop role: %s", names[(int)role]);
 
-    // Activate deferred PE hooks now that a co-op session is starting
+    // Initialize subsystems and activate hooks now that a co-op session is starting
     if (role != TrueCoopRole::None) {
+        EnsureSubsystemsReady();
         ActivateTransitionHooks();
     }
 }
@@ -236,20 +237,34 @@ void TrueCoopTick(float deltaTime)
 
 // ─── Init/Shutdown ───────────────────────────────────────────────────────
 
-bool InitTrueCoop()
-{
-    if (s_Initialized) return true;
-    s_Initialized = true;
+static bool s_SubsystemsReady = false;
 
-    // Initialize all subsystems
+void EnsureSubsystemsReady()
+{
+    if (s_SubsystemsReady) return;
+    s_SubsystemsReady = true;
+
     InitWorldSync();
     InitP2System();
     InitP2Inventory();
     InitTransitions();
     InitCoopTesting();
 
-    LOG_INFO("[TrueCoop] Initialized (all phases, role=None, awaiting host/join)");
-    DebugSessionLog("TrueCoop initialized (all phases)");
+    LOG_INFO("[TrueCoop] Subsystems initialized (all phases)");
+    DebugSessionLog("TrueCoop subsystems initialized (all phases)");
+}
+
+bool InitTrueCoop()
+{
+    if (s_Initialized) return true;
+    s_Initialized = true;
+
+    // Subsystems are NOT initialized here — they are deferred until a co-op
+    // command is used (truehost/truejoin/cooptest/p2spawn) to avoid any
+    // interference with normal gameplay.
+
+    LOG_INFO("[TrueCoop] Ready (subsystems deferred until co-op session)");
+    DebugSessionLog("TrueCoop ready (deferred)");
     return true;
 }
 

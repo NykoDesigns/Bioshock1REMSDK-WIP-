@@ -1856,6 +1856,7 @@ void Overlay::RenderConsole()
         }
         // ─── cooptest [phase] ───
         else if (tokens[0] == "cooptest") {
+            EnsureSubsystemsReady();
             std::string phase = (tokens.size() >= 2) ? tokens[1] : "all";
             LogYellow("Running co-op tests: " + phase);
             RunCoopTests(phase);
@@ -1873,11 +1874,13 @@ void Overlay::RenderConsole()
         }
         // ─── quicktest ───
         else if (tokens[0] == "quicktest") {
+            EnsureSubsystemsReady();
             QuickValidate();
             LogGreen("Quick validation complete -> debug_dumps/coop_test_results.txt");
         }
         // ─── p2spawn ───
         else if (tokens[0] == "p2spawn") {
+            EnsureSubsystemsReady();
             auto prevRole = GetTrueCoopRole();
             if (prevRole == TrueCoopRole::None) SetTrueCoopRole(TrueCoopRole::TrueHost);
             if (P2SpawnPawn()) {
@@ -1901,6 +1904,7 @@ void Overlay::RenderConsole()
         }
         // ─── worldsync ───
         else if (tokens[0] == "worldsync") {
+            EnsureSubsystemsReady();
             auto stats = GetWorldSyncStats();
             char buf[256];
             std::snprintf(buf, sizeof(buf),
@@ -1916,6 +1920,7 @@ void Overlay::RenderConsole()
         }
         // ─── p2inv ───
         else if (tokens[0] == "p2inv") {
+            EnsureSubsystemsReady();
             LogInfo(GetP2InventoryStatus());
             DumpP2Inventory();
         }
