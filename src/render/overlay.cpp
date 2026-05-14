@@ -3,6 +3,7 @@
 
 #include "../engine/uobject.h"
 #include "../engine/function_caller.h"
+#include "../engine/world.h"
 #include "../sdk/sdk_generator.h"
 #include "../hooks/process_event.h"
 #include "../scripting/lua_bridge.h"
@@ -915,6 +916,16 @@ void Overlay::RenderConsole()
             LogInfo("  lua <code>              - Execute Lua code inline");
             LogInfo("  luafile <path>          - Execute a Lua script file");
             LogInfo("  reload                  - Hot-reload autorun.lua");
+            LogYellow("=== World / Actors ===");
+            LogInfo("  actors [class]          - List actors (optionally filter by class)");
+            LogInfo("  worldinfo               - Show level info + actor count");
+            LogInfo("  nearby <radius> [class] - Find actors within radius");
+            LogInfo("  tickrate                - Show current engine tick rate");
+            LogYellow("=== Engine Internals ===");
+            LogInfo("  cdo <class>             - Show ClassDefaultObject address");
+            LogInfo("  setdefault <c> <p> <v>  - Set a CDO property value");
+            LogInfo("  natives                 - Show GNatives info");
+            LogInfo("  gensdk                  - Regenerate SDK headers");
         }
         // ─── set <prop> <value> ───
         else if (tokens[0] == "set" && tokens.size() >= 3) {
@@ -1611,6 +1622,112 @@ void Overlay::RenderConsole()
             std::string result = LuaReload();
             if (result.empty()) LogGreen("autorun.lua reloaded");
             else LogRed(result);
+        }
+        // ─── actors [class] ───
+        else if (tokens[0] == "actors") {
+            if (!IsWorldSystemReady()) { LogRed("World system not ready"); }
+            else {
+                std::string filter = (tokens.size() >= 2) ? tokens[1] : "";
+                std::vector<UObject*> actors;
+                if (filter.empty())
+                    actors = GetAllActors();
+                else
+                    actors = GetActorsOfClass(filter);
+                char buf[128];
+                std::snprintf(buf, sizeof(buf), "Found %d actors%s", (int)actors.size(),
+                             filter.empty() ? "" : (" of class " + filter).c_str());
+                LogYellow(buf);
+                int shown = 0;
+                for (auto* a : actors) {
+                    if (shown++ >= 50) { LogInfo("... (" + std::to_string(actors.size() - 50) + " more)"); break; }
+                    LogInfo("  [" + a->GetObjClassName() + "] " + a->GetName());
+                }
+            }
+        }
+        // ─── worldinfo ───
+        else if (tokens[0] == "worldinfo") {
+            if (!IsWorldSystemReady()) { LogRed("World system not ready"); }
+            else {
+                LevelInfo info = GetCurrentLevel();
+                char buf[256];
+                std::snprintf(buf, sizeof(buf), "Level: %s\nActors: %d\nLevel ptr: 0x%08X",
+                             info.LevelName.c_str(), info.ActorCount, (uint32_t)info.LevelPtr);
+                LogGreen(buf);
+                std::snprintf(buf, sizeof(buf), "Tick rate: %.1f FPS", GetTickRate());
+                LogInfo(buf);
+                std::snprintf(buf, sizeof(buf), "GNatives: %d functions", GetNativeCount());
+                LogInfo(buf);
+            }
+        }
+        // ─── nearby <radius> [class] ───
+        else if (tokens[0] == "nearby" && tokens.size() >= 2) {
+            float radius = std::strtof(tokens[1].c_str(), nullptr);
+            std::string classFilter = (tokens.size() >= 3) ? tokens[2] : "";
+            FVec3 playerPos;
+            if (!GetPlayerPosition(playerPos)) { LogRed("Can't get player position"); }
+            else {
+                auto actors = GetActorsInRadius(playerPos, radius, classFilter);
+                char buf[128];
+                std::snprintf(buf, sizeof(buf), "%d actors within %.0f units", (int)actors.size(), radius);
+                LogYellow(buf);
+                for (auto* a : actors) {
+                    float dist = GetActorDistance(FindObjectByClassName("ShockPlayer"), a);
+                    std::snprintf(buf, sizeof(buf), "  [%s] %s (%.0f units)",
+                                 a->GetObjClassName().c_str(), a->GetName().c_str(), dist);
+                    LogInfo(buf);
+                }
+            }
+        }
+        // ─── tickrate ───
+        else if (tokens[0] == "tickrate") {
+            char buf[64];
+            std::snprintf(buf, sizeof(buf), "Engine tick: %.1f FPS (hook %s)",
+                         GetTickRate(), IsTickHookActive() ? "active" : "inactive");
+            LogInfo(buf);
+        }
+        // ─── cdo <class> ───
+        else if (tokens[0] == "cdo" && tokens.size() >= 2) {
+            UObject* cdo = GetDefaultObject(tokens[1]);
+            if (!cdo) { LogRed("No CDO for class: " + tokens[1]); }
+            else {
+                char buf[128];
+                std::snprintf(buf, sizeof(buf), "CDO for %s: 0x%08X (%s)",
+                             tokens[1].c_str(), (uint32_t)(uintptr_t)cdo, cdo->GetName().c_str());
+                LogGreen(buf);
+            }
+        }
+        // ─── setdefault <class> <prop> <value> ───
+        else if (tokens[0] == "setdefault" && tokens.size() >= 4) {
+            std::string className = tokens[1];
+            std::string propName = tokens[2];
+            std::string valStr = tokens[3];
+            // Try int first, then float
+            bool ok = false;
+            if (valStr.find('.') != std::string::npos) {
+                ok = SetDefaultProperty(className, propName, std::strtof(valStr.c_str(), nullptr));
+            } else {
+                ok = SetDefaultPropertyInt(className, propName, std::atoi(valStr.c_str()));
+                if (!ok) ok = SetDefaultProperty(className, propName, std::strtof(valStr.c_str(), nullptr));
+            }
+            if (ok) LogGreen("Set " + className + "." + propName + " = " + valStr + " (CDO)");
+            else LogRed("Failed to set CDO property");
+        }
+        // ─── natives ───
+        else if (tokens[0] == "natives") {
+            char buf[128];
+            std::snprintf(buf, sizeof(buf), "GNatives: %d functions at 0x%08X",
+                         GetNativeCount(), (uint32_t)GetNativesTableAddress());
+            LogGreen(buf);
+            LogInfo("Full dump at Z:\\Bioshock1SDK\\gnatives_dump.txt");
+        }
+        // ─── gensdk ───
+        else if (tokens[0] == "gensdk") {
+            LogYellow("Regenerating SDK headers...");
+            SDKGenerator gen;
+            int count = gen.Generate("Z:\\Bioshock1SDK\\sdk_gen");
+            char buf[128];
+            std::snprintf(buf, sizeof(buf), "SDK generated: %d classes", count);
+            LogGreen(buf);
         }
         // ─── unknown ───
         else {

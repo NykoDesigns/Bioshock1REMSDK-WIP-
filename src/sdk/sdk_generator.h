@@ -19,6 +19,17 @@ public:
 private:
     // ─── Internal types ────────────────────────────────────────────
 
+    struct FunctionSDKInfo {
+        std::string Name;
+        std::string Signature;    // e.g., "void TakeDamage(int32_t Damage, APawn* InstigatedBy)"
+        uint32_t Flags = 0;
+        uint16_t NativeIndex = 0;
+        bool IsNative = false;
+        bool IsEvent = false;
+        bool IsExec = false;
+        bool IsLatent = false;
+    };
+
     struct ClassInfo {
         UStruct* ClassObj = nullptr;
         std::string Name;
@@ -26,6 +37,7 @@ private:
         std::string SuperClassName;
         int32_t PropertiesSize = 0;
         std::vector<PropertyInfo> OwnProperties; // only this class level
+        std::vector<FunctionSDKInfo> OwnFunctions; // only this class level
     };
 
     // ─── Steps ─────────────────────────────────────────────────────
@@ -35,6 +47,9 @@ private:
 
     /// Step 2: For each class, collect direct properties (not inherited)
     void CollectProperties();
+
+    /// Step 2b: For each class, collect direct functions (not inherited)
+    void CollectFunctions();
 
     /// Step 3: Write header files per package
     void WriteHeaders(const std::string& outputDir);
@@ -62,6 +77,7 @@ private:
     std::map<std::string, std::vector<std::string>> m_Packages; // pkg -> class names
     std::map<std::string, std::string> m_Inheritance;    // className -> superClassName
     int m_TotalProps = 0;
+    int m_TotalFuncs = 0;
 };
 
 } // namespace bs1sdk

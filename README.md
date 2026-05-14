@@ -6,22 +6,28 @@
 
 ### Working Features
 - **D3D11 ImGui Overlay** — Debug UI rendered via DXGI hook
-- **Engine Globals** — Runtime access to GObjects/GNames (UE2.5 Vengeance)
+- **Engine Globals** — Runtime access to GObjects/GNames/GWorld/GEngine (UE2.5 Vengeance)
+- **Full Type System** — UFunction (flags, native index, params), UClass (CDO, ClassFlags), UState, UEnum (name resolution), and 8 specialized UProperty types with inner type resolution
+- **World System** — Level actor enumeration, spatial queries, position get/set, actor distance
+- **Engine Tick Hook** — Frame-rate-independent callbacks via UGameEngine::Tick vtable hook
+- **GNatives Table** — 4096-entry native function dispatch table discovery, hooking, and dumping
+- **Class Default Objects** — Read/write CDO properties to modify all future instances of a class
 - **Object Inspector** — Browse all live UObjects with property editing
 - **Player Properties** — Real-time ADAM, Credits, Health, EVE editing
-- **Console** — In-game command console (~) with 20+ commands
+- **Console** — In-game command console (~) with 30+ commands
 - **ProcessEvent Hook** — MinHook inline detour intercepting all UFunction calls
 - **Function Caller** — Invoke any UFunction on any object from console
 - **Weapon Editor** — Live editing of fire rate, accuracy, magazine size, ammo
 - **Gameplay Mods** — God mode, one-hit kill, infinite ammo via PE hooks
 - **Plasmid Hijacks** — Security Bullseye → teleport to impact, Hypnotize → summon Big Daddy
 - **Event Logger** — Dump all ProcessEvent calls to file for analysis
-- **Lua 5.4 Scripting** — Full scripting bridge with hot-reload
-- **SDK Generator** — Auto-generate C++ headers from runtime class data
-- **BSM Package Tools** — Full .bsm/.U analysis, spawn patcher, property editor (bsm_tool v0.4.0)
-- **INI Config Tool** — Parse, edit, diff BioShock INI files (ini_tool v1.0.0)
+- **Lua 5.4 Scripting** — Full scripting bridge with 25+ API functions and hot-reload
+- **SDK Generator** — Auto-generate fully-typed C++ headers with resolved inner types, function signatures, enum names, and flag annotations
+- **BSM Package Tools** — Full .bsm/.U analysis, spawn patcher, property editor, AI type editor (bsm_tool v0.5.0)
+- **INI Config Tool** — Parse, edit, diff, extract/repack IBF archives (ini_tool v2.0.0)
 - **Gameplay Mods** — Decoy→Teleport, Chain Lightning, Friendly Bots, Rivet Pistol, Splicer Factions
 - **Mod Distribution** — winmm.dll proxy loader (no injector needed) + JSON config + packager script
+- **Co-op Framework** — UDP transport, player state sync, NPC puppet system, damage forwarding
 
 ### Implemented Gameplay Mods
 
@@ -82,7 +88,9 @@ Dependencies (MinHook, ImGui, Lua 5.4) are fetched automatically via CMake Fetch
 ### Output
 - `build/bin/Release/BS1SDK.dll` — Main SDK (inject into game)
 - `build/bin/Release/BS1Injector.exe` — DLL injector
-- `build/bin/Release/bsm_tool.exe` — BSM/UE package analyzer (v0.3.0, 10 commands)
+- `build/bin/Release/bsm_tool.exe` — BSM/UE package analyzer + spawn patcher (v0.5.0)
+- `build/bin/Release/ini_tool.exe` — INI config tool + IBF archive support (v2.0.0)
+- `build/bin/Release/winmm.dll` — Proxy loader (drop in game folder, no injector needed)
 
 ## Usage
 
@@ -123,6 +131,16 @@ dumpevents                   Dump all events to file
 lua <code>                   Execute Lua code
 luafile <path>               Execute Lua script
 reload                       Hot-reload autorun.lua
+actors [class]               List level actors (optionally filter by class)
+worldinfo                    Show level info, actor count, tick rate
+nearby <radius> [class]      Find actors within radius of player
+tickrate                     Show engine tick rate
+cdo <class>                  Show ClassDefaultObject address
+setdefault <c> <p> <v>       Set a CDO property (affects all future instances)
+natives                      Show GNatives table info
+gensdk                       Regenerate SDK headers
+host [port]                  Host a co-op session
+join <ip> [port]             Join a co-op session
 ```
 
 ### Lua Scripting
@@ -166,18 +184,35 @@ end
 | `sdk.on(funcName, callback)` | Hook ProcessEvent (return true to block) |
 | `sdk.off(hookId)` | Remove event hook |
 | `sdk.hookpe()` | Enable ProcessEvent hook |
+| `sdk.getActors([class])` | Get all actors in level (optionally filter) |
+| `sdk.getActorPosition(addr)` | Get actor X, Y, Z position |
+| `sdk.setActorPosition(addr, x, y, z)` | Teleport an actor |
+| `sdk.getActorsInRadius(x, y, z, r)` | Spatial query — find nearby actors |
+| `sdk.getPlayerPos()` | Get player X, Y, Z |
+| `sdk.actorDistance(addr1, addr2)` | Distance between two actors |
+| `sdk.getLevelInfo()` | Get level name and actor count |
+| `sdk.getDefaultObject(class)` | Get ClassDefaultObject address |
+| `sdk.setDefault(class, prop, val)` | Modify CDO property (global effect) |
+| `sdk.getFunctions(class)` | List functions with flags/native info |
+| `sdk.getEnum(enumName)` | Get enum literal names |
+| `sdk.onTick(callback)` | Register per-frame tick callback |
+| `sdk.offTick(id)` | Remove tick callback |
+| `sdk.getTickRate()` | Current engine FPS |
+| `sdk.getNativeCount()` | Number of native functions |
+| `sdk.getNativeAddress(index)` | Get native function address |
 
 ## Project Structure
 ```
 BS1SDK/
 ├── src/
 │   ├── core/       — DLL entry, hooks, memory, patterns, logging
-│   ├── engine/     — UObject, UProperty, UFunction, function caller
+│   ├── engine/     — UObject type system, world access, function caller, engine globals
 │   ├── hooks/      — DXGI Present hook, ProcessEvent hook (MinHook)
 │   ├── render/     — ImGui overlay, mod menu, console
-│   ├── gameplay/   — Plasmid hijacks (teleport, Big Daddy summon)
-│   ├── scripting/  — Lua 5.4 bridge
-│   └── sdk/        — Runtime SDK header generation
+│   ├── gameplay/   — Plasmid hijacks (teleport, bots, chain lightning, factions)
+│   ├── scripting/  — Lua 5.4 bridge (25+ API functions)
+│   ├── sdk/        — Runtime SDK header generation (fully-typed output)
+│   └── network/    — UDP transport, co-op bridge, state sync, puppet system
 ├── scripts/        — Example Lua scripts
 ├── injector/       — Standalone DLL injector
 ├── tools/
@@ -198,8 +233,11 @@ BS1SDK/
 - **UObject size**: 0x40 bytes
 - **GObjects**: Static TArray at game base + 0x139042C
 - **GNames**: Static TArray at game base + 0x13904EC
+- **GWorld/GEngine**: Discovered at runtime via object class scan
+- **GNatives**: 4096-entry native function dispatch table (discovered via heuristic)
 - **Graphics**: D3D11 via DXGI (despite d3d9.dll being loaded)
 - **ProcessEvent**: Virtual function, hooked via MinHook inline detour
+- **Engine Tick**: UGameEngine::Tick hooked via vtable for per-frame callbacks
 
 ### Confirmed UObject Layout
 | Offset | Field |
@@ -209,6 +247,41 @@ BS1SDK/
 | +0x1C | Outer |
 | +0x28 | Name (FName) |
 | +0x30 | Class |
+
+### UFunction Layout (extends UStruct at +0x64)
+| Offset | Field |
+|--------|-------|
+| +0x64 | FunctionFlags (uint32) |
+| +0x68 | iNative (uint16) |
+| +0x6A | OperPrecedence (uint8) |
+| +0x6B | NumParms (uint8) |
+| +0x6C | ParmsSize (uint16) |
+| +0x6E | ReturnValueOffset (uint16) |
+| +0x70 | NativeFunc (void*) |
+
+### UClass Layout (extends UState)
+| Offset | Field |
+|--------|-------|
+| +0x90 | ClassFlags (uint32) |
+| +0x94 | ClassWithin (UObject*) |
+| +0x98 | ClassConfigName (FName) |
+| +0xC4 | ClassDefaultObject (UObject*) |
+
+### UEnum Layout (extends UField)
+| Offset | Field |
+|--------|-------|
+| +0x48 | Names.Data (FName*) |
+| +0x4C | Names.Count (int32) |
+
+### Specialized UProperty Inner Types (all at +0x78)
+| Property Type | Inner Field |
+|---------------|-------------|
+| UByteProperty | UEnum* Enum |
+| UObjectProperty | UClass* PropertyClass |
+| UClassProperty | +0x78 PropertyClass, +0x7C MetaClass |
+| UStructProperty | UStruct* Struct |
+| UArrayProperty | UProperty* Inner |
+| UMapProperty | +0x78 Key, +0x7C Value |
 
 ## Contributing
 

@@ -20,17 +20,19 @@ int SDKGenerator::Generate(const std::string& outputDir)
     m_Packages.clear();
     m_Inheritance.clear();
     m_TotalProps = 0;
+    m_TotalFuncs = 0;
 
     // Create output directory
     std::filesystem::create_directories(outputDir);
 
     DiscoverClasses();
     CollectProperties();
+    CollectFunctions();
     WriteHeaders(outputDir);
     WriteMasterHeader(outputDir);
 
-    LOG_INFO("SDK Generator: Done! {} classes, {} properties, {} packages",
-             m_Classes.size(), m_TotalProps, m_Packages.size());
+    LOG_INFO("SDK Generator: Done! {} classes, {} properties, {} functions, {} packages",
+             m_Classes.size(), m_TotalProps, m_TotalFuncs, m_Packages.size());
 
     return (int)m_Classes.size();
 }
@@ -124,6 +126,74 @@ void SDKGenerator::CollectProperties()
     }
 }
 
+// ─── Step 2b: Collect functions for each class ─────────────────────────
+
+void SDKGenerator::CollectFunctions()
+{
+    for (auto& [name, info] : m_Classes) {
+        if (!info.ClassObj) continue;
+
+        UField* child = info.ClassObj->GetChildren();
+        int limit = 2000;
+
+        while (child && limit-- > 0) {
+            std::string childClass = child->GetObjClassName();
+            if (childClass == "Function") {
+                UFunction* func = reinterpret_cast<UFunction*>(child);
+                FunctionSDKInfo fi;
+                fi.Name = func->GetName();
+                fi.Flags = func->GetFunctionFlags();
+                fi.NativeIndex = func->GetNativeIndex();
+                fi.IsNative = func->IsNative();
+                fi.IsEvent = func->IsEvent();
+                fi.IsExec = func->IsExec();
+                fi.IsLatent = func->IsLatent();
+
+                // Build signature string
+                std::string retType = "void";
+                std::string params;
+
+                UField* paramChild = func->GetChildren();
+                int paramLimit = 200;
+                while (paramChild && paramLimit-- > 0) {
+                    std::string pClass = paramChild->GetObjClassName();
+                    if (pClass.find("Property") != std::string::npos) {
+                        UProperty* prop = reinterpret_cast<UProperty*>(paramChild);
+                        uint32_t pflags = prop->GetPropertyFlags();
+                        if (pflags & 0x0080) { // CPF_Parm
+                            PropertyInfo pi;
+                            pi.Name = prop->GetName();
+                            pi.TypeName = pClass;
+                            pi.ElementSize = prop->GetElementSize();
+                            pi.PropertyObj = prop;
+                            pi.Offset = prop->GetPropertyOffset();
+                            pi.ArrayDim = prop->GetArrayDim();
+
+                            std::string mappedType = MapPropertyType(pi);
+
+                            if (pflags & 0x0400) { // CPF_ReturnParm
+                                retType = mappedType;
+                            } else {
+                                if (!params.empty()) params += ", ";
+                                if (pflags & 0x0100) params += "out "; // CPF_OutParm
+                                params += mappedType + " " + pi.Name;
+                            }
+                        }
+                    }
+                    paramChild = paramChild->GetNext();
+                }
+
+                fi.Signature = retType + " " + fi.Name + "(" + params + ")";
+                info.OwnFunctions.push_back(fi);
+                m_TotalFuncs++;
+            }
+            child = child->GetNext();
+        }
+    }
+
+    LOG_INFO("SDK Generator: Collected {} functions", m_TotalFuncs);
+}
+
 // ─── Step 3: Write per-package headers ─────────────────────────────────
 
 void SDKGenerator::WriteHeaders(const std::string& outputDir)
@@ -184,7 +254,7 @@ void SDKGenerator::WriteHeaders(const std::string& outputDir)
             out << " {\n";
             out << "public:\n";
 
-            if (info.OwnProperties.empty()) {
+            if (info.OwnProperties.empty() && info.OwnFunctions.empty()) {
                 out << "    // No properties at this class level\n";
             }
 
@@ -202,6 +272,18 @@ void SDKGenerator::WriteHeaders(const std::string& outputDir)
                 out << "    " << cppType << " " << prop.Name << arrayStr << ";";
                 out << " // " << offsetStr << " (" << prop.TypeName
                     << ", " << prop.ElementSize << "B)\n";
+            }
+
+            // Emit functions
+            if (!info.OwnFunctions.empty()) {
+                out << "\n    // ─── Functions ───\n";
+                for (auto& fi : info.OwnFunctions) {
+                    out << "    // " << fi.Signature;
+                    if (fi.IsNative) out << " [Native " << fi.NativeIndex << "]";
+                    if (fi.IsEvent) out << " [Event]";
+                    if (fi.IsExec) out << " [Exec]";
+                    out << "\n";
+                }
             }
 
             out << "\n";
@@ -385,23 +467,124 @@ std::string SDKGenerator::MapPropertyType(const PropertyInfo& prop)
     if (t == "FloatProperty")      return "float";
     if (t == "BoolProperty")       return "uint32_t";  // bitmask
     if (t == "ByteProperty") {
-        if (prop.ElementSize == 1) return "uint8_t";
-        return "uint8_t";  // could be enum, refine later
+        // Resolve inner enum if available
+        if (prop.PropertyObj) {
+            UByteProperty* bp = reinterpret_cast<UByteProperty*>(prop.PropertyObj);
+            UEnum* innerEnum = bp->GetEnum();
+            if (innerEnum && (uintptr_t)innerEnum > 0x10000) {
+                std::string enumName = innerEnum->GetName();
+                if (!enumName.empty() && enumName != "<invalid>")
+                    return "/* " + enumName + " */ uint8_t";
+            }
+        }
+        return "uint8_t";
     }
     if (t == "NameProperty")       return "FName";
     if (t == "StrProperty")        return "FString";
-    if (t == "ObjectProperty")     return "class UObject*";
-    if (t == "ClassProperty")      return "class UObject*";
-    if (t == "ComponentProperty")  return "class UObject*";
-    if (t == "InterfaceProperty")  return "class UObject*";
+    if (t == "ObjectProperty" || t == "ComponentProperty") {
+        // Resolve inner class
+        if (prop.PropertyObj) {
+            UObjectProperty* op = reinterpret_cast<UObjectProperty*>(prop.PropertyObj);
+            UObject* innerCls = op->GetPropertyClass();
+            if (innerCls && (uintptr_t)innerCls > 0x10000) {
+                std::string clsName = innerCls->GetName();
+                if (!clsName.empty() && clsName != "<invalid>") {
+                    std::string prefix = InheritsFromActor(clsName) ? "A" : "U";
+                    return "class " + prefix + clsName + "*";
+                }
+            }
+        }
+        return "class UObject*";
+    }
+    if (t == "ClassProperty") {
+        if (prop.PropertyObj) {
+            UClassProperty* cp = reinterpret_cast<UClassProperty*>(prop.PropertyObj);
+            UObject* metaCls = cp->GetMetaClass();
+            if (metaCls && (uintptr_t)metaCls > 0x10000) {
+                std::string clsName = metaCls->GetName();
+                if (!clsName.empty() && clsName != "<invalid>")
+                    return "class UClass* /* " + clsName + " */";
+            }
+        }
+        return "class UClass*";
+    }
+    if (t == "InterfaceProperty") {
+        if (prop.PropertyObj) {
+            UInterfaceProperty* ip = reinterpret_cast<UInterfaceProperty*>(prop.PropertyObj);
+            UObject* ifaceCls = ip->GetInterfaceClass();
+            if (ifaceCls && (uintptr_t)ifaceCls > 0x10000) {
+                std::string clsName = ifaceCls->GetName();
+                if (!clsName.empty() && clsName != "<invalid>")
+                    return "FScriptInterface /* " + clsName + " */";
+            }
+        }
+        return "FScriptInterface";
+    }
     if (t == "StructProperty") {
-        // Try to identify common structs by element size
+        // Resolve the actual inner struct name
+        if (prop.PropertyObj) {
+            UStructProperty* sp = reinterpret_cast<UStructProperty*>(prop.PropertyObj);
+            UStruct* innerStruct = sp->GetStruct();
+            if (innerStruct && (uintptr_t)innerStruct > 0x10000) {
+                std::string sName = innerStruct->GetName();
+                if (!sName.empty() && sName != "<invalid>") {
+                    // Map to known C++ types
+                    if (sName == "Vector")       return "FVector";
+                    if (sName == "Rotator")      return "FRotator";
+                    if (sName == "Color")        return "FColor";
+                    if (sName == "LinearColor")  return "FLinearColor";
+                    if (sName == "Vector2D")     return "FVector2D";
+                    if (sName == "Quat")         return "FQuat";
+                    if (sName == "Matrix")       return "FMatrix";
+                    if (sName == "Guid")         return "FGuid";
+                    if (sName == "Box")          return "FBox";
+                    if (sName == "Plane")        return "FPlane";
+                    // Generic struct — emit as F-prefixed
+                    return "F" + sName;
+                }
+            }
+        }
+        // Fallback by size
         if (prop.ElementSize == 12) return "FVector";
         if (prop.ElementSize == 16) return "FLinearColor";
         return "uint8_t[" + std::to_string(prop.ElementSize) + "]";
     }
-    if (t == "ArrayProperty")      return "TArray<uint8_t>";
-    if (t == "MapProperty")        return "TArray<uint8_t>";  // placeholder
+    if (t == "ArrayProperty") {
+        // Resolve inner property type
+        if (prop.PropertyObj) {
+            UArrayProperty* ap = reinterpret_cast<UArrayProperty*>(prop.PropertyObj);
+            UProperty* inner = ap->GetInner();
+            if (inner && (uintptr_t)inner > 0x10000) {
+                std::string innerClass = inner->GetObjClassName();
+                // Recursively map the inner type
+                PropertyInfo innerPI;
+                innerPI.TypeName = innerClass;
+                innerPI.ElementSize = inner->GetElementSize();
+                innerPI.PropertyObj = inner;
+                innerPI.Name = "Inner";
+                innerPI.ArrayDim = 1;
+                innerPI.Offset = 0;
+                std::string innerType = MapPropertyType(innerPI);
+                // Clean up array notation from inner type
+                if (innerType.find('[') != std::string::npos)
+                    innerType = "uint8_t"; // fallback for raw byte arrays
+                return "TArray<" + innerType + ">";
+            }
+        }
+        return "TArray<uint8_t>";
+    }
+    if (t == "MapProperty") {
+        if (prop.PropertyObj) {
+            UMapProperty* mp = reinterpret_cast<UMapProperty*>(prop.PropertyObj);
+            UProperty* key = mp->GetKey();
+            UProperty* value = mp->GetValue();
+            if (key && value && (uintptr_t)key > 0x10000 && (uintptr_t)value > 0x10000) {
+                // Simple map description
+                return "TMap<" + key->GetObjClassName() + ", " + value->GetObjClassName() + ">";
+            }
+        }
+        return "TMap<uint8_t, uint8_t>";
+    }
     if (t == "DelegateProperty")   return "FScriptDelegate";
     if (t == "PointerProperty")    return "void*";
 

@@ -41,7 +41,7 @@ std::vector<FunctionInfo> GetClassFunctions(UStruct* cls);
 /// Returns a string description of the return value (if any).
 std::string CallFunction(UObject* obj, UFunction* func, const std::vector<std::string>& args);
 
-/// UFunction flags (UE2.5)
+/// UFunction flags (UE2.5) — reference values for flag checking
 enum EFunctionFlags : uint32_t {
     FUNC_Final       = 0x00000001,
     FUNC_Defined     = 0x00000002,
@@ -61,6 +61,9 @@ enum EFunctionFlags : uint32_t {
     FUNC_Const       = 0x00008000,
     FUNC_Invariant   = 0x00010000,
 };
+
+/// Native function pointer type — for directly calling engine natives
+typedef void (*NativeFuncPtr)(UObject* Context, void* Stack, void* Result);
 
 /// UProperty flags relevant for function params
 enum EPropertyFlags : uint32_t {

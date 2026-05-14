@@ -189,4 +189,95 @@ UStruct* FindClass(const std::string& className)
     return nullptr;
 }
 
+UEnum* FindEnum(const std::string& enumName)
+{
+    auto& globals = GetEngineGlobals();
+    if (!globals.IsValid()) return nullptr;
+    
+    uintptr_t objData = *reinterpret_cast<uintptr_t*>(globals.GObjects);
+    int32_t objCount = *reinterpret_cast<int32_t*>(globals.GObjects + 4);
+    
+    for (int i = 0; i < objCount; i++) {
+        uintptr_t ptr = *reinterpret_cast<uintptr_t*>(objData + i * 4);
+        if (!ptr) continue;
+        UObject* obj = reinterpret_cast<UObject*>(ptr);
+        if (obj->GetObjClassName() == "Enum" && obj->GetName() == enumName)
+            return reinterpret_cast<UEnum*>(obj);
+    }
+    return nullptr;
+}
+
+UFunction* FindFunctionOnClass(const std::string& className, const std::string& funcName)
+{
+    UStruct* cls = FindClass(className);
+    if (!cls) return nullptr;
+
+    UStruct* current = cls;
+    int safetyLimit = 64;
+
+    while (current && safetyLimit-- > 0) {
+        UField* child = current->GetChildren();
+        int childLimit = 2000;
+
+        while (child && childLimit-- > 0) {
+            std::string childClass = child->GetObjClassName();
+            if (childClass == "Function") {
+                if (child->GetName() == funcName)
+                    return reinterpret_cast<UFunction*>(child);
+            }
+            child = child->GetNext();
+        }
+
+        UField* super = current->GetSuperField();
+        current = super ? reinterpret_cast<UStruct*>(super) : nullptr;
+    }
+    return nullptr;
+}
+
+UObject* GetDefaultObject(const std::string& className)
+{
+    UStruct* cls = FindClass(className);
+    if (!cls) return nullptr;
+    
+    // Cast to UClass to access CDO
+    UClass* uclass = reinterpret_cast<UClass*>(cls);
+    return uclass->GetDefaultObject();
+}
+
+bool SetDefaultProperty(const std::string& className, const std::string& propName, float value)
+{
+    UObject* cdo = GetDefaultObject(className);
+    if (!cdo) return false;
+    
+    UStruct* cls = FindClass(className);
+    if (!cls) return false;
+    
+    auto props = WalkProperties(cls);
+    for (auto& p : props) {
+        if (p.Name == propName && p.TypeName == "FloatProperty") {
+            cdo->SetField<float>(p.Offset, value);
+            return true;
+        }
+    }
+    return false;
+}
+
+bool SetDefaultPropertyInt(const std::string& className, const std::string& propName, int32_t value)
+{
+    UObject* cdo = GetDefaultObject(className);
+    if (!cdo) return false;
+    
+    UStruct* cls = FindClass(className);
+    if (!cls) return false;
+    
+    auto props = WalkProperties(cls);
+    for (auto& p : props) {
+        if (p.Name == propName && p.TypeName == "IntProperty") {
+            cdo->SetField<int32_t>(p.Offset, value);
+            return true;
+        }
+    }
+    return false;
+}
+
 } // namespace bs1sdk

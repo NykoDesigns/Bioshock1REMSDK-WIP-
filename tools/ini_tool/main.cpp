@@ -6,6 +6,8 @@
 #include <filesystem>
 #include <algorithm>
 #include <map>
+#include <cstdint>
+#include <cstring>
 
 /// INI Tool — Parse, display, and patch BioShock INI configuration files
 ///
@@ -211,18 +213,224 @@ static void CmdDiff(const std::string& fileA, const std::string& fileB)
     else std::printf("  %d differences found.\n", diffCount);
 }
 
+// ─── IBF Archive Support ─────────────────────────────────────────────
+// BioShock stores INI files in ConfigINI.IBF
+// Format: repeating [uint8 name_char_count] [UTF-16LE name] [uint32 size] [content]
+
+static void CmdExtractIBF(const std::string& ibfPath, const std::string& outputDir)
+{
+    std::ifstream file(ibfPath, std::ios::binary | std::ios::ate);
+    if (!file.is_open()) {
+        std::cerr << "Error: Cannot open " << ibfPath << "\n";
+        return;
+    }
+
+    size_t fileSize = file.tellg();
+    file.seekg(0);
+    std::vector<uint8_t> data(fileSize);
+    file.read(reinterpret_cast<char*>(data.data()), fileSize);
+
+    std::filesystem::create_directories(outputDir);
+
+    size_t offset = 0;
+    int count = 0;
+
+    while (offset < fileSize) {
+        if (offset + 1 > fileSize) break;
+
+        // Read filename length (char count including null terminator)
+        uint8_t nameLen = data[offset++];
+        if (nameLen == 0 || offset + (size_t)nameLen * 2 > fileSize) break;
+
+        // Read UTF-16LE filename
+        std::string filename;
+        for (int i = 0; i < nameLen; i++) {
+            uint16_t wc;
+            std::memcpy(&wc, data.data() + offset + i * 2, 2);
+            if (wc == 0) break;
+            filename += (wc < 128) ? static_cast<char>(wc) : '?';
+        }
+        offset += (size_t)nameLen * 2;
+
+        if (offset + 4 > fileSize) break;
+
+        uint32_t contentSize;
+        std::memcpy(&contentSize, data.data() + offset, 4);
+        offset += 4;
+
+        if (offset + contentSize > fileSize) {
+            std::fprintf(stderr, "  WARNING: %s truncated\n", filename.c_str());
+            contentSize = (uint32_t)(fileSize - offset);
+        }
+
+        std::string outPath = (std::filesystem::path(outputDir) / filename).string();
+        std::ofstream out(outPath, std::ios::binary);
+        out.write(reinterpret_cast<char*>(data.data() + offset), contentSize);
+        out.close();
+
+        std::printf("  Extracted: %-30s (%u bytes)\n", filename.c_str(), contentSize);
+        offset += contentSize;
+        count++;
+    }
+
+    std::printf("\n  Extracted %d files to %s\n", count, outputDir.c_str());
+}
+
+static void CmdRepackIBF(const std::string& inputDir, const std::string& ibfPath)
+{
+    std::vector<std::string> files;
+    for (auto& entry : std::filesystem::directory_iterator(inputDir)) {
+        if (entry.is_regular_file()) {
+            std::string ext = entry.path().extension().string();
+            std::transform(ext.begin(), ext.end(), ext.begin(),
+                           [](unsigned char c){ return (char)std::tolower(c); });
+            if (ext == ".ini")
+                files.push_back(entry.path().filename().string());
+        }
+    }
+    std::sort(files.begin(), files.end());
+
+    // Backup original IBF if it exists
+    if (std::filesystem::exists(ibfPath)) {
+        std::string bakPath = ibfPath + ".bak";
+        if (!std::filesystem::exists(bakPath)) {
+            std::filesystem::copy_file(ibfPath, bakPath);
+            std::printf("  Backed up: %s\n", bakPath.c_str());
+        }
+    }
+
+    std::ofstream out(ibfPath, std::ios::binary);
+    if (!out.is_open()) {
+        std::cerr << "Error: Cannot write to " << ibfPath << "\n";
+        return;
+    }
+
+    for (auto& filename : files) {
+        std::string filepath = (std::filesystem::path(inputDir) / filename).string();
+        std::ifstream in(filepath, std::ios::binary | std::ios::ate);
+        if (!in.is_open()) continue;
+        size_t contentSize = in.tellg();
+        in.seekg(0);
+        std::vector<uint8_t> content(contentSize);
+        in.read(reinterpret_cast<char*>(content.data()), contentSize);
+
+        // Name length including null terminator
+        std::string nameWithNull = filename;
+        nameWithNull.push_back('\0');
+        uint8_t nameLen = (uint8_t)nameWithNull.size();
+        out.write(reinterpret_cast<char*>(&nameLen), 1);
+
+        // UTF-16LE filename
+        for (char c : nameWithNull) {
+            uint16_t wc = (uint16_t)(unsigned char)c;
+            out.write(reinterpret_cast<char*>(&wc), 2);
+        }
+
+        // Content size + content
+        uint32_t cs = (uint32_t)contentSize;
+        out.write(reinterpret_cast<char*>(&cs), 4);
+        out.write(reinterpret_cast<char*>(content.data()), contentSize);
+
+        std::printf("  Packed: %-30s (%zu bytes)\n", filename.c_str(), contentSize);
+    }
+
+    out.close();
+    std::printf("\n  Repacked %zu files to %s\n", files.size(), ibfPath.c_str());
+}
+
+// ─── Additional INI Commands ─────────────────────────────────────────
+
+static void CmdSections(const std::string& filepath)
+{
+    auto entries = ParseIni(filepath);
+    std::string lastSection;
+    int sectionCount = 0;
+
+    for (auto& e : entries) {
+        if (!e.section.empty() && e.section != lastSection) {
+            lastSection = e.section;
+            int keys = 0;
+            for (auto& e2 : entries)
+                if (e2.section == lastSection && !e2.key.empty()) keys++;
+            std::printf("  [%s]  (%d keys)\n", lastSection.c_str(), keys);
+            sectionCount++;
+        }
+    }
+    std::printf("\n  %d sections\n", sectionCount);
+}
+
+static void CmdSearch(const std::string& filepath, const std::string& pattern)
+{
+    auto entries = ParseIni(filepath);
+    int matchCount = 0;
+
+    auto toLower = [](std::string s) {
+        std::transform(s.begin(), s.end(), s.begin(),
+                       [](unsigned char c){ return (char)std::tolower(c); });
+        return s;
+    };
+    std::string lp = toLower(pattern);
+
+    for (auto& e : entries) {
+        if (e.key.empty()) continue;
+        if (toLower(e.key).find(lp) != std::string::npos ||
+            toLower(e.value).find(lp) != std::string::npos ||
+            toLower(e.section).find(lp) != std::string::npos) {
+            std::printf("  [%s] %s = %s\n", e.section.c_str(), e.key.c_str(), e.value.c_str());
+            matchCount++;
+        }
+    }
+    std::printf("\n  %d matches\n", matchCount);
+}
+
+static void CmdAdd(const std::string& filepath, const std::string& section,
+                    const std::string& key, const std::string& value)
+{
+    auto entries = ParseIni(filepath);
+
+    // Find last entry in the target section
+    int insertIdx = -1;
+    for (int i = 0; i < (int)entries.size(); i++) {
+        if (entries[i].section == section) insertIdx = i;
+    }
+
+    if (insertIdx < 0) {
+        // Section doesn't exist — create it
+        entries.push_back({section, "", "", "\n[" + section + "]\n"});
+        entries.push_back({section, key, value, key + "=" + value + "\n"});
+    } else {
+        IniEntry ne{section, key, value, key + "=" + value + "\n"};
+        entries.insert(entries.begin() + insertIdx + 1, ne);
+    }
+
+    // Backup
+    std::filesystem::path bakPath = std::filesystem::path(filepath).string() + ".bak";
+    if (!std::filesystem::exists(bakPath))
+        std::filesystem::copy_file(filepath, bakPath);
+
+    WriteIni(filepath, entries);
+    std::printf("  Added: [%s] %s = %s\n", section.c_str(), key.c_str(), value.c_str());
+    std::printf("  Written: %s\n", filepath.c_str());
+}
+
 // ─── Main ──────────────────────────────────────────────────────────────
 
 int main(int argc, char* argv[])
 {
-    std::cout << "BS1SDK - INI Tool v1.0.0\n\n";
+    std::cout << "BS1SDK - INI Tool v2.0.0\n\n";
 
     if (argc < 3) {
-        std::cout << "Usage:\n";
+        std::cout << "INI commands:\n";
         std::cout << "  ini_tool dump <file>                       - Display all sections/keys\n";
+        std::cout << "  ini_tool sections <file>                   - List sections with key counts\n";
+        std::cout << "  ini_tool search <file> <pattern>            - Search keys/values/sections\n";
         std::cout << "  ini_tool get <file> <section> <key>        - Get a specific value\n";
         std::cout << "  ini_tool set <file> <section> <key> <val>  - Set a value\n";
+        std::cout << "  ini_tool add <file> <section> <key> <val>  - Add a new key-value pair\n";
         std::cout << "  ini_tool diff <file_a> <file_b>            - Show differences\n";
+        std::cout << "\nIBF archive commands:\n";
+        std::cout << "  ini_tool extract <ibf_file> [output_dir]   - Extract INI files from IBF\n";
+        std::cout << "  ini_tool repack <input_dir> <output_ibf>   - Repack INI files into IBF\n";
         return 1;
     }
 
@@ -230,12 +438,23 @@ int main(int argc, char* argv[])
 
     if (cmd == "dump") {
         CmdDump(argv[2]);
+    } else if (cmd == "sections") {
+        CmdSections(argv[2]);
+    } else if (cmd == "search" && argc >= 4) {
+        CmdSearch(argv[2], argv[3]);
     } else if (cmd == "get" && argc >= 5) {
         CmdGet(argv[2], argv[3], argv[4]);
     } else if (cmd == "set" && argc >= 6) {
         CmdSet(argv[2], argv[3], argv[4], argv[5]);
+    } else if (cmd == "add" && argc >= 6) {
+        CmdAdd(argv[2], argv[3], argv[4], argv[5]);
     } else if (cmd == "diff" && argc >= 4) {
         CmdDiff(argv[2], argv[3]);
+    } else if (cmd == "extract") {
+        std::string outDir = (argc >= 4) ? argv[3] : "extracted_ini";
+        CmdExtractIBF(argv[2], outDir);
+    } else if (cmd == "repack" && argc >= 4) {
+        CmdRepackIBF(argv[2], argv[3]);
     } else {
         std::cerr << "Unknown command or missing args: " << cmd << "\n";
         return 1;

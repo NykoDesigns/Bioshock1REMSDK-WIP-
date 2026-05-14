@@ -1212,24 +1212,293 @@ void SetExportProp(const std::string& filepath, int exportIdx,
     std::cout << "  Written: " << filepath << "\n";
 }
 
+// ═══════════════════════════════════════════════════════════════════════
+// Goal 4: Custom Splicer Types — RepopulationAITypes array editing
+// ═══════════════════════════════════════════════════════════════════════
+// RepopulationAITypes is array<class<Pawn>> on AggressorSpawner.
+// Serialized as: Array property tag + value(INT32 count + count*INT32 refs)
+// Each ref is an object reference (positive=export, negative=import, 0=none)
+
+void DumpAITypes(const std::string& filepath, int exportIdx)
+{
+    auto pkg = ParsePackage(filepath);
+    if (!pkg.valid) { std::cerr << "Error: Failed to parse\n"; return; }
+
+    if (exportIdx < 0 || exportIdx >= (int)pkg.exports.size()) {
+        std::cerr << "Error: Export index out of range (0-" << pkg.exports.size()-1 << ")\n";
+        return;
+    }
+
+    auto& exp = pkg.exports[exportIdx];
+    std::string className = pkg.ResolveClassName(exp.classIndex);
+    std::string objName = pkg.ResolveFName(exp.objectName);
+
+    std::printf("RepopulationAITypes for [%d] %s '%s'\n\n", exportIdx,
+                 className.c_str(), objName.c_str());
+
+    if (exp.serialSize <= 0) {
+        std::cout << "  No serial data.\n";
+        return;
+    }
+
+    int skip = DetectHeaderSkip(pkg.rawData.data(), exp.serialOffset, exp.serialSize, pkg.names);
+    auto props = ParseProperties(pkg.rawData.data(), exp.serialOffset + skip,
+                                  pkg.names, exp.serialOffset + exp.serialSize);
+
+    bool found = false;
+    for (auto& p : props) {
+        if (p.name == "RepopulationAITypes" && p.type == PT_Array) {
+            found = true;
+            if (p.value.size() < 4) {
+                std::cout << "  Array data too small\n";
+                break;
+            }
+
+            // Read count as INT32
+            int32_t count;
+            memcpy(&count, p.value.data(), 4);
+
+            // Validate: count * 4 + 4 should equal p.value.size()
+            size_t expectedSize = 4 + (size_t)count * 4;
+            if (expectedSize != p.value.size()) {
+                std::printf("  WARNING: Array size mismatch (count=%d, expected %zu bytes, got %zu)\n",
+                             count, expectedSize, p.value.size());
+                // Try compact index interpretation
+                size_t ciPos = 0;
+                int ciCount = ReadCI(p.value.data(), ciPos);
+                size_t ciExpected = ciPos + (size_t)ciCount * 4;
+                if (ciExpected == p.value.size()) {
+                    std::printf("  (Using compact-index count: %d)\n", ciCount);
+                    count = ciCount;
+                    std::printf("\n  RepopulationAITypes: %d entries\n\n", count);
+                    for (int i = 0; i < count && ciPos + 4 <= p.value.size(); i++) {
+                        int32_t ref;
+                        memcpy(&ref, p.value.data() + ciPos, 4);
+                        ciPos += 4;
+                        std::printf("    [%d] ref=%-6d  %s\n", i, ref,
+                                     pkg.ResolveObjRef(ref).c_str());
+                    }
+                    break;
+                }
+            }
+
+            std::printf("  RepopulationAITypes: %d entries (value_offset=0x%zX)\n\n",
+                         count, p.valueOffset);
+
+            for (int i = 0; i < count; i++) {
+                size_t elemOff = 4 + (size_t)i * 4;
+                if (elemOff + 4 > p.value.size()) break;
+                int32_t ref;
+                memcpy(&ref, p.value.data() + elemOff, 4);
+                std::printf("    [%d] ref=%-6d  %s\n", i, ref,
+                             pkg.ResolveObjRef(ref).c_str());
+            }
+            break;
+        }
+    }
+
+    if (!found) {
+        std::cout << "  RepopulationAITypes property not found on this export.\n";
+        std::cout << "  Available properties:\n";
+        for (auto& p : props) {
+            if (p.type != PT_None)
+                std::printf("    %-30s %s (size=%d)\n",
+                             p.name.c_str(), PropTypeName(p.type), p.size);
+        }
+    }
+}
+
+void SetAIType(const std::string& filepath, int exportIdx, int arrayIdx, int32_t newRef)
+{
+    auto pkg = ParsePackage(filepath);
+    if (!pkg.valid) { std::cerr << "Error: Failed to parse\n"; return; }
+
+    if (exportIdx < 0 || exportIdx >= (int)pkg.exports.size()) {
+        std::cerr << "Error: Export index out of range\n";
+        return;
+    }
+
+    auto& exp = pkg.exports[exportIdx];
+    if (exp.serialSize <= 0) { std::cerr << "Error: No serial data\n"; return; }
+
+    int skip = DetectHeaderSkip(pkg.rawData.data(), exp.serialOffset, exp.serialSize, pkg.names);
+    auto props = ParseProperties(pkg.rawData.data(), exp.serialOffset + skip,
+                                  pkg.names, exp.serialOffset + exp.serialSize);
+
+    for (auto& p : props) {
+        if (p.name != "RepopulationAITypes" || p.type != PT_Array) continue;
+        if (p.value.size() < 4) { std::cerr << "Error: Array too small\n"; return; }
+
+        int32_t count;
+        memcpy(&count, p.value.data(), 4);
+
+        // Detect format: INT32 count vs compact-index count
+        size_t headerSize = 4; // default: INT32 count
+        size_t expectedSize = 4 + (size_t)count * 4;
+        if (expectedSize != p.value.size()) {
+            // Try compact-index count
+            size_t ciPos = 0;
+            int ciCount = ReadCI(p.value.data(), ciPos);
+            if (ciPos + (size_t)ciCount * 4 == p.value.size()) {
+                count = ciCount;
+                headerSize = ciPos;
+            } else {
+                std::cerr << "Error: Cannot determine array format\n";
+                return;
+            }
+        }
+
+        if (arrayIdx < 0 || arrayIdx >= count) {
+            std::cerr << "Error: Array index " << arrayIdx << " out of range (0-"
+                      << count - 1 << ")\n";
+            return;
+        }
+
+        // Read old value
+        size_t elemFileOff = p.valueOffset + headerSize + (size_t)arrayIdx * 4;
+        int32_t oldRef;
+        memcpy(&oldRef, pkg.rawData.data() + elemFileOff, 4);
+
+        // Write new value
+        memcpy(pkg.rawData.data() + elemFileOff, &newRef, 4);
+
+        std::string className = pkg.ResolveClassName(exp.classIndex);
+        std::string objName = pkg.ResolveFName(exp.objectName);
+        std::printf("  [%d] %s '%s' RepopulationAITypes[%d]:\n",
+                     exportIdx, className.c_str(), objName.c_str(), arrayIdx);
+        std::printf("    OLD: ref=%-6d  %s\n", oldRef, pkg.ResolveObjRef(oldRef).c_str());
+        std::printf("    NEW: ref=%-6d  %s\n", newRef, pkg.ResolveObjRef(newRef).c_str());
+
+        // Backup
+        std::string mapName = std::filesystem::path(filepath).filename().string();
+        auto backupDir = std::filesystem::path(filepath).parent_path() / "backups";
+        std::filesystem::create_directories(backupDir);
+        auto backupPath = backupDir / mapName;
+        if (!std::filesystem::exists(backupPath)) {
+            std::filesystem::copy_file(filepath, backupPath);
+            std::cout << "  Backed up: " << backupPath.string() << "\n";
+        }
+
+        // Write
+        std::ofstream outFile(filepath, std::ios::binary);
+        if (!outFile.is_open()) { std::cerr << "Error: Cannot write\n"; return; }
+        outFile.write(reinterpret_cast<char*>(pkg.rawData.data()), pkg.rawData.size());
+        outFile.close();
+        std::cout << "  Written: " << filepath << "\n";
+        return;
+    }
+
+    std::cerr << "Error: RepopulationAITypes not found on export " << exportIdx << "\n";
+}
+
+void FindImportByName(const std::string& filepath, const std::string& pattern)
+{
+    auto pkg = ParsePackage(filepath);
+    if (!pkg.valid) { std::cerr << "Error: Failed to parse\n"; return; }
+
+    auto toLower = [](std::string s) {
+        for (auto& c : s) c = (char)std::tolower((unsigned char)c);
+        return s;
+    };
+    std::string lp = toLower(pattern);
+
+    std::printf("Imports matching '%s':\n\n", pattern.c_str());
+    int count = 0;
+    for (int i = 0; i < (int)pkg.imports.size(); i++) {
+        auto& imp = pkg.imports[i];
+        std::string objName = pkg.ResolveFName(imp.objectName);
+        std::string clsName = pkg.ResolveFName(imp.className);
+        std::string pkgName = pkg.ResolveFName(imp.classPackage);
+
+        if (toLower(objName).find(lp) != std::string::npos ||
+            toLower(clsName).find(lp) != std::string::npos) {
+            // Import refs are negative 1-based
+            int ref = -(i + 1);
+            std::printf("  [Import %d]  ref=%-6d  %s.%s  (pkg: %s)\n",
+                         i, ref, clsName.c_str(), objName.c_str(), pkgName.c_str());
+            count++;
+        }
+    }
+    std::printf("\n  %d matches\n", count);
+}
+
+void FindExportByName(const std::string& filepath, const std::string& pattern)
+{
+    auto pkg = ParsePackage(filepath);
+    if (!pkg.valid) { std::cerr << "Error: Failed to parse\n"; return; }
+
+    auto toLower = [](std::string s) {
+        for (auto& c : s) c = (char)std::tolower((unsigned char)c);
+        return s;
+    };
+    std::string lp = toLower(pattern);
+
+    std::printf("Exports matching '%s':\n\n", pattern.c_str());
+    int count = 0;
+    for (int i = 0; i < (int)pkg.exports.size(); i++) {
+        auto& exp = pkg.exports[i];
+        std::string objName = pkg.ResolveFName(exp.objectName);
+        std::string clsName = pkg.ResolveClassName(exp.classIndex);
+
+        if (toLower(objName).find(lp) != std::string::npos ||
+            toLower(clsName).find(lp) != std::string::npos) {
+            int ref = i + 1; // Export refs are positive 1-based
+            std::printf("  [Export %d]  ref=%-6d  %s '%s'  (size=%d)\n",
+                         i, ref, clsName.c_str(), objName.c_str(), exp.serialSize);
+            count++;
+        }
+    }
+    std::printf("\n  %d matches\n", count);
+}
+
+void FindNameInTable(const std::string& filepath, const std::string& pattern)
+{
+    auto pkg = ParsePackage(filepath);
+    if (!pkg.valid) { std::cerr << "Error: Failed to parse\n"; return; }
+
+    auto toLower = [](std::string s) {
+        for (auto& c : s) c = (char)std::tolower((unsigned char)c);
+        return s;
+    };
+    std::string lp = toLower(pattern);
+
+    std::printf("Names matching '%s':\n\n", pattern.c_str());
+    int count = 0;
+    for (int i = 0; i < (int)pkg.names.size(); i++) {
+        if (toLower(pkg.names[i].name).find(lp) != std::string::npos) {
+            std::printf("  [%5d] %s\n", i, pkg.names[i].name.c_str());
+            count++;
+        }
+    }
+    std::printf("\n  %d matches\n", count);
+}
+
 int main(int argc, char* argv[])
 {
-    std::cout << "BS1SDK - BSM File Tool v0.4.0\n\n";
+    std::cout << "BS1SDK - BSM File Tool v0.5.0\n\n";
 
     if (argc < 3) {
-        std::cout << "Usage:\n";
-        std::cout << "  bsm_tool analyze <file>            - Analyze header + validation\n";
-        std::cout << "  bsm_tool names <file>              - Dump name table\n";
-        std::cout << "  bsm_tool imports <file>            - Dump import table\n";
-        std::cout << "  bsm_tool exports <file>            - Dump export table\n";
-        std::cout << "  bsm_tool actors <file>             - Dump non-structural exports\n";
-        std::cout << "  bsm_tool props <file> <export_idx>  - Dump properties of an export\n";
-        std::cout << "  bsm_tool spawners <file>           - Find spawner actors with locations\n";
-        std::cout << "  bsm_tool dump <file>               - Full dump (names+imports+exports)\n";
-        std::cout << "  bsm_tool hexdump <file> [off] [len] - Hex dump\n";
-        std::cout << "  bsm_tool compare <a> <b>           - Compare two packages\n";
-        std::cout << "  bsm_tool patch <file> <mult> [dry]  - Duplicate spawners (x2-x10)\n";
+        std::cout << "Package analysis:\n";
+        std::cout << "  bsm_tool analyze <file>                    - Header + validation\n";
+        std::cout << "  bsm_tool names <file>                      - Dump name table\n";
+        std::cout << "  bsm_tool imports <file>                    - Dump import table\n";
+        std::cout << "  bsm_tool exports <file>                    - Dump export table\n";
+        std::cout << "  bsm_tool actors <file>                     - Non-structural exports\n";
+        std::cout << "  bsm_tool props <file> <export_idx>         - Properties of an export\n";
+        std::cout << "  bsm_tool spawners <file>                   - Spawner actors + locations\n";
+        std::cout << "  bsm_tool dump <file>                       - Full dump\n";
+        std::cout << "  bsm_tool hexdump <file> [off] [len]        - Hex dump\n";
+        std::cout << "  bsm_tool compare <a> <b>                   - Compare two packages\n";
+        std::cout << "\nSearch:\n";
+        std::cout << "  bsm_tool findname <file> <pattern>         - Search name table\n";
+        std::cout << "  bsm_tool findimport <file> <pattern>       - Search imports by name\n";
+        std::cout << "  bsm_tool findexport <file> <pattern>       - Search exports by name\n";
+        std::cout << "\nSpawn patching:\n";
+        std::cout << "  bsm_tool patch <file> <mult> [dry]         - Duplicate spawners (x2-x10)\n";
         std::cout << "  bsm_tool setprop <file> <idx> <prop> <val> - Edit export property\n";
+        std::cout << "\nCustom splicer types:\n";
+        std::cout << "  bsm_tool aitypes <file> <export_idx>       - List RepopulationAITypes\n";
+        std::cout << "  bsm_tool setaitype <file> <exp> <arr> <ref> - Replace one AI type entry\n";
         return 1;
     }
 
@@ -1274,6 +1543,16 @@ int main(int argc, char* argv[])
         PatchSpawners(argv[2], mult, dry);
     } else if (command == "setprop" && argc >= 6) {
         SetExportProp(argv[2], std::stoi(argv[3]), argv[4], argv[5]);
+    } else if (command == "aitypes" && argc >= 4) {
+        DumpAITypes(argv[2], std::stoi(argv[3]));
+    } else if (command == "setaitype" && argc >= 6) {
+        SetAIType(argv[2], std::stoi(argv[3]), std::stoi(argv[4]), std::stoi(argv[5]));
+    } else if (command == "findimport" && argc >= 4) {
+        FindImportByName(argv[2], argv[3]);
+    } else if (command == "findexport" && argc >= 4) {
+        FindExportByName(argv[2], argv[3]);
+    } else if (command == "findname" && argc >= 4) {
+        FindNameInTable(argv[2], argv[3]);
     } else {
         std::cerr << "Unknown command: " << command << "\n";
         return 1;

@@ -87,7 +87,7 @@ std::vector<FunctionInfo> GetClassFunctions(UStruct* cls)
                 fi.Name = func->GetName();
                 fi.FullName = current->GetName() + "." + fi.Name;
                 fi.ParamsSize = func->GetPropertiesSize();
-                fi.FunctionFlags = 0; // TODO: read function flags when offset is confirmed
+                fi.FunctionFlags = func->GetFunctionFlags();
                 fi.Params = GetFunctionParams(func);
                 funcs.push_back(fi);
             }

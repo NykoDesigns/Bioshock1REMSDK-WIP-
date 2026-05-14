@@ -12,16 +12,7 @@ namespace bs1sdk {
 /// In UE2.5, UObject::ProcessEvent(UFunction*, void* Parms, void* Result)
 /// is a virtual function. We hook it by patching the vtable.
 
-// UFunction is a UStruct with additional fields for bytecode
-class UFunction : public UStruct {
-public:
-    // UFunction extends UStruct with:
-    //   +??: uint32 FunctionFlags
-    //   +??: uint16 iNative (native function index)
-    //   +??: uint8 OperPrecedence
-    //   +??: FName FriendlyName
-    // Exact offsets TBD - for now we just use the UField name/class info
-};
+// UFunction is now fully defined in uobject.h with confirmed offsets
 
 // Signature: void __thiscall UObject::ProcessEvent(UFunction* Function, void* Parms, void* Result)
 // On x86 MSVC __thiscall: 'this' in ECX, args on stack

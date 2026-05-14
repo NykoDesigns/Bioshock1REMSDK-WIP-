@@ -4,6 +4,7 @@
 #include "pattern.h"
 #include "mod_config.h"
 #include "../engine/uobject.h"
+#include "../engine/world.h"
 #include "../gameplay/gameplay_mods.h"
 
 #include <Windows.h>
@@ -127,7 +128,26 @@ void InitializeSDK()
         DumpPropertyLayout();
     }
 
-    // Phase 4: Load mod config and auto-init gameplay mods
+    // Phase 4: World system + GNatives + Tick hook
+    if (GetEngineGlobals().IsValid()) {
+        // Wait for level to load (actors need to exist)
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+        
+        if (InitWorldSystem()) {
+            LOG_INFO("World system ready - {} actors in level", GetCurrentLevel().ActorCount);
+        }
+        
+        if (InitNativeTable()) {
+            LOG_INFO("GNatives table found - {} native functions", GetNativeCount());
+            DumpNativesToFile("Z:\\Bioshock1SDK\\gnatives_dump.txt");
+        }
+        
+        if (InstallTickHook()) {
+            LOG_INFO("Engine tick hook installed");
+        }
+    }
+
+    // Phase 5: Load mod config and auto-init gameplay mods
     ModConfig cfg = LoadModConfig();
     if (cfg.autoInitMods && GetEngineGlobals().IsValid()) {
         LOG_INFO("Auto-initializing gameplay mods from config...");

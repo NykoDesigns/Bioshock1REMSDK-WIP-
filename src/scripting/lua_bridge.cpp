@@ -1,6 +1,7 @@
 #include "lua_bridge.h"
 #include "../engine/uobject.h"
 #include "../engine/function_caller.h"
+#include "../engine/world.h"
 #include "../hooks/process_event.h"
 #include "../gameplay/teleport_plasmid.h"
 #include "../core/log.h"
@@ -329,6 +330,286 @@ static int lua_sdk_teleport(lua_State* L)
     return 1;
 }
 
+// ─── World/Actor Lua bindings ────────────────────────────────────────────
+
+// sdk.getActors([className]) -> table of {address, name, class}
+static int lua_sdk_getActors(lua_State* L)
+{
+    const char* classFilter = lua_isnoneornil(L, 1) ? nullptr : luaL_checkstring(L, 1);
+    
+    std::vector<UObject*> actors;
+    if (classFilter)
+        actors = GetActorsOfClass(classFilter);
+    else
+        actors = GetAllActors();
+    
+    lua_newtable(L);
+    int idx = 1;
+    for (auto* actor : actors) {
+        lua_newtable(L);
+        lua_pushinteger(L, (lua_Integer)(uintptr_t)actor);
+        lua_setfield(L, -2, "address");
+        lua_pushstring(L, actor->GetName().c_str());
+        lua_setfield(L, -2, "name");
+        lua_pushstring(L, actor->GetObjClassName().c_str());
+        lua_setfield(L, -2, "class");
+        lua_rawseti(L, -2, idx++);
+    }
+    return 1;
+}
+
+// sdk.getActorPosition(address) -> x, y, z
+static int lua_sdk_getActorPosition(lua_State* L)
+{
+    uintptr_t addr = (uintptr_t)luaL_checkinteger(L, 1);
+    UObject* actor = reinterpret_cast<UObject*>(addr);
+    
+    FVec3 pos;
+    if (GetActorPosition(actor, pos)) {
+        lua_pushnumber(L, pos.X);
+        lua_pushnumber(L, pos.Y);
+        lua_pushnumber(L, pos.Z);
+        return 3;
+    }
+    return 0;
+}
+
+// sdk.setActorPosition(address, x, y, z)
+static int lua_sdk_setActorPosition(lua_State* L)
+{
+    uintptr_t addr = (uintptr_t)luaL_checkinteger(L, 1);
+    UObject* actor = reinterpret_cast<UObject*>(addr);
+    
+    FVec3 pos;
+    pos.X = (float)luaL_checknumber(L, 2);
+    pos.Y = (float)luaL_checknumber(L, 3);
+    pos.Z = (float)luaL_checknumber(L, 4);
+    
+    lua_pushboolean(L, SetActorPosition(actor, pos));
+    return 1;
+}
+
+// sdk.getActorsInRadius(x, y, z, radius, [classFilter]) -> table
+static int lua_sdk_getActorsInRadius(lua_State* L)
+{
+    FVec3 center;
+    center.X = (float)luaL_checknumber(L, 1);
+    center.Y = (float)luaL_checknumber(L, 2);
+    center.Z = (float)luaL_checknumber(L, 3);
+    float radius = (float)luaL_checknumber(L, 4);
+    const char* classFilter = lua_isnoneornil(L, 5) ? "" : luaL_checkstring(L, 5);
+    
+    auto actors = GetActorsInRadius(center, radius, classFilter);
+    
+    lua_newtable(L);
+    int idx = 1;
+    for (auto* actor : actors) {
+        lua_newtable(L);
+        lua_pushinteger(L, (lua_Integer)(uintptr_t)actor);
+        lua_setfield(L, -2, "address");
+        lua_pushstring(L, actor->GetName().c_str());
+        lua_setfield(L, -2, "name");
+        lua_pushstring(L, actor->GetObjClassName().c_str());
+        lua_setfield(L, -2, "class");
+        
+        FVec3 pos;
+        if (GetActorPosition(actor, pos)) {
+            lua_pushnumber(L, pos.X);
+            lua_setfield(L, -2, "x");
+            lua_pushnumber(L, pos.Y);
+            lua_setfield(L, -2, "y");
+            lua_pushnumber(L, pos.Z);
+            lua_setfield(L, -2, "z");
+        }
+        
+        lua_rawseti(L, -2, idx++);
+    }
+    return 1;
+}
+
+// sdk.getPlayerPos() -> x, y, z
+static int lua_sdk_getPlayerPos(lua_State* L)
+{
+    FVec3 pos;
+    if (GetPlayerPosition(pos)) {
+        lua_pushnumber(L, pos.X);
+        lua_pushnumber(L, pos.Y);
+        lua_pushnumber(L, pos.Z);
+        return 3;
+    }
+    return 0;
+}
+
+// sdk.actorDistance(addr1, addr2) -> float
+static int lua_sdk_actorDistance(lua_State* L)
+{
+    uintptr_t a1 = (uintptr_t)luaL_checkinteger(L, 1);
+    uintptr_t a2 = (uintptr_t)luaL_checkinteger(L, 2);
+    float dist = GetActorDistance(reinterpret_cast<UObject*>(a1), reinterpret_cast<UObject*>(a2));
+    lua_pushnumber(L, dist);
+    return 1;
+}
+
+// sdk.getLevelInfo() -> {actorCount, levelName}
+static int lua_sdk_getLevelInfo(lua_State* L)
+{
+    LevelInfo info = GetCurrentLevel();
+    lua_newtable(L);
+    lua_pushinteger(L, info.ActorCount);
+    lua_setfield(L, -2, "actorCount");
+    lua_pushstring(L, info.LevelName.c_str());
+    lua_setfield(L, -2, "name");
+    return 1;
+}
+
+// ─── CDO (Class Default Object) Lua bindings ────────────────────────────
+
+// sdk.getDefaultObject(className) -> address or nil
+static int lua_sdk_getDefaultObject(lua_State* L)
+{
+    const char* className = luaL_checkstring(L, 1);
+    UObject* cdo = GetDefaultObject(className);
+    if (cdo) {
+        lua_pushinteger(L, (lua_Integer)(uintptr_t)cdo);
+    } else {
+        lua_pushnil(L);
+    }
+    return 1;
+}
+
+// sdk.setDefault(className, propName, value) -> bool
+static int lua_sdk_setDefault(lua_State* L)
+{
+    const char* className = luaL_checkstring(L, 1);
+    const char* propName = luaL_checkstring(L, 2);
+    
+    if (lua_isinteger(L, 3)) {
+        int32_t val = (int32_t)lua_tointeger(L, 3);
+        lua_pushboolean(L, SetDefaultPropertyInt(className, propName, val));
+    } else {
+        float val = (float)lua_tonumber(L, 3);
+        lua_pushboolean(L, SetDefaultProperty(className, propName, val));
+    }
+    return 1;
+}
+
+// ─── Function introspection Lua bindings ─────────────────────────────────
+
+// sdk.getFunctions(className) -> table of {name, flags, isNative, nativeIdx}
+static int lua_sdk_getFunctions(lua_State* L)
+{
+    const char* className = luaL_checkstring(L, 1);
+    UStruct* cls = FindClass(className);
+    if (!cls) { lua_pushnil(L); return 1; }
+    
+    auto funcs = GetClassFunctions(cls);
+    
+    lua_newtable(L);
+    int idx = 1;
+    for (auto& fi : funcs) {
+        lua_newtable(L);
+        lua_pushstring(L, fi.Name.c_str());
+        lua_setfield(L, -2, "name");
+        lua_pushinteger(L, fi.FunctionFlags);
+        lua_setfield(L, -2, "flags");
+        
+        UFunction* func = fi.Function;
+        lua_pushboolean(L, func->IsNative());
+        lua_setfield(L, -2, "isNative");
+        lua_pushinteger(L, func->GetNativeIndex());
+        lua_setfield(L, -2, "nativeIndex");
+        lua_pushboolean(L, func->IsEvent());
+        lua_setfield(L, -2, "isEvent");
+        lua_pushboolean(L, func->IsExec());
+        lua_setfield(L, -2, "isExec");
+        lua_pushinteger(L, func->GetParmsSize());
+        lua_setfield(L, -2, "paramsSize");
+        
+        lua_rawseti(L, -2, idx++);
+    }
+    return 1;
+}
+
+// sdk.getEnum(enumName) -> table of strings or nil
+static int lua_sdk_getEnum(lua_State* L)
+{
+    const char* enumName = luaL_checkstring(L, 1);
+    UEnum* uenum = FindEnum(enumName);
+    if (!uenum) { lua_pushnil(L); return 1; }
+    
+    auto names = uenum->GetAllEnumNames();
+    lua_newtable(L);
+    for (int i = 0; i < (int)names.size(); i++) {
+        lua_pushstring(L, names[i].c_str());
+        lua_rawseti(L, -2, i + 1);
+    }
+    return 1;
+}
+
+// ─── Tick callback Lua binding ───────────────────────────────────────────
+
+static int s_LuaTickRef = LUA_NOREF;
+
+// sdk.onTick(function(dt) ... end) -> tickId
+static int lua_sdk_onTick(lua_State* L)
+{
+    luaL_checktype(L, 1, LUA_TFUNCTION);
+    
+    // Store the function reference
+    lua_pushvalue(L, 1);
+    int ref = luaL_ref(L, LUA_REGISTRYINDEX);
+    
+    // Register tick callback that calls the Lua function
+    int tickId = RegisterTickCallback([L, ref](float dt) {
+        lua_rawgeti(L, LUA_REGISTRYINDEX, ref);
+        lua_pushnumber(L, dt);
+        if (lua_pcall(L, 1, 0, 0) != LUA_OK) {
+            LOG_ERROR("Lua tick error: {}", lua_tostring(L, -1));
+            lua_pop(L, 1);
+        }
+    });
+    
+    lua_pushinteger(L, tickId);
+    return 1;
+}
+
+// sdk.offTick(tickId)
+static int lua_sdk_offTick(lua_State* L)
+{
+    int id = (int)luaL_checkinteger(L, 1);
+    UnregisterTickCallback(id);
+    return 0;
+}
+
+// sdk.getTickRate() -> float
+static int lua_sdk_getTickRate(lua_State* L)
+{
+    lua_pushnumber(L, GetTickRate());
+    return 1;
+}
+
+// ─── Native function access Lua bindings ─────────────────────────────────
+
+// sdk.getNativeCount() -> int
+static int lua_sdk_getNativeCount(lua_State* L)
+{
+    lua_pushinteger(L, GetNativeCount());
+    return 1;
+}
+
+// sdk.getNativeAddress(index) -> integer address or nil
+static int lua_sdk_getNativeAddress(lua_State* L)
+{
+    int idx = (int)luaL_checkinteger(L, 1);
+    NativeFunc fn = GetNative((uint16_t)idx);
+    if (fn) {
+        lua_pushinteger(L, (lua_Integer)(uintptr_t)fn);
+    } else {
+        lua_pushnil(L);
+    }
+    return 1;
+}
+
 // ─── Registration ────────────────────────────────────────────────────────
 
 static const luaL_Reg sdk_funcs[] = {
@@ -341,6 +622,27 @@ static const luaL_Reg sdk_funcs[] = {
     {"off", lua_sdk_off},
     {"hookpe", lua_sdk_hookpe},
     {"teleport", lua_sdk_teleport},
+    // World/Actor
+    {"getActors", lua_sdk_getActors},
+    {"getActorPosition", lua_sdk_getActorPosition},
+    {"setActorPosition", lua_sdk_setActorPosition},
+    {"getActorsInRadius", lua_sdk_getActorsInRadius},
+    {"getPlayerPos", lua_sdk_getPlayerPos},
+    {"actorDistance", lua_sdk_actorDistance},
+    {"getLevelInfo", lua_sdk_getLevelInfo},
+    // CDO
+    {"getDefaultObject", lua_sdk_getDefaultObject},
+    {"setDefault", lua_sdk_setDefault},
+    // Functions / Enums
+    {"getFunctions", lua_sdk_getFunctions},
+    {"getEnum", lua_sdk_getEnum},
+    // Tick
+    {"onTick", lua_sdk_onTick},
+    {"offTick", lua_sdk_offTick},
+    {"getTickRate", lua_sdk_getTickRate},
+    // Natives
+    {"getNativeCount", lua_sdk_getNativeCount},
+    {"getNativeAddress", lua_sdk_getNativeAddress},
     {nullptr, nullptr}
 };
 

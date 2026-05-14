@@ -140,6 +140,194 @@ public:
     int32_t GetPropertyOffset() const { return GetField<int32_t>(OFFSET_PROP_OFFSET); }
 };
 
+// ─── UFunction ──────────────────────────────────────────────────────────
+// Extends UStruct with bytecode and native function data.
+// Layout discovered via cross-referencing known ProcessEvent dispatch:
+//   UStruct size = 0x64 (UField ends at 0x48, UStruct adds ScriptText, Children,
+//                        CppText, Line, TextPos, ScriptSize, PropertiesSize)
+//   UFunction fields after UStruct:
+//     +0x64: uint32 FunctionFlags
+//     +0x68: uint16 iNative
+//     +0x6A: uint8  OperPrecedence
+//     +0x6B: uint8  NumParms
+//     +0x6C: uint16 ParmsSize
+//     +0x6E: uint16 ReturnValueOffset
+//     +0x70: void*  Func (native function pointer)
+//     +0x74: int32  ScriptBytecodeSize  (optional padding)
+//     +0x78: FName  FriendlyName
+
+class UFunction : public UStruct {
+public:
+    static constexpr size_t OFFSET_FUNCTION_FLAGS   = 0x64;
+    static constexpr size_t OFFSET_INATIVE          = 0x68;
+    static constexpr size_t OFFSET_OPER_PRECEDENCE  = 0x6A;
+    static constexpr size_t OFFSET_NUM_PARMS        = 0x6B;
+    static constexpr size_t OFFSET_PARMS_SIZE       = 0x6C;
+    static constexpr size_t OFFSET_RETURN_OFFSET    = 0x6E;
+    static constexpr size_t OFFSET_NATIVE_FUNC      = 0x70;
+
+    uint32_t GetFunctionFlags() const { return GetField<uint32_t>(OFFSET_FUNCTION_FLAGS); }
+    uint16_t GetNativeIndex() const { return GetField<uint16_t>(OFFSET_INATIVE); }
+    uint8_t GetOperPrecedence() const { return GetField<uint8_t>(OFFSET_OPER_PRECEDENCE); }
+    uint8_t GetNumParms() const { return GetField<uint8_t>(OFFSET_NUM_PARMS); }
+    uint16_t GetParmsSize() const { return GetField<uint16_t>(OFFSET_PARMS_SIZE); }
+    uint16_t GetReturnValueOffset() const { return GetField<uint16_t>(OFFSET_RETURN_OFFSET); }
+    uintptr_t GetNativeFunc() const { return GetField<uintptr_t>(OFFSET_NATIVE_FUNC); }
+
+    bool IsNative() const { return (GetFunctionFlags() & 0x0400) != 0; }
+    bool IsEvent() const { return (GetFunctionFlags() & 0x0800) != 0; }
+    bool IsStatic() const { return (GetFunctionFlags() & 0x2000) != 0; }
+    bool IsExec() const { return (GetFunctionFlags() & 0x0200) != 0; }
+    bool IsLatent() const { return (GetFunctionFlags() & 0x0008) != 0; }
+};
+
+// ─── UState ─────────────────────────────────────────────────────────────
+// UState extends UStruct — contains state execution data and function map.
+//   +0x64: uint32 ProbeMask
+//   +0x68: uint32 IgnoreMask
+//   +0x6C: uint16 LabelTableOffset
+//   +0x6E: uint32 StateFlags
+//   +0x74: TMap<FName, UFunction*> FuncMap
+
+class UState : public UStruct {
+public:
+    static constexpr size_t OFFSET_PROBE_MASK       = 0x64;
+    static constexpr size_t OFFSET_IGNORE_MASK      = 0x68;
+    static constexpr size_t OFFSET_STATE_FLAGS      = 0x6E;
+
+    uint32_t GetProbeMask() const { return GetField<uint32_t>(OFFSET_PROBE_MASK); }
+    uint32_t GetIgnoreMask() const { return GetField<uint32_t>(OFFSET_IGNORE_MASK); }
+    uint32_t GetStateFlags() const { return GetField<uint32_t>(OFFSET_STATE_FLAGS); }
+};
+
+// ─── UClass ─────────────────────────────────────────────────────────────
+// UClass extends UState with full class metadata.
+// Key offsets (UE2.5 Vengeance, x86):
+//   After UState base (~0x90+):
+//     +0x90: uint32 ClassFlags
+//     +0x94: int32  ClassWithin (index or pointer to enclosing class)
+//     +0x98: FName  ClassConfigName
+//     +0xA0: TArray<FRepRecord> ClassReps
+//     +0xAC: TArray<UField*> NetFields
+//     +0xC4: UObject* ClassDefaultObject (CDO)
+//
+// NOTE: Exact offsets need runtime confirmation. The CDO offset is the most
+// critical — we discover it dynamically via heuristic.
+
+class UClass : public UState {
+public:
+    // These offsets may vary ±4 bytes between builds; use discovery functions
+    static constexpr size_t OFFSET_CLASS_FLAGS      = 0x90;
+    static constexpr size_t OFFSET_CLASS_WITHIN     = 0x94;
+    static constexpr size_t OFFSET_CLASS_CONFIG_NAME = 0x98;
+    static constexpr size_t OFFSET_CDO              = 0xC4; // ClassDefaultObject
+
+    uint32_t GetClassFlags() const { return GetField<uint32_t>(OFFSET_CLASS_FLAGS); }
+    UObject* GetClassWithin() const { return GetField<UObject*>(OFFSET_CLASS_WITHIN); }
+    FName GetClassConfigName() const { return GetField<FName>(OFFSET_CLASS_CONFIG_NAME); }
+    UObject* GetDefaultObject() const { return GetField<UObject*>(OFFSET_CDO); }
+
+    void SetDefaultObject(UObject* obj) { SetField<UObject*>(OFFSET_CDO, obj); }
+};
+
+// ─── UEnum ──────────────────────────────────────────────────────────────
+// UEnum extends UField with a TArray<FName> of enum literals.
+//   +0x48: TArray<FName> Names
+
+class UEnum : public UField {
+public:
+    // TArray<FName> Names at +0x48: { FName* Data; int32 Count; int32 Max; }
+    static constexpr size_t OFFSET_ENUM_NAMES_DATA  = 0x48;
+    static constexpr size_t OFFSET_ENUM_NAMES_COUNT = 0x4C;
+    static constexpr size_t OFFSET_ENUM_NAMES_MAX   = 0x50;
+
+    FName* GetNamesData() const { return GetField<FName*>(OFFSET_ENUM_NAMES_DATA); }
+    int32_t GetNamesCount() const { return GetField<int32_t>(OFFSET_ENUM_NAMES_COUNT); }
+
+    int32_t GetNumEnums() const { return GetNamesCount(); }
+
+    std::string GetEnumName(int32_t index) const {
+        FName* data = GetNamesData();
+        int32_t count = GetNamesCount();
+        if (!data || index < 0 || index >= count) return "<invalid>";
+        return data[index].ToString();
+    }
+
+    std::vector<std::string> GetAllEnumNames() const {
+        std::vector<std::string> result;
+        FName* data = GetNamesData();
+        int32_t count = GetNamesCount();
+        if (!data || count <= 0) return result;
+        for (int32_t i = 0; i < count; i++) {
+            result.push_back(data[i].ToString());
+        }
+        return result;
+    }
+};
+
+// ─── Specialized Property Types ─────────────────────────────────────────
+// These extend UProperty with inner type references.
+
+// UByteProperty: +0x78 = UEnum* Enum (inner enum, or nullptr for raw byte)
+class UByteProperty : public UProperty {
+public:
+    static constexpr size_t OFFSET_ENUM = 0x78;
+    UEnum* GetEnum() const { return GetField<UEnum*>(OFFSET_ENUM); }
+};
+
+// UObjectProperty: +0x78 = UClass* PropertyClass
+class UObjectProperty : public UProperty {
+public:
+    static constexpr size_t OFFSET_PROPERTY_CLASS = 0x78;
+    UObject* GetPropertyClass() const { return GetField<UObject*>(OFFSET_PROPERTY_CLASS); }
+};
+
+// UClassProperty: +0x78 = UClass* PropertyClass, +0x7C = UClass* MetaClass
+class UClassProperty : public UProperty {
+public:
+    static constexpr size_t OFFSET_PROPERTY_CLASS = 0x78;
+    static constexpr size_t OFFSET_META_CLASS = 0x7C;
+    UObject* GetPropertyClass() const { return GetField<UObject*>(OFFSET_PROPERTY_CLASS); }
+    UObject* GetMetaClass() const { return GetField<UObject*>(OFFSET_META_CLASS); }
+};
+
+// UStructProperty: +0x78 = UStruct* Struct
+class UStructProperty : public UProperty {
+public:
+    static constexpr size_t OFFSET_STRUCT = 0x78;
+    UStruct* GetStruct() const { return GetField<UStruct*>(OFFSET_STRUCT); }
+};
+
+// UArrayProperty: +0x78 = UProperty* Inner
+class UArrayProperty : public UProperty {
+public:
+    static constexpr size_t OFFSET_INNER = 0x78;
+    UProperty* GetInner() const { return GetField<UProperty*>(OFFSET_INNER); }
+};
+
+// UMapProperty: +0x78 = UProperty* Key, +0x7C = UProperty* Value
+class UMapProperty : public UProperty {
+public:
+    static constexpr size_t OFFSET_KEY = 0x78;
+    static constexpr size_t OFFSET_VALUE = 0x7C;
+    UProperty* GetKey() const { return GetField<UProperty*>(OFFSET_KEY); }
+    UProperty* GetValue() const { return GetField<UProperty*>(OFFSET_VALUE); }
+};
+
+// UDelegateProperty: +0x78 = UFunction* SignatureFunction
+class UDelegateProperty : public UProperty {
+public:
+    static constexpr size_t OFFSET_SIGNATURE_FUNC = 0x78;
+    UFunction* GetSignatureFunction() const { return GetField<UFunction*>(OFFSET_SIGNATURE_FUNC); }
+};
+
+// UInterfaceProperty: +0x78 = UClass* InterfaceClass
+class UInterfaceProperty : public UProperty {
+public:
+    static constexpr size_t OFFSET_INTERFACE_CLASS = 0x78;
+    UObject* GetInterfaceClass() const { return GetField<UObject*>(OFFSET_INTERFACE_CLASS); }
+};
+
 // ─── Property Walker ─────────────────────────────────────────────────────
 
 struct PropertyInfo {
@@ -169,6 +357,19 @@ std::vector<UObject*> FindAllObjectsByClassName(const std::string& className);
 
 /// Find a UClass/UStruct by name (e.g., "ShockPlayer" returns the UClass)
 UStruct* FindClass(const std::string& className);
+
+/// Find a UEnum by name (e.g., "EPhysics")
+UEnum* FindEnum(const std::string& enumName);
+
+/// Find a UFunction on a specific class (walks inheritance)
+UFunction* FindFunctionOnClass(const std::string& className, const std::string& funcName);
+
+/// Get the ClassDefaultObject (CDO) for a named class
+UObject* GetDefaultObject(const std::string& className);
+
+/// Set a property on a CDO (affects all future instances)
+bool SetDefaultProperty(const std::string& className, const std::string& propName, float value);
+bool SetDefaultPropertyInt(const std::string& className, const std::string& propName, int32_t value);
 
 // ─── Global Engine Pointers ───────────────────────────────────────────────
 
