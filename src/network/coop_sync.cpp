@@ -31,6 +31,17 @@ static bool s_ApplyingRemoteDeath = false;
 static bool s_LocalPlayerDead = false;
 static float s_DeathCheckTimer = 0.0f;
 
+// Pending health snapshots for damage-delta calculation
+struct PendingDamageCapture {
+    UObject* target;
+    float    healthBefore;
+    uint32_t nameHash;
+    float    px, py, pz;
+    bool     valid;
+};
+static PendingDamageCapture s_DamageCaptures[32];
+static int s_DamageCaptureCount = 0;
+
 // ─── Helpers ───────────────────────────────────────────────────────────
 
 /// FNV-1a 32-bit hash for actor name matching across instances.
@@ -138,14 +149,22 @@ static void ApplyRemoteWorldEvent(const WorldEventData& evt)
     std::vector<PropertyInfo> props = WalkProperties(cls);
 
     switch (evt.eventType) {
-    case 0: { // Door
-        PropertyInfo* pi = FindProperty(cls, "bOpening", props);
-        if (!pi) pi = FindProperty(cls, "bOpen", props);
-        if (pi) {
-            uint8_t* raw = reinterpret_cast<uint8_t*>(actor);
-            int32_t state = evt.state;
-            memcpy(raw + pi->Offset, &state, 4);
-            LOG_INFO("[Co-op Sync] Door '{}' -> state {}", actor->GetName(), evt.state);
+    case 0: { // Door — call Open() or ForceClose() via ProcessEvent
+        // ShockDoor uses a state machine (DoorOpening/DoorClosing), so calling
+        // the actual function is more reliable than toggling a bool property.
+        const char* targetFunc = (evt.state == 1) ? "Open" : "ForceClose";
+        UField* child = cls->GetChildren();
+        int limit = 2000;
+        while (child && limit-- > 0) {
+            if (child->GetObjClassName() == "Function" && child->GetName() == targetFunc) {
+                ProcessEventFn origPE = GetOriginalProcessEvent();
+                if (origPE) {
+                    origPE(actor, reinterpret_cast<UFunction*>(child), nullptr, nullptr);
+                    LOG_INFO("[Co-op Sync] Door '{}' -> {}()", actor->GetName(), targetFunc);
+                }
+                break;
+            }
+            child = child->GetNext();
         }
         break;
     }
@@ -186,48 +205,32 @@ static void InstallDamageHook()
         //            name EffectEventName, float DamageAttenuation,
         //            optional name HitHighBone, optional name HitLowBone,
         //            optional bool WasMeleeAttack)
-        //
-        // Parms layout (UE2 packed sequentially):
-        //   +0x00: UObject* DamageStimuli (4 bytes, pointer)
-        //   +0x04: float CritChance (4 bytes)
-        //   +0x08: UObject* Damager (4 bytes, pointer)
-        //   +0x0C: FVector HitLocation (12 bytes: X,Y,Z)
-        //   +0x18: FVector HitNormal (12 bytes)
-        //   +0x24: FVector HitImpulseDirection (12 bytes)
-        //   +0x30: FName EffectEventName (8 bytes)
-        //   +0x38: float DamageAttenuation (4 bytes)
         if (!parms) return false;
 
-        // We can't easily extract the numerical damage from the DamageStimuliSet
-        // object without walking its properties. For sync, use DamageAttenuation
-        // as an approximate scalar, or just send a "this enemy was hit" event.
-        // The health delta on the target is more reliable.
-        float prevHealth = 0, postHealth = 0;
-        if (s_SyncHealthOffset > 0) {
+        // Capture health BEFORE the damage is applied (hook fires pre-call).
+        // We'll queue this and compute the delta on the next tick.
+        if (s_SyncHealthOffset > 0 && s_DamageCaptureCount < 32) {
+            float hp;
             const uint8_t* raw = reinterpret_cast<const uint8_t*>(obj);
-            memcpy(&prevHealth, raw + s_SyncHealthOffset, 4);
+            memcpy(&hp, raw + s_SyncHealthOffset, 4);
+            if (hp <= 0.0f) return false; // already dead
+
+            float tx = 0, ty = 0, tz = 0;
+            if (s_SyncLocOffset > 0) {
+                memcpy(&tx, raw + s_SyncLocOffset, 4);
+                memcpy(&ty, raw + s_SyncLocOffset + 4, 4);
+                memcpy(&tz, raw + s_SyncLocOffset + 8, 4);
+            }
+
+            auto& cap = s_DamageCaptures[s_DamageCaptureCount++];
+            cap.target = obj;
+            cap.healthBefore = hp;
+            cap.nameHash = FnvHash(obj->GetName());
+            cap.px = tx; cap.py = ty; cap.pz = tz;
+            cap.valid = true;
         }
 
-        // We'll read damage as health delta on next tick; for now, send a
-        // nominal damage value of 1.0 to indicate "this NPC was hit"
-        float damage = 1.0f;
-        if (damage <= 0.0f) return false;
-
-        // Get target position for matching
-        float tx = 0, ty = 0, tz = 0;
-        if (s_SyncLocOffset > 0) {
-            const uint8_t* raw = reinterpret_cast<const uint8_t*>(obj);
-            memcpy(&tx, raw + s_SyncLocOffset, 4);
-            memcpy(&ty, raw + s_SyncLocOffset + 4, 4);
-            memcpy(&tz, raw + s_SyncLocOffset + 8, 4);
-        }
-
-        // Send to remote
-        std::string name = obj->GetName();
-        CoopSendDamage((float)damage, tx, ty, tz, tx, ty, tz,
-                       FnvHash(name), 0);
-
-        return false; // don't block
+        return false; // don't block — let TakeDamage execute
     };
     s_DamageHookId = RegisterProcessEventHook(hook);
 }
@@ -255,11 +258,11 @@ static void InstallWorldHook()
             }
         }
 
-        // Detect pickups
-        if (funcName == "PickedUp" || funcName == "Touch") {
+        // Detect pickups (OnUsed is the main pickup function per decompiled Pickup.uc)
+        if (funcName == "OnUsed" || funcName == "PickedUp" || funcName == "Touch") {
             std::string cn = obj->GetObjClassName();
             if (cn.find("Pickup") != std::string::npos || cn.find("Ammo") != std::string::npos ||
-                cn.find("Health") != std::string::npos) {
+                cn.find("Health") != std::string::npos || cn.find("Hypo") != std::string::npos) {
                 float px = 0, py = 0, pz = 0;
                 if (s_SyncLocOffset > 0) {
                     const uint8_t* raw = reinterpret_cast<const uint8_t*>(obj);
@@ -480,7 +483,19 @@ static void InstallDeathHook()
         if (s_ApplyingRemoteDeath) return false;
 
         std::string funcName = func->GetName();
-        if (funcName != "Died") return false;
+        // Decompiled source confirms death function is OnKilled, not Died:
+        //   ShockPawn.OnKilled(DamageStimuliSet DamageStimuli, float TotalDamageDealt,
+        //       Actor Damager, Vector HitLocation, Vector HitNormal,
+        //       Vector HitImpulseDirection, name EffectEventName,
+        //       bool bIsCriticalHit, optional name HitHighBone, optional name HitLowBone)
+        //
+        // Parms layout:
+        //   +0x00: UObject* DamageStimuli  (4 bytes)
+        //   +0x04: float TotalDamageDealt  (4 bytes)
+        //   +0x08: UObject* Damager        (4 bytes)
+        //   +0x0C: FVector HitLocation     (12 bytes)
+        //   ...
+        if (funcName != "OnKilled") return false;
 
         std::string cn = obj->GetObjClassName();
 
@@ -520,13 +535,13 @@ static void InstallDeathHook()
             PlayerDeathData death{};
             death.posX = px; death.posY = py; death.posZ = pz;
 
-            // Try to get killer class from parms
-            // Died(Controller Killer, class DamageType, vector HitLoc)
+            // Extract Damager from correct offset (+0x08 = 3rd param)
             if (parms) {
-                UObject* killer = *reinterpret_cast<UObject**>(parms);
-                if (killer) {
-                    std::string killerCn = killer->GetObjClassName();
-                    strncpy(death.killerClass, killerCn.c_str(), sizeof(death.killerClass) - 1);
+                UObject* damager = *reinterpret_cast<UObject**>(
+                    reinterpret_cast<uint8_t*>(parms) + 0x08);
+                if (damager) {
+                    std::string damagerCn = damager->GetObjClassName();
+                    strncpy(death.killerClass, damagerCn.c_str(), sizeof(death.killerClass) - 1);
                 }
             }
 
@@ -622,6 +637,27 @@ void ShutdownCoopSync()
 
 void CoopSyncProcessPackets()
 {
+    // Flush damage captures: compute health deltas and send to remote.
+    // TakeDamage has already executed by now, so current HP reflects the hit.
+    for (int i = 0; i < s_DamageCaptureCount; i++) {
+        auto& cap = s_DamageCaptures[i];
+        if (!cap.valid || !cap.target) continue;
+
+        float hpNow = 0;
+        if (s_SyncHealthOffset > 0) {
+            const uint8_t* raw = reinterpret_cast<const uint8_t*>(cap.target);
+            memcpy(&hpNow, raw + s_SyncHealthOffset, 4);
+        }
+
+        float delta = cap.healthBefore - hpNow;
+        if (delta > 0.5f) { // ignore tiny rounding noise
+            CoopSendDamage(delta, cap.px, cap.py, cap.pz,
+                           cap.px, cap.py, cap.pz, cap.nameHash, 0);
+        }
+        cap.valid = false;
+    }
+    s_DamageCaptureCount = 0;
+
     // Process pending damage
     for (int i = 0; i < s_PendingDamageCount; i++) {
         ApplyRemoteDamage(s_PendingDamage[i]);
