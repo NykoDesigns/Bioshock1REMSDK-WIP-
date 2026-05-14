@@ -1,0 +1,6 @@
+=== P2 Pawn State ===
+P2 (local)
+  Camera override: no
+  Pos: (0, 0, 0)
+  Health: 0  EVE: 0
+  Input seq: 0

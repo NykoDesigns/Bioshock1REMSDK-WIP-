@@ -1,0 +1,16 @@
+╔══════════════════════════════════════════════════════════════╗
+║  CO-OP TEST RESULTS                                         ║
+╚══════════════════════════════════════════════════════════════╝
+
+PASSED: 4  |  FAILED: 1  |  SKIPPED: 0  |  TOTAL: 5
+
+
+─── Core ───
+  ✓ Engine globals valid                GObjects and GNames found
+  ✓ PE hooked                           ProcessEvent intercepted
+  ✓ World ready                         World system initialized
+  ✗ Tick hook                           Tick NOT hooked
+  ✓ Player accessible                   At (-18809, 11841, 1223)
+
+═══════════════════════════════════════════════════════════════
+RESULT: SOME TESTS FAILED - see details above

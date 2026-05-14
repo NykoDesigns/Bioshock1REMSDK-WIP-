@@ -1,0 +1,14 @@
+=== P2 Inventory ===
+Health: 100/100
+EVE: 75/100
+ADAM: 0
+Credits: 100/0
+Medkits: 3
+EVE Hypos: 3
+
+â”€â”€â”€ Weapons â”€â”€â”€
+  [0] ˜ŠÞ (infinite)
+  [1] ŠÞ (5/6 mag, 48 reserve) <ACTIVE>
+
+â”€â”€â”€ Plasmids â”€â”€â”€
+  [0] 8ŠÞ (Lv1) <ACTIVE>

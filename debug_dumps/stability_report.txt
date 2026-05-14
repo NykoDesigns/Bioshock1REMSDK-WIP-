@@ -1,0 +1,8 @@
+=== Stability Report ===
+Null guards triggered: 1
+Big Daddies tracked: 0
+Cutscenes detected: none active
+Level transitions: Entry.MyLevel
+
+─── Null Guard Contexts ───
+  test_context

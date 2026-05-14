@@ -1,1 +1,3 @@
 P2 system initialized. Role=Client
+WARN: No candidate pawn found for P2. Attempting spawn via GameInfo...
+Found GameInfo at 0x962F5410, spawn not yet implemented

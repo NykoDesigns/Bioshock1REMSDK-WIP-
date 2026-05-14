@@ -1,0 +1,13 @@
+=== World Sync State ===
+Role: Client
+Host frame: 0
+Tracked actors: 0
+Dirty actors: 0
+Packets/sec sent: 0
+Packets/sec recv: 0
+Bytes/sec sent: 0
+Bytes/sec recv: 0
+Client matched: 0
+Client unmatched: 0
+
+─── Client Actor Map (top 50) ───

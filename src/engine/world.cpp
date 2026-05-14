@@ -3,6 +3,7 @@
 #include "../core/memory.h"
 #include "../core/pattern.h"
 #include "../core/hooks.h"
+#include "../hooks/process_event.h"
 #include "../debug/crash_handler.h"
 
 #include <Windows.h>
@@ -548,89 +549,81 @@ static void __fastcall HookedEngineTick(void* thisEngine, void* /*edx*/, float d
     SafeCallOriginalTick(thisEngine, deltaTime);
 }
 
+// ─── PE-Based Tick (safe alternative) ────────────────────────────────────
+// Instead of hooking a vtable entry (which can hook the wrong function),
+// we register a ProcessEvent listener that detects per-frame function calls
+// like "Tick" or "PlayerTick" and fires our tick callbacks from there.
+// This is safe because it uses the already-proven PE hook infrastructure.
+
+static int s_PETickHookId = -1;
+static uint64_t s_PETickCount = 0;
+
 bool InstallTickHook()
 {
     if (s_TickHooked) return true;
-    
-    // Strategy: Find UGameEngine::Tick by looking at the GameEngine vtable.
-    // Tick is typically a large function called every frame.
-    // Alternative: find it via ProcessEvent pattern — Tick often calls ProcessEvent.
-    
-    UObject* engine = GetEngine();
-    if (!engine) {
-        LOG_WARN("TickHook: No GameEngine found");
-        return false;
+
+    if (!IsProcessEventHooked()) {
+        // Need PE hook first — try to initialize it
+        if (!InitProcessEventHook()) {
+            LOG_WARN("TickHook: ProcessEvent hook not available");
+            return false;
+        }
     }
-    
-    uintptr_t vtable = *reinterpret_cast<uintptr_t*>(engine);
-    uintptr_t* vtableEntries = reinterpret_cast<uintptr_t*>(vtable);
-    
-    uintptr_t modBase = Memory::GetModuleBase(nullptr);
-    size_t modSize = Memory::GetModuleSize(nullptr);
-    
-    // UGameEngine::Tick is usually at vtable index ~30-50.
-    // It's the largest function in that range (processes the entire frame).
-    // Strategy: find the function that:
-    //   1. Is in the code section
-    //   2. Is relatively large (>2KB)
-    //   3. Contains a delta-time float comparison (frame rate limiting)
-    
-    uintptr_t bestCandidate = 0;
-    size_t bestSize = 0;
-    
-    for (int idx = 25; idx < 60; idx++) {
-        uintptr_t funcAddr = vtableEntries[idx];
-        if (funcAddr < modBase || funcAddr >= modBase + modSize) continue;
-        
-        // Estimate function size (distance to next vtable entry)
-        uintptr_t nextFunc = vtableEntries[idx + 1];
-        if (nextFunc < modBase || nextFunc >= modBase + modSize) continue;
-        if (nextFunc <= funcAddr) continue;
-        
-        size_t funcSize = nextFunc - funcAddr;
-        if (funcSize < 2048 || funcSize > 65536) continue;
-        
-        // Look for float operations (Tick processes deltaTime as a float)
-        const uint8_t* code = reinterpret_cast<const uint8_t*>(funcAddr);
-        bool hasFloatOps = false;
-        for (size_t b = 0; b < std::min(funcSize, (size_t)512); b++) {
-            // fld/fstp/fadd/fsub/fmul/fdiv/fcomp opcodes
-            if (code[b] == 0xD9 || code[b] == 0xDD || code[b] == 0xD8 || code[b] == 0xDC) {
-                hasFloatOps = true;
-                break;
+
+    ProcessEventHook hook;
+    hook.Name = "PETick";
+    hook.FunctionFilter = "Tick"; // Only fires for functions named exactly "Tick"
+    hook.Callback = [](UObject* obj, UFunction* func, void* parms) -> bool {
+        // Only fire once per frame — use the FIRST "Tick" call each frame
+        // (there can be multiple Tick calls per frame for different objects)
+        s_PETickCount++;
+
+        // Calculate delta time from wall clock
+        auto now = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+        float deltaTime = 0.016f; // default 60fps
+        if (s_LastTickTime > 0) {
+            double elapsed = (double)(now - s_LastTickTime) / 1000000000.0;
+            if (elapsed > 0.0001 && elapsed < 1.0) {
+                deltaTime = (float)elapsed;
+                s_TickRate = 1.0f / deltaTime;
             }
         }
-        
-        if (hasFloatOps && funcSize > bestSize) {
-            bestSize = funcSize;
-            bestCandidate = funcAddr;
+
+        // Only fire callbacks once per unique frame time (debounce)
+        // Multiple objects get Tick per frame — we only want the first one
+        if (now - s_LastTickTime < 1000000) { // less than 1ms since last
+            return false; // same frame, skip
         }
-    }
-    
-    if (!bestCandidate) {
-        LOG_WARN("TickHook: Could not identify Tick function in vtable");
-        return false;
-    }
-    
-    // Hook via the centralized hook framework
-    if (!Hooks::CreateHook(
-            reinterpret_cast<void*>(bestCandidate),
-            reinterpret_cast<void*>(&HookedEngineTick),
-            reinterpret_cast<void**>(&s_OriginalTick))) {
-        LOG_ERROR("TickHook: CreateHook failed");
-        return false;
-    }
-    
+        s_LastTickTime = now;
+        s_TickCount++;
+
+        // Fire registered tick callbacks
+        {
+            std::lock_guard<std::mutex> lock(s_TickMutex);
+            for (auto& [id, cb] : s_TickCallbacks) {
+                if (cb) cb(deltaTime);
+            }
+        }
+
+        return false; // never block the original Tick call
+    };
+
+    s_PETickHookId = RegisterProcessEventHook(hook);
     s_TickHooked = true;
-    LOG_INFO("TickHook: Installed at 0x{:08X} (~{}B function)", 
-             (uint32_t)bestCandidate, bestSize);
+    LOG_INFO("TickHook: Installed via ProcessEvent listener (safe mode)");
     return true;
 }
 
 void RemoveTickHook()
 {
     if (!s_TickHooked) return;
-    // MH_DisableAll handles cleanup
+
+    // Remove PE-based tick if active
+    if (s_PETickHookId >= 0) {
+        UnregisterProcessEventHook(s_PETickHookId);
+        s_PETickHookId = -1;
+    }
+
     s_TickHooked = false;
     s_OriginalTick = nullptr;
     

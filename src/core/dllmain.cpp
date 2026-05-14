@@ -8,6 +8,7 @@
 #include "../gameplay/gameplay_mods.h"
 #include "../debug/coop_debug.h"
 #include "../debug/crash_handler.h"
+#include "../hooks/process_event.h"
 #include "../network/coop_true.h"
 
 #include <Windows.h>
@@ -149,8 +150,15 @@ void InitializeSDK()
             DumpNativesToFile("Z:\\Bioshock1SDK\\gnatives_dump.txt");
         }
         
+        // Initialize ProcessEvent hook first (tick hook depends on it)
+        if (!IsProcessEventHooked()) {
+            if (InitProcessEventHook()) {
+                LOG_INFO("ProcessEvent hook installed");
+            }
+        }
+
         if (InstallTickHook()) {
-            LOG_INFO("Engine tick hook installed");
+            LOG_INFO("Engine tick hook installed (PE-based safe mode)");
         }
 
         CrashSetContext("init:coop_debug");

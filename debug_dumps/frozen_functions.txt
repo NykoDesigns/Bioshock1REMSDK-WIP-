@@ -1,0 +1,3 @@
+=== Functions Blocked During Freeze ===
+Total blocked calls: 0
+
