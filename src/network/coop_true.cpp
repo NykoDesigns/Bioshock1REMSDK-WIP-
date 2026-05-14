@@ -1,4 +1,9 @@
 #include "coop_true.h"
+#include "coop_world_sync.h"
+#include "coop_p2.h"
+#include "coop_inventory.h"
+#include "coop_transitions.h"
+#include "coop_testing.h"
 #include "net_manager.h"
 #include "coop_bridge.h"
 #include "../core/log.h"
@@ -189,15 +194,37 @@ void TrueCoopTick(float deltaTime)
 {
     if (s_Role == TrueCoopRole::None) return;
 
+    // Phase 6: Transitions (both roles)
+    TransitionsTick(deltaTime);
+
     if (IsTrueHost()) {
         s_HostFrameNum++;
-        // Phase 2: World state broadcast will go here
-        // For now, just use the existing coop bridge
+
+        // Phase 2: World state broadcast
+        WorldSyncHostTick(deltaTime);
+
+        // Phase 3: Apply P2 input + broadcast P2 state
+        if (P2IsSpawned()) {
+            P2PawnState p2state = P2GetState();
+            // Send P2 state to client at 30Hz
+            static float p2SendAccum = 0;
+            p2SendAccum += deltaTime;
+            if (p2SendAccum >= 1.0f / 30.0f) {
+                p2SendAccum = 0;
+                NetSendRawPacket((PacketType)TrueCoopPackets::P2State,
+                                 &p2state, sizeof(p2state));
+            }
+        }
     }
 
     if (IsTrueClient()) {
-        // Phase 2: World state application will go here
-        // For now, freeze is the only active thing
+        // Phase 2: Apply world state from host
+        WorldSyncClientTick(deltaTime);
+
+        // Phase 3: Capture and send input to host
+        if (!IsInCutscene()) {
+            P2CaptureAndSendInput(deltaTime);
+        }
     }
 }
 
@@ -207,8 +234,16 @@ bool InitTrueCoop()
 {
     if (s_Initialized) return true;
     s_Initialized = true;
-    LOG_INFO("[TrueCoop] Initialized (role=None, awaiting host/join)");
-    DebugSessionLog("TrueCoop initialized");
+
+    // Initialize all subsystems
+    InitWorldSync();
+    InitP2System();
+    InitP2Inventory();
+    InitTransitions();
+    InitCoopTesting();
+
+    LOG_INFO("[TrueCoop] Initialized (all phases, role=None, awaiting host/join)");
+    DebugSessionLog("TrueCoop initialized (all phases)");
     return true;
 }
 
@@ -216,9 +251,17 @@ void ShutdownTrueCoop()
 {
     if (!s_Initialized) return;
     UnfreezeClientSimulation();
+
+    // Shutdown all subsystems
+    ShutdownCoopTesting();
+    ShutdownTransitions();
+    ShutdownP2Inventory();
+    ShutdownP2System();
+    ShutdownWorldSync();
+
     s_Role = TrueCoopRole::None;
     s_Initialized = false;
-    DebugSessionLog("TrueCoop shutdown");
+    DebugSessionLog("TrueCoop shutdown (all phases)");
 }
 
 std::string GetTrueCoopStatus()

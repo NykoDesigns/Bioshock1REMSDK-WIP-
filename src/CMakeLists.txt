@@ -27,6 +27,11 @@ add_library(BS1SDK SHARED
     network/coop_economy.cpp
     network/coop_save.cpp
     network/coop_true.cpp
+    network/coop_world_sync.cpp
+    network/coop_p2.cpp
+    network/coop_inventory.cpp
+    network/coop_transitions.cpp
+    network/coop_testing.cpp
     debug/coop_debug.cpp
 )
 

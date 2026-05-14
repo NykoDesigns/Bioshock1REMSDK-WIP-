@@ -7,6 +7,11 @@
 #include "../sdk/sdk_generator.h"
 #include "../debug/coop_debug.h"
 #include "../network/coop_true.h"
+#include "../network/coop_world_sync.h"
+#include "../network/coop_p2.h"
+#include "../network/coop_inventory.h"
+#include "../network/coop_transitions.h"
+#include "../network/coop_testing.h"
 #include "../hooks/process_event.h"
 #include "../scripting/lua_bridge.h"
 #include "../gameplay/teleport_plasmid.h"
@@ -1848,6 +1853,93 @@ void Overlay::RenderConsole()
                 std::snprintf(buf, sizeof(buf), "Blocking %d unique function+class combos", (int)frozen.size());
                 LogYellow(buf);
             }
+        }
+        // ─── cooptest [phase] ───
+        else if (tokens[0] == "cooptest") {
+            std::string phase = (tokens.size() >= 2) ? tokens[1] : "all";
+            LogYellow("Running co-op tests: " + phase);
+            RunCoopTests(phase);
+            auto results = GetCoopTestResults();
+            int pass = 0, fail = 0, skip = 0;
+            for (auto& r : results) {
+                if (r.Result == TestResult::Pass) pass++;
+                else if (r.Result == TestResult::Fail) fail++;
+                else if (r.Result == TestResult::Skipped) skip++;
+            }
+            char buf[128];
+            std::snprintf(buf, sizeof(buf), "Results: %d PASS, %d FAIL, %d SKIP", pass, fail, skip);
+            if (fail > 0) LogRed(buf); else LogGreen(buf);
+            LogInfo("Details in debug_dumps/coop_test_results.txt");
+        }
+        // ─── quicktest ───
+        else if (tokens[0] == "quicktest") {
+            QuickValidate();
+            LogGreen("Quick validation complete -> debug_dumps/coop_test_results.txt");
+        }
+        // ─── p2spawn ───
+        else if (tokens[0] == "p2spawn") {
+            auto prevRole = GetTrueCoopRole();
+            if (prevRole == TrueCoopRole::None) SetTrueCoopRole(TrueCoopRole::TrueHost);
+            if (P2SpawnPawn()) {
+                LogGreen("P2 pawn spawned: " + std::string(P2GetPawn() ? P2GetPawn()->GetName() : "unknown"));
+            } else {
+                LogRed("P2 pawn spawn failed (no candidate found)");
+            }
+        }
+        // ─── p2kill / p2respawn ───
+        else if (tokens[0] == "p2kill") {
+            P2Kill();
+            LogYellow("P2 killed");
+        }
+        else if (tokens[0] == "p2respawn") {
+            P2Respawn();
+            LogGreen("P2 respawned");
+        }
+        // ─── p2status ───
+        else if (tokens[0] == "p2status") {
+            LogInfo(GetP2Status());
+        }
+        // ─── worldsync ───
+        else if (tokens[0] == "worldsync") {
+            auto stats = GetWorldSyncStats();
+            char buf[256];
+            std::snprintf(buf, sizeof(buf),
+                "WorldSync: %d tracked, %d dirty, %d pkt/s sent, %d pkt/s recv\n"
+                "  Bandwidth: %d B/s out, %d B/s in\n"
+                "  Client: %d matched, %d unmatched",
+                stats.TrackedActors, stats.DirtyActors,
+                stats.PacketsSentThisSec, stats.PacketsRecvThisSec,
+                stats.BytesSentThisSec, stats.BytesRecvThisSec,
+                stats.ClientMatchedActors, stats.ClientUnmatchedActors);
+            LogInfo(buf);
+            DumpWorldSyncState();
+        }
+        // ─── p2inv ───
+        else if (tokens[0] == "p2inv") {
+            LogInfo(GetP2InventoryStatus());
+            DumpP2Inventory();
+        }
+        // ─── transitions ───
+        else if (tokens[0] == "transitions") {
+            LogInfo(GetTransitionsStatus());
+        }
+        // ─── stability ───
+        else if (tokens[0] == "stability") {
+            DumpStabilityReport();
+            LogGreen("Stability report -> debug_dumps/stability_report.txt");
+        }
+        // ─── dumpall ───
+        else if (tokens[0] == "dumpall") {
+            DumpFullSnapshot("manual_dumpall");
+            DumpActorCensus();
+            DumpPropertyOffsets();
+            DumpAIFunctions();
+            DumpWorldSyncState();
+            DumpP2State();
+            DumpP2Inventory();
+            DumpStabilityReport();
+            DumpCoopTestResults();
+            LogGreen("All debug data dumped to debug_dumps/");
         }
         // ─── unknown ───
         else {
