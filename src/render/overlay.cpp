@@ -5,6 +5,8 @@
 #include "../engine/function_caller.h"
 #include "../engine/world.h"
 #include "../sdk/sdk_generator.h"
+#include "../debug/coop_debug.h"
+#include "../network/coop_true.h"
 #include "../hooks/process_event.h"
 #include "../scripting/lua_bridge.h"
 #include "../gameplay/teleport_plasmid.h"
@@ -926,6 +928,21 @@ void Overlay::RenderConsole()
             LogInfo("  setdefault <c> <p> <v>  - Set a CDO property value");
             LogInfo("  natives                 - Show GNatives info");
             LogInfo("  gensdk                  - Regenerate SDK headers");
+            LogYellow("=== Co-op Debug ===");
+            LogInfo("  snapshot [label]        - Dump full engine state to file");
+            LogInfo("  census                  - Dump actor class census");
+            LogInfo("  offsets                 - Dump property offsets for key classes");
+            LogInfo("  petrack [secs]          - Track PE frequency (default 10s)");
+            LogInfo("  pestop                  - Stop PE tracker early and dump");
+            LogInfo("  aifuncs                 - Catalog all AI/tick/spawn functions");
+            LogInfo("  snapa / snapb           - Mark actor snapshot A/B");
+            LogInfo("  snapdiff                - Diff snapshots A vs B");
+            LogYellow("=== True Co-op ===");
+            LogInfo("  truehost [port]         - Start as true co-op host");
+            LogInfo("  truejoin <ip> [port]    - Join as true co-op client");
+            LogInfo("  freeze                  - Freeze client simulation");
+            LogInfo("  unfreeze                - Unfreeze client simulation");
+            LogInfo("  truecoop                - Show true co-op status");
         }
         // ─── set <prop> <value> ───
         else if (tokens[0] == "set" && tokens.size() >= 3) {
@@ -1728,6 +1745,109 @@ void Overlay::RenderConsole()
             char buf[128];
             std::snprintf(buf, sizeof(buf), "SDK generated: %d classes", count);
             LogGreen(buf);
+        }
+        // ─── snapshot [label] ───
+        else if (tokens[0] == "snapshot") {
+            std::string label = (tokens.size() >= 2) ? tokens[1] : "";
+            DumpFullSnapshot(label);
+            LogGreen("Full snapshot dumped to debug_dumps/");
+        }
+        // ─── census ───
+        else if (tokens[0] == "census") {
+            DumpActorCensus();
+            LogGreen("Actor census dumped to debug_dumps/actor_census.txt");
+        }
+        // ─── offsets ───
+        else if (tokens[0] == "offsets") {
+            DumpPropertyOffsets();
+            LogGreen("Property offsets dumped to debug_dumps/property_offsets.txt");
+        }
+        // ─── petrack [seconds] ───
+        else if (tokens[0] == "petrack") {
+            if (IsPETrackerRunning()) {
+                LogYellow("PE tracker already running");
+            } else {
+                float secs = (tokens.size() >= 2) ? std::strtof(tokens[1].c_str(), nullptr) : 10.0f;
+                StartPETracker(secs);
+                char buf[64];
+                std::snprintf(buf, sizeof(buf), "PE tracker started (%.0fs)", secs);
+                LogGreen(buf);
+            }
+        }
+        // ─── pestop ───
+        else if (tokens[0] == "pestop") {
+            if (!IsPETrackerRunning()) {
+                LogYellow("PE tracker not running");
+            } else {
+                StopPETracker();
+                DumpPEFrequency();
+                LogGreen("PE tracker stopped, dumped to debug_dumps/pe_frequency.txt");
+            }
+        }
+        // ─── aifuncs ───
+        else if (tokens[0] == "aifuncs") {
+            DumpAIFunctions();
+            LogGreen("AI function catalog dumped to debug_dumps/ai_functions.txt");
+        }
+        // ─── snapa / snapb ───
+        else if (tokens[0] == "snapa") {
+            MarkSnapshotA();
+            LogGreen("Snapshot A marked");
+        }
+        else if (tokens[0] == "snapb") {
+            MarkSnapshotB();
+            LogGreen("Snapshot B marked");
+        }
+        // ─── snapdiff ───
+        else if (tokens[0] == "snapdiff") {
+            DumpSnapshotDiff();
+            LogGreen("Snapshot diff dumped to debug_dumps/snapshot_diff.txt");
+        }
+        // ─── truehost [port] ───
+        else if (tokens[0] == "truehost") {
+            uint16_t port = (tokens.size() >= 2) ? (uint16_t)std::atoi(tokens[1].c_str()) : 27015;
+            SetTrueCoopRole(TrueCoopRole::TrueHost);
+            if (CoopHost(port, "TrueHost")) {
+                LogGreen("True co-op HOST started on port " + std::to_string(port));
+            } else {
+                LogRed("Failed to start true co-op host");
+            }
+        }
+        // ─── truejoin <ip> [port] ───
+        else if (tokens[0] == "truejoin" && tokens.size() >= 2) {
+            std::string ip = tokens[1];
+            uint16_t port = (tokens.size() >= 3) ? (uint16_t)std::atoi(tokens[2].c_str()) : 27015;
+            SetTrueCoopRole(TrueCoopRole::TrueClient);
+            if (CoopJoin(ip, port, "TrueClient")) {
+                LogGreen("True co-op CLIENT joining " + ip + ":" + std::to_string(port));
+                FreezeClientSimulation();
+                LogYellow("Client simulation FROZEN");
+            } else {
+                LogRed("Failed to join true co-op session");
+            }
+        }
+        // ─── freeze ───
+        else if (tokens[0] == "freeze") {
+            if (FreezeClientSimulation()) {
+                LogGreen("Client simulation FROZEN (AI/physics/spawn blocked)");
+            } else {
+                LogRed("Failed to freeze (PE hook not active?)");
+            }
+        }
+        // ─── unfreeze ───
+        else if (tokens[0] == "unfreeze") {
+            UnfreezeClientSimulation();
+            LogGreen("Client simulation UNFROZEN");
+        }
+        // ─── truecoop ───
+        else if (tokens[0] == "truecoop") {
+            LogInfo(GetTrueCoopStatus());
+            if (IsSimulationFrozen()) {
+                auto frozen = GetFrozenFunctions();
+                char buf[64];
+                std::snprintf(buf, sizeof(buf), "Blocking %d unique function+class combos", (int)frozen.size());
+                LogYellow(buf);
+            }
         }
         // ─── unknown ───
         else {

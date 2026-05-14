@@ -6,6 +6,8 @@
 #include "../engine/uobject.h"
 #include "../engine/world.h"
 #include "../gameplay/gameplay_mods.h"
+#include "../debug/coop_debug.h"
+#include "../network/coop_true.h"
 
 #include <Windows.h>
 #include <thread>
@@ -145,6 +147,12 @@ void InitializeSDK()
         if (InstallTickHook()) {
             LOG_INFO("Engine tick hook installed");
         }
+
+        // Initialize debug tools (auto-dumps snapshots to debug_dumps/)
+        InitCoopDebug();
+
+        // Initialize true co-op skeleton
+        InitTrueCoop();
     }
 
     // Phase 5: Load mod config and auto-init gameplay mods
@@ -603,6 +611,8 @@ static void DumpPropertyLayout()
 void ShutdownSDK()
 {
     LOG_INFO("Shutting down BS1SDK...");
+    ShutdownTrueCoop();
+    ShutdownCoopDebug();
     Hooks::Shutdown();
     Log::Shutdown();
 }
