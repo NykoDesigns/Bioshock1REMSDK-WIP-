@@ -370,13 +370,58 @@ bool SpawnGhostPuppet(float x, float y, float z)
 
         LOG_INFO("[Puppet] AI puppet configured: disabled movement/AI, set invincible");
     } else {
-        // StaticMesh puppet — scale down the cube to human-ish size
-        float drawScale = 0.25f; // ~64 units
+        // StaticMesh puppet — assign a visible mesh and scale appropriately
+        float drawScale = 0.5f;
         SetPuppetProperty("DrawScale", &drawScale, 4);
+
+        // Find a StaticMesh object to assign (try sphere first, then cube, then any)
+        const char* meshNames[] = { "Sphere128Radius", "Cube256Diameter", "BeaconBall" };
+        UObject* meshObj = nullptr;
+        {
+            const auto& globals = GetEngineGlobals();
+            if (globals.IsValid()) {
+                uintptr_t objData = *reinterpret_cast<uintptr_t*>(globals.GObjects);
+                int32_t objCount = *reinterpret_cast<int32_t*>(globals.GObjects + 4);
+                // First pass: look for preferred meshes by name
+                for (const char* mName : meshNames) {
+                    if (meshObj) break;
+                    for (int i = 0; i < objCount && i < 100000; i++) {
+                        uintptr_t ptr = *reinterpret_cast<uintptr_t*>(objData + i * 4);
+                        if (!ptr) continue;
+                        UObject* o = reinterpret_cast<UObject*>(ptr);
+                        if (o->GetObjClassName() == "StaticMesh" && o->GetName() == mName) {
+                            meshObj = o;
+                            break;
+                        }
+                    }
+                }
+                // Fallback: grab ANY StaticMesh
+                if (!meshObj) {
+                    for (int i = 0; i < objCount && i < 100000; i++) {
+                        uintptr_t ptr = *reinterpret_cast<uintptr_t*>(objData + i * 4);
+                        if (!ptr) continue;
+                        UObject* o = reinterpret_cast<UObject*>(ptr);
+                        if (o->GetObjClassName() == "StaticMesh") {
+                            meshObj = o;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (meshObj) {
+            SetPuppetProperty("StaticMesh", &meshObj, sizeof(UObject*));
+            LOG_INFO("[Puppet] Assigned mesh '{}' to puppet", meshObj->GetName());
+        } else {
+            LOG_WARN("[Puppet] No StaticMesh found to assign — puppet may be invisible");
+        }
     }
 
     // Make it glow / unlit so it's always visible
     SetPuppetProperty("bUnlit", &bTrue, 4);
+    uint8_t ambientGlow = 254;
+    SetPuppetProperty("AmbientGlow", &ambientGlow, 1);
 
     // Set initial position
     s_InterpX = x; s_InterpY = y; s_InterpZ = z;
