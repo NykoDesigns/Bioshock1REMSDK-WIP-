@@ -139,67 +139,104 @@ static bool IsA(UObject* obj, const std::string& baseClassName)
     return false;
 }
 
-// ─── Big Daddy Summoning ────────────────────────────────────────────────
-// Find an existing Protector (Bouncer/Rosie) in the level by walking
-// the class hierarchy, move it to the target location, make it friendly.
+// ─── Big Daddy Teleport ─────────────────────────────────────────────────
+// Find the CLOSEST living Protector (Bouncer/Rosie) to the player,
+// teleport it to the dart impact location. Preserves its current aggro
+// state (neutral/hostile/friendly). If the tracked BD dies, the plasmid
+// reverts to vanilla behavior (no new BD is grabbed).
 
-static void SummonBigDaddyAt(float x, float y, float z)
+static UObject* s_TrackedBigDaddy = nullptr; // The one BD we're moving around
+
+static bool IsBigDaddyAlive(UObject* bd)
+{
+    if (!bd) return false;
+    if (s_LocationOffset < 0) return false;
+    // Check health > 0
+    UObject* cls = bd->GetClass();
+    if (!cls) return false;
+    auto props = WalkProperties(reinterpret_cast<UStruct*>(cls));
+    for (auto& p : props) {
+        if (p.Name == "Health") {
+            float hp = bd->GetField<float>(p.Offset);
+            return hp > 0.0f;
+        }
+    }
+    return true; // Can't read health — assume alive
+}
+
+static void TeleportBigDaddyTo(float x, float y, float z)
 {
     auto& globals = GetEngineGlobals();
     if (!globals.IsValid()) return;
 
     if (!CachePropertyOffsets()) return;
 
+    // If we have a tracked BD, check if it's still alive
+    if (s_TrackedBigDaddy) {
+        if (!IsBigDaddyAlive(s_TrackedBigDaddy)) {
+            LOG_INFO("[BigDaddy] Tracked Big Daddy died — reverting to vanilla behavior");
+            s_TrackedBigDaddy = nullptr;
+            return; // Don't grab a new one
+        }
+        // Teleport the tracked BD to the impact location
+        // Add Z offset to avoid clipping into ground/stairs
+        FVector targetLoc = { x, y, z + 120.0f };
+        s_TrackedBigDaddy->SetField<FVector>(s_LocationOffset, targetLoc);
+        LOG_INFO("[BigDaddy] Teleported {} to ({:.0f}, {:.0f}, {:.0f})",
+                 s_TrackedBigDaddy->GetObjClassName(), x, y, z + 120.0f);
+        return;
+    }
+
+    // First use: find the closest living Protector to the PLAYER
+    UObject* player = FindObjectByClassName("ShockPlayer");
+    if (!player) {
+        LOG_WARN("[BigDaddy] No player found");
+        return;
+    }
+
+    FVector playerLoc = player->GetField<FVector>(s_LocationOffset);
+
     uintptr_t objData = *reinterpret_cast<uintptr_t*>(globals.GObjects);
     int32_t objCount = *reinterpret_cast<int32_t*>(globals.GObjects + 4);
 
-    // Find a Protector instance by walking class hierarchy (IsA check)
-    UObject* protector = nullptr;
-    for (int i = 0; i < objCount && !protector; i++) {
+    UObject* closest = nullptr;
+    float closestDist = 1e18f;
+
+    for (int i = 0; i < objCount; i++) {
         uintptr_t ptr = *reinterpret_cast<uintptr_t*>(objData + i * 4);
         if (!ptr) continue;
         UObject* obj = reinterpret_cast<UObject*>(ptr);
-
-        // Skip Class objects themselves — we want instances
         if (obj->GetObjClassName() == "Class") continue;
 
-        // Check if this object inherits from Protector
         if (IsA(obj, "Protector")) {
-            protector = obj;
-            LOG_INFO("[BigDaddy] Found Protector instance: {} (class: {})",
-                     obj->GetName(), obj->GetObjClassName());
-        }
-    }
+            if (!IsBigDaddyAlive(obj)) continue;
 
-    if (protector) {
-        // Move it to the target location
-        FVector targetLoc = { x, y, z };
-        protector->SetField<FVector>(s_LocationOffset, targetLoc);
+            FVector loc = obj->GetField<FVector>(s_LocationOffset);
+            float dx = loc.X - playerLoc.X;
+            float dy = loc.Y - playerLoc.Y;
+            float dz = loc.Z - playerLoc.Z;
+            float dist = dx*dx + dy*dy + dz*dz;
 
-        // Walk properties to set friendly disposition
-        UObject* clsObj = protector->GetClass();
-        if (clsObj) {
-            auto props = WalkProperties(reinterpret_cast<UStruct*>(clsObj));
-            for (auto& p : props) {
-                if (p.Name == "DispositionToPlayer") {
-                    // EDispositionToPlayer: 0=None, 1=Hostile, 2=Friendly
-                    protector->SetField<int32_t>(p.Offset, 2);
-                    LOG_INFO("[BigDaddy] Set DispositionToPlayer = Friendly");
-                }
-                if (p.Name == "bProtectingPlayer") {
-                    protector->SetField<uint8_t>(p.Offset, 1);
-                    LOG_INFO("[BigDaddy] Set bProtectingPlayer = true");
-                }
+            if (dist < closestDist) {
+                closestDist = dist;
+                closest = obj;
             }
         }
-
-        LOG_INFO("[BigDaddy] Summoned friendly {} at ({:.0f}, {:.0f}, {:.0f})",
-                 protector->GetObjClassName(), x, y, z);
-    } else {
-        LOG_WARN("[BigDaddy] No Protector-derived object found in GObjects!");
-        LOG_INFO("[BigDaddy] The Big Daddy may not be in the object table yet.");
-        LOG_INFO("[BigDaddy] Try approaching one to get it loaded, then fire again.");
     }
+
+    if (!closest) {
+        LOG_WARN("[BigDaddy] No living Protector found in level");
+        return;
+    }
+
+    // Lock onto this BD — preserve its aggro, just teleport it
+    s_TrackedBigDaddy = closest;
+    FVector targetLoc = { x, y, z + 120.0f };
+    closest->SetField<FVector>(s_LocationOffset, targetLoc);
+
+    LOG_INFO("[BigDaddy] Locked onto {} (dist={:.0f}) — teleported to ({:.0f}, {:.0f}, {:.0f})",
+             closest->GetObjClassName(), sqrtf(closestDist), x, y, z + 120.0f);
+    LOG_INFO("[BigDaddy] Aggro preserved — BD keeps its current disposition");
 }
 
 // ─── Plasmid Hijack System ──────────────────────────────────────────────
@@ -295,9 +332,9 @@ bool InitPlasmidHijacks()
                 FVector projLoc = obj->GetField<FVector>(s_LocationOffset);
 
                 if (projLoc.X != 0.0f || projLoc.Y != 0.0f || projLoc.Z != 0.0f) {
-                    LOG_INFO("[BigDaddy] Dart hit ({}) at ({:.0f}, {:.0f}, {:.0f}) after {}ms — summoning!",
+                    LOG_INFO("[BigDaddy] Dart hit ({}) at ({:.0f}, {:.0f}, {:.0f}) after {}ms — teleporting BD!",
                              funcName, projLoc.X, projLoc.Y, projLoc.Z, elapsed);
-                    SummonBigDaddyAt(projLoc.X, projLoc.Y, projLoc.Z + 80.0f);
+                    TeleportBigDaddyTo(projLoc.X, projLoc.Y, projLoc.Z);
                     s_dartSummoned = true;
                 }
                 return false; // Don't block cleanup

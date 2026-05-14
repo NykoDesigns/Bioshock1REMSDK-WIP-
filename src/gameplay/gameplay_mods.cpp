@@ -5,6 +5,7 @@
 #include "../hooks/process_event.h"
 #include "../core/log.h"
 #include <cmath>
+#include <cstring>
 #include <vector>
 #include <algorithm>
 #include <Windows.h>
@@ -45,7 +46,25 @@ static bool CacheOffsets()
     return (s_LocationOff >= 0);
 }
 
-// ─── IsA helper ─────────────────────────────────────────────────────
+// ─── Helpers ────────────────────────────────────────────────────────
+
+static UFunction* FindFunctionOnClass(UStruct* cls, const char* funcName)
+{
+    if (!cls) return nullptr;
+    UField* child = cls->GetChildren();
+    int limit = 2000;
+    while (child && limit-- > 0) {
+        if (child->GetObjClassName() == "Function" && child->GetName() == funcName) {
+            return reinterpret_cast<UFunction*>(child);
+        }
+        child = child->GetNext();
+    }
+    UField* super = cls->GetSuperField();
+    if (super && limit > 0)
+        return FindFunctionOnClass(reinterpret_cast<UStruct*>(super), funcName);
+    return nullptr;
+}
+
 static bool IsA(UObject* obj, const std::string& baseClassName)
 {
     if (!obj) return false;
@@ -151,68 +170,167 @@ static void PruneDeadBots()
         s_FriendlyBots.end());
 }
 
+// Cached SpawnSecurityBot function + SpawningManager object
+static UObject*   s_SpawningMgr = nullptr;
+static UFunction* s_SpawnBotFunc = nullptr;
+
+static bool FindSpawnBotFunc()
+{
+    if (s_SpawningMgr && s_SpawnBotFunc) return true;
+
+    auto& globals = GetEngineGlobals();
+    if (!globals.IsValid()) return false;
+
+    uintptr_t objData = *reinterpret_cast<uintptr_t*>(globals.GObjects);
+    int32_t objCount = *reinterpret_cast<int32_t*>(globals.GObjects + 4);
+
+    // Find the SpawningManager instance
+    for (int i = 0; i < objCount && !s_SpawningMgr; i++) {
+        uintptr_t ptr = *reinterpret_cast<uintptr_t*>(objData + i * 4);
+        if (!ptr) continue;
+        UObject* obj = reinterpret_cast<UObject*>(ptr);
+        if (obj->GetObjClassName() == "Class") continue;
+        if (IsA(obj, "SpawningManager") || IsA(obj, "SpawningManagerBase")) {
+            s_SpawningMgr = obj;
+            LOG_INFO("[FriendlyBot] Found SpawningManager: {} ({})",
+                     obj->GetName(), obj->GetObjClassName());
+        }
+    }
+
+    if (!s_SpawningMgr) return false;
+
+    // Find SpawnSecurityBot function on it
+    UStruct* cls = reinterpret_cast<UStruct*>(s_SpawningMgr->GetClass());
+    if (cls) {
+        s_SpawnBotFunc = FindFunctionOnClass(cls, "SpawnSecurityBot");
+        if (s_SpawnBotFunc) {
+            LOG_INFO("[FriendlyBot] Found SpawnSecurityBot function (size={})",
+                     s_SpawnBotFunc->GetPropertiesSize());
+        }
+    }
+
+    return s_SpawnBotFunc != nullptr;
+}
+
 static void SpawnFriendlyBotAt(float x, float y, float z)
 {
     PruneDeadBots();
 
     if ((int)s_FriendlyBots.size() >= s_FriendlyBotLimit) {
         LOG_WARN("[FriendlyBot] Bot limit ({}) reached — destroying oldest", s_FriendlyBotLimit);
-        // Kill the oldest bot by setting health to 0
         if (!s_FriendlyBots.empty() && s_HealthOff >= 0) {
             s_FriendlyBots[0]->SetField<float>(s_HealthOff, 0.0f);
             s_FriendlyBots.erase(s_FriendlyBots.begin());
         }
     }
 
-    // Find an existing SecurityBot and relocate it, OR find the SecurityBot
-    // class and try to summon one via existing SpawnSecurityBot cheat function
+    // Find the player (used as CenterTarget for spawn)
+    UObject* player = FindObjectByClassName("ShockPlayer");
+    if (!player) {
+        LOG_WARN("[FriendlyBot] No player found");
+        return;
+    }
+
+    // Try to call SpawnSecurityBot on the SpawningManager
+    if (FindSpawnBotFunc()) {
+        ProcessEventFn originalPE = GetOriginalProcessEvent();
+        if (originalPE) {
+            // SpawnSecurityBot(int NumBotsToSpawn, Pawn CenterTarget)
+            // Parameter layout: int32(4 bytes) + Pawn*(4 bytes)
+            int32_t pSize = s_SpawnBotFunc->GetPropertiesSize();
+            std::vector<uint8_t> parms(pSize > 0 ? pSize : 8, 0);
+
+            int32_t numBots = 1;
+            std::memcpy(parms.data(), &numBots, 4);
+            std::memcpy(parms.data() + 4, &player, sizeof(UObject*));
+
+            LOG_INFO("[FriendlyBot] Calling SpawnSecurityBot(1, ShockPlayer) on SpawningManager...");
+            originalPE(s_SpawningMgr, s_SpawnBotFunc, parms.data(), nullptr);
+
+            // After spawn, find the newest SecurityBot that isn't in our list
+            auto& globals = GetEngineGlobals();
+            uintptr_t objData = *reinterpret_cast<uintptr_t*>(globals.GObjects);
+            int32_t objCount = *reinterpret_cast<int32_t*>(globals.GObjects + 4);
+
+            UObject* newBot = nullptr;
+            for (int i = objCount - 1; i >= 0 && !newBot; i--) {
+                uintptr_t ptr = *reinterpret_cast<uintptr_t*>(objData + i * 4);
+                if (!ptr) continue;
+                UObject* obj = reinterpret_cast<UObject*>(ptr);
+                if (obj->GetObjClassName() == "Class") continue;
+                if (IsA(obj, "SecurityBot")) {
+                    bool already = false;
+                    for (auto* fb : s_FriendlyBots)
+                        if (fb == obj) { already = true; break; }
+                    if (!already) newBot = obj;
+                }
+            }
+
+            if (newBot) {
+                // Move to beacon impact location
+                FVec3 spawnPos = { x, y, z + 100.0f };
+                newBot->SetField<FVec3>(s_LocationOff, spawnPos);
+
+                // Make it friendly
+                UObject* cls = newBot->GetClass();
+                if (cls) {
+                    auto props = WalkProperties(reinterpret_cast<UStruct*>(cls));
+                    for (auto& p : props) {
+                        if (p.Name == "DispositionToPlayer")
+                            newBot->SetField<int32_t>(p.Offset, 2); // Friendly
+                    }
+                }
+
+                s_FriendlyBots.push_back(newBot);
+                LOG_INFO("[FriendlyBot] Spawned SecurityBot at ({:.0f}, {:.0f}, {:.0f}) — {}/{} bots",
+                         x, y, z, s_FriendlyBots.size(), s_FriendlyBotLimit);
+                return;
+            } else {
+                LOG_WARN("[FriendlyBot] SpawnSecurityBot called but no new bot found in GObjects");
+            }
+        }
+    }
+
+    // Fallback: try to recruit an existing SecurityBot
     auto& globals = GetEngineGlobals();
     if (!globals.IsValid()) return;
 
     uintptr_t objData = *reinterpret_cast<uintptr_t*>(globals.GObjects);
     int32_t objCount = *reinterpret_cast<int32_t*>(globals.GObjects + 4);
 
-    // Strategy: Find a SecurityBot that is NOT in our friendly list
     UObject* botToRecruit = nullptr;
     for (int i = 0; i < objCount && !botToRecruit; i++) {
         uintptr_t ptr = *reinterpret_cast<uintptr_t*>(objData + i * 4);
         if (!ptr) continue;
         UObject* obj = reinterpret_cast<UObject*>(ptr);
         if (obj->GetObjClassName() == "Class") continue;
-
         if (IsA(obj, "SecurityBot")) {
-            // Check it's not already in our friendly list
-            bool alreadyFriendly = false;
+            bool already = false;
             for (auto* fb : s_FriendlyBots)
-                if (fb == obj) { alreadyFriendly = true; break; }
-            if (!alreadyFriendly) {
-                botToRecruit = obj;
-            }
+                if (fb == obj) { already = true; break; }
+            if (!already) botToRecruit = obj;
         }
     }
 
     if (!botToRecruit) {
-        LOG_WARN("[FriendlyBot] No SecurityBot found to recruit. Need SecurityBot spawner.");
+        LOG_WARN("[FriendlyBot] No SecurityBot found to recruit and SpawnSecurityBot failed");
         return;
     }
 
-    // Move it to position
-    FVec3 spawnPos = { x, y, z + 100.0f }; // Offset up so it doesn't clip ground
+    FVec3 spawnPos = { x, y, z + 100.0f };
     botToRecruit->SetField<FVec3>(s_LocationOff, spawnPos);
 
-    // Make it friendly: set disposition properties
     UObject* cls = botToRecruit->GetClass();
     if (cls) {
         auto props = WalkProperties(reinterpret_cast<UStruct*>(cls));
         for (auto& p : props) {
-            if (p.Name == "DispositionToPlayer") {
+            if (p.Name == "DispositionToPlayer")
                 botToRecruit->SetField<int32_t>(p.Offset, 2); // Friendly
-            }
         }
     }
 
     s_FriendlyBots.push_back(botToRecruit);
-    LOG_INFO("[FriendlyBot] Recruited SecurityBot at ({:.0f}, {:.0f}, {:.0f}) — {}/{} bots",
+    LOG_INFO("[FriendlyBot] Recruited existing SecurityBot at ({:.0f}, {:.0f}, {:.0f}) — {}/{} bots",
              x, y, z, s_FriendlyBots.size(), s_FriendlyBotLimit);
 }
 
