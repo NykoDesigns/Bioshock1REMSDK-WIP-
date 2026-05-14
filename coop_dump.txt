@@ -3915,19 +3915,19 @@ GObjects count: 108372
   AIContainerInfo x9
   AIController x1
   AIEventNotification x24
-  AI_CharacterResource x22
+  AI_CharacterResource x20
   AI_DummyMovement x5
   AI_DummyMovementGoal x5
-  AI_DummyWeapon x11
-  AI_DummyWeaponGoal x11
-  AI_HeadResource x22
-  AI_MovementResource x22
-  AI_MuzzleFlash x5
+  AI_DummyWeapon x10
+  AI_DummyWeaponGoal x10
+  AI_HeadResource x20
+  AI_MovementResource x20
+  AI_MuzzleFlash x4
   AI_SensorData x1
   AI_SensorRecipient x1
   AI_SensorResource x1
-  AI_SensorWithBounds x9
-  AI_WeaponResource x22
+  AI_SensorWithBounds x4
+  AI_WeaponResource x20
   AccessControl x2
   AccordianGateDoor x6
   AchievementManager x1
@@ -4058,11 +4058,11 @@ GObjects count: 108372
   ActorBank x1
   ActorGroup x2
   AdamPickup x8
-  AdditionMod x30
+  AdditionMod x29
   AggBabyJaneBooty x6
   AggDoctorBooty x3
   AggToastyBooty x8
-  AggressorCommanderAction x11
+  AggressorCommanderAction x10
   AggressorSpawner x20
   AlertSensor x1
   AlertSensorAction x1
@@ -4112,18 +4112,12 @@ GObjects count: 108372
   BeerPickup x3
   BioAmmoAdvisor x1
   BioAmmoHypoTool x1
-  BioshockAIController x33
+  BioshockAIController x31
   BlockingVolume x57
   BoolProperty x3911
   BooleanStatement x204
-  BotBeFriendlyAction x1
-  BotBeFriendlyGoal x1
-  BotCommanderAction x1
+  BotHackedColor x1
   BotPropellerSpark x2
-  BotProtectTargetAction x1
-  BotProtectTargetGoal x1
-  BotProtectTargetMovementAction x1
-  BotProtectTargetMovementGoal x1
   BouncerMeleeHandWeapon x2
   BouncerShoulderWeapon x2
   BouncerThreeSixtyWeapon x2
@@ -4158,15 +4152,13 @@ GObjects count: 108372
   CatMask_Black x2
   CausticShader x1
   Caustic_Projector x8
-  CharacterMoveToAction x1
-  CharacterMoveToGoal x1
   CheapCigarettesPickup x4
   ChipsPickup x3
   ChompersDentalButton x1
   ChompersDentalKeyPickup x1
   ClassProperty x618
   ColorCycle x50
-  CommanderGoal x22
+  CommanderGoal x20
   Concrete_Barrier x3
   Concrete_Barrier_Broken x1
   Console x1
@@ -4179,11 +4171,10 @@ GObjects count: 108372
   CubemapProbe x31
   D3DRenderDevice_11 x1
   DamageMultiplierSet x1
-  DamageResistanceSet x1
+  DamageResistanceSet x2
   DamageSendMessageSpecifier x5
-  DamageStimuliSet x1
+  DamageStimuliSet x2
   DeadBodyContainer x21
-  Deck1BotMiniGun x1
   Deck1TurretMiniGun x4
   Deck1TurretRPG x1
   DefaultPhysicsVolume x2
@@ -4193,21 +4184,21 @@ GObjects count: 108372
   Desk_2 x1
   DifficultyManager x1
   DifficultyStatsManager x1
-  DistanceTraveledSensor x22
-  DistanceTraveledSensorAction x22
+  DistanceTraveledSensor x20
+  DistanceTraveledSensorAction x20
   DoorForceActor x18
   DoorKeypadControl x1
   DoorModel x75
   DoorSwitch x4
   DownloadableContentManager x1
-  DrHeadMagnifyGlass x7
+  DrHeadMagnifyGlass x6
   Drips_Gen x8
   DustHanging_400x_400 x19
   DynamicLightEffect x6
   DynamicLightMuzzleFlash x4
   DynamicLight_Flashlight x5
   DynamicLight_MuzzleMG x3
-  DynamicLight_MuzzleMGPulse x6
+  DynamicLight_MuzzleMGPulse x4
   EVEHypoPickup x10
   EaseTable x9
   EaseTableEvaluator x2
@@ -4249,7 +4240,6 @@ GObjects count: 108372
   GameInfo x1
   GameReplicationInfo x2
   GamepadPlayerInput x1
-  GhostDesaturateSettings x1
   GinPickup x1
   GlobalTempObjects x1
   GlobalTravelContainer x1
@@ -4278,8 +4268,8 @@ GObjects count: 108372
   HavokHingeConstraint x5
   HavokRigidBody x314
   Head x1
-  HeadTrackingAction x11
-  HeadTrackingGoal x11
+  HeadTrackingAction x10
+  HeadTrackingGoal x10
   HeadbobAnimSettings x1
   HealthAdvisor x1
   HearingNotifier x3
@@ -4316,11 +4306,11 @@ GObjects count: 108372
   Lockbox x32
   LogPickup x10
   LootItemSpecification x262
-  LootSlot x625
+  LootSlot x619
   LootTableSpecification x34
   LowRentDoorsWide x3
   MG_ShellEject x1
-  MG_Tracer x8
+  MG_Tracer x7
   MachineGun x1
   MachineGunBulletPickup x4
   MachineGunFrozenBulletPickup x1
@@ -4342,7 +4332,7 @@ GObjects count: 108372
   MedicalDoors x13
   MedicalDoors_Solid x20
   MeleeThugThreeSixtyWeapon x11
-  MeshEmitter x150
+  MeshEmitter x148
   MessageAISpawned x2
   MessageAIWeaponFired x5
   MessageDispatcher x2
@@ -4367,14 +4357,12 @@ GObjects count: 108372
   ModEffectSpecification x412
   ModEffectsSubsystem x1
   ModGroup x10
-  ModManager x3
+  ModManager x2
   Model x487
-  MoveToAction x3
-  MoveToGoal x2
-  MoveToSpawnPointAction x6
-  MoveToSpawnPointGoal x6
+  MoveToSpawnPointAction x5
+  MoveToSpawnPointGoal x5
   MovingInWaterNew x2
-  MultipleRibbonEmitter x54
+  MultipleRibbonEmitter x52
   MusicBox x1
   Mutator x2
   NameProperty x2231
@@ -4385,7 +4373,7 @@ GObjects count: 108372
   OilSlick02_Reactive x1
   OilSlick04_Reactive x1
   OilSlick_Reactive x5
-  OrMod x11
+  OrMod x6
   OrStatement x2
   OwlMask_Black x3
   PCOptionsData x1
@@ -4401,8 +4389,6 @@ GObjects count: 108372
   PatrolList x46
   PatrolPoint x132
   PauseDOF x1
-  PauseDOFSettings x1
-  PauseDesaturate x1
   PhysicalPlasmidPickup x1
   PhysicalReactiveActor x2
   PhysicalSteamerTrunk x3
@@ -4425,13 +4411,13 @@ GObjects count: 108372
   PlayerReplicationInfo x1
   PlayerStart x3
   PlayerStatsManager x1
-  Player_CrouchWalk x1
   PointerProperty x88
   Polys x487
   PowerBarPickup x3
   Primitive x1
   Projector x1
   ProtectorCommanderAction x1
+  ProtectorNeutralColor x1
   ProtectorNeutral_Light x1
   ProtectorSpawner x4
   ProxyBitmapMaterial x1
@@ -4442,7 +4428,7 @@ GObjects count: 108372
   QuestManager x1
   RabbitMask_White x1
   RangedAggressorPistolMeleeWeapon x2
-  RangedAggressorSMGMeleeWeapon x6
+  RangedAggressorSMGMeleeWeapon x5
   RangedFloatProperty x98
   RangedIntProperty x2
   ReachSpec x4792
@@ -4453,7 +4439,7 @@ GObjects count: 108372
   ResStation_ActivateElec x7
   ResurrectionStation x3
   ResurrectionStationModel x9
-  RibbonEmitter x44
+  RibbonEmitter x45
   RippleShader x2
   RipplingContentInfo x2
   Rubble_Marble_Large x9
@@ -4463,13 +4449,8 @@ GObjects count: 108372
   SG_UpgradeB x1
   Script x308
   ScriptableMover x9
-  SecBotExhaust x3
-  SecBotFlaming x1
-  SecBotLightBeam x3
-  SecBotMG_MuzzleNEW x1
-  SecBotSmoking x3
-  SecBotTracer_New x1
-  SecBot_ShellEject x6
+  SecBotSmoking x2
+  SecBot_ShellEject x4
   SecCamLightR_Mesh x4
   Security x1
   SecurityBotSpawner x3
@@ -4501,12 +4482,12 @@ GObjects count: 108372
   SimpleDamageData x39
   SkeletalDecoration x1
   SkeletalMesh x68
-  SkeletalMeshInstance x182
+  SkeletalMeshInstance x179
   SkyZoneInfo x1
   Sound x2060
   SoundEffectSpecification x1800
   SoundEffectsSubsystem x1
-  SoundInstance x719
+  SoundInstance x722
   SoundMarker x36
   SoundSet x1
   SparksSmall x6
@@ -4516,7 +4497,6 @@ GObjects count: 108372
   SpawnZoneInfo x14
   SpawnedBouncer x2
   SpawnedDeck1MaximumSecurityTurret x1
-  SpawnedDeck1MediumSecurityBot x1
   SpawnedDeck1MinimumSecurityTurret x4
   SpawnedDeck1SecurityCamera x4
   SpawnedGathererGun x1
@@ -4525,9 +4505,8 @@ GObjects count: 108372
   SpawnedMeleeThugClub x2
   SpawnedMeleeThugFlashlight x5
   SpawnedMeleeThugWrench x3
-  SpawnedRangedAggressorMachineGun x1
   SpawnedRangedAggressorPistol x2
-  SpawnedRangedAggressorSMG x6
+  SpawnedRangedAggressorSMG x5
   SpawnedTurretDeadBody x1
   SpawningManager x2
   Special_InPlayerViewTrigger x1
@@ -4536,7 +4515,7 @@ GObjects count: 108372
   SpiderMask_Red x1
   Splash_Foam x2
   Splash_SmallStream x6
-  SpriteEmitter x1411
+  SpriteEmitter x1402
   StandardBuckshotPickup x6
   StandardBulletPickup x7
   StaticMesh x651
@@ -4579,14 +4558,14 @@ GObjects count: 108372
   TurretStandbyGoal x5
   TwinkiePickup x2
   UpgradeableWeaponStat x2
-  VariableBool x96
-  VariableFloat x32
+  VariableBool x97
+  VariableFloat x33
   VendingLootTable x2
   VendingStationRigidBody x2
   VisibleAmmoModel x4
-  VisionNotifier x32
-  VisionSensor x12
-  VisionSensorAction x12
+  VisionNotifier x30
+  VisionSensor x11
+  VisionSensorAction x11
   VisualEffectSpecification x973
   VisualEffectsSubsystem x1
   VisualFXProxyReactiveActor x1
@@ -4608,6 +4587,7 @@ GObjects count: 108372
   WindowsViewport x1
   WinePickup x2
   Wrench x1
+  WrenchAmmo x1
   ZoneInfo x74
   ZoneSoundPropagation x1
   actionSetQuestHint x10
@@ -7200,14 +7180,12 @@ GObjects count: 108372
   [82690] EventResponse_SoundEffectsSubsystem: xxxxxSpawnedScriptedAITenShootToasty_Agg_Toasty_Mesh_bullethits
   [82691] EventResponse_SoundEffectsSubsystem: xxxxxSpawnedScriptedAITenShootToasty_Agg_Toasty_Mesh_damageVO
   [82692] EventResponse_SoundEffectsSubsystem: xxxxxSpawnedScriptedAITenShootToasty_Agg_Toasty_Mesh_pistol
-  [86758] SpawnedDeck1MediumSecurityBot: SpawnedDeck1MediumSecurityBot_0
   [86760] SpawnedBouncer: SpawnedBouncer_0
   [86761] SpawnedBouncer: SpawnedBouncer_2
   [86762] SpawnedMeleeThug: SpawnedMeleeThug_14
   [86763] SpawnedMeleeThug: SpawnedMeleeThug_20
   [86764] SpawnedMeleeThug: SpawnedMeleeThug_16
   [86765] SpawnedMeleeThug: SpawnedMeleeThug_18
-  [86766] SpawnedRangedAggressorSMG: SpawnedRangedAggressorSMG_0
   [86767] SpawnedMeleeThug: SpawnedMeleeThug_21
   [86768] SpawnedMeleeThug: SpawnedMeleeThug_22
   [86770] SpawnedMeleeThug: SpawnedMeleeThug_19
@@ -7233,7 +7211,6 @@ GObjects count: 108372
   [86806] SpawnedMeleeThug: SpawnedMeleeThug_107
   [86809] SpawnedRangedAggressorSMG: SpawnedRangedAggressorSMG_8
   [86867] SpawningManager: SpawningManager_0
-  [86958] SpawnedRangedAggressorMachineGun: SpawnedRangedAggressorMachineGun_0
   [87012] SpawnedMeleeThugFlashlight: SpawnedMeleeThugFlashlight_4
   [87013] SpawnedMeleeThugFlashlight: SpawnedMeleeThugFlashlight_2
   [87020] SpawnedMeleeThugFlashlight: SpawnedMeleeThugFlashlight_3
@@ -7243,7 +7220,6 @@ GObjects count: 108372
   [87155] SpawnedMeleeThugClub: SpawnedMeleeThugClub_6
   [87166] SpawnedMeleeThugClub: SpawnedMeleeThugClub_5
   [87197] SpawnedMeleeThugWrench: SpawnedMeleeThugWrench_6
-  [87209] MoveToSpawnPointAction: MoveToSpawnPointAction_224
   [87215] SpawnedMeleeThugWrench: SpawnedMeleeThugWrench_7
   [87353] ActionSpawnAI: ActionSpawnAI_39
   [87445] AnimatedMeshAttachmentModel: AnimatedMeshAttachmentModel_37
@@ -7289,7 +7265,6 @@ GObjects count: 108372
   [87729] MoveToSpawnPointAction: MoveToSpawnPointAction_329
   [87748] ProtectorSpawner: ProtectorSpawner_0
   [87749] AggressorSpawner: AggressorSpawner_7
-  [87753] MoveToSpawnPointGoal: MoveToSpawnPointGoal_67
   [87768] AggressorSpawner: AggressorSpawner_11
   [87770] AggressorSpawner: AggressorSpawner_0
   [87771] AggressorSpawner: AggressorSpawner_6

@@ -241,187 +241,121 @@ bool SpawnGhostPuppet(float x, float y, float z)
     // Already have one?
     if (s_Puppet) return true;
 
-    ProcessEventFn origPE = GetOriginalProcessEvent();
-    if (!origPE) {
-        LOG_WARN("[Puppet] No ProcessEvent — can't spawn");
-        return false;
-    }
+    // ── Strategy: "Borrow" an existing world actor instead of spawning ──
+    // ProcessEvent(Spawn) doesn't work for native functions in BioShock
+    // Remastered. Instead, find a distant StaticMeshActor, claim it as
+    // our puppet, and move it to the partner's position.
 
-    // Find the local player to call Spawn on
     UObject* player = FindObjectByClassName("ShockPlayer");
     if (!player) {
-        LOG_WARN("[Puppet] No ShockPlayer for Spawn call");
+        LOG_WARN("[Puppet] No ShockPlayer found");
         return false;
     }
 
-    // Try each class in order of visual quality, falling through on failure.
-    // AI classes (SpawnedDecoyHumanAI, DecoyHumanAI) often fail because they
-    // need BSM archetype data. BasePlayerAttachment is the reliable fallback.
-    const char* classNames[] = {
-        "DecoyHuman",              // simple decoy model (no AI baggage)
-        "SpawnedDecoyHumanAI",     // full human model (Decoy plasmid, may need archetype)
-        "DecoyHumanAI",            // abstract but might work as visual
-        "BasePlayerAttachment",    // cube — always works
-        "StaticMeshActor",         // basic mesh — 3000+ instances in world
-    };
-
-    // Actor.Spawn parms layout (UE2):
-    struct SpawnParms {
-        UObject* SpawnClass;          // +0x00
-        UObject* SpawnOwner;          // +0x04
-        uint32_t SpawnTag[2];         // +0x08 FName (index + instance)
-        float    SpawnLocX;           // +0x10
-        float    SpawnLocY;           // +0x14
-        float    SpawnLocZ;           // +0x18
-        int32_t  SpawnRotPitch;       // +0x1C
-        int32_t  SpawnRotYaw;         // +0x20
-        int32_t  SpawnRotRoll;        // +0x24
-        int32_t  bNoCollisionFail;    // +0x28
-        uint32_t SpawnLabel[2];       // +0x2C FName
-        UObject* ReturnValue;         // +0x34
-    };
-
-    for (const char* className : classNames) {
-        UObject* spawnClass = FindClassObject(className);
-        if (!spawnClass) {
-            LOG_INFO("[Puppet] Class '{}' not found, trying next...", className);
-            continue;
+    // Find Location offset from player class (needed to measure distance)
+    int locOff = -1;
+    {
+        UStruct* cls = reinterpret_cast<UStruct*>(player->GetClass());
+        if (cls) {
+            std::vector<PropertyInfo> allProps = WalkProperties(cls);
+            PropertyInfo* pi = FindProperty(cls, "Location", allProps);
+            if (pi) locOff = pi->Offset;
         }
-
-        LOG_INFO("[Puppet] Trying to spawn {} at ({:.0f}, {:.0f}, {:.0f})",
-                 className, x, y, z);
-
-        SpawnParms parms{};
-        parms.SpawnClass = spawnClass;
-        parms.SpawnOwner = player;
-        parms.SpawnTag[0] = 0; parms.SpawnTag[1] = 0;
-        parms.SpawnLocX = x;
-        parms.SpawnLocY = y;
-        parms.SpawnLocZ = z;
-        parms.SpawnRotPitch = 0;
-        parms.SpawnRotYaw = 0;
-        parms.SpawnRotRoll = 0;
-        parms.bNoCollisionFail = 1;
-        parms.SpawnLabel[0] = 0; parms.SpawnLabel[1] = 0;
-        parms.ReturnValue = nullptr;
-
-        origPE(player, s_SpawnFunc, &parms, nullptr);
-
-        if (parms.ReturnValue) {
-            s_Puppet = parms.ReturnValue;
-            LOG_INFO("[Puppet] SUCCESS — spawned '{}' as puppet", className);
-            break;
-        }
-
-        LOG_WARN("[Puppet] Spawn '{}' returned null, trying next...", className);
     }
 
-    if (!s_Puppet) {
-        LOG_WARN("[Puppet] All spawn classes failed — will retry in 5 seconds");
+    // Read player location to find the most distant actor
+    float playerX = 0, playerY = 0, playerZ = 0;
+    if (locOff > 0) {
+        const uint8_t* raw = reinterpret_cast<const uint8_t*>(player);
+        memcpy(&playerX, raw + locOff, 4);
+        memcpy(&playerY, raw + locOff + 4, 4);
+        memcpy(&playerZ, raw + locOff + 8, 4);
+    }
+
+    // Scan GObjects for a StaticMeshActor to borrow
+    const auto& globals = GetEngineGlobals();
+    if (!globals.IsValid()) return false;
+
+    uintptr_t objData = *reinterpret_cast<uintptr_t*>(globals.GObjects);
+    int32_t objCount = *reinterpret_cast<int32_t*>(globals.GObjects + 4);
+
+    // Prefer classes in this order — StaticMeshActor has 3000+ instances
+    const char* borrowClasses[] = {
+        "StaticMeshActor", "Decoration", "BasePlayerAttachment"
+    };
+
+    UObject* bestCandidate = nullptr;
+    float bestDist = 0.0f;
+    int candidatesScanned = 0;
+
+    for (const char* bClass : borrowClasses) {
+        if (bestCandidate) break;
+        for (int i = 0; i < objCount && i < 100000; i++) {
+            uintptr_t ptr = *reinterpret_cast<uintptr_t*>(objData + i * 4);
+            if (!ptr) continue;
+            UObject* obj = reinterpret_cast<UObject*>(ptr);
+            if (obj->GetObjClassName() != bClass) continue;
+            if (obj == player) continue;
+            candidatesScanned++;
+
+            if (locOff > 0) {
+                const uint8_t* raw = reinterpret_cast<const uint8_t*>(obj);
+                float ax, ay, az;
+                memcpy(&ax, raw + locOff, 4);
+                memcpy(&ay, raw + locOff + 4, 4);
+                memcpy(&az, raw + locOff + 8, 4);
+
+                float dx = ax - playerX, dy = ay - playerY, dz = az - playerZ;
+                float dist = dx*dx + dy*dy + dz*dz;
+
+                // Pick the farthest one (least likely to be noticed missing)
+                if (dist > bestDist) {
+                    bestDist = dist;
+                    bestCandidate = obj;
+                }
+            } else {
+                // No location offset — just grab first one
+                bestCandidate = obj;
+                break;
+            }
+        }
+    }
+
+    LOG_INFO("[Puppet] Scanned {} candidate actors, locOff={}", candidatesScanned, locOff);
+
+    if (!bestCandidate) {
+        LOG_WARN("[Puppet] No world actor found to borrow as puppet");
         return false;
     }
 
-    LOG_INFO("[Puppet] Spawned ghost puppet: {} ({})",
-             s_Puppet->GetName(), s_Puppet->GetObjClassName());
+    s_Puppet = bestCandidate;
+    LOG_INFO("[Puppet] Borrowed world actor: {} ({}) dist={:.0f}",
+             s_Puppet->GetName(), s_Puppet->GetObjClassName(), sqrtf(bestDist));
 
-    // Cache property offsets
+    // Cache property offsets on the borrowed actor
     CachePuppetOffsets();
 
-    // Configure the puppet: no collision, no AI targeting, visible
+    // Configure: disable collision so it doesn't block anything
     int32_t bFalse = 0;
     int32_t bTrue = 1;
     SetPuppetProperty("bCollideActors", &bFalse, 4);
     SetPuppetProperty("bBlockActors", &bFalse, 4);
     SetPuppetProperty("bBlockPlayers", &bFalse, 4);
     SetPuppetProperty("bBlockHavok", &bFalse, 4);
-    SetPuppetProperty("bBlockNonZeroExtentTraces", &bFalse, 4);
-    SetPuppetProperty("bBlockZeroExtentTraces", &bFalse, 4);
     SetPuppetProperty("bHidden", &bFalse, 4);
-    SetPuppetProperty("bInGameRenderable", &bTrue, 4);
 
-    // Make invincible so enemies can't kill our puppet
-    float bigHP = 99999.0f;
-    SetPuppetProperty("Health", &bigHP, 4);
-    SetPuppetProperty("HealthMax", &bigHP, 4);
-    SetPuppetProperty("bIsInvincible", &bTrue, 4);
-
-    // Disable AI brain if this is a ShockAI/DecoyHuman subclass
-    std::string puppetClass = s_Puppet->GetObjClassName();
-    bool isAIPuppet = (puppetClass.find("Decoy") != std::string::npos ||
-                       puppetClass.find("ShockAI") != std::string::npos ||
-                       puppetClass.find("Aggressor") != std::string::npos);
-
-    s_IsAIPuppet = isAIPuppet;
-    if (isAIPuppet) {
-        // Prevent AI from running — set LifeSpan to 0 (infinite) and disable AI tick
-        float noLifeSpan = 0.0f;
-        SetPuppetProperty("LifeSpan", &noLifeSpan, 4);
-        // Make sure it doesn't try to pathfind or attack
-        SetPuppetProperty("bCanWalk", &bFalse, 4);
-        SetPuppetProperty("bCanFly", &bFalse, 4);
-        SetPuppetProperty("bCanSwim", &bFalse, 4);
-        // Human-scale draw for AI puppet
-        float drawScale = 1.0f;
-        SetPuppetProperty("DrawScale", &drawScale, 4);
-
-        // Cache AddForcedEnemy for enemy aggro
-        // We'll find it on EcologyFighter/Aggressor classes later when needed
-        s_AddForcedEnemyFunc = nullptr;
-
-        LOG_INFO("[Puppet] AI puppet configured: disabled movement/AI, set invincible");
-    } else {
-        // StaticMesh puppet — assign a visible mesh and scale appropriately
-        float drawScale = 0.5f;
-        SetPuppetProperty("DrawScale", &drawScale, 4);
-
-        // Find a StaticMesh object to assign (try sphere first, then cube, then any)
-        const char* meshNames[] = { "Sphere128Radius", "Cube256Diameter", "BeaconBall" };
-        UObject* meshObj = nullptr;
-        {
-            const auto& globals = GetEngineGlobals();
-            if (globals.IsValid()) {
-                uintptr_t objData = *reinterpret_cast<uintptr_t*>(globals.GObjects);
-                int32_t objCount = *reinterpret_cast<int32_t*>(globals.GObjects + 4);
-                // First pass: look for preferred meshes by name
-                for (const char* mName : meshNames) {
-                    if (meshObj) break;
-                    for (int i = 0; i < objCount && i < 100000; i++) {
-                        uintptr_t ptr = *reinterpret_cast<uintptr_t*>(objData + i * 4);
-                        if (!ptr) continue;
-                        UObject* o = reinterpret_cast<UObject*>(ptr);
-                        if (o->GetObjClassName() == "StaticMesh" && o->GetName() == mName) {
-                            meshObj = o;
-                            break;
-                        }
-                    }
-                }
-                // Fallback: grab ANY StaticMesh
-                if (!meshObj) {
-                    for (int i = 0; i < objCount && i < 100000; i++) {
-                        uintptr_t ptr = *reinterpret_cast<uintptr_t*>(objData + i * 4);
-                        if (!ptr) continue;
-                        UObject* o = reinterpret_cast<UObject*>(ptr);
-                        if (o->GetObjClassName() == "StaticMesh") {
-                            meshObj = o;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
-        if (meshObj) {
-            SetPuppetProperty("StaticMesh", &meshObj, sizeof(UObject*));
-            LOG_INFO("[Puppet] Assigned mesh '{}' to puppet", meshObj->GetName());
-        } else {
-            LOG_WARN("[Puppet] No StaticMesh found to assign — puppet may be invisible");
-        }
-    }
-
-    // Make it glow / unlit so it's always visible
+    // Make it glow so it stands out as "the partner"
     SetPuppetProperty("bUnlit", &bTrue, 4);
     uint8_t ambientGlow = 254;
     SetPuppetProperty("AmbientGlow", &ambientGlow, 1);
+
+    // Scale down so it's not huge — it'll be whatever mesh the borrowed
+    // actor already had (barrel, crate, etc.) but smaller and glowing
+    float drawScale = 0.35f;
+    SetPuppetProperty("DrawScale", &drawScale, 4);
+
+    s_IsAIPuppet = false;
+    LOG_INFO("[Puppet] Puppet configured: no collision, glowing, scale={:.2f}", drawScale);
 
     // Set initial position
     s_InterpX = x; s_InterpY = y; s_InterpZ = z;
