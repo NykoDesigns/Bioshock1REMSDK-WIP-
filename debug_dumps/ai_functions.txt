@@ -1,4 +1,4 @@
-=== AI/Tick/Spawn Function Catalog === 2026-05-14 12:34:43
+=== AI/Tick/Spawn Function Catalog === 2026-05-14 12:39:17
 Total matching functions: 1883
 
 

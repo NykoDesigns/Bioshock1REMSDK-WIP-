@@ -7,6 +7,7 @@
 #include "../engine/world.h"
 #include "../gameplay/gameplay_mods.h"
 #include "../debug/coop_debug.h"
+#include "../debug/crash_handler.h"
 #include "../network/coop_true.h"
 
 #include <Windows.h>
@@ -74,6 +75,10 @@ void InitializeSDK()
         LOG_ERROR("Failed to initialize hook framework!");
         return;
     }
+
+    // Install crash handler FIRST so we catch any crashes during init
+    InstallCrashHandler();
+    CrashSetContext("init:scanning");
 
     LOG_INFO("Scanning for engine structures...");
     
@@ -148,10 +153,10 @@ void InitializeSDK()
             LOG_INFO("Engine tick hook installed");
         }
 
-        // Initialize debug tools (auto-dumps snapshots to debug_dumps/)
+        CrashSetContext("init:coop_debug");
         InitCoopDebug();
 
-        // Initialize true co-op skeleton
+        CrashSetContext("init:true_coop");
         InitTrueCoop();
     }
 
@@ -176,6 +181,7 @@ void InitializeSDK()
         }
     }
 
+    CrashSetContext("runtime:normal");
     LOG_INFO("BS1SDK initialization complete");
 }
 

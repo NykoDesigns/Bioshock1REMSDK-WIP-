@@ -3,6 +3,7 @@
 #include "../core/memory.h"
 #include "../core/pattern.h"
 #include "../core/hooks.h"
+#include "../debug/crash_handler.h"
 
 #include <Windows.h>
 #include <Psapi.h>
@@ -498,6 +499,30 @@ void DumpNativesToFile(const std::string& filepath)
 
 // ─── Engine Tick Hook ────────────────────────────────────────────────────
 
+// SEH helper: call a tick callback safely (no C++ objects in this function)
+static void SafeCallTickCallback(void (*rawCb)(float), float dt)
+{
+    __try {
+        rawCb(dt);
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER) {
+        CrashBreadcrumb("TickHook: callback crashed (SEH caught)");
+    }
+}
+
+// SEH helper: call original tick safely
+static void SafeCallOriginalTick(void* thisEngine, float dt)
+{
+    __try {
+        if (s_OriginalTick) {
+            s_OriginalTick(thisEngine, dt);
+        }
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER) {
+        CrashBreadcrumb("TickHook: original tick crashed (SEH caught)");
+    }
+}
+
 static void __fastcall HookedEngineTick(void* thisEngine, void* /*edx*/, float deltaTime)
 {
     s_TickCount++;
@@ -520,9 +545,7 @@ static void __fastcall HookedEngineTick(void* thisEngine, void* /*edx*/, float d
     }
     
     // Call original
-    if (s_OriginalTick) {
-        s_OriginalTick(thisEngine, deltaTime);
-    }
+    SafeCallOriginalTick(thisEngine, deltaTime);
 }
 
 bool InstallTickHook()

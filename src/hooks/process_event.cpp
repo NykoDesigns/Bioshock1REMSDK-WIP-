@@ -1,5 +1,6 @@
 #include "process_event.h"
 #include "../core/log.h"
+#include "../debug/crash_handler.h"
 
 #include <Windows.h>
 #include <Psapi.h>
@@ -21,6 +22,42 @@ static int s_NextHookId = 1;
 static ProcessEventStats s_Stats;
 static uintptr_t s_ProcessEventAddr = 0;
 
+// ─── SEH helper: safely resolve a single name (no C++ objects) ──────────
+
+static int SafeGetOneName(UObject* obj, char* outBuf, int outBufLen)
+{
+    __try {
+        // Read the FName index from UObject (offset 0x18 for NameIndex)
+        // Then index into GNames to get the string
+        // GetName() returns std::string which we can't use in __try
+        // So we probe the object memory first, then let the caller use GetName()
+        volatile uint32_t nameIdx = *(uint32_t*)((uint8_t*)obj + 0x18);
+        (void)nameIdx;
+        outBuf[0] = '?';
+        outBuf[1] = '\0';
+        return 0; // Pointer is safe to dereference
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER) {
+        CrashBreadcrumb("PE: name probe crashed (SEH caught)");
+        outBuf[0] = '\0';
+        return 1;
+    }
+}
+
+// ─── SEH helper: safely call a hook callback ────────────────────────────
+
+static int SafeCallHook(const std::function<bool(UObject*, UFunction*, void*)>& cb,
+                         UObject* obj, UFunction* func, void* parms)
+{
+    __try {
+        return cb(obj, func, parms) ? 1 : 0;
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER) {
+        CrashBreadcrumb("PE: Hook callback crashed (SEH caught)");
+        return 0;
+    }
+}
+
 // ─── Our replacement ProcessEvent ───────────────────────────────────────
 // x86 __thiscall: 'this' in ECX. We use __fastcall to capture ECX + EDX.
 
@@ -29,14 +66,41 @@ static void __fastcall HookedProcessEvent(UObject* thisObj, void* /*edx*/,
 {
     s_Stats.TotalCalls++;
 
+    // Safety: validate pointers before any dereference
+    if (!thisObj || !function) {
+        if (s_OriginalProcessEvent) {
+            s_OriginalProcessEvent(thisObj, function, parms, result);
+        }
+        return;
+    }
+
+    // Validate pointers are actually readable memory
+    if (!IsSafeToRead(thisObj, 8) || !IsSafeToRead(function, 8)) {
+        if (s_OriginalProcessEvent) {
+            s_OriginalProcessEvent(thisObj, function, parms, result);
+        }
+        return;
+    }
+
     // Only resolve names if we have hooks or every Nth call for stats display
     bool needNames = !s_Hooks.empty() || (s_Stats.TotalCalls % 64 == 0);
     std::string funcName;
 
-    if (needNames && function) {
+    if (needNames) {
+        // Probe that name memory is readable before calling GetName()
+        char probeBuf[4];
+        if (SafeGetOneName(reinterpret_cast<UObject*>(function), probeBuf, 4) != 0 ||
+            SafeGetOneName(thisObj, probeBuf, 4) != 0) {
+            // Memory not readable — skip hooks, call original
+            if (s_OriginalProcessEvent) {
+                s_OriginalProcessEvent(thisObj, function, parms, result);
+            }
+            return;
+        }
+        // Memory is safe, call GetName() normally
         funcName = function->GetName();
         s_Stats.LastFunctionName = funcName;
-        s_Stats.LastObjectName = thisObj ? thisObj->GetName() : "<null>";
+        s_Stats.LastObjectName = thisObj->GetName();
     }
 
     bool blocked = false;
@@ -48,7 +112,7 @@ static void __fastcall HookedProcessEvent(UObject* thisObj, void* /*edx*/,
                 continue;
 
             if (hook.Callback) {
-                if (hook.Callback(thisObj, function, parms)) {
+                if (SafeCallHook(hook.Callback, thisObj, function, parms)) {
                     blocked = true;
                     s_Stats.BlockedCalls++;
                     break;

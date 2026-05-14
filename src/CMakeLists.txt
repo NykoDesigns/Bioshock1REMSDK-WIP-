@@ -33,6 +33,7 @@ add_library(BS1SDK SHARED
     network/coop_transitions.cpp
     network/coop_testing.cpp
     debug/coop_debug.cpp
+    debug/crash_handler.cpp
 )
 
 target_include_directories(BS1SDK PRIVATE
