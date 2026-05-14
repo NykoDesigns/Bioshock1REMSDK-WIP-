@@ -180,16 +180,38 @@ static void InstallDamageHook()
         std::string cn = obj->GetObjClassName();
         if (cn == "ShockPlayer" || cn == "ShockPlayerController") return false;
 
-        // Extract damage amount from TakeDamage params
-        // TakeDamage(int Damage, Pawn InstigatedBy, vector HitLocation, vector Momentum, class DamageType)
-        // In UE2, params are packed sequentially
+        // ACTUAL TakeDamage signature (from decompiled ShockPawn.uc):
+        // TakeDamage(DamageStimuliSet DamageStimuli, float CritChance, Actor Damager,
+        //            Vector HitLocation, Vector HitNormal, Vector HitImpulseDirection,
+        //            name EffectEventName, float DamageAttenuation,
+        //            optional name HitHighBone, optional name HitLowBone,
+        //            optional bool WasMeleeAttack)
+        //
+        // Parms layout (UE2 packed sequentially):
+        //   +0x00: UObject* DamageStimuli (4 bytes, pointer)
+        //   +0x04: float CritChance (4 bytes)
+        //   +0x08: UObject* Damager (4 bytes, pointer)
+        //   +0x0C: FVector HitLocation (12 bytes: X,Y,Z)
+        //   +0x18: FVector HitNormal (12 bytes)
+        //   +0x24: FVector HitImpulseDirection (12 bytes)
+        //   +0x30: FName EffectEventName (8 bytes)
+        //   +0x38: float DamageAttenuation (4 bytes)
         if (!parms) return false;
 
-        // Read the first int (damage amount)
-        int32_t damage;
-        memcpy(&damage, parms, 4);
+        // We can't easily extract the numerical damage from the DamageStimuliSet
+        // object without walking its properties. For sync, use DamageAttenuation
+        // as an approximate scalar, or just send a "this enemy was hit" event.
+        // The health delta on the target is more reliable.
+        float prevHealth = 0, postHealth = 0;
+        if (s_SyncHealthOffset > 0) {
+            const uint8_t* raw = reinterpret_cast<const uint8_t*>(obj);
+            memcpy(&prevHealth, raw + s_SyncHealthOffset, 4);
+        }
 
-        if (damage <= 0) return false;
+        // We'll read damage as health delta on next tick; for now, send a
+        // nominal damage value of 1.0 to indicate "this NPC was hit"
+        float damage = 1.0f;
+        if (damage <= 0.0f) return false;
 
         // Get target position for matching
         float tx = 0, ty = 0, tz = 0;

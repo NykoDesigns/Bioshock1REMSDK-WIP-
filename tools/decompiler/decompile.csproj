@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Eliot.UELib">
+      <HintPath>..\..\tools\UE-Explorer\Eliot.UELib.dll</HintPath>
+    </Reference>
+    <Reference Include="Eliot.Utilities">
+      <HintPath>..\..\tools\UE-Explorer\Eliot.Utilities.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>

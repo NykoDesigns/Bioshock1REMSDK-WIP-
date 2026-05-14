@@ -32,3 +32,10 @@ Thumbs.db
 *.obj
 *.ilk
 *.exp
+
+# Decompiled game source (generated, copyrighted)
+docs/reverse-engineering/decompiled/
+docs/reverse-engineering/engine-dump/
+tools/UE-Explorer/
+tools/decompiler/bin/
+tools/decompiler/obj/
