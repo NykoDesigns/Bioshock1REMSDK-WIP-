@@ -258,10 +258,11 @@ bool SpawnGhostPuppet(float x, float y, float z)
     // AI classes (SpawnedDecoyHumanAI, DecoyHumanAI) often fail because they
     // need BSM archetype data. BasePlayerAttachment is the reliable fallback.
     const char* classNames[] = {
-        "SpawnedDecoyHumanAI",     // human model (Decoy plasmid)
-        "DecoyHumanAI",            // abstract but might work
+        "DecoyHuman",              // simple decoy model (no AI baggage)
+        "SpawnedDecoyHumanAI",     // full human model (Decoy plasmid, may need archetype)
+        "DecoyHumanAI",            // abstract but might work as visual
         "BasePlayerAttachment",    // cube — always works
-        "StaticMeshActor",         // basic mesh
+        "StaticMeshActor",         // basic mesh — 3000+ instances in world
     };
 
     // Actor.Spawn parms layout (UE2):
