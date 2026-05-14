@@ -8,6 +8,8 @@
 #include "../hooks/process_event.h"
 
 #include <cstring>
+#include <thread>
+#include <atomic>
 
 namespace bs1sdk {
 
@@ -16,6 +18,13 @@ namespace bs1sdk {
 static bool s_Initialized = false;
 static bool s_Active = false;
 static float s_SendAccum = 0.0f;
+
+// Background keepalive thread (runs even when game is alt-tabbed)
+static std::atomic<bool> s_KeepAliveRunning{false};
+static std::thread s_KeepAliveThread;
+
+// Chat callback for overlay
+static OnChatFunc s_LocalChatCallback;
 
 // Cached property offsets for reading player state
 static int s_LocOffset = -1;     // Location (Vector)
@@ -210,6 +219,10 @@ bool InitCoopBridge()
     // Register callbacks
     SetOnRemoteState(OnRemoteStateReceived);
     SetOnPeerEvent(OnPeerConnectionEvent);
+    SetOnChat([](const std::string& sender, const std::string& msg) {
+        LOG_INFO("[Chat] {}: {}", sender, msg);
+        if (s_LocalChatCallback) s_LocalChatCallback(sender, msg);
+    });
 
     // Register a ProcessEvent hook for reading player state on Tick
     if (IsProcessEventHooked()) {
@@ -294,6 +307,17 @@ bool CoopHost(uint16_t port, const std::string& name)
 
     if (!NetHost(port, name)) return false;
     s_Active = true;
+
+    // Start background keepalive thread (survives alt-tab)
+    s_KeepAliveRunning = true;
+    s_KeepAliveThread = std::thread([]() {
+        while (s_KeepAliveRunning) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+            if (s_Active) NetTick(0.5f);
+        }
+    });
+    s_KeepAliveThread.detach();
+
     return true;
 }
 
@@ -312,11 +336,23 @@ bool CoopJoin(const std::string& ip, uint16_t port, const std::string& name)
 
     if (!NetJoin(ip, port, name)) return false;
     s_Active = true;
+
+    // Start background keepalive thread (survives alt-tab)
+    s_KeepAliveRunning = true;
+    s_KeepAliveThread = std::thread([]() {
+        while (s_KeepAliveRunning) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+            if (s_Active) NetTick(0.5f);
+        }
+    });
+    s_KeepAliveThread.detach();
+
     return true;
 }
 
 void CoopDisconnect()
 {
+    s_KeepAliveRunning = false;
     NetDisconnect();
     s_Active = false;
     s_PuppetPawn = nullptr;
@@ -383,6 +419,11 @@ std::string GetCoopStatus()
 bool IsCoopActive()
 {
     return s_Active;
+}
+
+void SetCoopChatCallback(ChatDisplayFunc fn)
+{
+    s_LocalChatCallback = std::move(fn);
 }
 
 } // namespace bs1sdk

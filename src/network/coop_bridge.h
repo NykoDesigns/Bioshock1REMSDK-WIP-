@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <functional>
 
 namespace bs1sdk {
 
@@ -30,5 +31,10 @@ bool IsCoopActive();
 
 /// Send a chat message to co-op partner.
 void NetSendChat(const std::string& message);
+
+/// Register a callback for when chat messages are received.
+/// The callback receives (senderName, message).
+using ChatDisplayFunc = std::function<void(const std::string&, const std::string&)>;
+void SetCoopChatCallback(ChatDisplayFunc fn);
 
 } // namespace bs1sdk

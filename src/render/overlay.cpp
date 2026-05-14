@@ -809,8 +809,16 @@ void Overlay::RenderConsole()
     static bool open = true;
     ImGui::Begin("Console (~)", &open);
     
-    // Log history
+    // Log history (static so it persists and is accessible from chat callback)
     static std::vector<std::pair<ImVec4, std::string>> logHistory;
+    static bool chatCallbackRegistered = false;
+    if (!chatCallbackRegistered) {
+        chatCallbackRegistered = true;
+        SetCoopChatCallback([](const std::string& sender, const std::string& msg) {
+            logHistory.push_back({ImVec4(0.3f, 1.0f, 0.3f, 1.0f), "[" + sender + "] " + msg});
+            if (logHistory.size() > 200) logHistory.erase(logHistory.begin());
+        });
+    }
     auto Log = [&](const ImVec4& col, const std::string& msg) {
         logHistory.push_back({col, msg});
         if (logHistory.size() > 200) logHistory.erase(logHistory.begin());

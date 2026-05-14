@@ -13,7 +13,7 @@ constexpr uint8_t  NET_PROTOCOL_VERSION = 1;
 constexpr int      NET_MAX_PACKET = 1024;
 constexpr int      NET_TICK_RATE_HZ = 30;           // state updates per second
 constexpr float    NET_TICK_INTERVAL = 1.0f / NET_TICK_RATE_HZ;
-constexpr float    NET_TIMEOUT_SEC = 5.0f;           // peer timeout
+constexpr float    NET_TIMEOUT_SEC = 15.0f;          // peer timeout (generous for VPN/Hamachi)
 
 // ─── Packet Types ──────────────────────────────────────────────────────
 

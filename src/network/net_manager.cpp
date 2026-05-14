@@ -24,6 +24,8 @@ static PlayerStateData s_LastSentState{};
 
 static OnRemoteStateFunc s_OnRemoteState;
 static OnPeerEventFunc   s_OnPeerEvent;
+static OnChatFunc        s_OnChat;
+static float             s_PingAccum = 0.0f; // ping keepalive timer
 
 // Buffer for outgoing packets
 static uint8_t s_SendBuf[NET_MAX_PACKET];
@@ -199,6 +201,13 @@ static void ProcessIncoming()
             if (hdr->size >= sizeof(WorldEventData))
                 QueueWorldEventPacket(*reinterpret_cast<const WorldEventData*>(payload));
             break;
+        case PacketType::Chat:
+            if (hdr->size >= sizeof(ChatData)) {
+                auto* chatData = reinterpret_cast<const ChatData*>(payload);
+                s_RemotePeer.lastRecvTime = s_Uptime;
+                if (s_OnChat) s_OnChat(s_RemotePeer.name, chatData->message);
+            }
+            break;
         default:
             break;
         }
@@ -322,9 +331,13 @@ void NetTick(float deltaTime)
         }
     }
 
-    // Send keepalive ping every 2 seconds when connected but no state being sent
+    // Send keepalive ping every 2 seconds to prevent timeout during alt-tab / pauses
     if (s_RemotePeer.connected) {
-        // Ping is sent as a fallback; normal state sends keep connection alive
+        s_PingAccum += deltaTime;
+        if (s_PingAccum >= 2.0f) {
+            s_PingAccum = 0.0f;
+            SendPacket(PacketType::Ping, nullptr, 0);
+        }
     }
 }
 
@@ -389,6 +402,7 @@ const NetPeer* GetRemotePeer()
 
 void SetOnRemoteState(OnRemoteStateFunc fn) { s_OnRemoteState = std::move(fn); }
 void SetOnPeerEvent(OnPeerEventFunc fn) { s_OnPeerEvent = std::move(fn); }
+void SetOnChat(OnChatFunc fn) { s_OnChat = std::move(fn); }
 
 bool NetSendRawPacket(PacketType type, const void* data, uint16_t size)
 {

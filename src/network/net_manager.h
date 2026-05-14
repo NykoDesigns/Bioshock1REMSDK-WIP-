@@ -28,6 +28,9 @@ using OnRemoteStateFunc = std::function<void(const NetPeer& peer, const PlayerSt
 /// Callback when a peer connects/disconnects
 using OnPeerEventFunc = std::function<void(const NetPeer& peer, bool connected)>;
 
+/// Callback when a chat message is received
+using OnChatFunc = std::function<void(const std::string& senderName, const std::string& message)>;
+
 // ─── Public API ────────────────────────────────────────────────────────
 
 /// Start hosting a co-op session on the given port.
@@ -58,6 +61,7 @@ const NetPeer* GetRemotePeer();
 /// Register callbacks.
 void SetOnRemoteState(OnRemoteStateFunc fn);
 void SetOnPeerEvent(OnPeerEventFunc fn);
+void SetOnChat(OnChatFunc fn);
 
 /// Level tracking — set before host/join for mismatch detection.
 void NetSetLocalLevel(const std::string& levelName);
