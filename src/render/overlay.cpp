@@ -999,9 +999,7 @@ void Overlay::RenderConsole()
             LogInfo("  snapa / snapb           - Mark actor snapshot A/B");
             LogInfo("  snapdiff                - Diff snapshots A vs B");
             LogYellow("=== Co-op Analysis ===");
-            LogInfo("  catalog [secs]          - Record ALL PE events (default 30s)");
-            LogInfo("  interactions            - Dump all interaction event param layouts");
-            LogInfo("  statediff [class] [sec] - Track property changes over time");
+            LogInfo("  coopanalysis [secs]     - Full co-op sync analysis (events+interactions+statediff)");
             LogYellow("=== True Co-op ===");
             LogInfo("  truehost [port]         - HOST: start co-op session");
             LogInfo("  truejoin <ip> [port]    - CLIENT: join a host");
@@ -2042,42 +2040,35 @@ void Overlay::RenderConsole()
             DumpSnapshotDiff();
             LogGreen("Snapshot diff dumped to debug_dumps/snapshot_diff.txt");
         }
-        // ─── catalog [seconds] ─── record all PE events for co-op sync analysis
-        else if (tokens[0] == "catalog") {
-            if (IsEventCatalogRunning()) {
-                StopEventCatalog();
-                DumpEventCatalog();
-                LogGreen("Event catalog stopped and dumped");
+        // ─── coopanalysis [seconds] ─── full co-op sync analysis in one command
+        else if (tokens[0] == "coopanalysis") {
+            if (IsEventCatalogRunning() || IsStateDiffRunning()) {
+                // Stop everything and dump
+                if (IsEventCatalogRunning()) { StopEventCatalog(); DumpEventCatalog(); }
+                if (IsStateDiffRunning()) { StopStateDiff(); DumpStateDiff(); }
+                LogGreen("Co-op analysis stopped and dumped!");
+                LogInfo("  -> debug_dumps/event_catalog.txt (sync blueprint)");
+                LogInfo("  -> debug_dumps/interaction_events.txt (param layouts)");
+                LogInfo("  -> debug_dumps/state_diff.txt (property changes)");
             } else {
                 float secs = (tokens.size() >= 2) ? std::strtof(tokens[1].c_str(), nullptr) : 30.0f;
+
+                // Step 1: Dump interaction layouts immediately (static scan)
+                DumpInteractionEvents();
+                LogGreen("1/3 Interaction events dumped");
+
+                // Step 2: Start event catalog (records live PE events)
                 StartEventCatalog(secs);
-                char buf[64];
-                std::snprintf(buf, sizeof(buf), "Event catalog started (%.0fs) - play normally!", secs);
-                LogGreen(buf);
-                LogInfo("Open doors, pick up items, fight enemies, etc.");
-                LogInfo("Run 'catalog' again to stop early. Auto-dumps after timeout.");
-            }
-        }
-        // ─── interactions ─── dump all interaction event layouts
-        else if (tokens[0] == "interactions") {
-            DumpInteractionEvents();
-            LogGreen("Interaction events dumped to debug_dumps/interaction_events.txt");
-        }
-        // ─── statediff [class] [seconds] ─── track property changes over time
-        else if (tokens[0] == "statediff") {
-            if (IsStateDiffRunning()) {
-                StopStateDiff();
-                DumpStateDiff();
-                LogGreen("State diff stopped and dumped");
-            } else {
-                std::string filter = (tokens.size() >= 2) ? tokens[1] : "";
-                float secs = (tokens.size() >= 3) ? std::strtof(tokens[2].c_str(), nullptr) : 10.0f;
-                StartStateDiff(filter, secs);
+                LogGreen("2/3 Event catalog recording...");
+
+                // Step 3: Start state diff (captures property changes)
+                StartStateDiff("", secs);
+                LogGreen("3/3 State diff recording...");
+
                 char buf[128];
-                std::snprintf(buf, sizeof(buf), "State diff started: filter='%s' (%.0fs)", filter.c_str(), secs);
-                LogGreen(buf);
-                LogInfo("Interact with world (open door, pick up item, kill enemy)");
-                LogInfo("Run 'statediff' again to stop early.");
+                std::snprintf(buf, sizeof(buf),
+                    "Co-op analysis running (%.0fs). Play normally! Run 'coopanalysis' to stop early.", secs);
+                LogYellow(buf);
             }
         }
         // ─── truehost [port] ───
