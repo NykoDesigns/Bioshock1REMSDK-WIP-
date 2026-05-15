@@ -359,13 +359,21 @@ void CoopTick(float deltaTime)
     CrashBreadcrumb("CoopTick: NetTick");
     NetTick(deltaTime);
 
+    // Read local player state every frame (needed for camera + send)
+    auto localState = ReadLocalPlayerState();
+
+    // Always update camera for overlay marker rendering
+    if (localState.posX != 0 || localState.posY != 0 || localState.posZ != 0) {
+        SetLocalCamera(localState.posX, localState.posY, localState.posZ,
+                       localState.rotPitch, localState.rotYaw, 90.0f);
+    }
+
     // Send local state at tick rate
     if (IsNetConnected()) {
         s_SendAccum += deltaTime;
         if (s_SendAccum >= NET_TICK_INTERVAL) {
             s_SendAccum -= NET_TICK_INTERVAL;
-            auto state = ReadLocalPlayerState();
-            NetSendPlayerState(state);
+            NetSendPlayerState(localState);
         }
 
         // Periodic level change detection (every 2s)
