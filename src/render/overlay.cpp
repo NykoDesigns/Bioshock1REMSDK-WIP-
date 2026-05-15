@@ -6,6 +6,7 @@
 #include "../engine/world.h"
 #include "../sdk/sdk_generator.h"
 #include "../debug/coop_debug.h"
+#include "../debug/disasm_dump.h"
 #include "../network/coop_true.h"
 #include "../network/coop_world_sync.h"
 #include "../network/coop_p2.h"
@@ -1806,6 +1807,17 @@ void Overlay::RenderConsole()
                          GetNativeCount(), (uint32_t)GetNativesTableAddress());
             LogGreen(buf);
             LogInfo("Full dump at Z:\\Bioshock1SDK\\gnatives_dump.txt");
+        }
+        // ─── pedisasm ─── dump ProcessEvent disassembly + struct validation
+        else if (tokens[0] == "pedisasm") {
+            LogYellow("Dumping ProcessEvent disassembly...");
+            DumpProcessEventDisasm();
+            DumpStructValidation();
+            DumpFunctionAddresses();
+            LogGreen("Dumps written to debug_dumps/:");
+            LogInfo("  pe_disasm.txt          — ProcessEvent + native disasm");
+            LogInfo("  struct_validation.txt  — UFunction layout verification");
+            LogInfo("  function_addresses.txt — All native addresses for IDA/Ghidra");
         }
         // ─── gensdk ───
         else if (tokens[0] == "gensdk") {

@@ -8,6 +8,7 @@
 #include "../gameplay/gameplay_mods.h"
 #include "../debug/coop_debug.h"
 #include "../debug/crash_handler.h"
+#include "../debug/disasm_dump.h"
 #include "../hooks/process_event.h"
 #include "../network/coop_true.h"
 
@@ -164,6 +165,13 @@ void InitializeSDK()
         if (InstallTickHook()) {
             LOG_INFO("Engine tick hook installed (PE-based safe mode)");
         }
+
+        // Auto-dump PE disassembly for engine analysis
+        CrashSetContext("init:disasm_dump");
+        DumpProcessEventDisasm();
+        DumpStructValidation();
+        DumpFunctionAddresses();
+        LOG_INFO("Engine disassembly dumps written to debug_dumps/");
 
         LOG_INFO(">>> About to init CoopDebug...");
         CrashSetContext("init:coop_debug");
