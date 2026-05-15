@@ -5,6 +5,7 @@
 #include "../hooks/process_event.h"
 #include "../debug/crash_handler.h"
 
+#include <Windows.h>
 #include <cstring>
 #include <cmath>
 #include <string>
@@ -457,41 +458,69 @@ void UpdateGhostPuppet(const PlayerStateData& remoteState)
     s_InterpY += (s_TargetY - s_InterpY) * t;
     s_InterpZ += (s_TargetZ - s_InterpZ) * t;
 
-    // Write position via SetLocation ProcessEvent (properly updates render octree)
+    // Write position — try SetLocation via ProcessEvent (updates render octree),
+    // but validate NativeFunc first and protect with SEH to avoid crash.
+    static bool s_SetLocSafe = true;   // optimistic; disable on first failure
+    static bool s_SetRotSafe = true;
     ProcessEventFn origPE = GetOriginalProcessEvent();
-    if (origPE && s_SetLocFunc) {
-        // SetLocation(FVector NewLocation, bool bNoTest) -> bool
-        struct {
-            float X, Y, Z;           // FVector NewLocation
-            uint32_t bNoTest;        // skip collision test
-            uint32_t ReturnValue;
-        } locParms{};
-        locParms.X = s_InterpX;
-        locParms.Y = s_InterpY;
-        locParms.Z = s_InterpZ;
-        locParms.bNoTest = 1;  // skip collision — it's a puppet
-        origPE(s_Puppet, s_SetLocFunc, &locParms, nullptr);
-    } else if (s_PuppetLocOffset > 0) {
-        // Fallback: raw write (won't update render, but stores value)
+
+    bool locWritten = false;
+    if (origPE && s_SetLocFunc && s_SetLocSafe) {
+        // Validate NativeFunc pointer at +0x70 before calling
+        uintptr_t nativePtr = s_SetLocFunc->GetField<uintptr_t>(0x70);
+        if (nativePtr && nativePtr > 0x10000 && IsSafeToRead(reinterpret_cast<const void*>(nativePtr), 4)) {
+            struct {
+                float X, Y, Z;
+                uint32_t bNoTest;
+                uint32_t ReturnValue;
+            } locParms{};
+            locParms.X = s_InterpX;
+            locParms.Y = s_InterpY;
+            locParms.Z = s_InterpZ;
+            locParms.bNoTest = 1;
+            __try {
+                origPE(s_Puppet, s_SetLocFunc, &locParms, nullptr);
+                locWritten = true;
+            } __except(EXCEPTION_EXECUTE_HANDLER) {
+                LOG_WARN("[Puppet] SetLocation PE crashed — falling back to raw write");
+                s_SetLocSafe = false;
+            }
+        } else {
+            LOG_WARN("[Puppet] SetLocation NativeFunc invalid (0x{:08X}) — using raw write", (uint32_t)nativePtr);
+            s_SetLocSafe = false;
+        }
+    }
+    if (!locWritten && s_PuppetLocOffset > 0) {
         uint8_t* raw = reinterpret_cast<uint8_t*>(s_Puppet);
         memcpy(raw + s_PuppetLocOffset, &s_InterpX, 4);
         memcpy(raw + s_PuppetLocOffset + 4, &s_InterpY, 4);
         memcpy(raw + s_PuppetLocOffset + 8, &s_InterpZ, 4);
     }
 
-    // Write rotation via SetRotation ProcessEvent
-    if (origPE && s_SetRotFunc) {
-        // SetRotation(FRotator NewRotation) -> bool
-        struct {
-            int32_t Pitch, Yaw, Roll;  // FRotator
-            uint32_t ReturnValue;
-        } rotParms{};
-        rotParms.Pitch = (int32_t)(s_TargetPitch * (65536.0f / 360.0f));
-        rotParms.Yaw = (int32_t)(s_TargetYaw * (65536.0f / 360.0f));
-        rotParms.Roll = 0;
-        origPE(s_Puppet, s_SetRotFunc, &rotParms, nullptr);
-    } else if (s_PuppetRotOffset > 0) {
-        // Fallback: raw write
+    // Write rotation — same safety pattern
+    bool rotWritten = false;
+    if (origPE && s_SetRotFunc && s_SetRotSafe) {
+        uintptr_t nativePtr = s_SetRotFunc->GetField<uintptr_t>(0x70);
+        if (nativePtr && nativePtr > 0x10000 && IsSafeToRead(reinterpret_cast<const void*>(nativePtr), 4)) {
+            struct {
+                int32_t Pitch, Yaw, Roll;
+                uint32_t ReturnValue;
+            } rotParms{};
+            rotParms.Pitch = (int32_t)(s_TargetPitch * (65536.0f / 360.0f));
+            rotParms.Yaw = (int32_t)(s_TargetYaw * (65536.0f / 360.0f));
+            rotParms.Roll = 0;
+            __try {
+                origPE(s_Puppet, s_SetRotFunc, &rotParms, nullptr);
+                rotWritten = true;
+            } __except(EXCEPTION_EXECUTE_HANDLER) {
+                LOG_WARN("[Puppet] SetRotation PE crashed — falling back to raw write");
+                s_SetRotSafe = false;
+            }
+        } else {
+            s_SetRotSafe = false;
+        }
+    }
+    if (!rotWritten && s_PuppetRotOffset > 0) {
         int32_t pitch = (int32_t)(s_TargetPitch * (65536.0f / 360.0f));
         int32_t yaw = (int32_t)(s_TargetYaw * (65536.0f / 360.0f));
         int32_t roll = 0;

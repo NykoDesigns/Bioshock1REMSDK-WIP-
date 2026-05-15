@@ -282,16 +282,34 @@ bool GetActorPosition(UObject* actor, FVec3& outPos)
     return false;
 }
 
+// SEH-safe wrapper for ProcessEvent — in a separate function to avoid C2712
+static bool SafeCallSetLocation(ProcessEventFn pe, UObject* actor, UFunction* func,
+                                 float x, float y, float z)
+{
+    struct {
+        float X, Y, Z;
+        uint32_t bNoTest;
+        uint32_t ReturnValue;
+    } parms{};
+    parms.X = x; parms.Y = y; parms.Z = z;
+    parms.bNoTest = 1;
+    __try {
+        pe(actor, func, &parms, nullptr);
+        return true;
+    } __except(EXCEPTION_EXECUTE_HANDLER) {
+        return false;
+    }
+}
+
 bool SetActorPosition(UObject* actor, const FVec3& pos)
 {
     if (!actor) return false;
 
-    // Try SetLocation via ProcessEvent first — this properly updates the render octree
+    // Try SetLocation via ProcessEvent first — this properly updates the render octree.
     ProcessEventFn origPE = GetOriginalProcessEvent();
     if (origPE) {
         UStruct* cls = reinterpret_cast<UStruct*>(actor->GetClass());
         if (cls) {
-            // Walk class hierarchy to find SetLocation function
             UField* walk = reinterpret_cast<UField*>(cls);
             int depth = 0;
             while (walk && depth < 64) {
@@ -301,17 +319,15 @@ bool SetActorPosition(UObject* actor, const FVec3& pos)
                 while (child && limit-- > 0) {
                     if (child->GetObjClassName() == "Function" && child->GetName() == "SetLocation") {
                         UFunction* setLocFunc = reinterpret_cast<UFunction*>(child);
-                        struct {
-                            float X, Y, Z;        // FVector NewLocation
-                            uint32_t bNoTest;     // skip collision test
-                            uint32_t ReturnValue;
-                        } parms{};
-                        parms.X = pos.X;
-                        parms.Y = pos.Y;
-                        parms.Z = pos.Z;
-                        parms.bNoTest = 1;
-                        origPE(actor, setLocFunc, &parms, nullptr);
-                        return true;
+                        // Validate NativeFunc at +0x70
+                        uintptr_t nativePtr = setLocFunc->GetField<uintptr_t>(0x70);
+                        if (!nativePtr || nativePtr < 0x10000 ||
+                            !IsSafeToRead(reinterpret_cast<const void*>(nativePtr), 4)) {
+                            break; // invalid — fall through to raw write
+                        }
+                        if (SafeCallSetLocation(origPE, actor, setLocFunc, pos.X, pos.Y, pos.Z))
+                            return true;
+                        break; // crashed — fall through
                     }
                     child = child->GetNext();
                 }
