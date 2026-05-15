@@ -179,6 +179,7 @@ enum FuncIndex {
     FI_mixerGetControlDetailsW,
     FI_mixerSetControlDetails,
     FI_mixerMessage,
+    FI_mixerGetID,
     FI_midiStreamOpen,
     FI_midiStreamClose,
     FI_midiStreamOut,
@@ -308,6 +309,7 @@ PROXY_TRAMPOLINE(mixerGetControlDetailsA, FI_mixerGetControlDetailsA)
 PROXY_TRAMPOLINE(mixerGetControlDetailsW, FI_mixerGetControlDetailsW)
 PROXY_TRAMPOLINE(mixerSetControlDetails, FI_mixerSetControlDetails)
 PROXY_TRAMPOLINE(mixerMessage, FI_mixerMessage)
+PROXY_TRAMPOLINE(mixerGetID, FI_mixerGetID)
 PROXY_TRAMPOLINE(midiStreamOpen, FI_midiStreamOpen)
 PROXY_TRAMPOLINE(midiStreamClose, FI_midiStreamClose)
 PROXY_TRAMPOLINE(midiStreamOut, FI_midiStreamOut)
@@ -358,6 +360,7 @@ static const char* g_FuncNames[] = {
     "mixerGetLineControlsA", "mixerGetLineControlsW",
     "mixerGetControlDetailsA", "mixerGetControlDetailsW",
     "mixerSetControlDetails", "mixerMessage",
+    "mixerGetID",
     "midiStreamOpen", "midiStreamClose", "midiStreamOut",
     "midiStreamPause", "midiStreamRestart", "midiStreamStop",
     "midiStreamPosition", "midiStreamProperty",

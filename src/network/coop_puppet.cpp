@@ -2,6 +2,7 @@
 #include "../core/log.h"
 #include "../engine/uobject.h"
 #include "../hooks/process_event.h"
+#include "../debug/crash_handler.h"
 
 #include <cstring>
 #include <cmath>
@@ -279,49 +280,84 @@ bool SpawnGhostPuppet(float x, float y, float z)
     uintptr_t objData = *reinterpret_cast<uintptr_t*>(globals.GObjects);
     int32_t objCount = *reinterpret_cast<int32_t*>(globals.GObjects + 4);
 
-    // Prefer classes in this order — StaticMeshActor has 3000+ instances
+    // Prefer classes in this order — many fallbacks for different game states
     const char* borrowClasses[] = {
-        "StaticMeshActor", "Decoration", "BasePlayerAttachment"
+        "StaticMeshActor", "InterpActor", "KActor",
+        "Decoration", "Emitter", "Note",
+        "Trigger", "BlockingVolume", "PhysicsVolume"
     };
 
     UObject* bestCandidate = nullptr;
     float bestDist = 0.0f;
     int candidatesScanned = 0;
+    int totalChecked = 0;
+    int nullPtrs = 0;
+    int badPtr = 0;
+    int noClass = 0;
+    int nameErrors = 0;
+    static bool s_DiagLogged = false;
 
-    for (const char* bClass : borrowClasses) {
-        if (bestCandidate) break;
-        for (int i = 0; i < objCount && i < 100000; i++) {
-            uintptr_t ptr = *reinterpret_cast<uintptr_t*>(objData + i * 4);
-            if (!ptr) continue;
-            UObject* obj = reinterpret_cast<UObject*>(ptr);
-            if (obj->GetObjClassName() != bClass) continue;
-            if (obj == player) continue;
-            candidatesScanned++;
+    // Single-pass scan: check all objects once, matching any borrow class
+    for (int i = 0; i < objCount && i < 120000; i++) {
+        uintptr_t ptr = *reinterpret_cast<uintptr_t*>(objData + i * 4);
+        if (!ptr) { nullPtrs++; continue; }
 
-            if (locOff > 0) {
-                const uint8_t* raw = reinterpret_cast<const uint8_t*>(obj);
-                float ax, ay, az;
-                memcpy(&ax, raw + locOff, 4);
-                memcpy(&ay, raw + locOff + 4, 4);
-                memcpy(&az, raw + locOff + 8, 4);
+        // Quick validity check: reject obviously bad pointers (IsSafeToRead handles LAA range)
+        if (ptr < 0x10000u) { badPtr++; continue; }
 
-                float dx = ax - playerX, dy = ay - playerY, dz = az - playerZ;
-                float dist = dx*dx + dy*dy + dz*dz;
+        UObject* obj = reinterpret_cast<UObject*>(ptr);
+        totalChecked++;
 
-                // Pick the farthest one (least likely to be noticed missing)
-                if (dist > bestDist) {
-                    bestDist = dist;
-                    bestCandidate = obj;
-                }
-            } else {
-                // No location offset — just grab first one
+        // Read class pointer directly at +0x30, with minimal safety check
+        if (!IsSafeToRead(reinterpret_cast<const void*>(ptr), 0x34)) { badPtr++; continue; }
+        uintptr_t clsPtr = *reinterpret_cast<uintptr_t*>(ptr + UObject::OFFSET_CLASS);
+        if (!clsPtr || clsPtr < 0x10000u) { noClass++; continue; }
+        if (!IsSafeToRead(reinterpret_cast<const void*>(clsPtr), 0x30)) { noClass++; continue; }
+
+        // Read the class FName directly (at +0x28 on the class object)
+        FName classFName = *reinterpret_cast<FName*>(clsPtr + UObject::OFFSET_NAME);
+        std::string cn = classFName.ToString();
+        if (cn.empty() || cn[0] == '<') { nameErrors++; continue; }
+
+        // Log first few class names on first scan for diagnostics
+        if (!s_DiagLogged && i <= 4 && !cn.empty()) {
+            LOG_INFO("[Puppet] GObj[{}] class='{}' ptr=0x{:08X}", i, cn, (uint32_t)ptr);
+        }
+
+        // Check against all borrow classes
+        bool isMatch = false;
+        for (const char* bClass : borrowClasses) {
+            if (cn == bClass) { isMatch = true; break; }
+        }
+        if (!isMatch) continue;
+        if (obj == player) continue;
+        candidatesScanned++;
+
+        if (locOff > 0) {
+            const uint8_t* raw = reinterpret_cast<const uint8_t*>(obj);
+            float ax, ay, az;
+            memcpy(&ax, raw + locOff, 4);
+            memcpy(&ay, raw + locOff + 4, 4);
+            memcpy(&az, raw + locOff + 8, 4);
+
+            float dx = ax - playerX, dy = ay - playerY, dz = az - playerZ;
+            float dist = dx*dx + dy*dy + dz*dz;
+
+            // Pick the farthest one (least likely to be noticed missing)
+            if (dist > bestDist) {
+                bestDist = dist;
                 bestCandidate = obj;
-                break;
             }
+        } else {
+            // No location offset — just grab first one
+            bestCandidate = obj;
+            break;
         }
     }
 
-    LOG_INFO("[Puppet] Scanned {} candidate actors, locOff={}", candidatesScanned, locOff);
+    LOG_INFO("[Puppet] Scanned {} candidates, locOff={} (total={}, null={}, badPtr={}, noClass={}, nameErr={}, objCount={})",
+             candidatesScanned, locOff, totalChecked, nullPtrs, badPtr, noClass, nameErrors, objCount);
+    s_DiagLogged = true;
 
     if (!bestCandidate) {
         LOG_WARN("[Puppet] No world actor found to borrow as puppet");
@@ -344,14 +380,13 @@ bool SpawnGhostPuppet(float x, float y, float z)
     SetPuppetProperty("bBlockHavok", &bFalse, 4);
     SetPuppetProperty("bHidden", &bFalse, 4);
 
-    // Make it glow so it stands out as "the partner"
+    // Make it bright and fully lit so it's always visible as "the partner"
     SetPuppetProperty("bUnlit", &bTrue, 4);
     uint8_t ambientGlow = 254;
     SetPuppetProperty("AmbientGlow", &ambientGlow, 1);
 
-    // Scale down so it's not huge — it'll be whatever mesh the borrowed
-    // actor already had (barrel, crate, etc.) but smaller and glowing
-    float drawScale = 0.35f;
+    // Keep at human-ish scale so it's easy to see (it's a barrel/crate/etc.)
+    float drawScale = 1.0f;
     SetPuppetProperty("DrawScale", &drawScale, 4);
 
     s_IsAIPuppet = false;
@@ -466,6 +501,135 @@ int GetPuppetLastAction(float& timeSinceAction)
     timeSinceAction = s_ActionTimer;
     if (s_ActionTimer > 1.0f) return -1; // expired after 1 second
     return s_LastAction;
+}
+
+std::string GetPuppetDiagnostics()
+{
+    char buf[1024];
+    const auto& globals = GetEngineGlobals();
+    int32_t objCount = 0;
+    uintptr_t objData = 0;
+    if (globals.IsValid()) {
+        objData = *reinterpret_cast<uintptr_t*>(globals.GObjects);
+        objCount = *reinterpret_cast<int32_t*>(globals.GObjects + 4);
+    }
+
+    std::snprintf(buf, sizeof(buf),
+        "=== Puppet Diagnostics ===\n"
+        "Initialized: %s\n"
+        "Puppet ptr: 0x%08X\n"
+        "SpawnFunc: 0x%08X\n"
+        "DestroyFunc: 0x%08X\n"
+        "LocOffset: %d  RotOffset: %d\n"
+        "HasTarget: %s  (%.0f, %.0f, %.0f)\n"
+        "GObjects: data=0x%08X count=%d\n"
+        "IsAIPuppet: %s\n"
+        "RetryTimer: %.1f / %.1f",
+        s_Initialized ? "YES" : "NO",
+        (uint32_t)(uintptr_t)s_Puppet,
+        (uint32_t)(uintptr_t)s_SpawnFunc,
+        (uint32_t)(uintptr_t)s_DestroyFunc,
+        s_PuppetLocOffset, s_PuppetRotOffset,
+        s_HasTarget ? "YES" : "NO", s_TargetX, s_TargetY, s_TargetZ,
+        (uint32_t)objData, objCount,
+        s_IsAIPuppet ? "YES" : "NO",
+        s_SpawnRetryTimer, SPAWN_RETRY_INTERVAL);
+
+    std::string result = buf;
+
+    // If puppet is alive, show its current position
+    if (s_Puppet && s_PuppetLocOffset > 0) {
+        float px, py, pz;
+        const uint8_t* raw = reinterpret_cast<const uint8_t*>(s_Puppet);
+        memcpy(&px, raw + s_PuppetLocOffset, 4);
+        memcpy(&py, raw + s_PuppetLocOffset + 4, 4);
+        memcpy(&pz, raw + s_PuppetLocOffset + 8, 4);
+        std::snprintf(buf, sizeof(buf), "\nPuppet pos: (%.0f, %.0f, %.0f)", px, py, pz);
+        result += buf;
+    }
+
+    // Quick class scan check — test first 5 non-null objects
+    if (globals.IsValid() && objData && objCount > 0) {
+        result += "\nFirst 5 GObj classes: ";
+        int shown = 0;
+        for (int i = 0; i < objCount && i < 1000 && shown < 5; i++) {
+            uintptr_t ptr = *reinterpret_cast<uintptr_t*>(objData + i * 4);
+            if (!ptr) continue;
+            UObject* obj = reinterpret_cast<UObject*>(ptr);
+            std::string cn = obj->GetObjClassName();
+            if (cn.empty() || cn == "<bad_ptr>" || cn == "<no_class>") {
+                result += "[BAD] ";
+            } else {
+                result += cn + " ";
+            }
+            shown++;
+        }
+    }
+
+    // Direct test: try FindObjectByClassName
+    UObject* testPlayer = FindObjectByClassName("ShockPlayer");
+    std::snprintf(buf, sizeof(buf), "\nFindObjectByClassName('ShockPlayer'): 0x%08X",
+                 (uint32_t)(uintptr_t)testPlayer);
+    result += buf;
+
+    // Scan for any class name containing "Player" or "Shock"
+    if (globals.IsValid() && objData && objCount > 0) {
+        result += "\nPlayer-related objects found:";
+        int playerHits = 0;
+        std::string seenClasses;
+        for (int i = 0; i < objCount && i < 150000; i++) {
+            uintptr_t ptr = *reinterpret_cast<uintptr_t*>(objData + i * 4);
+            if (!ptr) continue;
+            UObject* obj = reinterpret_cast<UObject*>(ptr);
+            if (!IsSafeToRead(obj, 64)) continue;
+            std::string cn = obj->GetObjClassName();
+            // Check for anything player-related
+            if (cn.find("Player") != std::string::npos ||
+                cn.find("player") != std::string::npos ||
+                cn.find("ShockPlayer") != std::string::npos) {
+                // Only log unique class names, up to 10
+                if (seenClasses.find(cn) == std::string::npos && playerHits < 10) {
+                    std::string objName = obj->GetName();
+                    std::snprintf(buf, sizeof(buf), "\n  [%d] cls='%s' name='%s' ptr=0x%08X",
+                                 i, cn.c_str(), objName.c_str(), (uint32_t)ptr);
+                    result += buf;
+                    seenClasses += cn + ";";
+                    playerHits++;
+                }
+            }
+        }
+        if (playerHits == 0) result += " NONE!";
+    }
+
+    // Scan for puppet borrow candidates using direct pointer reads
+    if (globals.IsValid() && objData && objCount > 0) {
+        int meshActors = 0, interpActors = 0, decorations = 0, emitters = 0;
+        int totalBad = 0, totalGood = 0;
+        for (int i = 0; i < objCount && i < 150000; i++) {
+            uintptr_t ptr = *reinterpret_cast<uintptr_t*>(objData + i * 4);
+            if (!ptr) continue;
+            if (ptr < 0x10000u) { totalBad++; continue; }
+            if (!IsSafeToRead(reinterpret_cast<const void*>(ptr), 0x34)) { totalBad++; continue; }
+            uintptr_t clsPtr = *reinterpret_cast<uintptr_t*>(ptr + UObject::OFFSET_CLASS);
+            if (!clsPtr || clsPtr < 0x10000u || !IsSafeToRead(reinterpret_cast<const void*>(clsPtr), 0x30)) { totalBad++; continue; }
+            FName classFName = *reinterpret_cast<FName*>(clsPtr + UObject::OFFSET_NAME);
+            std::string cn = classFName.ToString();
+            if (cn.empty() || cn[0] == '<') { totalBad++; continue; }
+            totalGood++;
+            if (cn == "StaticMeshActor") meshActors++;
+            else if (cn == "InterpActor") interpActors++;
+            else if (cn == "Decoration") decorations++;
+            else if (cn == "Emitter") emitters++;
+        }
+        std::snprintf(buf, sizeof(buf),
+            "\nBorrow candidates: SMA=%d Interp=%d Decor=%d Emit=%d"
+            "\nObjects: %d good, %d bad (of %d total)",
+            meshActors, interpActors, decorations, emitters,
+            totalGood, totalBad, objCount);
+        result += buf;
+    }
+
+    return result;
 }
 
 } // namespace bs1sdk

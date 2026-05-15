@@ -56,6 +56,12 @@ bool SetActorPosition(UObject* actor, const FVec3& pos);
 /// Get distance between two actors
 float GetActorDistance(UObject* a, UObject* b);
 
+/// Write a raw property value on an actor by property name
+bool SetActorProperty(UObject* actor, const char* propName, const void* value, int size);
+
+/// Read a raw property value from an actor by property name
+bool GetActorProperty(UObject* actor, const char* propName, void* outValue, int size);
+
 /// Iterate all actors with a callback
 void ForEachActor(std::function<void(UObject* actor, const std::string& className)> callback);
 

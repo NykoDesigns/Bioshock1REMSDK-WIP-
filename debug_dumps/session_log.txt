@@ -171,3 +171,37 @@
 [2026-05-14 13:02:58] TEST PASS: Big Daddy tracking - Found 0 Big Daddies in level
 [2026-05-14 13:02:58] TEST PASS: Null guard counting - Null guard counter incremented
 [2026-05-14 13:02:58] TEST PASS: Level detected - Current level: Entry.MyLevel
+[2026-05-14 19:29:54] ═══ SESSION START ═══
+[2026-05-14 19:29:54] GObjects=0x10EF042C GNames=0x10EF04EC
+[2026-05-14 19:29:54] Full snapshot dumped: auto_init
+[2026-05-14 19:29:54] Actor census: 805 classes, 102218 objects
+[2026-05-14 19:29:54] Property offsets: 23 classes dumped
+[2026-05-14 19:29:54] AI function catalog: 1883 functions
+[2026-05-14 19:29:54] TrueCoop ready (deferred)
+[2026-05-14 19:30:02] TrueCoop subsystems initialized (all phases)
+[2026-05-14 19:30:02] TrueCoop role: TrueHost
+[2026-05-14 19:30:02] P2 pawn: [SpawnedMeleeThug] SpawnedMeleeThug_10
+[2026-05-14 19:40:24] ═══ SESSION START ═══
+[2026-05-14 19:40:24] GObjects=0x10EF042C GNames=0x10EF04EC
+[2026-05-14 19:40:24] Full snapshot dumped: auto_init
+[2026-05-14 19:40:24] Actor census: 804 classes, 102223 objects
+[2026-05-14 19:40:24] Property offsets: 23 classes dumped
+[2026-05-14 19:40:24] AI function catalog: 1883 functions
+[2026-05-14 19:40:24] TrueCoop ready (deferred)
+[2026-05-14 19:40:57] TrueCoop subsystems initialized (all phases)
+[2026-05-14 19:40:57] TEST PASS: Engine globals valid - GObjects and GNames found
+[2026-05-14 19:40:57] TEST PASS: PE hooked - ProcessEvent intercepted
+[2026-05-14 19:40:57] TEST PASS: World ready - World system initialized
+[2026-05-14 19:40:57] TEST PASS: Tick hook - Engine tick hooked
+[2026-05-14 19:40:57] TEST PASS: Player accessible - At (-18751, 11802, 1195)
+[2026-05-14 21:45:54] ═══ SESSION START ═══
+[2026-05-14 21:45:54] GObjects=0x10EF042C GNames=0x10EF04EC
+[2026-05-14 21:45:54] Full snapshot dumped: auto_init
+[2026-05-14 21:45:54] Actor census: 810 classes, 102222 objects
+[2026-05-14 21:45:54] Property offsets: 23 classes dumped
+[2026-05-14 21:45:54] AI function catalog: 1883 functions
+[2026-05-14 21:45:54] TrueCoop ready (deferred)
+[2026-05-14 21:47:01] TrueCoop subsystems initialized (all phases)
+[2026-05-14 21:47:01] TrueCoop role: TrueHost
+[2026-05-14 21:47:01] P2 pawn: [SpawnedMeleeThug] SpawnedMeleeThug_10
+[2026-05-14 21:47:38] TrueCoop role: TrueClient

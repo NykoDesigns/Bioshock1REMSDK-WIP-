@@ -4,6 +4,7 @@
 #include "../core/log.h"
 #include "../engine/uobject.h"
 #include "../hooks/process_event.h"
+#include "../debug/crash_handler.h"
 
 #include <cstring>
 #include <string>
@@ -66,22 +67,27 @@ static void ReadLocalEconomy(int& adam, int& credits, int& maxCredits)
 {
     adam = 0; credits = 0; maxCredits = 9999;
     UObject* player = FindShockPlayer();
-    if (!player) return;
+    if (!player || !IsSafeToRead(player, 4096)) return;
 
     const uint8_t* raw = reinterpret_cast<const uint8_t*>(player);
-    if (s_ADAMOffset > 0) memcpy(&adam, raw + s_ADAMOffset, 4);
-    if (s_CreditsOffset > 0) memcpy(&credits, raw + s_CreditsOffset, 4);
-    if (s_MaxCreditsOffset > 0) memcpy(&maxCredits, raw + s_MaxCreditsOffset, 4);
+    if (s_ADAMOffset > 0 && IsSafeToRead(raw + s_ADAMOffset, 4))
+        memcpy(&adam, raw + s_ADAMOffset, 4);
+    if (s_CreditsOffset > 0 && IsSafeToRead(raw + s_CreditsOffset, 4))
+        memcpy(&credits, raw + s_CreditsOffset, 4);
+    if (s_MaxCreditsOffset > 0 && IsSafeToRead(raw + s_MaxCreditsOffset, 4))
+        memcpy(&maxCredits, raw + s_MaxCreditsOffset, 4);
 }
 
 static void WriteLocalEconomy(int adam, int credits)
 {
     UObject* player = FindShockPlayer();
-    if (!player) return;
+    if (!player || !IsSafeToRead(player, 4096)) return;
 
     uint8_t* raw = reinterpret_cast<uint8_t*>(player);
-    if (s_ADAMOffset > 0) memcpy(raw + s_ADAMOffset, &adam, 4);
-    if (s_CreditsOffset > 0) memcpy(raw + s_CreditsOffset, &credits, 4);
+    if (s_ADAMOffset > 0 && IsSafeToRead(raw + s_ADAMOffset, 4))
+        memcpy(raw + s_ADAMOffset, &adam, 4);
+    if (s_CreditsOffset > 0 && IsSafeToRead(raw + s_CreditsOffset, 4))
+        memcpy(raw + s_CreditsOffset, &credits, 4);
 }
 
 // ─── Hook: detect ADAM/Credit gains ────────────────────────────────────
@@ -91,6 +97,8 @@ static void InstallEconomyHook()
     ProcessEventHook hook;
     hook.Name = "CoopEconomySync";
     hook.Callback = [](UObject* obj, UFunction* func, void* parms) -> bool {
+        if (!obj || !func || !IsSafeToRead(obj, 32) || !IsSafeToRead(func, 32))
+            return false;
         std::string cn = obj->GetObjClassName();
         if (cn != "ShockPlayer") return false;
 
@@ -183,7 +191,8 @@ bool InitEconomySync()
     InstallEconomyHook();
 
     // Read initial values
-    ReadLocalEconomy(s_LastADAM, s_LastCredits, s_MaxCreditsOffset);
+    int initMaxCredits = 0;
+    ReadLocalEconomy(s_LastADAM, s_LastCredits, initMaxCredits);
 
     s_EcoInit = true;
     LOG_INFO("[Economy] Economy sync initialized");
@@ -204,6 +213,7 @@ void TickEconomySync(float deltaTime)
 
     // Process pending incoming
     if (s_HasPendingEco) {
+        CrashBreadcrumb("EcoTick: ApplyEconomySync");
         ApplyEconomySync(s_PendingEco);
         s_HasPendingEco = false;
     }
@@ -213,6 +223,7 @@ void TickEconomySync(float deltaTime)
     if (s_EcoAccum >= ECO_SYNC_INTERVAL) {
         s_EcoAccum = 0.0f;
 
+        CrashBreadcrumb("EcoTick: ReadLocalEconomy");
         int adam, credits, maxCredits;
         ReadLocalEconomy(adam, credits, maxCredits);
 
@@ -223,6 +234,7 @@ void TickEconomySync(float deltaTime)
         eco.eventType = 0; // snapshot
         eco.eventAmount = 0;
 
+        CrashBreadcrumb("EcoTick: NetSendRawPacket");
         NetSendRawPacket(PacketType::EconomySync, &eco, sizeof(eco));
 
         s_LastADAM = adam;

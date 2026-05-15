@@ -4,6 +4,7 @@
 #include "coop_save.h"
 #include "udp_socket.h"
 #include "../core/log.h"
+#include "../debug/crash_handler.h"
 
 #include <chrono>
 #include <cstdlib>
@@ -70,6 +71,7 @@ static bool SendPacket(PacketType type, const void* payload, uint16_t payloadSiz
 static void HandleHandshake(const std::string& fromIp, uint16_t fromPort,
                             const HandshakeData* data)
 {
+    CrashBreadcrumbf("HandleHandshake from %s:%u name=%s", fromIp.c_str(), fromPort, data->playerName);
     if (s_Role == NetRole::Host) {
         // Accept connection
         s_RemotePeer.ip = fromIp;
@@ -97,6 +99,7 @@ static void HandleHandshake(const std::string& fromIp, uint16_t fromPort,
         ack.sessionId = s_SessionId;
         SendPacket(PacketType::HandshakeAck, &ack, sizeof(ack));
 
+        CrashBreadcrumb("HandleHandshake: calling OnPeerEvent(connected)");
         if (s_OnPeerEvent) s_OnPeerEvent(s_RemotePeer, true);
     }
 }
@@ -120,6 +123,7 @@ static void HandleHandshakeAck(const std::string& fromIp, uint16_t fromPort,
                      s_LocalLevel, s_RemotePeer.levelName);
         }
 
+        CrashBreadcrumb("HandleHandshakeAck: calling OnPeerEvent(connected)");
         if (s_OnPeerEvent) s_OnPeerEvent(s_RemotePeer, true);
     }
 }

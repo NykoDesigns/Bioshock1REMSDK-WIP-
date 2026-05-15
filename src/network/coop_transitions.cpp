@@ -56,7 +56,7 @@ void InitTransitions()
     if (s_Initialized) return;
     s_Initialized = true;
 
-    std::string logPath = std::string(DEBUG_DIR) + "/transitions_log.txt";
+    std::string logPath = std::string(GetDebugDir()) + "/transitions_log.txt";
     s_TransLog.open(logPath, std::ios::trunc);
     TransLog("Transitions system initialized");
 
@@ -370,7 +370,7 @@ int GetNullGuardCount() { return s_NullGuards; }
 
 void DumpStabilityReport()
 {
-    std::string filepath = std::string(DEBUG_DIR) + "/stability_report.txt";
+    std::string filepath = std::string(GetDebugDir()) + "/stability_report.txt";
     std::ofstream out(filepath);
     out << "=== Stability Report ===\n";
     out << "Null guards triggered: " << s_NullGuards << "\n";

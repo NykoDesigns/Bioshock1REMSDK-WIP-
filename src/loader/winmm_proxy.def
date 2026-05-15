@@ -117,6 +117,7 @@ EXPORTS
     mixerGetControlDetailsW  = proxy_mixerGetControlDetailsW
     mixerSetControlDetails   = proxy_mixerSetControlDetails
     mixerMessage             = proxy_mixerMessage
+    mixerGetID               = proxy_mixerGetID
     midiStreamOpen           = proxy_midiStreamOpen
     midiStreamClose          = proxy_midiStreamClose
     midiStreamOut            = proxy_midiStreamOut

@@ -1,6 +1,3 @@
 [0.0] Transitions system initialized
 [0.0] Initial level: Entry.MyLevel
 [0.0] PE hooks activated for co-op session
-[0.0] CUTSCENE START: TestCutscene (P2 input paused)
-[0.0] CUTSCENE END: TestCutscene (duration=0.0s)
-[0.0] NULL GUARD: test_context (total=1)

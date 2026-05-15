@@ -1,6 +1,7 @@
 #pragma once
 
 #include "net_common.h"
+#include <string>
 
 namespace bs1sdk {
 
@@ -32,5 +33,8 @@ void NotifyPuppetAction(const PlayerActionData& action);
 /// Get the puppet's last known action for rendering effects.
 /// Returns the action type or -1 if no recent action.
 int GetPuppetLastAction(float& timeSinceAction);
+
+/// Get detailed puppet diagnostics string for debug console.
+std::string GetPuppetDiagnostics();
 
 } // namespace bs1sdk

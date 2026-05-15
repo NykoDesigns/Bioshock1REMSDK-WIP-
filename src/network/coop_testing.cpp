@@ -450,7 +450,7 @@ std::vector<CoopTestResult> GetCoopTestResults() { return s_Results; }
 
 void DumpCoopTestResults()
 {
-    std::string filepath = std::string(DEBUG_DIR) + "/coop_test_results.txt";
+    std::string filepath = std::string(GetDebugDir()) + "/coop_test_results.txt";
     std::ofstream out(filepath);
     out << "╔══════════════════════════════════════════════════════════════╗\n";
     out << "║  CO-OP TEST RESULTS                                         ║\n";

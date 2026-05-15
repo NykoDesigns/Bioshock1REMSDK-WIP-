@@ -35,7 +35,7 @@ void InitP2Inventory()
     if (s_Initialized) return;
     s_Initialized = true;
 
-    std::string logPath = std::string(DEBUG_DIR) + "/p2_inventory_log.txt";
+    std::string logPath = std::string(GetDebugDir()) + "/p2_inventory_log.txt";
     s_InvLog.open(logPath, std::ios::trunc);
     InvLog("P2 Inventory initialized");
 
@@ -275,7 +275,7 @@ void P2DeserializeInventory(const uint8_t* buffer, int size)
 
 void DumpP2Inventory()
 {
-    std::string filepath = std::string(DEBUG_DIR) + "/p2_inventory.txt";
+    std::string filepath = std::string(GetDebugDir()) + "/p2_inventory.txt";
     std::ofstream out(filepath);
     out << "=== P2 Inventory ===\n";
     out << "Health: " << s_Inventory.Health << "/" << s_Inventory.MaxHealth << "\n";

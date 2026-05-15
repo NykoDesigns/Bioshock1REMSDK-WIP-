@@ -184,7 +184,7 @@ void UnfreezeClientSimulation()
     // Dump what was frozen for analysis
     {
         std::lock_guard<std::mutex> lock(s_FreezeMutex);
-        std::string filepath = std::string(DEBUG_DIR) + "/frozen_functions.txt";
+        std::string filepath = std::string(GetDebugDir()) + "/frozen_functions.txt";
         std::ofstream out(filepath);
         out << "=== Functions Blocked During Freeze ===\n";
         out << "Total blocked calls: " << s_BlockedCount << "\n\n";

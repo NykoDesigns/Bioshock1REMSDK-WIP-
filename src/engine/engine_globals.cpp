@@ -1,4 +1,5 @@
 #include "uobject.h"
+#include "../debug/crash_handler.h"
 #include <cstring>
 
 namespace bs1sdk {
@@ -57,8 +58,9 @@ std::string UObject::GetName() const
 
 std::string UObject::GetObjClassName() const
 {
+    if (!IsSafeToRead(this, 32)) return "<bad_ptr>";
     UObject* cls = GetClass();
-    if (!cls) return "<no_class>";
+    if (!cls || !IsSafeToRead(cls, 32)) return "<no_class>";
     return cls->GetName();
 }
 
@@ -90,11 +92,13 @@ std::vector<PropertyInfo> WalkProperties(UStruct* cls)
     int safetyLimit = 64;
     
     while (current && safetyLimit-- > 0) {
+        if (!IsSafeToRead(current, 32)) break;
         // Walk the Children chain for this class level
         UField* child = current->GetChildren();
         int childLimit = 2000;
         
         while (child && childLimit-- > 0) {
+            if (!IsSafeToRead(child, 32)) break;
             // Only collect UProperty-derived objects (class name contains "Property")
             std::string childClass = child->GetObjClassName();
             if (childClass.find("Property") != std::string::npos) {
@@ -146,6 +150,7 @@ UObject* FindObjectByClassName(const std::string& className)
         uintptr_t ptr = *reinterpret_cast<uintptr_t*>(objData + i * 4);
         if (!ptr) continue;
         UObject* obj = reinterpret_cast<UObject*>(ptr);
+        if (!IsSafeToRead(obj, 32)) continue;
         if (obj->GetObjClassName() == className)
             return obj;
     }
@@ -165,6 +170,7 @@ std::vector<UObject*> FindAllObjectsByClassName(const std::string& className)
         uintptr_t ptr = *reinterpret_cast<uintptr_t*>(objData + i * 4);
         if (!ptr) continue;
         UObject* obj = reinterpret_cast<UObject*>(ptr);
+        if (!IsSafeToRead(obj, 32)) continue;
         if (obj->GetObjClassName() == className)
             results.push_back(obj);
     }
@@ -183,6 +189,7 @@ UStruct* FindClass(const std::string& className)
         uintptr_t ptr = *reinterpret_cast<uintptr_t*>(objData + i * 4);
         if (!ptr) continue;
         UObject* obj = reinterpret_cast<UObject*>(ptr);
+        if (!IsSafeToRead(obj, 32)) continue;
         if (obj->GetObjClassName() == "Class" && obj->GetName() == className)
             return reinterpret_cast<UStruct*>(obj);
     }
@@ -201,6 +208,7 @@ UEnum* FindEnum(const std::string& enumName)
         uintptr_t ptr = *reinterpret_cast<uintptr_t*>(objData + i * 4);
         if (!ptr) continue;
         UObject* obj = reinterpret_cast<UObject*>(ptr);
+        if (!IsSafeToRead(obj, 32)) continue;
         if (obj->GetObjClassName() == "Enum" && obj->GetName() == enumName)
             return reinterpret_cast<UEnum*>(obj);
     }
@@ -216,10 +224,12 @@ UFunction* FindFunctionOnClass(const std::string& className, const std::string& 
     int safetyLimit = 64;
 
     while (current && safetyLimit-- > 0) {
+        if (!IsSafeToRead(current, 32)) break;
         UField* child = current->GetChildren();
         int childLimit = 2000;
 
         while (child && childLimit-- > 0) {
+            if (!IsSafeToRead(child, 32)) break;
             std::string childClass = child->GetObjClassName();
             if (childClass == "Function") {
                 if (child->GetName() == funcName)

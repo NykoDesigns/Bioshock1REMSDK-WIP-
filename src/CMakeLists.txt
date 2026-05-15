@@ -57,5 +57,16 @@ target_compile_definitions(BS1SDK PRIVATE
 
 # Disable SAFESEH for hook compatibility
 if(MSVC)
-    target_link_options(BS1SDK PRIVATE /SAFESEH:NO)
+    target_link_options(BS1SDK PRIVATE /SAFESEH:NO /MAP /DEBUG)
+    target_compile_options(BS1SDK PRIVATE /Zi)
+endif()
+
+# Auto-deploy to game directory after build
+if(BS1SDK_GAME_DIR)
+    add_custom_command(TARGET BS1SDK POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "$<TARGET_FILE:BS1SDK>"
+            "${BS1SDK_GAME_DIR}/BS1SDK.dll"
+        COMMENT "Deploying BS1SDK.dll -> ${BS1SDK_GAME_DIR}"
+    )
 endif()

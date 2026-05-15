@@ -8,7 +8,8 @@
 namespace bs1sdk {
 
 // ─── Output directory for all debug dumps ────────────────────────────────
-constexpr const char* DEBUG_DIR = "Z:\\Bioshock1SDK\\debug_dumps";
+// Resolved at runtime — see GetDebugDir() in coop_debug.cpp
+const char* GetDebugDir();
 
 // ─── Session Log ─────────────────────────────────────────────────────────
 // Append-mode log that persists across DLL loads. Every test session
@@ -97,6 +98,31 @@ void DumpAIFunctions();
 void MarkSnapshotA();
 void MarkSnapshotB();
 void DumpSnapshotDiff();
+
+// ─── SDK Generation ──────────────────────────────────────────────────────
+// Generate full Unreal-style SDK headers from runtime reflection.
+// Dumps every class, struct, enum, property (with offset/size), and function.
+// Output: debug_dumps/SDK/
+
+void DumpSDKHeaders();
+
+// ─── Object Inspector ────────────────────────────────────────────────────
+// Deep inspection of a single object by class name or address.
+// Returns formatted string with all properties and their current values.
+
+std::string InspectObject(const std::string& classNameOrAddr);
+
+// ─── Class Hierarchy ─────────────────────────────────────────────────────
+// Dump full inheritance tree of all classes.
+// Output: debug_dumps/class_hierarchy.txt
+
+void DumpClassHierarchy();
+
+// ─── Function Catalog ────────────────────────────────────────────────────
+// Dump all UFunction objects with their flags, parameter info.
+// Output: debug_dumps/all_functions.txt
+
+void DumpAllFunctions();
 
 // ─── Console integration ─────────────────────────────────────────────────
 // All dump commands are also accessible from console.

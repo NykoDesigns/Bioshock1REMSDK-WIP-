@@ -5,6 +5,7 @@
 #include "../core/log.h"
 #include "../engine/uobject.h"
 #include "../hooks/process_event.h"
+#include "../debug/crash_handler.h"
 
 #include <cstring>
 #include <cmath>
@@ -499,6 +500,7 @@ static UObject* FindActorByClassAndPos(const std::string& className, float tx, f
         uintptr_t ptr = *reinterpret_cast<uintptr_t*>(objData + i * 4);
         if (!ptr) continue;
         UObject* obj = reinterpret_cast<UObject*>(ptr);
+        if (!IsSafeToRead(obj, 32)) continue;
 
         // Match by class name (exact or inheritance)
         std::string cn = obj->GetObjClassName();
@@ -508,6 +510,7 @@ static UObject* FindActorByClassAndPos(const std::string& className, float tx, f
         // Position check
         if (s_SyncLocOffset > 0) {
             const uint8_t* raw = reinterpret_cast<const uint8_t*>(obj);
+            if (!IsSafeToRead(raw + s_SyncLocOffset, 12)) continue;
             float ox, oy, oz;
             memcpy(&ox, raw + s_SyncLocOffset, 4);
             memcpy(&oy, raw + s_SyncLocOffset + 4, 4);

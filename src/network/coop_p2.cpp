@@ -58,7 +58,7 @@ void InitP2System()
     if (s_P2Initialized) return;
     s_P2Initialized = true;
 
-    std::string logPath = std::string(DEBUG_DIR) + "/p2_system_log.txt";
+    std::string logPath = std::string(GetDebugDir()) + "/p2_system_log.txt";
     s_P2Log.open(logPath, std::ios::trunc);
     P2Log("P2 system initialized. Role=%s", IsTrueHost() ? "Host" : "Client");
 
@@ -149,6 +149,29 @@ bool P2SpawnPawn()
 
     s_P2Pawn = bestCandidate;
     s_P2PawnName = bestCandidate->GetName();
+
+    // ── Disable AI on the commandeered pawn ──
+    // PHYS_None = 0 stops physics-driven movement
+    uint8_t physNone = 0;
+    if (SetActorProperty(s_P2Pawn, "Physics", &physNone, 1)) {
+        P2Log("Set Physics=PHYS_None");
+    }
+    // Put into stasis to prevent AI ticking
+    int32_t bTrue = 1;
+    int32_t bFalse = 0;
+    SetActorProperty(s_P2Pawn, "bStasis", &bTrue, 4);
+    // Disable collision with players so P2 pawn doesn't block host
+    SetActorProperty(s_P2Pawn, "bBlockPlayers", &bFalse, 4);
+    // Clear the controller reference so AI controller stops driving it
+    uintptr_t nullPtr = 0;
+    SetActorProperty(s_P2Pawn, "Controller", &nullPtr, 4);
+    // Disable AI alertness
+    SetActorProperty(s_P2Pawn, "bIsPlayer", &bTrue, 4);
+    // Make friendly (don't attack player)
+    float zeroHealth = 0;
+    SetActorProperty(s_P2Pawn, "bCanBeDamaged", &bFalse, 4);
+
+    LOG_INFO("[P2] AI disabled: Physics=None, bStasis=1, Controller=null");
 
     // Move P2 pawn near the player
     if (GetPlayerPosition(playerPos)) {
@@ -544,7 +567,7 @@ std::string GetP2Status()
 
 void DumpP2State()
 {
-    std::string filepath = std::string(DEBUG_DIR) + "/p2_state.txt";
+    std::string filepath = std::string(GetDebugDir()) + "/p2_state.txt";
     std::ofstream out(filepath);
     out << "=== P2 Pawn State ===\n";
     out << GetP2Status() << "\n";

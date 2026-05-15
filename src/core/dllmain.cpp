@@ -131,11 +131,13 @@ void InitializeSDK()
         }
     }
 
+    CrashSetContext("init:property_layout");
     // Phase 3: Discover UField/UStruct/UProperty layout
     if (GetEngineGlobals().IsValid()) {
         DumpPropertyLayout();
     }
 
+    CrashSetContext("init:world_system");
     // Phase 4: World system + GNatives + Tick hook
     if (GetEngineGlobals().IsValid()) {
         // Wait for level to load (actors need to exist)
@@ -145,11 +147,12 @@ void InitializeSDK()
             LOG_INFO("World system ready - {} actors in level", GetCurrentLevel().ActorCount);
         }
         
+        CrashSetContext("init:natives");
         if (InitNativeTable()) {
             LOG_INFO("GNatives table found - {} native functions", GetNativeCount());
-            DumpNativesToFile("Z:\\Bioshock1SDK\\gnatives_dump.txt");
         }
         
+        CrashSetContext("init:process_event_hook");
         // Initialize ProcessEvent hook first (tick hook depends on it)
         if (!IsProcessEventHooked()) {
             if (InitProcessEventHook()) {
@@ -157,24 +160,32 @@ void InitializeSDK()
             }
         }
 
+        CrashSetContext("init:tick_hook");
         if (InstallTickHook()) {
             LOG_INFO("Engine tick hook installed (PE-based safe mode)");
         }
 
+        LOG_INFO(">>> About to init CoopDebug...");
         CrashSetContext("init:coop_debug");
         InitCoopDebug();
+        LOG_INFO(">>> CoopDebug initialized OK");
 
+        LOG_INFO(">>> About to init TrueCoop...");
         CrashSetContext("init:true_coop");
         InitTrueCoop();
+        LOG_INFO(">>> TrueCoop initialized OK");
     }
 
     // Phase 5: Load mod config and auto-init gameplay mods
+    LOG_INFO(">>> About to load mod config...");
+    CrashSetContext("init:mod_config");
     ModConfig cfg = LoadModConfig();
     if (cfg.autoInitMods && GetEngineGlobals().IsValid()) {
         LOG_INFO("Auto-initializing gameplay mods from config...");
-        // Wait a bit more for game classes to be fully loaded
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
+        LOG_INFO(">>> About to init gameplay mods...");
+        CrashSetContext("init:gameplay_mods");
         if (InitGameplayMods()) {
             SetDecoyTeleportEnabled(cfg.decoyTeleport);
             SetFriendlyBotsEnabled(cfg.friendlyBots);

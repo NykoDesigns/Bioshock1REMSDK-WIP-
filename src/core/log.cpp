@@ -30,7 +30,26 @@ void Log::Initialize(const std::string& filename, LogLevel minLevel)
     if (s_Initialized) return;
 
     s_MinLevel = minLevel;
-    s_File.open(filename, std::ios::out | std::ios::trunc);
+
+    // Write log file next to the game EXE in BS1SDK_dumps/
+    char exePath[MAX_PATH];
+    GetModuleFileNameA(GetModuleHandleA(NULL), exePath, MAX_PATH);
+    char* lastSlash = strrchr(exePath, '\\');
+    if (lastSlash) *lastSlash = '\0';
+
+    char logDir[MAX_PATH];
+    snprintf(logDir, MAX_PATH, "%s\\BS1SDK_dumps", exePath);
+    CreateDirectoryA(logDir, NULL);
+
+    char logPath[MAX_PATH];
+    snprintf(logPath, MAX_PATH, "%s\\%s", logDir, filename.c_str());
+    s_File.open(logPath, std::ios::out | std::ios::trunc);
+
+    // Also try opening in the working directory as fallback
+    if (!s_File.is_open()) {
+        s_File.open(filename, std::ios::out | std::ios::trunc);
+    }
+
     s_Initialized = true;
 
     // Allocate a console for debug output

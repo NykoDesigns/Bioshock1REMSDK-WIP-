@@ -316,6 +316,66 @@ bool SetActorPosition(UObject* actor, const FVec3& pos)
     return false;
 }
 
+bool SetActorProperty(UObject* actor, const char* propName, const void* value, int size)
+{
+    if (!actor || !propName) return false;
+    UStruct* cls = reinterpret_cast<UStruct*>(actor->GetClass());
+    if (!cls) return false;
+    
+    UField* child = cls;
+    int depth = 0;
+    while (child && depth < 64) {
+        UStruct* current = reinterpret_cast<UStruct*>(child);
+        UField* prop = current->GetChildren();
+        int limit = 2000;
+        while (prop && limit-- > 0) {
+            if (prop->GetObjClassName().find("Property") != std::string::npos) {
+                if (prop->GetName() == propName) {
+                    UProperty* p = reinterpret_cast<UProperty*>(prop);
+                    int32_t offset = p->GetPropertyOffset();
+                    uint8_t* base = reinterpret_cast<uint8_t*>(actor);
+                    memcpy(base + offset, value, size);
+                    return true;
+                }
+            }
+            prop = prop->GetNext();
+        }
+        child = current->GetSuperField();
+        depth++;
+    }
+    return false;
+}
+
+bool GetActorProperty(UObject* actor, const char* propName, void* outValue, int size)
+{
+    if (!actor || !propName) return false;
+    UStruct* cls = reinterpret_cast<UStruct*>(actor->GetClass());
+    if (!cls) return false;
+    
+    UField* child = cls;
+    int depth = 0;
+    while (child && depth < 64) {
+        UStruct* current = reinterpret_cast<UStruct*>(child);
+        UField* prop = current->GetChildren();
+        int limit = 2000;
+        while (prop && limit-- > 0) {
+            if (prop->GetObjClassName().find("Property") != std::string::npos) {
+                if (prop->GetName() == propName) {
+                    UProperty* p = reinterpret_cast<UProperty*>(prop);
+                    int32_t offset = p->GetPropertyOffset();
+                    const uint8_t* base = reinterpret_cast<const uint8_t*>(actor);
+                    memcpy(outValue, base + offset, size);
+                    return true;
+                }
+            }
+            prop = prop->GetNext();
+        }
+        child = current->GetSuperField();
+        depth++;
+    }
+    return false;
+}
+
 float GetActorDistance(UObject* a, UObject* b)
 {
     FVec3 posA, posB;

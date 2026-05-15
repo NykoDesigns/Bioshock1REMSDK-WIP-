@@ -18,6 +18,7 @@
 #include "../gameplay/gameplay_mods.h"
 #include "../core/mod_config.h"
 #include "../network/coop_bridge.h"
+#include "../network/coop_puppet.h"
 #include "../network/coop_render.h"
 #include "../network/coop_save.h"
 #include "../network/net_manager.h"
@@ -933,6 +934,11 @@ void Overlay::RenderConsole()
             LogInfo("  setdefault <c> <p> <v>  - Set a CDO property value");
             LogInfo("  natives                 - Show GNatives info");
             LogInfo("  gensdk                  - Regenerate SDK headers");
+            LogYellow("=== Reverse Engineering ===");
+            LogInfo("  dumpsdk                 - Generate full SDK (all classes/props/funcs)");
+            LogInfo("  inspect <class|0xAddr>  - Live inspect object properties+values");
+            LogInfo("  hierarchy               - Dump full class inheritance tree");
+            LogInfo("  functions               - Dump all UFunction objects");
             LogYellow("=== Co-op Debug ===");
             LogInfo("  snapshot [label]        - Dump full engine state to file");
             LogInfo("  census                  - Dump actor class census");
@@ -943,11 +949,16 @@ void Overlay::RenderConsole()
             LogInfo("  snapa / snapb           - Mark actor snapshot A/B");
             LogInfo("  snapdiff                - Diff snapshots A vs B");
             LogYellow("=== True Co-op ===");
-            LogInfo("  truehost [port]         - Start as true co-op host");
-            LogInfo("  truejoin <ip> [port]    - Join as true co-op client");
-            LogInfo("  freeze                  - Freeze client simulation");
-            LogInfo("  unfreeze                - Unfreeze client simulation");
+            LogInfo("  truehost [port]         - HOST: start co-op session");
+            LogInfo("  truejoin <ip> [port]    - CLIENT: join a host");
+            LogInfo("  freeze / unfreeze       - Toggle client sim freeze");
             LogInfo("  truecoop                - Show true co-op status");
+            LogInfo("  coopdiag                - Full co-op diagnostics");
+            LogInfo("  netstatus               - Network connection details");
+            LogYellow("--- Quick Start Guide ---");
+            LogInfo("  HOST:   truehost");
+            LogInfo("  CLIENT: truejoin <host_ip>");
+            LogInfo("  (default port: 27015)");
         }
         // ─── set <prop> <value> ───
         else if (tokens[0] == "set" && tokens.size() >= 3) {
@@ -1825,15 +1836,19 @@ void Overlay::RenderConsole()
                 LogGreen("True co-op HOST started on port " + std::to_string(port));
                 LogInfo("Waiting for client to join...");
                 LogInfo("Tick hook: " + std::string(IsTickHookActive() ? "active" : "NOT active"));
+                LogInfo("PE hook: " + std::string(IsProcessEventHooked() ? "active" : "NOT active"));
+                LogYellow("────────────────────────────────────────");
+                LogYellow("Tell the CLIENT to run:");
+                LogGreen("  truejoin <YOUR_IP> " + std::to_string(port));
+                LogYellow("(Use Hamachi/ZeroTier IP or LAN IP)");
+                LogYellow("────────────────────────────────────────");
 
-                // Attempt P2 pawn spawn
-                if (P2SpawnPawn()) {
-                    LogGreen("P2 pawn ready: " + std::string(P2GetPawn() ? P2GetPawn()->GetName() : "unknown"));
-                } else {
-                    LogYellow("P2 pawn not available yet (will retry when client connects)");
-                }
+                // P2 splicer pawn disabled for now — use ghost puppet only
+                // Use 'p2spawn' command to manually test splicer commandeering
+                LogInfo("Ghost puppet will track remote player position");
             } else {
                 LogRed("Failed to start true co-op host");
+                LogRed("Check: Is port " + std::to_string(port) + " already in use?");
             }
         }
         // ─── truejoin <ip> [port] ───
@@ -1853,10 +1868,17 @@ void Overlay::RenderConsole()
             if (CoopJoin(ip, port, "TrueClient")) {
                 LogGreen("True co-op CLIENT joining " + ip + ":" + std::to_string(port));
                 LogInfo("Tick hook: " + std::string(IsTickHookActive() ? "active" : "NOT active"));
-                FreezeClientSimulation();
-                LogYellow("Client simulation FROZEN — waiting for host world state");
+                LogInfo("PE hook: " + std::string(IsProcessEventHooked() ? "active" : "NOT active"));
+                if (FreezeClientSimulation()) {
+                    LogYellow("Client simulation FROZEN (AI/physics/spawn blocked)");
+                } else {
+                    LogRed("WARNING: Failed to freeze simulation!");
+                }
+                LogInfo("Connecting... (will timeout in 30s if host unreachable)");
             } else {
                 LogRed("Failed to join true co-op session");
+                LogRed("Check: Is " + ip + ":" + std::to_string(port) + " reachable?");
+                LogRed("       Host must run 'truehost' first!");
             }
         }
         // ─── freeze ───
@@ -1881,6 +1903,59 @@ void Overlay::RenderConsole()
                 std::snprintf(buf, sizeof(buf), "Blocking %d unique function+class combos", (int)frozen.size());
                 LogYellow(buf);
             }
+        }
+        // ─── coopdiag ─── comprehensive co-op diagnostics
+        else if (tokens[0] == "coopdiag") {
+            LogYellow("═══ CO-OP DIAGNOSTICS ═══");
+
+            // ProcessEvent hook state
+            if (IsProcessEventHooked()) {
+                const auto& st = GetProcessEventStats();
+                char buf[128];
+                std::snprintf(buf, sizeof(buf), "ProcessEvent: ACTIVE (calls=%llu, blocked=%llu)",
+                             st.TotalCalls, st.BlockedCalls);
+                LogGreen(buf);
+            } else {
+                LogRed("ProcessEvent: NOT HOOKED (co-op will NOT work!)");
+            }
+
+            // Tick hook
+            LogInfo(std::string("Tick hook: ") + (IsTickHookActive() ? "ACTIVE" : "NOT active"));
+
+            // Role & connection
+            LogInfo(GetTrueCoopStatus());
+            LogInfo(GetCoopStatus());
+
+            // Puppet diagnostics
+            std::string puppetInfo = GetPuppetDiagnostics();
+            // Split multiline string into separate log entries
+            size_t pos = 0;
+            while (pos < puppetInfo.size()) {
+                size_t nl = puppetInfo.find('\n', pos);
+                if (nl == std::string::npos) nl = puppetInfo.size();
+                std::string line = puppetInfo.substr(pos, nl - pos);
+                if (!line.empty()) {
+                    if (line.find("[BAD]") != std::string::npos)
+                        LogRed(line);
+                    else if (line.find("===") != std::string::npos)
+                        LogYellow(line);
+                    else
+                        LogInfo(line);
+                }
+                pos = nl + 1;
+            }
+
+            // Simulation freeze state
+            if (IsSimulationFrozen()) {
+                auto frozen = GetFrozenFunctions();
+                char buf[128];
+                std::snprintf(buf, sizeof(buf), "Simulation: FROZEN (%d func combos blocked)", (int)frozen.size());
+                LogYellow(buf);
+            } else {
+                LogInfo("Simulation: NOT frozen");
+            }
+
+            LogYellow("═══════════════════════════");
         }
         // ─── cooptest [phase] ───
         else if (tokens[0] == "cooptest") {
@@ -1973,6 +2048,45 @@ void Overlay::RenderConsole()
             DumpStabilityReport();
             DumpCoopTestResults();
             LogGreen("All debug data dumped to debug_dumps/");
+        }
+        // ─── dumpsdk ───
+        else if (tokens[0] == "dumpsdk") {
+            LogYellow("Generating SDK headers (this may take a moment)...");
+            DumpSDKHeaders();
+            DumpClassHierarchy();
+            DumpAllFunctions();
+            LogGreen("Full SDK dump complete -> debug_dumps/SDK/");
+            LogInfo("  + class_hierarchy.txt");
+            LogInfo("  + all_functions.txt");
+            LogInfo("  + One .txt per class with properties + functions");
+        }
+        // ─── inspect <class_or_addr> ───
+        else if (tokens[0] == "inspect" && tokens.size() >= 2) {
+            std::string target = tokens[1];
+            std::string result = InspectObject(target);
+            // Split into lines for console display
+            std::istringstream stream(result);
+            std::string line;
+            int lineCount = 0;
+            while (std::getline(stream, line) && lineCount < 100) {
+                if (line.find("===") != std::string::npos) {
+                    LogGreen(line);
+                } else {
+                    LogInfo(line);
+                }
+                lineCount++;
+            }
+            if (lineCount >= 100) LogYellow("(output truncated at 100 lines)");
+        }
+        // ─── hierarchy ───
+        else if (tokens[0] == "hierarchy") {
+            DumpClassHierarchy();
+            LogGreen("Class hierarchy -> debug_dumps/class_hierarchy.txt");
+        }
+        // ─── functions [filter] ───
+        else if (tokens[0] == "functions") {
+            DumpAllFunctions();
+            LogGreen("All functions -> debug_dumps/all_functions.txt");
         }
         // ─── unknown ───
         else {

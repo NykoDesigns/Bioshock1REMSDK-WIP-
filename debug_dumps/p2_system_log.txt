@@ -1,3 +1,2 @@
 P2 system initialized. Role=Client
-WARN: No candidate pawn found for P2. Attempting spawn via GameInfo...
-Found GameInfo at 0x9F98E7D0, spawn not yet implemented
+P2 pawn spawned: [SpawnedMeleeThug] SpawnedMeleeThug_10 at 0xA249D880

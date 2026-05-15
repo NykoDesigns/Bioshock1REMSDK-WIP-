@@ -73,7 +73,7 @@ void InitWorldSync()
     if (s_Initialized) return;
     s_Initialized = true;
 
-    std::string logPath = std::string(DEBUG_DIR) + "/world_sync_log.txt";
+    std::string logPath = std::string(GetDebugDir()) + "/world_sync_log.txt";
     s_SyncLog.open(logPath, std::ios::trunc);
     SyncLog("WorldSync initialized. Role=%s", IsTrueHost() ? "Host" : "Client");
 
@@ -411,7 +411,7 @@ void WorldSyncClientTick(float deltaTime)
 
 void DumpWorldSyncState()
 {
-    std::string filepath = std::string(DEBUG_DIR) + "/world_sync_state.txt";
+    std::string filepath = std::string(GetDebugDir()) + "/world_sync_state.txt";
     std::ofstream out(filepath);
     out << "=== World Sync State ===\n";
     out << "Role: " << (IsTrueHost() ? "Host" : "Client") << "\n";

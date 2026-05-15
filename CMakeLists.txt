@@ -16,6 +16,10 @@ endif()
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+# Game directory for auto-deploy after build (set to your local install)
+set(BS1SDK_GAME_DIR "D:/SteamLibrary/steamapps/common/BioShock Remastered/Build/Final"
+    CACHE PATH "BioShock Remastered game directory for auto-deploy")
+
 # Options
 option(BS1SDK_BUILD_INJECTOR "Build the DLL injector" ON)
 option(BS1SDK_BUILD_TOOLS "Build standalone tools (bsm_tool, etc.)" ON)

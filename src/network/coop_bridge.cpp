@@ -9,6 +9,7 @@
 #include "../core/log.h"
 #include "../engine/uobject.h"
 #include "../hooks/process_event.h"
+#include "../debug/crash_handler.h"
 
 #include <cstring>
 #include <thread>
@@ -67,45 +68,40 @@ static std::string DetectCurrentLevel()
 
 static bool CachePlayerOffsets()
 {
-    // Walk GObjects to find ShockPlayer class and cache property offsets
-    const auto& globals = GetEngineGlobals();
-    if (!globals.IsValid()) return false;
+    if (s_LocOffset > 0 && s_RotOffset > 0 && s_HealthOffset > 0) return true;
 
-    uintptr_t objData = *reinterpret_cast<uintptr_t*>(globals.GObjects);
-    int32_t objCount = *reinterpret_cast<int32_t*>(globals.GObjects + 4);
+    UObject* player = FindObjectByClassName("ShockPlayer");
+    if (!player) return false;
 
-    for (int i = 0; i < objCount && i < 100000; i++) {
-        uintptr_t ptr = *reinterpret_cast<uintptr_t*>(objData + i * 4);
-        if (!ptr) continue;
-        UObject* obj = reinterpret_cast<UObject*>(ptr);
+    UStruct* cls = reinterpret_cast<UStruct*>(player->GetClass());
+    if (!cls) return false;
 
-        std::string cn = obj->GetObjClassName();
-        if (cn != "ShockPlayer" && cn != "Pawn") continue;
-
-        std::string name = obj->GetName();
-
-        // Walk properties to find Location, Rotation, Health
-        // These are on the Actor → Pawn → ShockPlayer hierarchy
-        UObject* cls = obj->GetClass();
-        if (!cls) continue;
-
-        // Try to find properties by iterating the property chain
-        // Property offsets discovered in property_layout.txt
-        // For now, use known offsets from UE2.5 Actor class:
-        //   Location typically at offset ~0x64-0x70 in Actor
-        //   Rotation typically at offset ~0x70-0x7C in Actor
-        //   Health at various offsets in Pawn subclass
-
-        // We'll use ProcessEvent hook tick to read these dynamically
-        break;
+    std::vector<PropertyInfo> allProps = WalkProperties(cls);
+    if (s_LocOffset < 0) {
+        auto* pi = FindProperty(cls, "Location", allProps);
+        if (pi) s_LocOffset = pi->Offset;
+    }
+    if (s_RotOffset < 0) {
+        auto* pi = FindProperty(cls, "Rotation", allProps);
+        if (pi) s_RotOffset = pi->Offset;
+    }
+    if (s_HealthOffset < 0) {
+        auto* pi = FindProperty(cls, "Health", allProps);
+        if (pi) s_HealthOffset = pi->Offset;
     }
 
-    return true;
+    if (s_LocOffset > 0) {
+        LOG_INFO("[Co-op] Cached offsets: Loc={}, Rot={}, Health={}", s_LocOffset, s_RotOffset, s_HealthOffset);
+    }
+    return s_LocOffset > 0;
 }
 
 static PlayerStateData ReadLocalPlayerState()
 {
     PlayerStateData state{};
+
+    // Ensure offsets are cached (PE hook may not be firing)
+    if (s_LocOffset < 0) CachePlayerOffsets();
 
     const auto& globals = GetEngineGlobals();
     if (!globals.IsValid()) return state;
@@ -216,6 +212,8 @@ bool InitCoopBridge()
         ProcessEventHook hook;
         hook.Name = "CoopBridge";
         hook.Callback = [](UObject* obj, UFunction* func, void* parms) -> bool {
+            if (!obj || !func || !IsSafeToRead(obj, 32) || !IsSafeToRead(func, 32))
+                return false;
             // We use PlayerTick to read state at the right time
             std::string funcName = func->GetName();
             if (funcName == "PlayerTick" || funcName == "Tick") {
@@ -355,8 +353,10 @@ static float s_LevelCheckAccum = 0.0f;
 void CoopTick(float deltaTime)
 {
     if (!s_Active) return;
+    CrashSetContext("runtime:CoopTick");
 
     // Process network
+    CrashBreadcrumb("CoopTick: NetTick");
     NetTick(deltaTime);
 
     // Send local state at tick rate
@@ -391,12 +391,15 @@ void CoopTick(float deltaTime)
         }
 
         // Process incoming damage/world events + periodic enemy HP sync
+        CrashBreadcrumb("CoopTick: CoopSyncProcessPackets");
         CoopSyncProcessPackets(deltaTime);
 
         // Economy sync (ADAM/Credits sharing)
+        CrashBreadcrumb("CoopTick: TickEconomySync");
         TickEconomySync(deltaTime);
 
         // Tick save file transfer if active
+        CrashBreadcrumb("CoopTick: TickSaveTransfer");
         TickSaveTransfer();
     }
 }
