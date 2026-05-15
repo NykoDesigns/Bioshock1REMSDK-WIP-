@@ -4,6 +4,7 @@
 #include "../engine/uobject.h"
 #include "../engine/world.h"
 #include "../hooks/process_event.h"
+#include "../engine/function_caller.h"
 #include "../network/net_manager.h"
 #include "../network/coop_bridge.h"
 
@@ -17,6 +18,7 @@
 #include <mutex>
 #include <atomic>
 #include <functional>
+#include <set>
 #include <filesystem>
 
 namespace bs1sdk {
@@ -1083,6 +1085,564 @@ void DumpAllFunctions()
 
     f.close();
     LOG_INFO("[SDK] Dumped {} functions to {}", funcs.size(), filename);
+}
+
+// ─── Event Catalog (Co-op Sync Blueprint) ────────────────────────────────
+
+static std::map<std::string, EventCatalogEntry> s_EventCatalog;
+static std::mutex s_CatalogMutex;
+static std::atomic<bool> s_CatalogRunning{false};
+static float s_CatalogDuration = 30.0f;
+static float s_CatalogElapsed = 0.0f;
+static int s_CatalogPEHookId = -1;
+static int s_CatalogTickId = -1;
+
+// Categorize a function name for co-op relevance
+static std::string CategorizeEvent(const std::string& funcName, const std::string& className)
+{
+    // Interaction events (P2 needs to send these)
+    if (funcName == "UsedBy" || funcName == "Used" || funcName == "Use" ||
+        funcName == "Activate" || funcName == "Touch" || funcName == "UnTouch" ||
+        funcName == "Trigger" || funcName == "UnTrigger" ||
+        funcName == "Bump" || funcName == "PressedUse")
+        return "interaction";
+
+    // Damage events (must be synced)
+    if (funcName == "TakeDamage" || funcName == "TakeEnvironmentalDamage" ||
+        funcName == "HealDamage" || funcName == "Died" || funcName == "Killed" ||
+        funcName == "KilledBy" || funcName.find("Damage") != std::string::npos)
+        return "damage";
+
+    // State change events (world sync)
+    if (funcName == "Destroyed" || funcName == "GainedChild" || funcName == "LostChild" ||
+        funcName == "SetPhysics" || funcName == "ChangeAnimation" ||
+        funcName == "PlayAnim" || funcName == "SetCollision" ||
+        funcName.find("Open") != std::string::npos || funcName.find("Close") != std::string::npos ||
+        funcName.find("Lock") != std::string::npos || funcName.find("Unlock") != std::string::npos)
+        return "state";
+
+    // Movement events
+    if (funcName == "MoveSmooth" || funcName == "SetLocation" || funcName == "SetRotation" ||
+        funcName == "Landed" || funcName == "Falling" || funcName == "HitWall" ||
+        funcName == "PhysicsVolumeChange" || funcName == "ZoneChange")
+        return "movement";
+
+    // AI events (may need selective sync)
+    if (funcName.find("AI") != std::string::npos || funcName.find("Attack") != std::string::npos ||
+        funcName.find("See") != std::string::npos || funcName.find("Hear") != std::string::npos ||
+        funcName.find("Enemy") != std::string::npos || funcName.find("Patrol") != std::string::npos ||
+        className.find("AI") != std::string::npos || className.find("Controller") != std::string::npos)
+        return "AI";
+
+    // Tick/timer (internal, usually not synced)
+    if (funcName == "Tick" || funcName == "Timer" || funcName == "PostRender" ||
+        funcName == "DrawHUD" || funcName == "PlayerTick" || funcName == "PlayerCalcView")
+        return "tick";
+
+    // Inventory/Items
+    if (funcName.find("Pickup") != std::string::npos || funcName.find("Item") != std::string::npos ||
+        funcName.find("Inventory") != std::string::npos || funcName.find("Weapon") != std::string::npos ||
+        funcName.find("Ammo") != std::string::npos || funcName.find("Give") != std::string::npos)
+        return "inventory";
+
+    return "other";
+}
+
+static bool IsSyncRelevant(const std::string& category)
+{
+    return category == "interaction" || category == "damage" ||
+           category == "state" || category == "inventory";
+}
+
+void StartEventCatalog(float durationSeconds)
+{
+    if (s_CatalogRunning) return;
+
+    s_EventCatalog.clear();
+    s_CatalogDuration = durationSeconds;
+    s_CatalogElapsed = 0.0f;
+    s_CatalogRunning = true;
+
+    if (IsProcessEventHooked()) {
+        ProcessEventHook hook;
+        hook.Name = "EventCatalog";
+        hook.Callback = [](UObject* obj, UFunction* func, void* parms) -> bool {
+            if (!s_CatalogRunning) return false;
+
+            std::string funcName = func->GetName();
+            std::string className = obj->GetObjClassName();
+            std::string key = className + "." + funcName;
+
+            std::lock_guard<std::mutex> lock(s_CatalogMutex);
+            auto& entry = s_EventCatalog[key];
+            entry.HitCount++;
+
+            if (entry.HitCount == 1) {
+                // First time seeing this event — capture full metadata
+                entry.FuncName = funcName;
+                entry.OwnerClass = className;
+                entry.Category = CategorizeEvent(funcName, className);
+                entry.SyncRelevant = IsSyncRelevant(entry.Category);
+                entry.FunctionFlags = func->GetFunctionFlags();
+                entry.ParamsSize = func->GetParmsSize();
+
+                // Capture parameter layout
+                auto params = GetFunctionParams(func);
+                for (auto& p : params) {
+                    std::string desc = p.Name + ": " + p.TypeName + " (" + std::to_string(p.Size) + "B)";
+                    if (p.IsReturnParam) desc += " [return]";
+                    if (p.IsOutParam) desc += " [out]";
+                    entry.ParamDescriptions.push_back(desc);
+                }
+            }
+            // Track sample actors (first 3 unique)
+            if (entry.SampleActors.size() < 3) {
+                std::string actorName = obj->GetName();
+                bool found = false;
+                for (auto& s : entry.SampleActors) {
+                    if (s == actorName) { found = true; break; }
+                }
+                if (!found) entry.SampleActors.push_back(actorName);
+            }
+            return false;
+        };
+        s_CatalogPEHookId = RegisterProcessEventHook(hook);
+    }
+
+    s_CatalogTickId = RegisterTickCallback([](float dt) {
+        if (!s_CatalogRunning) return;
+        s_CatalogElapsed += dt;
+        if (s_CatalogElapsed >= s_CatalogDuration) {
+            StopEventCatalog();
+            DumpEventCatalog();
+            LOG_INFO("[Debug] Event catalog auto-stopped after {:.1f}s", s_CatalogDuration);
+        }
+    });
+
+    LOG_INFO("[Debug] Event catalog started ({:.0f}s)", durationSeconds);
+}
+
+void StopEventCatalog()
+{
+    s_CatalogRunning = false;
+    if (s_CatalogPEHookId >= 0) {
+        UnregisterProcessEventHook(s_CatalogPEHookId);
+        s_CatalogPEHookId = -1;
+    }
+    if (s_CatalogTickId >= 0) {
+        UnregisterTickCallback(s_CatalogTickId);
+        s_CatalogTickId = -1;
+    }
+}
+
+bool IsEventCatalogRunning() { return s_CatalogRunning; }
+
+void DumpEventCatalog()
+{
+    EnsureDir();
+    std::lock_guard<std::mutex> lock(s_CatalogMutex);
+
+    std::string filename = std::string(GetDebugDir()) + "/event_catalog.txt";
+    std::ofstream f(filename);
+    f << "BioShock Remastered - Event Catalog (Co-op Sync Blueprint)\n";
+    f << "Duration: " << s_CatalogElapsed << "s\n";
+    f << "Unique Events: " << s_EventCatalog.size() << "\n\n";
+
+    // Sort by category, then by hit count descending
+    std::vector<std::pair<std::string, EventCatalogEntry>> sorted(
+        s_EventCatalog.begin(), s_EventCatalog.end());
+    std::sort(sorted.begin(), sorted.end(), [](auto& a, auto& b) {
+        if (a.second.Category != b.second.Category) return a.second.Category < b.second.Category;
+        return a.second.HitCount > b.second.HitCount;
+    });
+
+    // Summary by category
+    std::map<std::string, int> catCounts;
+    std::map<std::string, int> catSync;
+    for (auto& kv : sorted) {
+        catCounts[kv.second.Category]++;
+        if (kv.second.SyncRelevant) catSync[kv.second.Category]++;
+    }
+    f << "═══ CATEGORY SUMMARY ═══\n";
+    for (auto& kv : catCounts) {
+        f << "  " << kv.first << ": " << kv.second << " events";
+        if (catSync.count(kv.first)) f << " (" << catSync[kv.first] << " sync-relevant)";
+        f << "\n";
+    }
+    f << "\n";
+
+    // Sync-relevant events first (these are the co-op blueprint)
+    f << "═══════════════════════════════════════════════════════════════\n";
+    f << "  CO-OP SYNC BLUEPRINT: Events that MUST be replicated\n";
+    f << "═══════════════════════════════════════════════════════════════\n\n";
+
+    for (auto& kv : sorted) {
+        auto& e = kv.second;
+        if (!e.SyncRelevant) continue;
+
+        f << "[" << e.Category << "] " << e.OwnerClass << "." << e.FuncName;
+        f << "  (fired " << e.HitCount << "x)\n";
+        f << "  Flags: 0x" << std::hex << e.FunctionFlags << std::dec;
+        f << "  ParamsSize: " << e.ParamsSize << "B\n";
+        if (!e.ParamDescriptions.empty()) {
+            f << "  Params:\n";
+            for (auto& p : e.ParamDescriptions)
+                f << "    - " << p << "\n";
+        }
+        if (!e.SampleActors.empty()) {
+            f << "  Actors: ";
+            for (size_t i = 0; i < e.SampleActors.size(); i++) {
+                if (i) f << ", ";
+                f << e.SampleActors[i];
+            }
+            f << "\n";
+        }
+        f << "\n";
+    }
+
+    // All events
+    f << "\n═══════════════════════════════════════════════════════════════\n";
+    f << "  ALL EVENTS (by category)\n";
+    f << "═══════════════════════════════════════════════════════════════\n\n";
+
+    std::string curCat;
+    for (auto& kv : sorted) {
+        auto& e = kv.second;
+        if (e.Category != curCat) {
+            curCat = e.Category;
+            f << "─── " << curCat << " ───\n";
+        }
+        f << "  " << e.OwnerClass << "." << e.FuncName;
+        f << " (" << e.HitCount << "x, " << e.ParamsSize << "B)";
+        if (e.SyncRelevant) f << " [SYNC]";
+        f << "\n";
+    }
+
+    f.close();
+    LOG_INFO("[Debug] Event catalog: {} unique events -> {}", s_EventCatalog.size(), filename);
+}
+
+// ─── Interaction Discovery ───────────────────────────────────────────────
+
+void DumpInteractionEvents()
+{
+    EnsureDir();
+    auto& globals = GetEngineGlobals();
+    if (!globals.IsValid()) return;
+
+    uintptr_t objData = *reinterpret_cast<uintptr_t*>(globals.GObjects);
+    int32_t objCount = *reinterpret_cast<int32_t*>(globals.GObjects + 4);
+
+    // Interaction function names we care about
+    static const char* interactionFuncs[] = {
+        "UsedBy", "Used", "Use", "Touch", "UnTouch", "Trigger", "UnTrigger",
+        "Bump", "TakeDamage", "TakeEnvironmentalDamage", "HealDamage",
+        "Died", "Killed", "KilledBy", "Destroyed",
+        "HitWall", "Landed", "Falling",
+        "GainedChild", "LostChild", "Attach", "Detach",
+        "EncroachingOn", "EncroachedBy",
+        "SetPhysics", "SetCollision",
+        "AnimEnd", "PlayAnim", "ChangeAnimation",
+        "Timer", "BeginState", "EndState",
+        "PressedUse", "Activate", "Deactivate",
+        "OpenMover", "CloseMover", "MoverOpened", "MoverClosed",
+        "PickupFunction", "SpawnCopy", "CheckReplacement",
+    };
+
+    struct InteractionFunc {
+        std::string className;
+        std::string funcName;
+        uint32_t flags;
+        int32_t parmsSize;
+        std::vector<std::string> params;
+    };
+
+    std::vector<InteractionFunc> results;
+    std::set<std::string> seen;
+
+    for (int i = 0; i < objCount && i < 200000; i++) {
+        uintptr_t ptr = *reinterpret_cast<uintptr_t*>(objData + i * 4);
+        if (!ptr) continue;
+        UObject* obj = reinterpret_cast<UObject*>(ptr);
+        if (obj->GetObjClassName() != "Function") continue;
+
+        UFunction* func = reinterpret_cast<UFunction*>(obj);
+        std::string funcName = func->GetName();
+
+        bool isInteraction = false;
+        for (auto& name : interactionFuncs) {
+            if (funcName == name) { isInteraction = true; break; }
+        }
+        if (!isInteraction) continue;
+
+        std::string ownerName;
+        UObject* outer = func->GetOuter();
+        if (outer && (uintptr_t)outer > 0x10000) ownerName = outer->GetName();
+
+        std::string key = ownerName + "." + funcName;
+        if (seen.count(key)) continue;
+        seen.insert(key);
+
+        InteractionFunc entry;
+        entry.className = ownerName;
+        entry.funcName = funcName;
+        entry.flags = func->GetFunctionFlags();
+        entry.parmsSize = func->GetParmsSize();
+
+        auto params = GetFunctionParams(func);
+        for (auto& p : params) {
+            std::string desc = p.Name + ": " + p.TypeName + " (" + std::to_string(p.Size) + "B)";
+            if (p.IsReturnParam) desc += " [ret]";
+            if (p.IsOutParam) desc += " [out]";
+            entry.params.push_back(desc);
+        }
+        results.push_back(entry);
+    }
+
+    // Sort by function name then class
+    std::sort(results.begin(), results.end(), [](auto& a, auto& b) {
+        if (a.funcName != b.funcName) return a.funcName < b.funcName;
+        return a.className < b.className;
+    });
+
+    std::string filename = std::string(GetDebugDir()) + "/interaction_events.txt";
+    std::ofstream f(filename);
+    f << "BioShock Remastered - Interaction Event Discovery\n";
+    f << "These are the events P2 must send to interact with the world.\n";
+    f << "Total: " << results.size() << " interaction functions\n\n";
+
+    std::string curFunc;
+    for (auto& e : results) {
+        if (e.funcName != curFunc) {
+            curFunc = e.funcName;
+            f << "\n═══ " << curFunc << " ═══\n";
+        }
+        f << "  " << e.className << "." << e.funcName;
+        f << "  flags=0x" << std::hex << e.flags << std::dec;
+        f << "  parms=" << e.parmsSize << "B\n";
+        for (auto& p : e.params)
+            f << "    " << p << "\n";
+    }
+
+    f.close();
+    LOG_INFO("[Debug] Interaction events: {} functions -> {}", results.size(), filename);
+}
+
+// ─── Actor State Diff ────────────────────────────────────────────────────
+
+struct ActorStateSnapshot {
+    uintptr_t addr;
+    std::string name;
+    std::string className;
+    std::map<std::string, std::string> propValues; // name -> value string
+};
+
+static std::vector<ActorStateSnapshot> s_DiffSnapA;
+static std::vector<ActorStateSnapshot> s_DiffSnapB;
+static std::mutex s_DiffMutex;
+static std::atomic<bool> s_DiffRunning{false};
+static float s_DiffDuration = 10.0f;
+static float s_DiffElapsed = 0.0f;
+static int s_DiffTickId = -1;
+static std::string s_DiffClassFilter;
+
+static ActorStateSnapshot CaptureActorState(UObject* obj)
+{
+    ActorStateSnapshot snap;
+    snap.addr = (uintptr_t)obj;
+    snap.name = obj->GetName();
+    snap.className = obj->GetObjClassName();
+
+    UStruct* cls = reinterpret_cast<UStruct*>(obj->GetClass());
+    if (!cls) return snap;
+
+    auto props = WalkProperties(cls);
+    const uint8_t* base = reinterpret_cast<const uint8_t*>(obj);
+
+    for (auto& p : props) {
+        std::string val;
+        if (p.TypeName == "IntProperty") {
+            val = std::to_string(*reinterpret_cast<const int32_t*>(base + p.Offset));
+        } else if (p.TypeName == "FloatProperty") {
+            char buf[32]; std::snprintf(buf, sizeof(buf), "%.4f",
+                *reinterpret_cast<const float*>(base + p.Offset));
+            val = buf;
+        } else if (p.TypeName == "BoolProperty") {
+            uint32_t bitMask = 1;
+            if (p.PropertyObj) {
+                bitMask = p.PropertyObj->GetField<uint32_t>(0x78);
+                if (bitMask == 0) bitMask = 1;
+            }
+            uint32_t raw = *reinterpret_cast<const uint32_t*>(base + p.Offset);
+            val = (raw & bitMask) ? "true" : "false";
+        } else if (p.TypeName == "ByteProperty") {
+            val = std::to_string(*(base + p.Offset));
+        } else if (p.TypeName == "StructProperty" && p.ElementSize == 12) {
+            const float* v = reinterpret_cast<const float*>(base + p.Offset);
+            char buf[64]; std::snprintf(buf, sizeof(buf), "(%.1f, %.1f, %.1f)", v[0], v[1], v[2]);
+            val = buf;
+        } else if (p.TypeName == "ObjectProperty") {
+            uintptr_t ref = *reinterpret_cast<const uintptr_t*>(base + p.Offset);
+            if (ref && ref > 0x10000) {
+                UObject* refObj = reinterpret_cast<UObject*>(ref);
+                val = refObj->GetName();
+            } else {
+                val = "NULL";
+            }
+        } else {
+            continue; // Skip types we can't easily serialize
+        }
+        snap.propValues[p.Name] = val;
+    }
+    return snap;
+}
+
+static std::vector<ActorStateSnapshot> CaptureFilteredActors(const std::string& filter)
+{
+    std::vector<ActorStateSnapshot> result;
+    auto& globals = GetEngineGlobals();
+    if (!globals.IsValid()) return result;
+
+    uintptr_t objData = *reinterpret_cast<uintptr_t*>(globals.GObjects);
+    int32_t objCount = *reinterpret_cast<int32_t*>(globals.GObjects + 4);
+
+    int captured = 0;
+    for (int i = 0; i < objCount && i < 200000 && captured < 200; i++) {
+        uintptr_t ptr = *reinterpret_cast<uintptr_t*>(objData + i * 4);
+        if (!ptr) continue;
+        UObject* obj = reinterpret_cast<UObject*>(ptr);
+        std::string cn = obj->GetObjClassName();
+
+        // Only capture actor-like objects (classes that have Location property)
+        if (cn == "Class" || cn == "Function" || cn == "Property" || cn == "Struct" ||
+            cn == "Enum" || cn == "State" || cn == "Package" || cn == "Texture" ||
+            cn == "Sound" || cn == "StaticMesh" || cn == "SkeletalMesh" ||
+            cn == "Material" || cn == "Shader" || cn == "Font" ||
+            cn.find("Property") != std::string::npos)
+            continue;
+
+        if (!filter.empty()) {
+            bool match = false;
+            for (size_t c = 0; c + filter.size() <= cn.size(); c++) {
+                if (_strnicmp(cn.c_str() + c, filter.c_str(), filter.size()) == 0) {
+                    match = true; break;
+                }
+            }
+            if (!match) continue;
+        }
+
+        result.push_back(CaptureActorState(obj));
+        captured++;
+    }
+    return result;
+}
+
+void StartStateDiff(const std::string& classFilter, float durationSeconds)
+{
+    if (s_DiffRunning) return;
+
+    s_DiffClassFilter = classFilter;
+    s_DiffDuration = durationSeconds;
+    s_DiffElapsed = 0.0f;
+    s_DiffRunning = true;
+
+    // Capture snapshot A
+    s_DiffSnapA = CaptureFilteredActors(classFilter);
+    LOG_INFO("[Debug] State diff started: {} actors captured (filter='{}', {:.0f}s)",
+             s_DiffSnapA.size(), classFilter, durationSeconds);
+
+    s_DiffTickId = RegisterTickCallback([](float dt) {
+        if (!s_DiffRunning) return;
+        s_DiffElapsed += dt;
+        if (s_DiffElapsed >= s_DiffDuration) {
+            StopStateDiff();
+            DumpStateDiff();
+            LOG_INFO("[Debug] State diff auto-stopped after {:.1f}s", s_DiffDuration);
+        }
+    });
+}
+
+void StopStateDiff()
+{
+    if (!s_DiffRunning) return;
+    s_DiffRunning = false;
+
+    // Capture snapshot B
+    s_DiffSnapB = CaptureFilteredActors(s_DiffClassFilter);
+
+    if (s_DiffTickId >= 0) {
+        UnregisterTickCallback(s_DiffTickId);
+        s_DiffTickId = -1;
+    }
+}
+
+bool IsStateDiffRunning() { return s_DiffRunning; }
+
+void DumpStateDiff()
+{
+    EnsureDir();
+    std::string filename = std::string(GetDebugDir()) + "/state_diff.txt";
+    std::ofstream f(filename);
+    f << "BioShock Remastered - Actor State Diff\n";
+    f << "Filter: '" << s_DiffClassFilter << "'\n";
+    f << "Duration: " << s_DiffElapsed << "s\n";
+    f << "Snap A: " << s_DiffSnapA.size() << " actors\n";
+    f << "Snap B: " << s_DiffSnapB.size() << " actors\n\n";
+
+    // Index snap A and B by address
+    std::map<uintptr_t, size_t> addrToA, addrToB;
+    for (size_t i = 0; i < s_DiffSnapA.size(); i++) addrToA[s_DiffSnapA[i].addr] = i;
+    for (size_t i = 0; i < s_DiffSnapB.size(); i++) addrToB[s_DiffSnapB[i].addr] = i;
+
+    int changedActors = 0;
+    int totalChanges = 0;
+
+    f << "═══ PROPERTY CHANGES ═══\n\n";
+
+    for (auto& [addr, idxA] : addrToA) {
+        auto itB = addrToB.find(addr);
+        if (itB == addrToB.end()) {
+            f << "  [REMOVED] " << s_DiffSnapA[idxA].name << " (" << s_DiffSnapA[idxA].className << ")\n";
+            changedActors++;
+            continue;
+        }
+
+        auto& a = s_DiffSnapA[idxA];
+        auto& b = s_DiffSnapB[itB->second];
+
+        std::vector<std::string> changes;
+        for (auto& [propName, valA] : a.propValues) {
+            auto it2 = b.propValues.find(propName);
+            if (it2 == b.propValues.end()) continue;
+            if (valA != it2->second) {
+                changes.push_back("  " + propName + ": " + valA + " -> " + it2->second);
+            }
+        }
+
+        if (!changes.empty()) {
+            changedActors++;
+            totalChanges += (int)changes.size();
+            f << a.name << " (" << a.className << ") [0x" << std::hex << addr << std::dec << "]\n";
+            for (auto& c : changes) f << c << "\n";
+            f << "\n";
+        }
+    }
+
+    // New actors in B
+    for (auto& [addr, idxB] : addrToB) {
+        if (addrToA.find(addr) == addrToA.end()) {
+            f << "  [NEW] " << s_DiffSnapB[idxB].name << " (" << s_DiffSnapB[idxB].className << ")\n";
+            changedActors++;
+        }
+    }
+
+    f << "\n═══ SUMMARY ═══\n";
+    f << "Changed actors: " << changedActors << "\n";
+    f << "Total property changes: " << totalChanges << "\n";
+
+    f.close();
+    LOG_INFO("[Debug] State diff: {} actors changed, {} property changes -> {}",
+             changedActors, totalChanges, filename);
 }
 
 // ─── Init/Shutdown ───────────────────────────────────────────────────────

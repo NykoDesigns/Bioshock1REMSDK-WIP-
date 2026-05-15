@@ -124,6 +124,47 @@ void DumpClassHierarchy();
 
 void DumpAllFunctions();
 
+// ─── Event Catalog (Co-op Sync Blueprint) ────────────────────────────────
+// Records every unique ProcessEvent with parameter layouts, categorized by
+// sync relevance: interaction, damage, state change, movement, AI, UI.
+// This is the blueprint for what needs to be network-replicated in co-op.
+// Output: debug_dumps/event_catalog.txt
+
+struct EventCatalogEntry {
+    std::string FuncName;
+    std::string OwnerClass;
+    std::string Category;        // interaction, damage, state, movement, AI, UI, other
+    uint32_t FunctionFlags = 0;
+    int32_t ParamsSize = 0;
+    uint64_t HitCount = 0;
+    bool SyncRelevant = false;   // true if this event should be replicated
+    std::vector<std::string> ParamDescriptions; // "Name: Type (size)" for each param
+    std::vector<std::string> SampleActors;      // first 3 actor instances that fired
+};
+
+void StartEventCatalog(float durationSeconds = 30.0f);
+void StopEventCatalog();
+bool IsEventCatalogRunning();
+void DumpEventCatalog();
+
+// ─── Interaction Discovery ───────────────────────────────────────────────
+// Finds all Use, Touch, UnTouch, Trigger, TakeDamage, Bump, HitWall,
+// Landed, Destroyed events across all classes with full param layouts.
+// These are the events P2 needs to simulate for world interaction.
+// Output: debug_dumps/interaction_events.txt
+
+void DumpInteractionEvents();
+
+// ─── Actor State Diff ────────────────────────────────────────────────────
+// Captures property snapshots of tracked actors and detects changes per tick.
+// Useful for finding which properties change when doors open, items disappear, etc.
+// Output: debug_dumps/state_diff.txt
+
+void StartStateDiff(const std::string& classFilter = "", float durationSeconds = 10.0f);
+void StopStateDiff();
+bool IsStateDiffRunning();
+void DumpStateDiff();
+
 // ─── Console integration ─────────────────────────────────────────────────
 // All dump commands are also accessible from console.
 

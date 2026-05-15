@@ -998,6 +998,10 @@ void Overlay::RenderConsole()
             LogInfo("  aifuncs                 - Catalog all AI/tick/spawn functions");
             LogInfo("  snapa / snapb           - Mark actor snapshot A/B");
             LogInfo("  snapdiff                - Diff snapshots A vs B");
+            LogYellow("=== Co-op Analysis ===");
+            LogInfo("  catalog [secs]          - Record ALL PE events (default 30s)");
+            LogInfo("  interactions            - Dump all interaction event param layouts");
+            LogInfo("  statediff [class] [sec] - Track property changes over time");
             LogYellow("=== True Co-op ===");
             LogInfo("  truehost [port]         - HOST: start co-op session");
             LogInfo("  truejoin <ip> [port]    - CLIENT: join a host");
@@ -2037,6 +2041,44 @@ void Overlay::RenderConsole()
         else if (tokens[0] == "snapdiff") {
             DumpSnapshotDiff();
             LogGreen("Snapshot diff dumped to debug_dumps/snapshot_diff.txt");
+        }
+        // ─── catalog [seconds] ─── record all PE events for co-op sync analysis
+        else if (tokens[0] == "catalog") {
+            if (IsEventCatalogRunning()) {
+                StopEventCatalog();
+                DumpEventCatalog();
+                LogGreen("Event catalog stopped and dumped");
+            } else {
+                float secs = (tokens.size() >= 2) ? std::strtof(tokens[1].c_str(), nullptr) : 30.0f;
+                StartEventCatalog(secs);
+                char buf[64];
+                std::snprintf(buf, sizeof(buf), "Event catalog started (%.0fs) - play normally!", secs);
+                LogGreen(buf);
+                LogInfo("Open doors, pick up items, fight enemies, etc.");
+                LogInfo("Run 'catalog' again to stop early. Auto-dumps after timeout.");
+            }
+        }
+        // ─── interactions ─── dump all interaction event layouts
+        else if (tokens[0] == "interactions") {
+            DumpInteractionEvents();
+            LogGreen("Interaction events dumped to debug_dumps/interaction_events.txt");
+        }
+        // ─── statediff [class] [seconds] ─── track property changes over time
+        else if (tokens[0] == "statediff") {
+            if (IsStateDiffRunning()) {
+                StopStateDiff();
+                DumpStateDiff();
+                LogGreen("State diff stopped and dumped");
+            } else {
+                std::string filter = (tokens.size() >= 2) ? tokens[1] : "";
+                float secs = (tokens.size() >= 3) ? std::strtof(tokens[2].c_str(), nullptr) : 10.0f;
+                StartStateDiff(filter, secs);
+                char buf[128];
+                std::snprintf(buf, sizeof(buf), "State diff started: filter='%s' (%.0fs)", filter.c_str(), secs);
+                LogGreen(buf);
+                LogInfo("Interact with world (open door, pick up item, kill enemy)");
+                LogInfo("Run 'statediff' again to stop early.");
+            }
         }
         // ─── truehost [port] ───
         else if (tokens[0] == "truehost") {
