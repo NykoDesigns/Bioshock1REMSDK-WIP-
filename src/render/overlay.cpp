@@ -2100,6 +2100,12 @@ void Overlay::RenderConsole()
                 // P2 splicer pawn disabled for now — use ghost puppet only
                 // Use 'p2spawn' command to manually test splicer commandeering
                 LogInfo("Ghost puppet will track remote player position");
+
+                // Auto-start coopanalysis (10 min capture window)
+                DumpInteractionEvents();
+                StartEventCatalog(600.0f);
+                StartStateDiff("", 600.0f);
+                LogInfo("[Auto] Co-op analysis recording (10 min). Run 'coopanalysis' to stop/dump.");
             } else {
                 LogRed("Failed to start true co-op host");
                 LogRed("Check: Is port " + std::to_string(port) + " already in use?");

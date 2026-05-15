@@ -458,35 +458,79 @@ void UpdateGhostPuppet(const PlayerStateData& remoteState)
     s_InterpY += (s_TargetY - s_InterpY) * t;
     s_InterpZ += (s_TargetZ - s_InterpZ) * t;
 
-    // Write position — try SetLocation via ProcessEvent (updates render octree),
-    // but validate NativeFunc first and protect with SEH to avoid crash.
-    static bool s_SetLocSafe = true;   // optimistic; disable on first failure
+    // ─── Move puppet via ProcessEvent ───
+    // Strategy: Fix NativeFunc from GNatives if it's broken, then call PE.
+    // Native indices: SetLocation=4014, SetRotation=4343, Move=4338
+    static bool s_NativesPatched = false;
+    static bool s_SetLocSafe = true;
     static bool s_SetRotSafe = true;
     ProcessEventFn origPE = GetOriginalProcessEvent();
 
-    bool locWritten = false;
-    if (origPE && s_SetLocFunc && s_SetLocSafe) {
-        // Validate NativeFunc pointer at +0x70 before calling
-        uintptr_t nativePtr = s_SetLocFunc->GetField<uintptr_t>(0x70);
-        if (nativePtr && nativePtr > 0x10000 && IsSafeToRead(reinterpret_cast<const void*>(nativePtr), 4)) {
-            struct {
-                float X, Y, Z;
-                uint32_t bNoTest;
-                uint32_t ReturnValue;
-            } locParms{};
-            locParms.X = s_InterpX;
-            locParms.Y = s_InterpY;
-            locParms.Z = s_InterpZ;
-            locParms.bNoTest = 1;
-            __try {
-                origPE(s_Puppet, s_SetLocFunc, &locParms, nullptr);
-                locWritten = true;
-            } __except(EXCEPTION_EXECUTE_HANDLER) {
-                LOG_WARN("[Puppet] SetLocation PE crashed — falling back to raw write");
+    // One-time: patch UFunction NativeFunc from GNatives table
+    if (!s_NativesPatched && s_SetLocFunc && GetNativesTableAddress() != 0) {
+        s_NativesPatched = true;
+        // Read iNative index from UFunction (+0x68 = uint16_t iNative)
+        uint16_t locNativeIdx = s_SetLocFunc->GetField<uint16_t>(0x68);
+        uint16_t rotNativeIdx = s_SetRotFunc ? s_SetRotFunc->GetField<uint16_t>(0x68) : 0;
+
+        LOG_INFO("[Puppet] SetLocation iNative={}, SetRotation iNative={}", locNativeIdx, rotNativeIdx);
+
+        // Try to get correct native from GNatives table
+        if (locNativeIdx > 0) {
+            NativeFunc nf = GetNative(locNativeIdx);
+            if (nf) {
+                // Patch the UFunction's NativeFunc pointer to the correct address
+                uintptr_t funcAddr = reinterpret_cast<uintptr_t>(nf);
+                DWORD oldProt;
+                uint8_t* target = reinterpret_cast<uint8_t*>(s_SetLocFunc) + 0x70;
+                VirtualProtect(target, 4, PAGE_READWRITE, &oldProt);
+                *reinterpret_cast<uintptr_t*>(target) = funcAddr;
+                VirtualProtect(target, 4, oldProt, &oldProt);
+                LOG_INFO("[Puppet] Patched SetLocation NativeFunc -> 0x{:08X} (from GNatives[{}])",
+                         (uint32_t)funcAddr, locNativeIdx);
+            } else {
+                LOG_WARN("[Puppet] GNatives[{}] is NULL — SetLocation won't work", locNativeIdx);
                 s_SetLocSafe = false;
             }
         } else {
-            LOG_WARN("[Puppet] SetLocation NativeFunc invalid (0x{:08X}) — using raw write", (uint32_t)nativePtr);
+            LOG_WARN("[Puppet] SetLocation iNative=0 — not a registered native!");
+            s_SetLocSafe = false;
+        }
+
+        if (rotNativeIdx > 0 && s_SetRotFunc) {
+            NativeFunc nf = GetNative(rotNativeIdx);
+            if (nf) {
+                DWORD oldProt;
+                uint8_t* target = reinterpret_cast<uint8_t*>(s_SetRotFunc) + 0x70;
+                VirtualProtect(target, 4, PAGE_READWRITE, &oldProt);
+                *reinterpret_cast<uintptr_t*>(target) = reinterpret_cast<uintptr_t>(nf);
+                VirtualProtect(target, 4, oldProt, &oldProt);
+                LOG_INFO("[Puppet] Patched SetRotation NativeFunc -> 0x{:08X}", (uint32_t)(uintptr_t)nf);
+            } else {
+                s_SetRotSafe = false;
+            }
+        } else {
+            s_SetRotSafe = false;
+        }
+    }
+
+    // Call SetLocation via ProcessEvent (now with corrected NativeFunc)
+    bool locWritten = false;
+    if (origPE && s_SetLocFunc && s_SetLocSafe) {
+        struct {
+            float X, Y, Z;
+            uint32_t bNoTest;
+            uint32_t ReturnValue;
+        } locParms{};
+        locParms.X = s_InterpX;
+        locParms.Y = s_InterpY;
+        locParms.Z = s_InterpZ;
+        locParms.bNoTest = 1;
+        __try {
+            origPE(s_Puppet, s_SetLocFunc, &locParms, nullptr);
+            locWritten = true;
+        } __except(EXCEPTION_EXECUTE_HANDLER) {
+            LOG_WARN("[Puppet] SetLocation PE crashed FCG falling back to raw write");
             s_SetLocSafe = false;
         }
     }
@@ -497,26 +541,21 @@ void UpdateGhostPuppet(const PlayerStateData& remoteState)
         memcpy(raw + s_PuppetLocOffset + 8, &s_InterpZ, 4);
     }
 
-    // Write rotation — same safety pattern
+    // Call SetRotation via ProcessEvent
     bool rotWritten = false;
     if (origPE && s_SetRotFunc && s_SetRotSafe) {
-        uintptr_t nativePtr = s_SetRotFunc->GetField<uintptr_t>(0x70);
-        if (nativePtr && nativePtr > 0x10000 && IsSafeToRead(reinterpret_cast<const void*>(nativePtr), 4)) {
-            struct {
-                int32_t Pitch, Yaw, Roll;
-                uint32_t ReturnValue;
-            } rotParms{};
-            rotParms.Pitch = (int32_t)(s_TargetPitch * (65536.0f / 360.0f));
-            rotParms.Yaw = (int32_t)(s_TargetYaw * (65536.0f / 360.0f));
-            rotParms.Roll = 0;
-            __try {
-                origPE(s_Puppet, s_SetRotFunc, &rotParms, nullptr);
-                rotWritten = true;
-            } __except(EXCEPTION_EXECUTE_HANDLER) {
-                LOG_WARN("[Puppet] SetRotation PE crashed — falling back to raw write");
-                s_SetRotSafe = false;
-            }
-        } else {
+        struct {
+            int32_t Pitch, Yaw, Roll;
+            uint32_t ReturnValue;
+        } rotParms{};
+        rotParms.Pitch = (int32_t)(s_TargetPitch * (65536.0f / 360.0f));
+        rotParms.Yaw = (int32_t)(s_TargetYaw * (65536.0f / 360.0f));
+        rotParms.Roll = 0;
+        __try {
+            origPE(s_Puppet, s_SetRotFunc, &rotParms, nullptr);
+            rotWritten = true;
+        } __except(EXCEPTION_EXECUTE_HANDLER) {
+            LOG_WARN("[Puppet] SetRotation PE crashed FCG falling back to raw write");
             s_SetRotSafe = false;
         }
     }
