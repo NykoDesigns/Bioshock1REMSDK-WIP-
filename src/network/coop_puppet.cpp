@@ -374,8 +374,8 @@ bool SpawnGhostPuppet(float x, float y, float z)
     // CRITICAL: allow the engine to move this actor's rendered mesh
     SetPuppetProperty("bStatic", &bFalse, 4);
     SetPuppetProperty("bWorldGeometry", &bFalse, 4);
-    // PHYS_Interpolating = 10 — engine updates render position from Location each tick
-    uint8_t physInterp = 10;
+    // PHYS_Interpolating = 9 (confirmed via enum dump). Engine updates render pos each tick.
+    uint8_t physInterp = 9;
     SetPuppetProperty("Physics", &physInterp, 1);
     // Always render regardless of distance
     SetPuppetProperty("bAlwaysRelevant", &bTrue, 4);

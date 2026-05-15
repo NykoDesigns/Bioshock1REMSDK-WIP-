@@ -33,6 +33,7 @@
 #include <set>
 #include <algorithm>
 #include <vector>
+#include <cmath>
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -407,11 +408,31 @@ static void RenderPropertyValue(UObject* obj, const PropertyInfo& p)
         ImGui::SameLine();
         ImGui::TextDisabled("(%.2f)", val);
     } else if (p.TypeName == "BoolProperty") {
-        uint32_t val = *reinterpret_cast<const uint32_t*>(base + p.Offset);
-        ImGui::Text("%s (0x%X)", val ? "true" : "false", val);
+        // Proper bitmask-aware bool toggle
+        uint32_t bitMask = 1;
+        if (p.PropertyObj) {
+            bitMask = p.PropertyObj->GetField<uint32_t>(0x78);
+            if (bitMask == 0) bitMask = 1;
+        }
+        uint32_t rawVal = *reinterpret_cast<const uint32_t*>(base + p.Offset);
+        bool isSet = (rawVal & bitMask) != 0;
+        if (ImGui::Checkbox(("##" + p.Name).c_str(), &isSet)) {
+            uint32_t* target = reinterpret_cast<uint32_t*>(const_cast<uint8_t*>(base) + p.Offset);
+            if (isSet) *target |= bitMask;
+            else *target &= ~bitMask;
+        }
+        ImGui::SameLine();
+        ImGui::TextDisabled("(bit 0x%X)", bitMask);
     } else if (p.TypeName == "ByteProperty") {
         uint8_t val = *(base + p.Offset);
-        ImGui::Text("%d (0x%02X)", val, val);
+        int ival = val;
+        ImGui::SetNextItemWidth(60);
+        if (ImGui::InputInt(("##" + p.Name).c_str(), &ival, 1, 5)) {
+            if (ival >= 0 && ival <= 255)
+                const_cast<uint8_t*>(base)[p.Offset] = (uint8_t)ival;
+        }
+        ImGui::SameLine();
+        ImGui::TextDisabled("(%d)", val);
     } else if (p.TypeName == "NameProperty") {
         FName val = *reinterpret_cast<const FName*>(base + p.Offset);
         ImGui::Text("%s", val.ToString().c_str());
@@ -443,8 +464,32 @@ static void RenderPropertyValue(UObject* obj, const PropertyInfo& p)
         Arr val = *reinterpret_cast<const Arr*>(base + p.Offset);
         ImGui::Text("TArray [%d/%d]", val.Count, val.Max);
     } else if (p.TypeName == "StructProperty") {
-        // Show raw hex for small structs
-        if (p.ElementSize <= 16) {
+        // Detect FVector/FRotator (12 bytes = 3 floats/ints)
+        if (p.ElementSize == 12) {
+            // Determine struct name from the UStructProperty's inner Struct pointer
+            std::string structName;
+            if (p.PropertyObj) {
+                // UStructProperty has Struct* at +0x78 (after UProperty fields)
+                UObject* inner = p.PropertyObj->GetField<UObject*>(0x78);
+                if (inner && (uintptr_t)inner > 0x10000) structName = inner->GetName();
+            }
+            if (structName == "Rotator") {
+                int32_t* rot = reinterpret_cast<int32_t*>(const_cast<uint8_t*>(base) + p.Offset);
+                ImGui::SetNextItemWidth(70); ImGui::InputInt(("P##" + p.Name).c_str(), &rot[0], 0, 0);
+                ImGui::SameLine(); ImGui::SetNextItemWidth(70); ImGui::InputInt(("Y##" + p.Name).c_str(), &rot[1], 0, 0);
+                ImGui::SameLine(); ImGui::SetNextItemWidth(70); ImGui::InputInt(("R##" + p.Name).c_str(), &rot[2], 0, 0);
+            } else {
+                // Assume FVector (or Color)
+                float* vec = reinterpret_cast<float*>(const_cast<uint8_t*>(base) + p.Offset);
+                ImGui::SetNextItemWidth(70); ImGui::InputFloat(("X##" + p.Name).c_str(), &vec[0], 0, 0, "%.1f");
+                ImGui::SameLine(); ImGui::SetNextItemWidth(70); ImGui::InputFloat(("Y##" + p.Name).c_str(), &vec[1], 0, 0, "%.1f");
+                ImGui::SameLine(); ImGui::SetNextItemWidth(70); ImGui::InputFloat(("Z##" + p.Name).c_str(), &vec[2], 0, 0, "%.1f");
+            }
+        } else if (p.ElementSize == 16) {
+            // FQuat or FPlane (4 floats)
+            float* v = reinterpret_cast<float*>(const_cast<uint8_t*>(base) + p.Offset);
+            ImGui::Text("%.2f %.2f %.2f %.2f", v[0], v[1], v[2], v[3]);
+        } else if (p.ElementSize <= 16) {
             std::string hex;
             for (int b = 0; b < p.ElementSize && b < 16; b++) {
                 char tmp[4];
@@ -929,11 +974,16 @@ void Overlay::RenderConsole()
             LogInfo("  worldinfo               - Show level info + actor count");
             LogInfo("  nearby <radius> [class] - Find actors within radius");
             LogInfo("  tickrate                - Show current engine tick rate");
+            LogYellow("=== Spawning / Movement ===");
+            LogInfo("  spawn <class>           - Spawn actor at your position");
+            LogInfo("  tp <x> <y> <z>          - Teleport to coordinates");
+            LogInfo("  noclip                  - Toggle fly + no collision");
             LogYellow("=== Engine Internals ===");
             LogInfo("  cdo <class>             - Show ClassDefaultObject address");
             LogInfo("  setdefault <c> <p> <v>  - Set a CDO property value");
             LogInfo("  natives                 - Show GNatives info");
             LogInfo("  gensdk                  - Regenerate SDK headers");
+            LogInfo("  assets [filter]         - Dump all loaded assets to file");
             LogYellow("=== Reverse Engineering ===");
             LogInfo("  dumpsdk                 - Generate full SDK (all classes/props/funcs)");
             LogInfo("  inspect <class|0xAddr>  - Live inspect object properties+values");
@@ -1761,6 +1811,175 @@ void Overlay::RenderConsole()
             char buf[128];
             std::snprintf(buf, sizeof(buf), "SDK generated: %d classes", count);
             LogGreen(buf);
+        }
+        // ─── spawn <className> ─── spawn an actor at the player's position
+        else if (tokens[0] == "spawn" && tokens.size() >= 2) {
+            std::string clsName = tokens[1];
+            UObject* player = FindObjectByClassName("ShockPlayer");
+            if (!player) { LogRed("No ShockPlayer found"); }
+            else {
+                UStruct* cls = FindClass(clsName);
+                if (!cls) { LogRed("Class '" + clsName + "' not found. Try: classes " + clsName); }
+                else {
+                    // Get player position for spawn location
+                    FVec3 pos;
+                    GetActorPosition(player, pos);
+                    // Offset slightly in front (use Rotation to get forward direction)
+                    const uint8_t* pBase = reinterpret_cast<const uint8_t*>(player);
+                    // Rotation at 0x01E4 (FRotator: pitch, yaw, roll as int32)
+                    int32_t yaw = *reinterpret_cast<const int32_t*>(pBase + 0x01E8); // Yaw component
+                    float yawRad = (float)yaw * 3.14159265f / 32768.0f;
+                    pos.X += cosf(yawRad) * 200.0f;
+                    pos.Y += sinf(yawRad) * 200.0f;
+                    pos.Z += 10.0f; // Slight lift
+
+                    // Find the GameInfo to call SpawnActor via ProcessEvent
+                    // Alternative: use the class factory approach
+                    // For now, we look for an existing actor of that class and clone location
+                    // or use native SpawnActor
+                    UObject* level = FindObjectByClassName("Level");
+                    if (!level) { LogRed("No Level found"); }
+                    else {
+                        // Try to find SpawnActor function on Level
+                        UStruct* levelCls = reinterpret_cast<UStruct*>(level->GetClass());
+                        UFunction* spawnFunc = FindFunction(levelCls, "SpawnActor");
+                        if (!spawnFunc) {
+                            // Fallback: look on GameInfo
+                            UObject* gi = FindObjectByClassName("ShockGameInfo");
+                            if (gi) {
+                                levelCls = reinterpret_cast<UStruct*>(gi->GetClass());
+                                spawnFunc = FindFunction(levelCls, "Spawn");
+                                if (spawnFunc) level = gi;
+                            }
+                        }
+                        if (!spawnFunc) {
+                            LogRed("Cannot find SpawnActor/Spawn function - spawn not supported yet");
+                            LogInfo("Tip: Use 'summon " + clsName + "' in engine console (tilde ~)");
+                        } else {
+                            std::vector<std::string> args;
+                            args.push_back(clsName);
+                            std::string result = CallFunction(level, spawnFunc, args);
+                            LogGreen("Spawn " + clsName + " -> " + result);
+                        }
+                    }
+                }
+            }
+        }
+        // ─── assets [filter] ─── dump loaded assets (textures, meshes, sounds, materials)
+        else if (tokens[0] == "assets") {
+            std::string filter = (tokens.size() >= 2) ? tokens[1] : "";
+            auto& globals = GetEngineGlobals();
+            if (!globals.IsValid()) { LogRed("Engine not initialized"); }
+            else {
+                uintptr_t objData = *reinterpret_cast<uintptr_t*>(globals.GObjects);
+                int32_t objCount = *reinterpret_cast<int32_t*>(globals.GObjects + 4);
+                // Asset types we care about
+                std::map<std::string, int> assetCounts;
+                std::ofstream out("Z:\\Bioshock1SDK\\sdk_gen\\SDK_Assets.txt");
+                out << "// BioShock Remastered - Loaded Asset Browser\n";
+                out << "// Generated by BS1SDK\n\n";
+
+                std::vector<std::pair<std::string, std::string>> entries; // {type, name}
+                for (int i = 0; i < objCount && i < 200000; i++) {
+                    uintptr_t ptr = *reinterpret_cast<uintptr_t*>(objData + i * 4);
+                    if (!ptr) continue;
+                    UObject* obj = reinterpret_cast<UObject*>(ptr);
+                    std::string cn = obj->GetObjClassName();
+                    // Filter to asset types
+                    bool isAsset = (cn == "Texture" || cn == "StaticMesh" || cn == "SkeletalMesh" ||
+                                    cn == "Sound" || cn == "Material" || cn == "Shader" ||
+                                    cn == "Combiner" || cn == "FinalBlend" || cn == "TexModifier" ||
+                                    cn == "TexOscillator" || cn == "TexPanner" || cn == "TexScaler" ||
+                                    cn == "Palette" || cn == "Font" || cn == "Level" ||
+                                    cn == "Animation" || cn == "MeshAnimation" ||
+                                    cn == "Package" || cn == "Music");
+                    if (!isAsset) continue;
+
+                    std::string name = obj->GetFullPath();
+                    if (!filter.empty()) {
+                        bool match = false;
+                        for (size_t c = 0; c + filter.size() <= name.size(); c++) {
+                            if (_strnicmp(name.c_str() + c, filter.c_str(), filter.size()) == 0) {
+                                match = true; break;
+                            }
+                        }
+                        if (!match) continue;
+                    }
+                    assetCounts[cn]++;
+                    entries.push_back({cn, name});
+                }
+                // Sort by type then name
+                std::sort(entries.begin(), entries.end());
+                std::string currentType;
+                for (auto& e : entries) {
+                    if (e.first != currentType) {
+                        currentType = e.first;
+                        out << "\n// ═══ " << currentType << " ═══\n";
+                    }
+                    out << "  " << e.second << "\n";
+                }
+                out << "\n// ═══ Summary ═══\n";
+                int total = 0;
+                for (auto& kv : assetCounts) {
+                    out << "// " << kv.first << ": " << kv.second << "\n";
+                    total += kv.second;
+                }
+                out << "// Total: " << total << " assets\n";
+                out.close();
+
+                // Console output
+                for (auto& kv : assetCounts) {
+                    char buf[128];
+                    std::snprintf(buf, sizeof(buf), "  %-20s %d", kv.first.c_str(), kv.second);
+                    LogInfo(buf);
+                }
+                char buf[128];
+                std::snprintf(buf, sizeof(buf), "Total: %d assets -> sdk_gen/SDK_Assets.txt", total);
+                LogGreen(buf);
+            }
+        }
+        // ─── tp <x> <y> <z> ─── teleport player to coordinates
+        else if (tokens[0] == "tp" && tokens.size() >= 4) {
+            UObject* player = FindObjectByClassName("ShockPlayer");
+            if (!player) { LogRed("No ShockPlayer found"); }
+            else {
+                FVec3 dest;
+                dest.X = std::strtof(tokens[1].c_str(), nullptr);
+                dest.Y = std::strtof(tokens[2].c_str(), nullptr);
+                dest.Z = std::strtof(tokens[3].c_str(), nullptr);
+                SetActorPosition(player, dest);
+                char buf[128];
+                std::snprintf(buf, sizeof(buf), "Teleported to (%.0f, %.0f, %.0f)", dest.X, dest.Y, dest.Z);
+                LogGreen(buf);
+            }
+        }
+        // ─── noclip ─── toggle noclip mode (fly through walls)
+        else if (tokens[0] == "noclip") {
+            static bool noclipOn = false;
+            UObject* player = FindObjectByClassName("ShockPlayer");
+            if (!player) { LogRed("No ShockPlayer found"); }
+            else {
+                noclipOn = !noclipOn;
+                if (noclipOn) {
+                    // PHYS_Flying = 6, disable collision
+                    uint8_t physFly = 6;
+                    int32_t bFalse = 0;
+                    SetActorProperty(player, "Physics", &physFly, 1);
+                    SetActorProperty(player, "bCollideWorld", &bFalse, 4);
+                    SetActorProperty(player, "bBlockActors", &bFalse, 4);
+                    SetActorProperty(player, "bBlockPlayers", &bFalse, 4);
+                    LogGreen("Noclip ON - PHYS_Flying, collision disabled");
+                } else {
+                    // PHYS_Walking = 2, re-enable collision
+                    uint8_t physWalk = 2;
+                    int32_t bTrue = 1;
+                    SetActorProperty(player, "Physics", &physWalk, 1);
+                    SetActorProperty(player, "bCollideWorld", &bTrue, 4);
+                    SetActorProperty(player, "bBlockActors", &bTrue, 4);
+                    SetActorProperty(player, "bBlockPlayers", &bTrue, 4);
+                    LogYellow("Noclip OFF - restored walking + collision");
+                }
+            }
         }
         // ─── snapshot [label] ───
         else if (tokens[0] == "snapshot") {

@@ -59,8 +59,8 @@ void SDKGenerator::DiscoverClasses()
         UObject* obj = reinterpret_cast<UObject*>(ptr);
         std::string className = obj->GetObjClassName();
 
-        // We want Class objects and ScriptStruct objects
-        if (className != "Class" && className != "ScriptStruct") continue;
+        // We want Class objects and Struct/ScriptStruct objects
+        if (className != "Class" && className != "ScriptStruct" && className != "Struct") continue;
 
         std::string name = obj->GetName();
         if (name.empty() || name == "<invalid>") continue;
@@ -665,6 +665,9 @@ void SDKGenerator::WriteEnums(const std::string& outputDir)
     out << "namespace sdk {\n\n";
 
     int enumCount = 0;
+    int enumsFound = 0;
+    int enumsSkippedCount = 0;
+    int enumsSkippedData = 0;
 
     for (int i = 0; i < objCount && i < 200000; i++) {
         uintptr_t ptr = *reinterpret_cast<uintptr_t*>(objData + i * 4);
@@ -675,6 +678,7 @@ void SDKGenerator::WriteEnums(const std::string& outputDir)
         UEnum* uenum = reinterpret_cast<UEnum*>(obj);
         std::string enumName = uenum->GetName();
         if (enumName.empty() || enumName == "<invalid>") continue;
+        enumsFound++;
 
         // Get owner class
         std::string ownerName;
@@ -683,9 +687,47 @@ void SDKGenerator::WriteEnums(const std::string& outputDir)
             ownerName = outer->GetName();
         }
 
-        int32_t count = uenum->GetNamesCount();
-        FName* data = uenum->GetNamesData();
-        if (!data || count <= 0 || count > 256) continue;
+        // Probe for TArray<FName> at various offsets after UField (0x48)
+        // TArray layout: { ptr Data, int32 Count, int32 Max }
+        // Valid if: Data is a valid pointer (>0x10000), Count in [1..512], Max >= Count
+        const uint8_t* raw = reinterpret_cast<const uint8_t*>(uenum);
+        FName* data = nullptr;
+        int32_t count = 0;
+        int probeOffset = -1;
+
+        for (int off = 0x48; off <= 0x60; off += 4) {
+            uintptr_t candidateData = *reinterpret_cast<const uintptr_t*>(raw + off);
+            int32_t candidateCount = *reinterpret_cast<const int32_t*>(raw + off + 4);
+            int32_t candidateMax = *reinterpret_cast<const int32_t*>(raw + off + 8);
+            if (candidateData > 0x10000 && candidateCount > 0 && candidateCount <= 512
+                && candidateMax >= candidateCount && candidateMax <= 1024) {
+                data = reinterpret_cast<FName*>(candidateData);
+                count = candidateCount;
+                probeOffset = off;
+                break;
+            }
+        }
+
+        // Diagnostic: log first few enums
+        if (enumsFound <= 5) {
+            LOG_INFO("[SDK] Enum '{}' owner='{}' probeOffset=0x{:02X} data=0x{:08X} count={}",
+                     enumName, ownerName, probeOffset, (uint32_t)(uintptr_t)data, count);
+            // Dump raw bytes for further analysis
+            LOG_INFO("[SDK]   Raw +0x48..+0x63: {:08X} {:08X} {:08X} {:08X} {:08X} {:08X} {:08X}",
+                     *reinterpret_cast<const uint32_t*>(raw + 0x48),
+                     *reinterpret_cast<const uint32_t*>(raw + 0x4C),
+                     *reinterpret_cast<const uint32_t*>(raw + 0x50),
+                     *reinterpret_cast<const uint32_t*>(raw + 0x54),
+                     *reinterpret_cast<const uint32_t*>(raw + 0x58),
+                     *reinterpret_cast<const uint32_t*>(raw + 0x5C),
+                     *reinterpret_cast<const uint32_t*>(raw + 0x60));
+        }
+
+        if (!data || count <= 0 || count > 512) {
+            if (!data) enumsSkippedData++;
+            else enumsSkippedCount++;
+            continue;
+        }
 
         out << "// Owner: " << ownerName << "\n";
         out << "enum " << enumName << " {\n";
@@ -700,7 +742,8 @@ void SDKGenerator::WriteEnums(const std::string& outputDir)
 
     out << "} // namespace sdk\n";
     out.close();
-    LOG_INFO("SDK Generator: Dumped {} enums", enumCount);
+    LOG_INFO("SDK Generator: Enums: found={} dumped={} skippedData={} skippedCount={}",
+             enumsFound, enumCount, enumsSkippedData, enumsSkippedCount);
 }
 
 // ─── Step 6: Dump CDO defaults ──────────────────────────────────────────
@@ -728,6 +771,7 @@ void SDKGenerator::WriteCDODefaults(const std::string& outputDir)
     };
 
     int dumped = 0;
+    int cdoChecked = 0;
     for (auto& className : keyClasses) {
         auto it = m_Classes.find(className);
         if (it == m_Classes.end()) continue;
@@ -738,6 +782,11 @@ void SDKGenerator::WriteCDODefaults(const std::string& outputDir)
         // Try to get CDO
         UClass* uclass = reinterpret_cast<UClass*>(cls);
         UObject* cdo = uclass->GetDefaultObject();
+        cdoChecked++;
+        if (cdoChecked <= 5) {
+            LOG_INFO("[SDK] CDO check '{}': classPtr=0x{:08X} cdo=0x{:08X}",
+                     className, (uint32_t)(uintptr_t)uclass, (uint32_t)(uintptr_t)cdo);
+        }
         if (!cdo || (uintptr_t)cdo < 0x10000) continue;
 
         out << "// ═══════════════════════════════════════════════════════════════\n";
@@ -895,6 +944,7 @@ void SDKGenerator::WriteNativeFunctions(const std::string& outputDir)
     };
     std::vector<NativeEntry> natives;
 
+    int funcFound = 0;
     for (int i = 0; i < objCount && i < 200000; i++) {
         uintptr_t ptr = *reinterpret_cast<uintptr_t*>(objData + i * 4);
         if (!ptr) continue;
@@ -902,7 +952,16 @@ void SDKGenerator::WriteNativeFunctions(const std::string& outputDir)
         if (obj->GetObjClassName() != "Function") continue;
 
         UFunction* func = reinterpret_cast<UFunction*>(obj);
-        if (!func->IsNative()) continue;
+        funcFound++;
+        // Diagnostic: log first few functions
+        if (funcFound <= 3) {
+            LOG_INFO("[SDK] Function '{}' flags=0x{:08X} iNative={} nativePtr=0x{:08X}",
+                     func->GetName(), func->GetFunctionFlags(),
+                     func->GetNativeIndex(), (uint32_t)func->GetNativeFunc());
+        }
+        // Check if native: either has FUNC_Native flag OR has a non-zero native function pointer
+        bool isNative = func->IsNative() || (func->GetNativeFunc() > 0x10000);
+        if (!isNative) continue;
 
         uint16_t nativeIdx = func->GetNativeIndex();
         uintptr_t nativeFunc = func->GetNativeFunc();
@@ -962,7 +1021,9 @@ void SDKGenerator::WriteStructs(const std::string& outputDir)
         uintptr_t ptr = *reinterpret_cast<uintptr_t*>(objData + i * 4);
         if (!ptr) continue;
         UObject* obj = reinterpret_cast<UObject*>(ptr);
-        if (obj->GetObjClassName() != "ScriptStruct") continue;
+        // In Vengeance UE2.5, the class name is "Struct" (not "ScriptStruct")
+        std::string cn = obj->GetObjClassName();
+        if (cn != "ScriptStruct" && cn != "Struct") continue;
 
         UStruct* s = reinterpret_cast<UStruct*>(obj);
         std::string structName = s->GetName();
