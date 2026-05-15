@@ -12,22 +12,25 @@
 - **Engine Tick Hook** — Frame-rate-independent callbacks via UGameEngine::Tick vtable hook
 - **GNatives Table** — 4096-entry native function dispatch table discovery, hooking, and dumping
 - **Class Default Objects** — Read/write CDO properties to modify all future instances of a class
-- **Object Inspector** — Browse all live UObjects with property editing
+- **Live Object Inspector** — Browse all live UObjects with property editing: bitmask-aware bool toggles, editable FVector/FRotator fields, byte/int/float spinboxes, object reference links
 - **Player Properties** — Real-time ADAM, Credits, Health, EVE editing
-- **Console** — In-game command console (~) with 30+ commands
+- **Console** — In-game command console (~) with 50+ commands
 - **ProcessEvent Hook** — MinHook inline detour intercepting all UFunction calls
-- **Function Caller** — Invoke any UFunction on any object from console
+- **Function Caller** — Invoke any UFunction on any object from console with arg marshaling
 - **Weapon Editor** — Live editing of fire rate, accuracy, magazine size, ammo
 - **Gameplay Mods** — God mode, one-hit kill, infinite ammo via PE hooks
 - **Plasmid Hijacks** — Security Bullseye → teleport to impact, Hypnotize → summon Big Daddy
+- **Noclip / Teleport** — `noclip` toggles PHYS_Flying + collision off; `tp <x> <y> <z>` instant teleport
+- **Actor Spawner** — `spawn <ClassName>` spawns any actor at the player's position
 - **Event Logger** — Dump all ProcessEvent calls to file for analysis
 - **Lua 5.4 Scripting** — Full scripting bridge with 25+ API functions and hot-reload
-- **SDK Generator** — Auto-generate fully-typed C++ headers with resolved inner types, function signatures, enum names, and flag annotations
+- **SDK Generator** — Auto-generate fully-typed C++ headers (4,100+ classes, 10,000+ properties across 38 packages) with enum values, struct layouts, native function addresses, AI states, and per-package headers modders can `#include`
+- **Asset Browser** — Dump all loaded textures, meshes, sounds, materials, animations to file
 - **BSM Package Tools** — Full .bsm/.U analysis, spawn patcher, property editor, AI type editor (bsm_tool v0.5.0)
 - **INI Config Tool** — Parse, edit, diff, extract/repack IBF archives (ini_tool v2.0.0)
 - **Gameplay Mods** — Decoy→Teleport, Chain Lightning, Friendly Bots, Rivet Pistol, Splicer Factions
 - **Mod Distribution** — winmm.dll proxy loader (no injector needed) + JSON config + packager script
-- **Co-op Framework** — UDP transport, player state sync, NPC puppet system, damage forwarding
+- **Co-op Framework** — UDP transport, player state sync, ghost puppet system, damage forwarding
 
 ### Implemented Gameplay Mods
 
@@ -53,12 +56,34 @@ Build\Final\
 ```
 Package with: `.\scripts\package_mod.ps1 -Name "MyMod"`
 
+### SDK Generator Output
+
+Run `dumpsdk` in the console to generate a complete reverse-engineered SDK:
+
+```
+sdk_gen/
+├── SDK.h                  ← Master include
+├── SDK_Types.h            ← Base types (FVector, FString, TArray, FName)
+├── SDK_Enums.h            ← All 177 game enums with values (EPhysics, EInputKey, etc.)
+├── SDK_Structs.h          ← All 213 struct layouts (FVector, FRotator, FQuat, etc.)
+├── SDK_NativeFunctions.txt ← 9,597 native C++ function pointers with addresses
+├── SDK_States.txt         ← All AI/game states per class (Idle, Attacking, Patrol...)
+├── SDK_Assets.txt         ← All loaded textures, meshes, sounds (via 'assets' command)
+├── SDK_STATS.txt          ← Summary: 4,119 classes, 10,343 properties, 38 packages
+├── Engine.h               ← AActor, APawn, APlayerController (370 classes)
+├── ShockGame.h            ← AShockPlayer, AShockPawn, weapons (400+ classes)
+├── ShockAI.h              ← BigDaddy, Splicer, AI behaviors (523 classes)
+├── ShockDesignerClasses.h ← Level scripting, triggers (831 classes)
+├── FXClass.h              ← Visual effects (799 classes)
+└── ... (38 packages total)
+```
+
 ### Planned Features
 
 **Co-op Multiplayer** (see `docs/reverse-engineering/co-op-feasibility.md`)
 - UDP network bridge between two game instances
 - Player state sync (position, rotation, health, weapon)
-- NPC puppet system for remote player visualization
+- Ghost puppet system for remote player visualization
 - Damage and world state synchronization
 
 **Additional Content**
@@ -122,8 +147,11 @@ god                          Toggle god mode
 list <filter>                Search objects (case-insensitive)
 props [filter]               List player properties
 classes [filter]             List class names
-call <class> <func> [args]   Call a UFunction
+call <class> <func> [args]   Call a UFunction on any object
 funcs <class> [filter]       List functions on a class
+spawn <class>                Spawn actor at player position
+tp <x> <y> <z>              Teleport to coordinates
+noclip                       Toggle fly + no collision
 hookpe                       Toggle ProcessEvent hook
 logpe [filter]               Log function calls (toggle)
 pestats                      Show PE statistics
@@ -139,8 +167,13 @@ cdo <class>                  Show ClassDefaultObject address
 setdefault <c> <p> <v>       Set a CDO property (affects all future instances)
 natives                      Show GNatives table info
 gensdk                       Regenerate SDK headers
-host [port]                  Host a co-op session
-join <ip> [port]             Join a co-op session
+assets [filter]              Dump all loaded game assets to file
+dumpsdk                      Full SDK dump (enums, structs, states, natives)
+inspect <class|0xAddr>       Live inspect object properties + values
+hierarchy                    Dump full class inheritance tree
+functions                    Dump all UFunction objects
+truehost [port]              Host a co-op session
+truejoin <ip> [port]         Join a co-op session
 ```
 
 ### Lua Scripting
@@ -248,6 +281,19 @@ BS1SDK/
 | +0x28 | Name (FName) |
 | +0x30 | Class |
 
+### Confirmed AActor Layout (selected key offsets)
+| Offset | Field | Type |
+|--------|-------|------|
+| +0x0090 | Physics | uint8 (EPhysics) |
+| +0x00CC | Bitfield: bStatic, bHidden, bStasis, bWorldGeometry... | uint32 bitmask |
+| +0x00D0 | Bitfield: bAlwaysRelevant, bReplicateMovement... | uint32 bitmask |
+| +0x01D8 | Location | FVector (12B) |
+| +0x01E4 | Rotation | FRotator (12B) |
+| +0x01F0 | Velocity | FVector (12B) |
+| +0x02AC | DrawScale | float |
+| +0x0304 | Bitfield: bCollideActors, bBlockActors, bBlockPlayers... | uint32 bitmask |
+| +0x0450 | Controller (APawn+) | UObject* |
+
 ### UFunction Layout (extends UStruct at +0x64)
 | Offset | Field |
 |--------|-------|
@@ -270,8 +316,9 @@ BS1SDK/
 ### UEnum Layout (extends UField)
 | Offset | Field |
 |--------|-------|
-| +0x48 | Names.Data (FName*) |
-| +0x4C | Names.Count (int32) |
+| +0x48..0x60 | Names TArray<FName> (auto-probed) |
+
+> **Note:** BoolProperty stores a bitmask at +0x78. Multiple bools share the same offset with different bitmasks. The SDK handles this correctly with OR/AND operations.
 
 ### Specialized UProperty Inner Types (all at +0x78)
 | Property Type | Inner Field |
