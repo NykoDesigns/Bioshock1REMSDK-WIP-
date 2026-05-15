@@ -123,20 +123,22 @@ void Overlay::InitializeDXGI(IDXGISwapChain* swapChain, ID3D11Device* device, HW
 
 void Overlay::Render()
 {
-    if (!s_Initialized || !s_Visible) return;
+    if (!s_Initialized) return;
 
     // Start ImGui frame
     ImGui_ImplDX11_NewFrame();
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
 
-    // Render our content
-    RenderMainMenu();
-
-    // Tick co-op network (approx 16ms at 60fps)
+    // ALWAYS tick co-op network and draw remote player marker, even when overlay is hidden
     if (IsCoopActive()) {
         CoopTick(1.0f / 60.0f);
-        RenderCoopOverlay(); // Draw remote player marker
+        RenderCoopOverlay(); // Draw remote player marker (always visible)
+    }
+
+    // Only render menu panels when overlay is toggled visible
+    if (s_Visible) {
+        RenderMainMenu();
     }
 
     // Finish frame

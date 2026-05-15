@@ -123,6 +123,17 @@ static float Lerp(float a, float b, float t) { return a + (b - a) * t; }
 
 void RenderCoopOverlay()
 {
+    // One-time diagnostic log
+    static int s_DiagCounter = 0;
+    if (s_DiagCounter < 3) {
+        s_DiagCounter++;
+        LOG_INFO("[Co-op Render] RenderCoopOverlay called: hasRemote={} hasCam={} camPos=({:.0f},{:.0f},{:.0f})",
+                 s_HasRemoteState, s_HasCamera, s_CamX, s_CamY, s_CamZ);
+        if (s_HasRemoteState) {
+            LOG_INFO("[Co-op Render] Remote: ({:.0f},{:.0f},{:.0f}) name={}",
+                     s_RemoteState.posX, s_RemoteState.posY, s_RemoteState.posZ, s_RemoteName);
+        }
+    }
     if (!s_HasRemoteState || !s_HasCamera) return;
 
     // Update screen size from ImGui
