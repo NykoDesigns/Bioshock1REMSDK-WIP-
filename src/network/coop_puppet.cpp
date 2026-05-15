@@ -16,6 +16,8 @@ namespace bs1sdk {
 static UObject*   s_Puppet = nullptr;      // The spawned actor
 static UFunction* s_SpawnFunc = nullptr;    // Cached Actor.Spawn function
 static UFunction* s_DestroyFunc = nullptr;  // Cached Actor.Destroy function
+static UFunction* s_SetLocFunc = nullptr;   // Cached Actor.SetLocation (updates octree!)
+static UFunction* s_SetRotFunc = nullptr;   // Cached Actor.SetRotation (updates octree!)
 static bool       s_Initialized = false;
 
 // Property offsets on the puppet (cached once after spawn)
@@ -206,15 +208,20 @@ bool InitGhostPuppet()
     UStruct* playerClass = reinterpret_cast<UStruct*>(player->GetClass());
     s_SpawnFunc = FindFunctionOnClass(playerClass, "Spawn");
     s_DestroyFunc = FindFunctionOnClass(playerClass, "Destroy");
+    s_SetLocFunc = FindFunctionOnClass(playerClass, "SetLocation");
+    s_SetRotFunc = FindFunctionOnClass(playerClass, "SetRotation");
 
     if (!s_SpawnFunc) {
         LOG_WARN("[Puppet] Could not find Actor.Spawn function");
         return false;
     }
 
+    if (!s_SetLocFunc) LOG_WARN("[Puppet] SetLocation not found — puppet won't visually move!");
+    if (!s_SetRotFunc) LOG_WARN("[Puppet] SetRotation not found — puppet won't visually rotate!");
+
     s_Initialized = true;
-    LOG_INFO("[Puppet] Ghost puppet system initialized (Spawn={}, Destroy={})",
-             (void*)s_SpawnFunc, (void*)s_DestroyFunc);
+    LOG_INFO("[Puppet] Ghost puppet system initialized (Spawn={}, Destroy={}, SetLoc={}, SetRot={})",
+             (void*)s_SpawnFunc, (void*)s_DestroyFunc, (void*)s_SetLocFunc, (void*)s_SetRotFunc);
     return true;
 }
 
@@ -223,6 +230,8 @@ void ShutdownGhostPuppet()
     DestroyGhostPuppet();
     s_SpawnFunc = nullptr;
     s_DestroyFunc = nullptr;
+    s_SetLocFunc = nullptr;
+    s_SetRotFunc = nullptr;
     s_Initialized = false;
 }
 
@@ -448,16 +457,41 @@ void UpdateGhostPuppet(const PlayerStateData& remoteState)
     s_InterpY += (s_TargetY - s_InterpY) * t;
     s_InterpZ += (s_TargetZ - s_InterpZ) * t;
 
-    // Write position
-    if (s_PuppetLocOffset > 0) {
+    // Write position via SetLocation ProcessEvent (properly updates render octree)
+    ProcessEventFn origPE = GetOriginalProcessEvent();
+    if (origPE && s_SetLocFunc) {
+        // SetLocation(FVector NewLocation, bool bNoTest) -> bool
+        struct {
+            float X, Y, Z;           // FVector NewLocation
+            uint32_t bNoTest;        // skip collision test
+            uint32_t ReturnValue;
+        } locParms{};
+        locParms.X = s_InterpX;
+        locParms.Y = s_InterpY;
+        locParms.Z = s_InterpZ;
+        locParms.bNoTest = 1;  // skip collision — it's a puppet
+        origPE(s_Puppet, s_SetLocFunc, &locParms, nullptr);
+    } else if (s_PuppetLocOffset > 0) {
+        // Fallback: raw write (won't update render, but stores value)
         uint8_t* raw = reinterpret_cast<uint8_t*>(s_Puppet);
         memcpy(raw + s_PuppetLocOffset, &s_InterpX, 4);
         memcpy(raw + s_PuppetLocOffset + 4, &s_InterpY, 4);
         memcpy(raw + s_PuppetLocOffset + 8, &s_InterpZ, 4);
     }
 
-    // Write rotation
-    if (s_PuppetRotOffset > 0) {
+    // Write rotation via SetRotation ProcessEvent
+    if (origPE && s_SetRotFunc) {
+        // SetRotation(FRotator NewRotation) -> bool
+        struct {
+            int32_t Pitch, Yaw, Roll;  // FRotator
+            uint32_t ReturnValue;
+        } rotParms{};
+        rotParms.Pitch = (int32_t)(s_TargetPitch * (65536.0f / 360.0f));
+        rotParms.Yaw = (int32_t)(s_TargetYaw * (65536.0f / 360.0f));
+        rotParms.Roll = 0;
+        origPE(s_Puppet, s_SetRotFunc, &rotParms, nullptr);
+    } else if (s_PuppetRotOffset > 0) {
+        // Fallback: raw write
         int32_t pitch = (int32_t)(s_TargetPitch * (65536.0f / 360.0f));
         int32_t yaw = (int32_t)(s_TargetYaw * (65536.0f / 360.0f));
         int32_t roll = 0;

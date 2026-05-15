@@ -285,11 +285,47 @@ bool GetActorPosition(UObject* actor, FVec3& outPos)
 bool SetActorPosition(UObject* actor, const FVec3& pos)
 {
     if (!actor) return false;
-    
+
+    // Try SetLocation via ProcessEvent first — this properly updates the render octree
+    ProcessEventFn origPE = GetOriginalProcessEvent();
+    if (origPE) {
+        UStruct* cls = reinterpret_cast<UStruct*>(actor->GetClass());
+        if (cls) {
+            // Walk class hierarchy to find SetLocation function
+            UField* walk = reinterpret_cast<UField*>(cls);
+            int depth = 0;
+            while (walk && depth < 64) {
+                UStruct* cur = reinterpret_cast<UStruct*>(walk);
+                UField* child = cur->GetChildren();
+                int limit = 2000;
+                while (child && limit-- > 0) {
+                    if (child->GetObjClassName() == "Function" && child->GetName() == "SetLocation") {
+                        UFunction* setLocFunc = reinterpret_cast<UFunction*>(child);
+                        struct {
+                            float X, Y, Z;        // FVector NewLocation
+                            uint32_t bNoTest;     // skip collision test
+                            uint32_t ReturnValue;
+                        } parms{};
+                        parms.X = pos.X;
+                        parms.Y = pos.Y;
+                        parms.Z = pos.Z;
+                        parms.bNoTest = 1;
+                        origPE(actor, setLocFunc, &parms, nullptr);
+                        return true;
+                    }
+                    child = child->GetNext();
+                }
+                walk = cur->GetSuperField();
+                depth++;
+            }
+        }
+    }
+
+    // Fallback: raw property write (doesn't update render octree)
     UStruct* cls = reinterpret_cast<UStruct*>(actor->GetClass());
     if (!cls) return false;
     
-    UField* child = cls;
+    UField* child = reinterpret_cast<UField*>(cls);
     int depth = 0;
     while (child && depth < 64) {
         UStruct* current = reinterpret_cast<UStruct*>(child);
