@@ -57,6 +57,21 @@ private:
     /// Step 4: Write master SDK.h
     void WriteMasterHeader(const std::string& outputDir);
 
+    /// Step 5: Dump all enums with their values
+    void WriteEnums(const std::string& outputDir);
+
+    /// Step 6: Dump ClassDefaultObject values for key classes
+    void WriteCDODefaults(const std::string& outputDir);
+
+    /// Step 7: Dump UState objects (AI/game states per class)
+    void WriteStates(const std::string& outputDir);
+
+    /// Step 8: Dump native function table (GNatives)
+    void WriteNativeFunctions(const std::string& outputDir);
+
+    /// Step 9: Dump structs with resolved inner properties
+    void WriteStructs(const std::string& outputDir);
+
     // ─── Helpers ───────────────────────────────────────────────────
 
     /// Map a UProperty type name to a C++ type string

@@ -2051,14 +2051,23 @@ void Overlay::RenderConsole()
         }
         // ─── dumpsdk ───
         else if (tokens[0] == "dumpsdk") {
-            LogYellow("Generating SDK headers (this may take a moment)...");
-            DumpSDKHeaders();
+            LogYellow("Generating FULL SDK (classes, enums, structs, defaults, states, natives)...");
+            SDKGenerator gen;
+            int count = gen.Generate("Z:\\Bioshock1SDK\\sdk_gen");
             DumpClassHierarchy();
             DumpAllFunctions();
-            LogGreen("Full SDK dump complete -> debug_dumps/SDK/");
-            LogInfo("  + class_hierarchy.txt");
-            LogInfo("  + all_functions.txt");
-            LogInfo("  + One .txt per class with properties + functions");
+            char buf2[128];
+            std::snprintf(buf2, sizeof(buf2), "Full SDK generated: %d classes -> Z:\\Bioshock1SDK\\sdk_gen\\", count);
+            LogGreen(buf2);
+            LogInfo("  + Per-package .h headers (C++ style)");
+            LogInfo("  + SDK_Enums.h (all enum values)");
+            LogInfo("  + SDK_Structs.h (all struct layouts)");
+            LogInfo("  + SDK_Defaults.txt (CDO property values)");
+            LogInfo("  + SDK_States.txt (AI/game states)");
+            LogInfo("  + SDK_NativeFunctions.txt (native C++ function pointers)");
+            LogInfo("  + SDK_STATS.txt (summary)");
+            LogGreen("  + debug_dumps/class_hierarchy.txt");
+            LogGreen("  + debug_dumps/all_functions.txt");
         }
         // ─── inspect <class_or_addr> ───
         else if (tokens[0] == "inspect" && tokens.size() >= 2) {

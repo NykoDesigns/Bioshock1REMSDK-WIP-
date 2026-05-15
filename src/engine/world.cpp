@@ -334,7 +334,24 @@ bool SetActorProperty(UObject* actor, const char* propName, const void* value, i
                     UProperty* p = reinterpret_cast<UProperty*>(prop);
                     int32_t offset = p->GetPropertyOffset();
                     uint8_t* base = reinterpret_cast<uint8_t*>(actor);
-                    memcpy(base + offset, value, size);
+                    
+                    // BoolProperty uses a bitmask within a uint32_t
+                    std::string typeName = prop->GetObjClassName();
+                    if (typeName == "BoolProperty") {
+                        // UBoolProperty has BitMask at +0x78
+                        uint32_t bitMask = p->GetField<uint32_t>(0x78);
+                        if (bitMask == 0) bitMask = 1; // fallback
+                        uint32_t* target = reinterpret_cast<uint32_t*>(base + offset);
+                        int32_t boolVal = 0;
+                        memcpy(&boolVal, value, std::min(size, 4));
+                        if (boolVal) {
+                            *target |= bitMask;  // set bit
+                        } else {
+                            *target &= ~bitMask; // clear bit
+                        }
+                    } else {
+                        memcpy(base + offset, value, size);
+                    }
                     return true;
                 }
             }
@@ -364,7 +381,18 @@ bool GetActorProperty(UObject* actor, const char* propName, void* outValue, int 
                     UProperty* p = reinterpret_cast<UProperty*>(prop);
                     int32_t offset = p->GetPropertyOffset();
                     const uint8_t* base = reinterpret_cast<const uint8_t*>(actor);
-                    memcpy(outValue, base + offset, size);
+                    
+                    // BoolProperty uses bitmask
+                    std::string typeName = prop->GetObjClassName();
+                    if (typeName == "BoolProperty") {
+                        uint32_t bitMask = p->GetField<uint32_t>(0x78);
+                        if (bitMask == 0) bitMask = 1;
+                        uint32_t rawVal = *reinterpret_cast<const uint32_t*>(base + offset);
+                        int32_t boolResult = (rawVal & bitMask) ? 1 : 0;
+                        memcpy(outValue, &boolResult, std::min(size, 4));
+                    } else {
+                        memcpy(outValue, base + offset, size);
+                    }
                     return true;
                 }
             }

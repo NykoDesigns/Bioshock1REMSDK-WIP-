@@ -1,6 +1,7 @@
 #include "coop_puppet.h"
 #include "../core/log.h"
 #include "../engine/uobject.h"
+#include "../engine/world.h"
 #include "../hooks/process_event.h"
 #include "../debug/crash_handler.h"
 
@@ -101,20 +102,12 @@ static void CachePuppetOffsets()
     LOG_INFO("[Puppet] Cached offsets: Loc={} Rot={}", s_PuppetLocOffset, s_PuppetRotOffset);
 }
 
-/// Set a property on the puppet by name.
+/// Set a property on the puppet by name (handles BoolProperty bitfields correctly).
 static bool SetPuppetProperty(const char* propName, const void* value, int size)
 {
     if (!s_Puppet) return false;
-    UStruct* cls = reinterpret_cast<UStruct*>(s_Puppet->GetClass());
-    if (!cls) return false;
-
-    std::vector<PropertyInfo> props = WalkProperties(cls);
-    PropertyInfo* pi = FindProperty(cls, propName, props);
-    if (!pi) return false;
-
-    uint8_t* raw = reinterpret_cast<uint8_t*>(s_Puppet);
-    memcpy(raw + pi->Offset, value, size);
-    return true;
+    // Delegate to SetActorProperty which handles BoolProperty bitmasks
+    return SetActorProperty(s_Puppet, propName, value, size);
 }
 
 /// Helper: check if an object inherits from a given base class name.
@@ -371,9 +364,23 @@ bool SpawnGhostPuppet(float x, float y, float z)
     // Cache property offsets on the borrowed actor
     CachePuppetOffsets();
 
-    // Configure: disable collision so it doesn't block anything
+    // ── Make movable: StaticMeshActors are bStatic=true by default,
+    //    which means UE2 never updates their render position when Location
+    //    changes. We must clear bStatic and give it physics so the engine
+    //    re-registers the actor in the render octree each frame.
     int32_t bFalse = 0;
     int32_t bTrue = 1;
+
+    // CRITICAL: allow the engine to move this actor's rendered mesh
+    SetPuppetProperty("bStatic", &bFalse, 4);
+    SetPuppetProperty("bWorldGeometry", &bFalse, 4);
+    // PHYS_Interpolating = 10 — engine updates render position from Location each tick
+    uint8_t physInterp = 10;
+    SetPuppetProperty("Physics", &physInterp, 1);
+    // Always render regardless of distance
+    SetPuppetProperty("bAlwaysRelevant", &bTrue, 4);
+
+    // Disable collision so it doesn't block anything
     SetPuppetProperty("bCollideActors", &bFalse, 4);
     SetPuppetProperty("bBlockActors", &bFalse, 4);
     SetPuppetProperty("bBlockPlayers", &bFalse, 4);
@@ -385,7 +392,7 @@ bool SpawnGhostPuppet(float x, float y, float z)
     uint8_t ambientGlow = 254;
     SetPuppetProperty("AmbientGlow", &ambientGlow, 1);
 
-    // Keep at human-ish scale so it's easy to see (it's a barrel/crate/etc.)
+    // Keep at human-ish scale so it's easy to see
     float drawScale = 1.0f;
     SetPuppetProperty("DrawScale", &drawScale, 4);
 

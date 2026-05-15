@@ -1100,6 +1100,8 @@ void InitCoopDebug()
     DumpActorCensus();
     DumpPropertyOffsets();
     DumpAIFunctions();
+    DumpClassHierarchy();
+    DumpAllFunctions();
 
     LOG_INFO("[Debug] Co-op debug tools initialized. Dumps in {}", GetDebugDir());
 }
