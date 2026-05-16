@@ -408,6 +408,11 @@ bool IsProcessEventHooked()
     return s_Hooked;
 }
 
+uintptr_t GetProcessEventAddress()
+{
+    return s_ProcessEventAddr;
+}
+
 const ProcessEventStats& GetProcessEventStats()
 {
     return s_Stats;

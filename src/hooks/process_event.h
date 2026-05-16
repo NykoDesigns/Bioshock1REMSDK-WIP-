@@ -45,6 +45,9 @@ ProcessEventFn GetOriginalProcessEvent();
 /// Check if the hook is active.
 bool IsProcessEventHooked();
 
+/// Get the discovered address of the original ProcessEvent function.
+uintptr_t GetProcessEventAddress();
+
 /// Get stats about ProcessEvent calls.
 struct ProcessEventStats {
     uint64_t TotalCalls = 0;

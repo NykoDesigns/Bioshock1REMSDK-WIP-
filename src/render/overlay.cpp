@@ -2118,6 +2118,11 @@ void Overlay::RenderConsole()
                 StartEventCatalog(600.0f);
                 StartStateDiff("", 600.0f);
                 LogInfo("[Auto] Co-op analysis recording (10 min). Run 'coopanalysis' to stop/dump.");
+
+                // Auto-dump PE disasm (now that world is loaded, UFunctions are bound)
+                DumpProcessEventDisasm();
+                DumpStructValidation();
+                DumpFunctionAddresses();
             } else {
                 LogRed("Failed to start true co-op host");
                 LogRed("Check: Is port " + std::to_string(port) + " already in use?");

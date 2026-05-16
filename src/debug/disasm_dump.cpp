@@ -432,10 +432,16 @@ void DumpProcessEventDisasm()
     out << "║  GNatives table:      0x" << std::setw(8) << gnativesAddr << "                        ║\n";
     out << "╚═══════════════════════════════════════════════════════════════╝\n\n";
 
-    // 1. ProcessEvent itself
-    ProcessEventFn origPE = GetOriginalProcessEvent();
-    uintptr_t peAddr = reinterpret_cast<uintptr_t>(origPE);
-    DumpFunction(out, "UObject::ProcessEvent", peAddr, 2048, modBase, modSize, gnativesAddr);
+    // 1. ProcessEvent itself — use the real discovered address, not the trampoline
+    uintptr_t peAddr = GetProcessEventAddress();
+    uintptr_t trampolineAddr = reinterpret_cast<uintptr_t>(GetOriginalProcessEvent());
+    out << "Discovered PE address: 0x" << std::hex << std::setfill('0') << std::setw(8) << peAddr << "\n";
+    out << "Trampoline address:    0x" << std::setw(8) << trampolineAddr << "\n\n";
+
+    DumpFunction(out, "UObject::ProcessEvent (original)", peAddr, 2048, modBase, modSize, gnativesAddr);
+    if (trampolineAddr != peAddr && trampolineAddr != 0) {
+        DumpFunction(out, "UObject::ProcessEvent (trampoline)", trampolineAddr, 256, modBase, modSize, gnativesAddr);
+    }
 
     // 2. Dump the first 16 bytes of GNatives entries for key indices
     out << "═══════════════════════════════════════════════════════════════\n";

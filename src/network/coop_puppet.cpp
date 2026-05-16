@@ -459,62 +459,88 @@ void UpdateGhostPuppet(const PlayerStateData& remoteState)
     s_InterpZ += (s_TargetZ - s_InterpZ) * t;
 
     // ─── Move puppet via ProcessEvent ───
-    // Strategy: Fix NativeFunc from GNatives if it's broken, then call PE.
-    // Native indices: SetLocation=4014, SetRotation=4343, Move=4338
-    static bool s_NativesPatched = false;
+    // Discovery: GNatives only has ~256 core bytecode natives.
+    // SetLocation (iNative=4014) is an EXTENDED native dispatched via
+    // UFunction->Func pointer at +0x70, not GNatives.
+    // Strategy: Call ProcessEvent directly — the engine knows how to dispatch.
+    static bool s_Diagnosed = false;
     static bool s_SetLocSafe = true;
     static bool s_SetRotSafe = true;
+    static uintptr_t s_SetLocNativeAddr = 0; // direct native call fallback
+    static uintptr_t s_SetRotNativeAddr = 0;
     ProcessEventFn origPE = GetOriginalProcessEvent();
 
-    // One-time: patch UFunction NativeFunc from GNatives table
-    if (!s_NativesPatched && s_SetLocFunc && GetNativesTableAddress() != 0) {
-        s_NativesPatched = true;
-        // Read iNative index from UFunction (+0x68 = uint16_t iNative)
-        uint16_t locNativeIdx = s_SetLocFunc->GetField<uint16_t>(0x68);
-        uint16_t rotNativeIdx = s_SetRotFunc ? s_SetRotFunc->GetField<uint16_t>(0x68) : 0;
+    // One-time: diagnose UFunction layout and find native addresses
+    if (!s_Diagnosed && s_SetLocFunc) {
+        s_Diagnosed = true;
+        const uint8_t* slRaw = reinterpret_cast<const uint8_t*>(s_SetLocFunc);
 
-        LOG_INFO("[Puppet] SetLocation iNative={}, SetRotation iNative={}", locNativeIdx, rotNativeIdx);
+        // Dump raw bytes 0x60-0x7F for analysis
+        LOG_INFO("[Puppet] SetLocation UFunction @ 0x{:08X}", (uint32_t)(uintptr_t)s_SetLocFunc);
+        LOG_INFO("[Puppet]   +60: {:02X} {:02X} {:02X} {:02X}  {:02X} {:02X} {:02X} {:02X}  {:02X} {:02X} {:02X} {:02X}  {:02X} {:02X} {:02X} {:02X}",
+                 slRaw[0x60], slRaw[0x61], slRaw[0x62], slRaw[0x63],
+                 slRaw[0x64], slRaw[0x65], slRaw[0x66], slRaw[0x67],
+                 slRaw[0x68], slRaw[0x69], slRaw[0x6A], slRaw[0x6B],
+                 slRaw[0x6C], slRaw[0x6D], slRaw[0x6E], slRaw[0x6F]);
+        LOG_INFO("[Puppet]   +70: {:02X} {:02X} {:02X} {:02X}  {:02X} {:02X} {:02X} {:02X}  {:02X} {:02X} {:02X} {:02X}  {:02X} {:02X} {:02X} {:02X}",
+                 slRaw[0x70], slRaw[0x71], slRaw[0x72], slRaw[0x73],
+                 slRaw[0x74], slRaw[0x75], slRaw[0x76], slRaw[0x77],
+                 slRaw[0x78], slRaw[0x79], slRaw[0x7A], slRaw[0x7B],
+                 slRaw[0x7C], slRaw[0x7D], slRaw[0x7E], slRaw[0x7F]);
 
-        // Try to get correct native from GNatives table
-        if (locNativeIdx > 0) {
-            NativeFunc nf = GetNative(locNativeIdx);
-            if (nf) {
-                // Patch the UFunction's NativeFunc pointer to the correct address
-                uintptr_t funcAddr = reinterpret_cast<uintptr_t>(nf);
-                DWORD oldProt;
-                uint8_t* target = reinterpret_cast<uint8_t*>(s_SetLocFunc) + 0x70;
-                VirtualProtect(target, 4, PAGE_READWRITE, &oldProt);
-                *reinterpret_cast<uintptr_t*>(target) = funcAddr;
-                VirtualProtect(target, 4, oldProt, &oldProt);
-                LOG_INFO("[Puppet] Patched SetLocation NativeFunc -> 0x{:08X} (from GNatives[{}])",
-                         (uint32_t)funcAddr, locNativeIdx);
+        // Read fields at expected offsets
+        uint32_t funcFlags = *(uint32_t*)(slRaw + 0x64);
+        uint16_t iNative   = *(uint16_t*)(slRaw + 0x68);
+        uint8_t  numParms  = *(uint8_t*)(slRaw + 0x6B);
+        uint16_t parmsSize = *(uint16_t*)(slRaw + 0x6C);
+        uintptr_t nativeFunc = *(uintptr_t*)(slRaw + 0x70);
+
+        LOG_INFO("[Puppet]   FuncFlags=0x{:08X} iNative={} NumParms={} ParmsSize={}",
+                 funcFlags, iNative, numParms, parmsSize);
+        LOG_INFO("[Puppet]   NativeFunc(+0x70)=0x{:08X}", (uint32_t)nativeFunc);
+
+        // Check if NativeFunc is a valid code pointer
+        if (nativeFunc != 0) {
+            if (IsSafeToRead(reinterpret_cast<const void*>(nativeFunc), 4)) {
+                LOG_INFO("[Puppet]   NativeFunc is READABLE — will try PE dispatch normally");
+                s_SetLocNativeAddr = nativeFunc;
             } else {
-                LOG_WARN("[Puppet] GNatives[{}] is NULL — SetLocation won't work", locNativeIdx);
-                s_SetLocSafe = false;
+                LOG_WARN("[Puppet]   NativeFunc is NOT READABLE (0x{:08X}) — bad pointer!", (uint32_t)nativeFunc);
             }
         } else {
-            LOG_WARN("[Puppet] SetLocation iNative=0 — not a registered native!");
-            s_SetLocSafe = false;
+            LOG_WARN("[Puppet]   NativeFunc is NULL!");
+            // Scan through additional offsets — maybe Func is at +0x74 or +0x78 in this build
+            for (int probe = 0x70; probe <= 0x80; probe += 4) {
+                uintptr_t val = *(uintptr_t*)(slRaw + probe);
+                if (val > 0x10000000 && val < 0x7FFFFFFF) {
+                    if (IsSafeToRead(reinterpret_cast<const void*>(val), 4)) {
+                        LOG_INFO("[Puppet]   Candidate NativeFunc at +0x{:02X} = 0x{:08X} (readable!)", probe, (uint32_t)val);
+                        if (s_SetLocNativeAddr == 0) s_SetLocNativeAddr = val;
+                    }
+                }
+            }
         }
 
-        if (rotNativeIdx > 0 && s_SetRotFunc) {
-            NativeFunc nf = GetNative(rotNativeIdx);
-            if (nf) {
-                DWORD oldProt;
-                uint8_t* target = reinterpret_cast<uint8_t*>(s_SetRotFunc) + 0x70;
-                VirtualProtect(target, 4, PAGE_READWRITE, &oldProt);
-                *reinterpret_cast<uintptr_t*>(target) = reinterpret_cast<uintptr_t>(nf);
-                VirtualProtect(target, 4, oldProt, &oldProt);
-                LOG_INFO("[Puppet] Patched SetRotation NativeFunc -> 0x{:08X}", (uint32_t)(uintptr_t)nf);
-            } else {
-                s_SetRotSafe = false;
-            }
+        // Also dump SetRotation if available
+        if (s_SetRotFunc) {
+            const uint8_t* srRaw = reinterpret_cast<const uint8_t*>(s_SetRotFunc);
+            uintptr_t rotNF = *(uintptr_t*)(srRaw + 0x70);
+            LOG_INFO("[Puppet] SetRotation NativeFunc(+0x70)=0x{:08X}", (uint32_t)rotNF);
+            if (rotNF != 0 && IsSafeToRead(reinterpret_cast<const void*>(rotNF), 4))
+                s_SetRotNativeAddr = rotNF;
+        }
+
+        // Log decision
+        if (s_SetLocNativeAddr) {
+            LOG_INFO("[Puppet] >>> Will call ProcessEvent for SetLocation (native at 0x{:08X})", (uint32_t)s_SetLocNativeAddr);
         } else {
-            s_SetRotSafe = false;
+            LOG_WARN("[Puppet] >>> No valid native found — ProcessEvent may execute script path or fail");
+            LOG_WARN("[Puppet] >>> Falling back to raw memory write (puppet won't update render octree)");
         }
     }
 
-    // Call SetLocation via ProcessEvent (now with corrected NativeFunc)
+    // Attempt 1: Call SetLocation via ProcessEvent
+    // Even if NativeFunc appears NULL, PE might handle it via script execution
     bool locWritten = false;
     if (origPE && s_SetLocFunc && s_SetLocSafe) {
         struct {
@@ -530,10 +556,19 @@ void UpdateGhostPuppet(const PlayerStateData& remoteState)
             origPE(s_Puppet, s_SetLocFunc, &locParms, nullptr);
             locWritten = true;
         } __except(EXCEPTION_EXECUTE_HANDLER) {
-            LOG_WARN("[Puppet] SetLocation PE crashed FCG falling back to raw write");
+            LOG_WARN("[Puppet] SetLocation PE crashed — disabling PE path");
             s_SetLocSafe = false;
         }
     }
+
+    // Attempt 2: Direct native call if PE failed and we have the address
+    if (!locWritten && s_SetLocNativeAddr && s_SetLocSafe) {
+        // UE2 native calling convention: void __thiscall Func(UObject* Context, FFrame& Stack, void* Result)
+        // But for ProcessEvent dispatch, params are passed as a flat struct, not FFrame.
+        // Skip this for now — the raw fallback is safer.
+    }
+
+    // Fallback: raw memory write (visual won't update, but position data is correct)
     if (!locWritten && s_PuppetLocOffset > 0) {
         uint8_t* raw = reinterpret_cast<uint8_t*>(s_Puppet);
         memcpy(raw + s_PuppetLocOffset, &s_InterpX, 4);
@@ -541,7 +576,7 @@ void UpdateGhostPuppet(const PlayerStateData& remoteState)
         memcpy(raw + s_PuppetLocOffset + 8, &s_InterpZ, 4);
     }
 
-    // Call SetRotation via ProcessEvent
+    // SetRotation via ProcessEvent
     bool rotWritten = false;
     if (origPE && s_SetRotFunc && s_SetRotSafe) {
         struct {
@@ -555,7 +590,7 @@ void UpdateGhostPuppet(const PlayerStateData& remoteState)
             origPE(s_Puppet, s_SetRotFunc, &rotParms, nullptr);
             rotWritten = true;
         } __except(EXCEPTION_EXECUTE_HANDLER) {
-            LOG_WARN("[Puppet] SetRotation PE crashed FCG falling back to raw write");
+            LOG_WARN("[Puppet] SetRotation PE crashed — disabling PE path");
             s_SetRotSafe = false;
         }
     }
