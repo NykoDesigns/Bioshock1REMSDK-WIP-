@@ -9,6 +9,7 @@
 #include <cstring>
 #include <cmath>
 #include <string>
+#include <vector>
 
 namespace bs1sdk {
 
@@ -45,6 +46,125 @@ static bool s_IsAIPuppet = false;       // true if puppet is a ShockPawn subclas
 // Spawn retry cooldown — don't spam every frame
 static float s_SpawnRetryTimer = 999.0f;  // start high so first attempt is immediate
 constexpr float SPAWN_RETRY_INTERVAL = 5.0f;
+
+// Direct MoveActor call (bypasses ProcessEvent entirely)
+// ULevel::MoveActor signature: INT __thiscall MoveActor(AActor*, FVector Delta, FRotator DeltaRot, DWORD Flags, FCheckResult* Hit)
+// In MSVC 32-bit thiscall, FVector/FRotator POD structs are placed directly on stack.
+typedef int (__thiscall *MoveActorFn)(
+    void* thisLevel,                              // ULevel* in ECX
+    void* actor,                                  // AActor*
+    float dX, float dY, float dZ,                 // FVector Delta (by value)
+    int rotPitch, int rotYaw, int rotRoll,         // FRotator DeltaRot (by value)
+    unsigned int flags,                            // DWORD MoveFlags
+    void* hitResult                                // FCheckResult* (NULL)
+);
+
+static MoveActorFn s_MoveActorFn = nullptr;
+static void*       s_ULevel = nullptr;
+static int         s_XLevelOffset = -1;  // offset of XLevel on Actor
+
+/// Scan the first N bytes of a native function for E8 (CALL rel32) instructions.
+/// Returns all call targets found.
+static std::vector<uintptr_t> ScanForCallTargets(uintptr_t funcAddr, int scanBytes)
+{
+    std::vector<uintptr_t> targets;
+    if (!funcAddr || !IsSafeToRead(reinterpret_cast<const void*>(funcAddr), scanBytes))
+        return targets;
+
+    const uint8_t* code = reinterpret_cast<const uint8_t*>(funcAddr);
+    for (int i = 0; i < scanBytes - 5; i++) {
+        if (code[i] == 0xE8) {
+            // E8 XX XX XX XX = CALL rel32
+            int32_t rel = *(int32_t*)(code + i + 1);
+            uintptr_t target = funcAddr + i + 5 + rel;
+            // Sanity: target should be in code range
+            if (target > 0x10000 && target < 0x7FFFFFFF &&
+                IsSafeToRead(reinterpret_cast<const void*>(target), 4)) {
+                targets.push_back(target);
+            }
+            i += 4; // skip the rel32 bytes
+        }
+    }
+    return targets;
+}
+
+/// Find ULevel from the puppet's XLevel field or GObjects.
+static void* FindULevel(UObject* actor)
+{
+    // Method 1: Read XLevel from the actor's properties
+    UStruct* cls = reinterpret_cast<UStruct*>(actor->GetClass());
+    if (cls) {
+        std::vector<PropertyInfo> props = WalkProperties(cls);
+        PropertyInfo* xlev = FindProperty(cls, "XLevel", props);
+        if (!xlev) xlev = FindProperty(cls, "Level", props);
+        if (xlev) {
+            s_XLevelOffset = xlev->Offset;
+            uintptr_t levelPtr = *(uintptr_t*)(reinterpret_cast<uint8_t*>(actor) + xlev->Offset);
+            if (levelPtr && IsSafeToRead(reinterpret_cast<const void*>(levelPtr), 0x10)) {
+                LOG_INFO("[Puppet] ULevel from XLevel property @ offset {} = 0x{:08X}",
+                         xlev->Offset, (uint32_t)levelPtr);
+                return reinterpret_cast<void*>(levelPtr);
+            }
+        }
+    }
+
+    // Method 2: Scan GObjects for class "Level"
+    const auto& globals = GetEngineGlobals();
+    if (!globals.IsValid()) return nullptr;
+    uintptr_t objData = *reinterpret_cast<uintptr_t*>(globals.GObjects);
+    int32_t objCount = *reinterpret_cast<int32_t*>(globals.GObjects + 4);
+
+    for (int i = 0; i < objCount && i < 120000; i++) {
+        uintptr_t ptr = *reinterpret_cast<uintptr_t*>(objData + i * 4);
+        if (!ptr || ptr < 0x10000u) continue;
+        if (!IsSafeToRead(reinterpret_cast<const void*>(ptr), 0x34)) continue;
+        UObject* obj = reinterpret_cast<UObject*>(ptr);
+        if (obj->GetObjClassName() == "Level") {
+            LOG_INFO("[Puppet] ULevel from GObjects[{}] = 0x{:08X}", i, (uint32_t)ptr);
+            return reinterpret_cast<void*>(ptr);
+        }
+    }
+    return nullptr;
+}
+
+/// Discover MoveActor by scanning SetLocation's native code for CALL instructions.
+/// SetLocation internally calls: Stack.Step(), P_FINISH, then MoveActor.
+/// MoveActor is typically the LAST call in the function.
+static bool DiscoverMoveActor(uintptr_t setLocNativeAddr)
+{
+    LOG_INFO("[Puppet] Scanning native at 0x{:08X} for MoveActor...", (uint32_t)setLocNativeAddr);
+
+    // Dump first 16 bytes for reference
+    const uint8_t* code = reinterpret_cast<const uint8_t*>(setLocNativeAddr);
+    LOG_INFO("[Puppet]   Bytes: {:02X} {:02X} {:02X} {:02X} {:02X} {:02X} {:02X} {:02X}  {:02X} {:02X} {:02X} {:02X} {:02X} {:02X} {:02X} {:02X}",
+             code[0], code[1], code[2], code[3], code[4], code[5], code[6], code[7],
+             code[8], code[9], code[10], code[11], code[12], code[13], code[14], code[15]);
+
+    auto targets = ScanForCallTargets(setLocNativeAddr, 256);
+    LOG_INFO("[Puppet]   Found {} CALL targets in SetLocation native:", targets.size());
+    for (size_t i = 0; i < targets.size(); i++) {
+        LOG_INFO("[Puppet]     CALL[{}] -> 0x{:08X}", i, (uint32_t)targets[i]);
+    }
+
+    // Heuristic: MoveActor is typically the last or second-to-last CALL.
+    // SetLocation's native does: P_GET_VECTOR (1-2 calls), P_FINISH (1 call),
+    // then GetLevel()->MoveActor() (1-2 calls: GetLevel + MoveActor, or just MoveActor if inlined).
+    // The LAST call is usually MoveActor.
+    if (targets.size() >= 2) {
+        // Try the last CALL as MoveActor
+        s_MoveActorFn = reinterpret_cast<MoveActorFn>(targets.back());
+        LOG_INFO("[Puppet]   Selected CALL[{}] = 0x{:08X} as MoveActor candidate",
+                 targets.size() - 1, (uint32_t)targets.back());
+        return true;
+    } else if (targets.size() == 1) {
+        s_MoveActorFn = reinterpret_cast<MoveActorFn>(targets[0]);
+        LOG_INFO("[Puppet]   Only one CALL found, using it as MoveActor");
+        return true;
+    }
+
+    LOG_WARN("[Puppet]   No CALL instructions found in SetLocation native!");
+    return false;
+}
 
 // ─── Helpers ───────────────────────────────────────────────────────────
 
@@ -458,24 +578,24 @@ void UpdateGhostPuppet(const PlayerStateData& remoteState)
     s_InterpY += (s_TargetY - s_InterpY) * t;
     s_InterpZ += (s_TargetZ - s_InterpZ) * t;
 
-    // ─── Move puppet via ProcessEvent ───
-    // Discovery: GNatives only has ~256 core bytecode natives.
-    // SetLocation (iNative=4014) is an EXTENDED native dispatched via
-    // UFunction->Func pointer at +0x70, not GNatives.
-    // Strategy: Call ProcessEvent directly — the engine knows how to dispatch.
+    // ─── Move puppet ───
+    // ProcessEvent + SetLocation crashes on borrowed StaticMeshActors because
+    // they're in the static octree and MoveActor can't manipulate them there.
+    // Solution: call MoveActor DIRECTLY, bypassing ProcessEvent entirely.
     static bool s_Diagnosed = false;
     static bool s_SetLocSafe = true;
     static bool s_SetRotSafe = true;
-    static uintptr_t s_SetLocNativeAddr = 0; // direct native call fallback
+    static uintptr_t s_SetLocNativeAddr = 0;
     static uintptr_t s_SetRotNativeAddr = 0;
+    static bool s_MoveActorDiscovered = false;
     ProcessEventFn origPE = GetOriginalProcessEvent();
 
-    // One-time: diagnose UFunction layout and find native addresses
+    // One-time: diagnose UFunction layout, discover MoveActor, find ULevel
     if (!s_Diagnosed && s_SetLocFunc) {
         s_Diagnosed = true;
         const uint8_t* slRaw = reinterpret_cast<const uint8_t*>(s_SetLocFunc);
 
-        // Dump raw bytes 0x60-0x7F for analysis
+        // Dump raw bytes for analysis
         LOG_INFO("[Puppet] SetLocation UFunction @ 0x{:08X}", (uint32_t)(uintptr_t)s_SetLocFunc);
         LOG_INFO("[Puppet]   +60: {:02X} {:02X} {:02X} {:02X}  {:02X} {:02X} {:02X} {:02X}  {:02X} {:02X} {:02X} {:02X}  {:02X} {:02X} {:02X} {:02X}",
                  slRaw[0x60], slRaw[0x61], slRaw[0x62], slRaw[0x63],
@@ -488,87 +608,101 @@ void UpdateGhostPuppet(const PlayerStateData& remoteState)
                  slRaw[0x78], slRaw[0x79], slRaw[0x7A], slRaw[0x7B],
                  slRaw[0x7C], slRaw[0x7D], slRaw[0x7E], slRaw[0x7F]);
 
-        // Read fields at expected offsets
-        uint32_t funcFlags = *(uint32_t*)(slRaw + 0x64);
-        uint16_t iNative   = *(uint16_t*)(slRaw + 0x68);
-        uint8_t  numParms  = *(uint8_t*)(slRaw + 0x6B);
-        uint16_t parmsSize = *(uint16_t*)(slRaw + 0x6C);
+        uint16_t iNative = *(uint16_t*)(slRaw + 0x68);
         uintptr_t nativeFunc = *(uintptr_t*)(slRaw + 0x70);
+        LOG_INFO("[Puppet]   iNative={} NativeFunc(+0x70)=0x{:08X}", iNative, (uint32_t)nativeFunc);
 
-        LOG_INFO("[Puppet]   FuncFlags=0x{:08X} iNative={} NumParms={} ParmsSize={}",
-                 funcFlags, iNative, numParms, parmsSize);
-        LOG_INFO("[Puppet]   NativeFunc(+0x70)=0x{:08X}", (uint32_t)nativeFunc);
+        if (nativeFunc && IsSafeToRead(reinterpret_cast<const void*>(nativeFunc), 4)) {
+            s_SetLocNativeAddr = nativeFunc;
+            LOG_INFO("[Puppet]   NativeFunc is READABLE");
 
-        // Check if NativeFunc is a valid code pointer
-        if (nativeFunc != 0) {
-            if (IsSafeToRead(reinterpret_cast<const void*>(nativeFunc), 4)) {
-                LOG_INFO("[Puppet]   NativeFunc is READABLE — will try PE dispatch normally");
-                s_SetLocNativeAddr = nativeFunc;
-            } else {
-                LOG_WARN("[Puppet]   NativeFunc is NOT READABLE (0x{:08X}) — bad pointer!", (uint32_t)nativeFunc);
-            }
-        } else {
-            LOG_WARN("[Puppet]   NativeFunc is NULL!");
-            // Scan through additional offsets — maybe Func is at +0x74 or +0x78 in this build
-            for (int probe = 0x70; probe <= 0x80; probe += 4) {
-                uintptr_t val = *(uintptr_t*)(slRaw + probe);
-                if (val > 0x10000000 && val < 0x7FFFFFFF) {
-                    if (IsSafeToRead(reinterpret_cast<const void*>(val), 4)) {
-                        LOG_INFO("[Puppet]   Candidate NativeFunc at +0x{:02X} = 0x{:08X} (readable!)", probe, (uint32_t)val);
-                        if (s_SetLocNativeAddr == 0) s_SetLocNativeAddr = val;
-                    }
-                }
-            }
+            // Scan native code to discover MoveActor address
+            s_MoveActorDiscovered = DiscoverMoveActor(nativeFunc);
         }
 
-        // Also dump SetRotation if available
+        // Also get SetRotation native address
         if (s_SetRotFunc) {
             const uint8_t* srRaw = reinterpret_cast<const uint8_t*>(s_SetRotFunc);
             uintptr_t rotNF = *(uintptr_t*)(srRaw + 0x70);
             LOG_INFO("[Puppet] SetRotation NativeFunc(+0x70)=0x{:08X}", (uint32_t)rotNF);
-            if (rotNF != 0 && IsSafeToRead(reinterpret_cast<const void*>(rotNF), 4))
+            if (rotNF && IsSafeToRead(reinterpret_cast<const void*>(rotNF), 4))
                 s_SetRotNativeAddr = rotNF;
         }
 
-        // Log decision
-        if (s_SetLocNativeAddr) {
-            LOG_INFO("[Puppet] >>> Will call ProcessEvent for SetLocation (native at 0x{:08X})", (uint32_t)s_SetLocNativeAddr);
-        } else {
-            LOG_WARN("[Puppet] >>> No valid native found — ProcessEvent may execute script path or fail");
-            LOG_WARN("[Puppet] >>> Falling back to raw memory write (puppet won't update render octree)");
+        // Find ULevel for direct MoveActor calls
+        if (s_MoveActorDiscovered) {
+            s_ULevel = FindULevel(s_Puppet);
+            if (s_ULevel) {
+                LOG_INFO("[Puppet] >>> Direct MoveActor available! ULevel=0x{:08X} MoveActor=0x{:08X}",
+                         (uint32_t)(uintptr_t)s_ULevel, (uint32_t)(uintptr_t)s_MoveActorFn);
+            } else {
+                LOG_WARN("[Puppet] >>> MoveActor found but ULevel NOT found — cannot call directly");
+                s_MoveActorDiscovered = false;
+            }
+        }
+
+        if (!s_MoveActorDiscovered) {
+            LOG_WARN("[Puppet] >>> No direct MoveActor — will try PE then raw write");
         }
     }
 
-    // Attempt 1: Call SetLocation via ProcessEvent
-    // Even if NativeFunc appears NULL, PE might handle it via script execution
+    // Read current position from puppet (needed for MoveActor delta computation)
+    float curX = 0, curY = 0, curZ = 0;
+    if (s_PuppetLocOffset > 0) {
+        const uint8_t* raw = reinterpret_cast<const uint8_t*>(s_Puppet);
+        memcpy(&curX, raw + s_PuppetLocOffset, 4);
+        memcpy(&curY, raw + s_PuppetLocOffset + 4, 4);
+        memcpy(&curZ, raw + s_PuppetLocOffset + 8, 4);
+    }
+
     bool locWritten = false;
-    if (origPE && s_SetLocFunc && s_SetLocSafe) {
+
+    // Attempt 1: Direct MoveActor call (bypasses ProcessEvent entirely)
+    if (!locWritten && s_MoveActorDiscovered && s_MoveActorFn && s_ULevel) {
+        float dX = s_InterpX - curX;
+        float dY = s_InterpY - curY;
+        float dZ = s_InterpZ - curZ;
+
+        // Skip if delta is negligible
+        if (dX * dX + dY * dY + dZ * dZ > 0.01f) {
+            __try {
+                s_MoveActorFn(s_ULevel, s_Puppet,
+                              dX, dY, dZ,
+                              0, 0, 0,      // no rotation delta
+                              0, nullptr);   // no flags, no hit result
+                locWritten = true;
+            } __except(EXCEPTION_EXECUTE_HANDLER) {
+                DWORD exCode = GetExceptionCode();
+                LOG_WARN("[Puppet] MoveActor CRASHED (exception=0x{:08X}) — disabling", exCode);
+                s_MoveActorDiscovered = false;
+            }
+        } else {
+            locWritten = true; // no movement needed
+        }
+    }
+
+    // Attempt 2: ProcessEvent + SetLocation (may crash on static actors)
+    if (!locWritten && origPE && s_SetLocFunc && s_SetLocSafe) {
         struct {
             float X, Y, Z;
-            uint32_t bNoTest;
+            uint32_t bNoCheck;
             uint32_t ReturnValue;
         } locParms{};
         locParms.X = s_InterpX;
         locParms.Y = s_InterpY;
         locParms.Z = s_InterpZ;
-        locParms.bNoTest = 1;
+        locParms.bNoCheck = 1;
         __try {
             origPE(s_Puppet, s_SetLocFunc, &locParms, nullptr);
             locWritten = true;
         } __except(EXCEPTION_EXECUTE_HANDLER) {
-            LOG_WARN("[Puppet] SetLocation PE crashed — disabling PE path");
+            DWORD exCode = GetExceptionCode();
+            LOG_WARN("[Puppet] SetLocation PE crashed (exception=0x{:08X}) — disabling PE path", exCode);
             s_SetLocSafe = false;
         }
     }
 
-    // Attempt 2: Direct native call if PE failed and we have the address
-    if (!locWritten && s_SetLocNativeAddr && s_SetLocSafe) {
-        // UE2 native calling convention: void __thiscall Func(UObject* Context, FFrame& Stack, void* Result)
-        // But for ProcessEvent dispatch, params are passed as a flat struct, not FFrame.
-        // Skip this for now — the raw fallback is safer.
-    }
-
-    // Fallback: raw memory write (visual won't update, but position data is correct)
+    // Fallback: raw memory write (position data correct, but mesh won't move visually)
     if (!locWritten && s_PuppetLocOffset > 0) {
         uint8_t* raw = reinterpret_cast<uint8_t*>(s_Puppet);
         memcpy(raw + s_PuppetLocOffset, &s_InterpX, 4);
@@ -576,25 +710,8 @@ void UpdateGhostPuppet(const PlayerStateData& remoteState)
         memcpy(raw + s_PuppetLocOffset + 8, &s_InterpZ, 4);
     }
 
-    // SetRotation via ProcessEvent
-    bool rotWritten = false;
-    if (origPE && s_SetRotFunc && s_SetRotSafe) {
-        struct {
-            int32_t Pitch, Yaw, Roll;
-            uint32_t ReturnValue;
-        } rotParms{};
-        rotParms.Pitch = (int32_t)(s_TargetPitch * (65536.0f / 360.0f));
-        rotParms.Yaw = (int32_t)(s_TargetYaw * (65536.0f / 360.0f));
-        rotParms.Roll = 0;
-        __try {
-            origPE(s_Puppet, s_SetRotFunc, &rotParms, nullptr);
-            rotWritten = true;
-        } __except(EXCEPTION_EXECUTE_HANDLER) {
-            LOG_WARN("[Puppet] SetRotation PE crashed — disabling PE path");
-            s_SetRotSafe = false;
-        }
-    }
-    if (!rotWritten && s_PuppetRotOffset > 0) {
+    // Rotation: raw write (SetRotation via PE also crashes, and MoveActor handles rotation delta)
+    if (s_PuppetRotOffset > 0) {
         int32_t pitch = (int32_t)(s_TargetPitch * (65536.0f / 360.0f));
         int32_t yaw = (int32_t)(s_TargetYaw * (65536.0f / 360.0f));
         int32_t roll = 0;

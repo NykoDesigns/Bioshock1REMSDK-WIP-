@@ -2,10 +2,10 @@
 ║              BS1SDK CRASH REPORT v2.0                      ║
 ╚══════════════════════════════════════════════════════════════╝
 
-Time:       2026-05-15 13:33:34.715
-Uptime:     54.7 seconds (since SDK init)
-Thread:     21444 (0x53C4)
-Process:    34856
+Time:       2026-05-15 20:21:46.040
+Uptime:     61.7 seconds (since SDK init)
+Thread:     35232 (0x89A0)
+Process:    26032
 Context:    runtime:CoopTick
 
 === EXCEPTION ===
@@ -21,24 +21,24 @@ Offset:     0x00E78FF8
 PDB:        NOT FOUND (place .pdb next to DLL for symbols)
 
 === REGISTERS ===
-EAX=5E7EF88C  EBX=08B5DC00  ECX=A4ED0B90  EDX=0000037D
-ESI=0E9DB550  EDI=11418FF8  EBP=5E7EF8CC  ESP=5E7EF85C
+EAX=5E7FF564  EBX=11418FF8  ECX=A66CDEB0  EDX=00000000
+ESI=0EA057B0  EDI=0EA05814  EBP=5E7FF5A4  ESP=5E7FF52C
 EIP=11418FF8  EFLAGS=00010202
 
 === REGISTER POINTER ANALYSIS ===
-  EAX = 0x5E7EF88C  -> [0xC68B52E0]  -> [0xFF8C6D43]
-         hex: E0 52 8B C6 16 7B E0 44 17 FA F2 45 01 00 00 00 00 00 00 00 F0 DC B5 08 73 A3 56 62 2C 00 00 00 
-  EBX = 0x08B5DC00  -> [0x00000000]
-         hex: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
-  ECX = 0xA4ED0B90  -> [0x11327868]  -> [0x107A1090]  -> [0x64EC8B55]
-         hex: 68 78 32 11 78 64 01 00 00 00 00 00 D0 6A A7 97 D0 1C DC A4 00 00 00 00 FF FF FF FF E0 5F 89 64 
-  EDX = 0x0000037D
-  ESI = 0x0E9DB550  -> [0xB0DEA029]  -> [0xDD3D70F0]
-         hex: 29 A0 DE B0 0E 00 00 00 00 29 60 D9 B0 0E 00 00 00 00 0B 00 00 00 00 00 00 00 00 00 00 00 00 00 
-  EDI = 0x11418FF8  -> BioshockHD.exe+0xE78FF8  -> [0x00000000]
+  EAX = 0x5E7FF564  -> [0xC68ACC7B]  -> [0xD4D2C6FF]
+         hex: 7B CC 8A C6 53 9F DC 44 E7 F9 F2 45 01 00 00 00 00 00 00 00 40 90 B6 08 43 A6 56 62 2C 00 00 00 
+  EBX = 0x11418FF8  -> BioshockHD.exe+0xE78FF8  -> [0x00000000]
          hex: 00 00 00 00 00 00 00 00 00 00 00 00 00 1E 7A 11 E8 8F 41 11 00 1E 7A 11 03 00 00 00 00 00 00 00 
-  EBP = 0x5E7EF8CC  -> [0x5E7EF8E0]  -> [0x5E7EF8F0]  -> [0x5E7EF96C]
-         hex: E0 F8 7E 5E 0F 20 57 62 20 EF 81 62 20 EF 81 62 14 13 81 62 F0 F8 7E 5E AE 23 57 62 F8 12 81 62 
+  ECX = 0xA66CDEB0  -> [0x11327868]  -> [0x107A1090]  -> [0x64EC8B55]
+         hex: 68 78 32 11 78 64 01 00 00 00 00 00 60 DE 1D 99 50 F5 66 A6 00 00 00 00 FF FF FF FF 10 3E 93 64 
+  EDX = 0x00000000  (NULL)
+  ESI = 0x0EA057B0  -> [0x113CEF1C]  -> [0x10CB8320]  -> [0x6AEC8B55]
+         hex: 1C EF 3C 11 16 1B 00 00 00 00 00 00 80 16 97 0E 00 00 00 00 00 00 00 00 FF FF FF FF 20 C9 32 08 
+  EDI = 0x0EA05814  -> [0x00000000]
+         hex: 00 00 00 00 AE 0F 00 00 00 00 00 00 40 A1 8D 0E 13 00 00 00 3A 00 00 00 E8 EF 00 00 F7 04 00 00 
+  EBP = 0x5E7FF5A4  -> [0x5E7FF5B8]  -> [0x5E7FF5C8]  -> [0x5E7FF644]
+         hex: B8 F5 7F 5E DF 22 57 62 F8 5F 82 62 F8 5F 82 62 14 83 81 62 C8 F5 7F 5E 7E 26 57 62 F8 82 81 62 
 
 === CODE BYTES (EIP-0x40 .. EIP+0x40) ===
   11418FB8:  5C  CB  3F  11  AC  CB  3F  11  00  00  00  00  00  00  00  00   \.?...?.........
@@ -54,271 +54,321 @@ EIP=11418FF8  EFLAGS=00010202
   # 0  ntdll.dll+0x0006D7C1  RtlGetAppContainerNamedObjectPath+0x231
 
 === RAW STACK (2048 bytes from ESP) ===
-  5E7EFD0C: FFFFFFFF 77CC4996 00000000 00000000  .....I.w........
-  5E7EFD1C: 10CACBB0 52803E40 00000000 00000000  ....@>.R........
-  5E7EFD2C: 00000000 00000000 00000000 00000000  ................
-  5E7EFD3C: 00000000 00000000 00000000 00000000  ................
-  5E7EFD4C: 00000000 00000000 00000000 00000000  ................
-  5E7EFD5C: 00000000 00000000 00000000 00000000  ................
-  5E7EFD6C: 00000000 00000000 00000000 00000000  ................
-  5E7EFD7C: 00000000 00000000 00000000 00000000  ................
-  5E7EFD8C: 00000000 00000000 00000000 00000000  ................
-  5E7EFD9C: 00000000 00000000 00000000 00000000  ................
-  5E7EFDAC: 00000000 00000000 00000000 00000000  ................
-  5E7EFDBC: 00000000 00000000 00000000 00000000  ................
-  5E7EFDCC: 00000000 00000000 00000000 00000000  ................
-  5E7EFDDC: 00000000 00000000 00000000 00000000  ................
-  5E7EFDEC: 00000000 00000000 00000000 00000000  ................
-  5E7EFDFC: 00000000 00000000 00000000 00000000  ................
-  5E7EFE0C: 00000000 00000000 00000000 00000000  ................
-  5E7EFE1C: 00000000 00000000 00000000 00000000  ................
-  5E7EFE2C: 00000000 00000000 00000000 00000000  ................
-  5E7EFE3C: 00000000 00000000 00000000 00000000  ................
-  5E7EFE4C: 00000000 00000000 00000000 00000000  ................
-  5E7EFE5C: 00000000 00000000 00000000 00000000  ................
-  5E7EFE6C: 00000000 00000000 00000000 00000000  ................
-  5E7EFE7C: 00000000 00000000 00000000 00000000  ................
-  5E7EFE8C: 00000000 00000000 00000000 00000000  ................
-  5E7EFE9C: 00000000 00000000 00000000 00000000  ................
-  5E7EFEAC: 00000000 00000000 00000000 00000000  ................
-  5E7EFEBC: 00000000 00000000 00000000 00000000  ................
-  5E7EFECC: 00000000 00000000 00000000 00000000  ................
-  5E7EFEDC: 00000000 00000000 00000000 00000000  ................
-  5E7EFEEC: 00000000 00000000 00000000 00000000  ................
-  5E7EFEFC: 00000000 00000000 00000000 00000000  ................
-  5E7EFF0C: 00000000 00000000 00000000 00000000  ................
-  5E7EFF1C: 00000000 00000000 00000000 00000000  ................
-  5E7EFF2C: 00000000 00000000 00000000 00000000  ................
-  5E7EFF3C: 00000000 00000000 00000000 00000000  ................
-  5E7EFF4C: 00000000 00000000 00000000 00000000  ................
-  5E7EFF5C: 00000000 00000000 00000000 00000000  ................
-  5E7EFF6C: 00000000 00000000 00000000 00000000  ................
-  5E7EFF7C: 00000000 00000000 00000000 00000000  ................
-  5E7EFF8C: 00000000 00000000 00000000 00000000  ................
-  5E7EFF9C: 00000000 00000000 00000000 00000000  ................
-  5E7EFFAC: 00000000 00000000 00000000 00000000  ................
-  5E7EFFBC: 00000000 00000000 00000000 00000000  ................
-  5E7EFFCC: 00000000 00000000 00000000 00000000  ................
-  5E7EFFDC: 00000000 00000000 00000000 00000000  ................
-  5E7EFFEC: 00000000 00000000 00000000 00000000  ................
+  5E7FF9E4: FFFFFFFF 77CC49AF 00000000 00000000  .....I.w........
+  5E7FF9F4: 10CACBB0 4ED3C8F0 00000000 00000000  .......N........
+  5E7FFA04: 00000000 00000000 00000000 00000000  ................
+  5E7FFA14: 00000000 00000000 00000000 00000000  ................
+  5E7FFA24: 00000000 00000000 00000000 00000000  ................
+  5E7FFA34: 00000000 00000000 00000000 00000000  ................
+  5E7FFA44: 00000000 00000000 00000000 00000000  ................
+  5E7FFA54: 00000000 00000000 00000000 00000000  ................
+  5E7FFA64: 00000000 00000000 00000000 00000000  ................
+  5E7FFA74: 00000000 00000000 00000000 00000000  ................
+  5E7FFA84: 00000000 00000000 00000000 00000000  ................
+  5E7FFA94: 00000000 00000000 00000000 00000000  ................
+  5E7FFAA4: 00000000 00000000 00000000 00000000  ................
+  5E7FFAB4: 00000000 00000000 00000000 00000000  ................
+  5E7FFAC4: 00000000 00000000 00000000 00000000  ................
+  5E7FFAD4: 00000000 00000000 00000000 00000000  ................
+  5E7FFAE4: 00000000 00000000 00000000 00000000  ................
+  5E7FFAF4: 00000000 00000000 00000000 00000000  ................
+  5E7FFB04: 00000000 00000000 00000000 00000000  ................
+  5E7FFB14: 00000000 00000000 00000000 00000000  ................
+  5E7FFB24: 00000000 00000000 00000000 00000000  ................
+  5E7FFB34: 00000000 00000000 00000000 00000000  ................
+  5E7FFB44: 00000000 00000000 00000000 00000000  ................
+  5E7FFB54: 00000000 00000000 00000000 00000000  ................
+  5E7FFB64: 00000000 00000000 00000000 00000000  ................
+  5E7FFB74: 00000000 00000000 00000000 00000000  ................
+  5E7FFB84: 00000000 00000000 00000000 00000000  ................
+  5E7FFB94: 00000000 00000000 00000000 00000000  ................
+  5E7FFBA4: 00000000 00000000 00000000 00000000  ................
+  5E7FFBB4: 00000000 00000000 00000000 00000000  ................
+  5E7FFBC4: 00000000 00000000 00000000 00000000  ................
+  5E7FFBD4: 00000000 00000000 00000000 00000000  ................
+  5E7FFBE4: 00000000 00000000 00000000 00000000  ................
+  5E7FFBF4: 00000000 00000000 00000000 00000000  ................
+  5E7FFC04: 00000000 00000000 00000000 00000000  ................
+  5E7FFC14: 00000000 00000000 00000000 00000000  ................
+  5E7FFC24: 00000000 00000000 00000000 00000000  ................
+  5E7FFC34: 00000000 00000000 00000000 00000000  ................
+  5E7FFC44: 00000000 00000000 00000000 00000000  ................
+  5E7FFC54: 00000000 00000000 00000000 00000000  ................
+  5E7FFC64: 00000000 00000000 00000000 00000000  ................
+  5E7FFC74: 00000000 00000000 00000000 00000000  ................
+  5E7FFC84: 00000000 00000000 00000000 00000000  ................
+  5E7FFC94: 00000000 00000000 00000000 00000000  ................
+  5E7FFCA4: 00000000 00000000 00000000 00000000  ................
+  5E7FFCB4: 00000000 00000000 00000000 00000000  ................
+  5E7FFCC4: 00000000 00000000 00000000 00000000  ................
+  5E7FFCD4: 00000000 00000000 00000000 00000000  ................
+  5E7FFCE4: 00000000 00000000 00000000 00000000  ................
+  5E7FFCF4: 00000000 00000000 00000000 00000000  ................
+  5E7FFD04: 00000000 00000000 00000000 00000000  ................
+  5E7FFD14: 00000000 00000000 00000000 00000000  ................
+  5E7FFD24: 00000000 00000000 00000000 00000000  ................
+  5E7FFD34: 00000000 00000000 00000000 00000000  ................
+  5E7FFD44: 00000000 00000000 00000000 00000000  ................
+  5E7FFD54: 00000000 00000000 00000000 00000000  ................
+  5E7FFD64: 00000000 00000000 00000000 00000000  ................
+  5E7FFD74: 00000000 00000000 00000000 00000000  ................
+  5E7FFD84: 00000000 00000000 00000000 00000000  ................
+  5E7FFD94: 00000000 00000000 00000000 00000000  ................
+  5E7FFDA4: 00000000 00000000 00000000 00000000  ................
+  5E7FFDB4: 00000000 00000000 00000000 00000000  ................
+  5E7FFDC4: 00000000 00000000 00000000 00000000  ................
+  5E7FFDD4: 00000000 00000000 00000000 00000000  ................
+  5E7FFDE4: 00000000 00000000 00000000 00000000  ................
+  5E7FFDF4: 00000000 00000000 00000000 00000000  ................
+  5E7FFE04: 00000000 00000000 00000000 00000000  ................
+  5E7FFE14: 00000000 00000000 00000000 00000000  ................
+  5E7FFE24: 00000000 00000000 00000000 00000000  ................
+  5E7FFE34: 00000000 00000000 00000000 00000000  ................
+  5E7FFE44: 00000000 00000000 00000000 00000000  ................
+  5E7FFE54: 00000000 00000000 00000000 00000000  ................
+  5E7FFE64: 00000000 00000000 00000000 00000000  ................
+  5E7FFE74: 00000000 00000000 00000000 00000000  ................
+  5E7FFE84: 00000000 00000000 00000000 00000000  ................
+  5E7FFE94: 00000000 00000000 00000000 00000000  ................
+  5E7FFEA4: 00000000 00000000 00000000 00000000  ................
+  5E7FFEB4: 00000000 00000000 00000000 00000000  ................
+  5E7FFEC4: 00000000 00000000 00000000 00000000  ................
+  5E7FFED4: 00000000 00000000 00000000 00000000  ................
+  5E7FFEE4: 00000000 00000000 00000000 00000000  ................
+  5E7FFEF4: 00000000 00000000 00000000 00000000  ................
+  5E7FFF04: 00000000 00000000 00000000 00000000  ................
+  5E7FFF14: 00000000 00000000 00000000 00000000  ................
+  5E7FFF24: 00000000 00000000 00000000 00000000  ................
+  5E7FFF34: 00000000 00000000 00000000 00000000  ................
+  5E7FFF44: 00000000 00000000 00000000 00000000  ................
+  5E7FFF54: 00000000 00000000 00000000 00000000  ................
+  5E7FFF64: 00000000 00000000 00000000 00000000  ................
+  5E7FFF74: 00000000 00000000 00000000 00000000  ................
+  5E7FFF84: 00000000 00000000 00000000 00000000  ................
+  5E7FFF94: 00000000 00000000 00000000 00000000  ................
+  5E7FFFA4: 00000000 00000000 00000000 00000000  ................
+  5E7FFFB4: 00000000 00000000 00000000 00000000  ................
+  5E7FFFC4: 00000000 00000000 00000000 00000000  ................
+  5E7FFFD4: 00000000 00000000 00000000 00000000  ................
+  5E7FFFE4: 00000000 00000000 00000000 00000000  ................
 
 === RETURN ADDRESS SCAN (all modules) ===
-  ESP+0004: 0x77CC4996  [ntdll.dll+0x000B4996]
+  ESP+0004: 0x77CC49AF  [ntdll.dll+0x000B49AF]
   ESP+0010: 0x10CACBB0  [BioshockHD.exe+0x0070CBB0]
 
 === BREADCRUMBS (last 128, newest first) ===
-  [ 0] -  0.016s  tid=21444  CoopTick: NetTick
-  [ 1] -  0.016s  tid=21444  CoopTick: TickSaveTransfer
-  [ 2] -  0.016s  tid=21444  CoopTick: TickEconomySync
-  [ 3] -  0.047s  tid=21444  CoopTick: CoopSyncProcessPackets
-  [ 4] -  0.047s  tid=21444  CoopTick: NetTick
-  [ 5] -  0.063s  tid=21444  CoopTick: TickSaveTransfer
-  [ 6] -  0.063s  tid=21444  CoopTick: TickEconomySync
-  [ 7] -  0.063s  tid=21444  CoopTick: CoopSyncProcessPackets
-  [ 8] -  0.063s  tid=21444  CoopTick: NetTick
-  [ 9] -  0.063s  tid=21444  CoopTick: TickSaveTransfer
-  [10] -  0.063s  tid=21444  CoopTick: TickEconomySync
-  [11] -  0.063s  tid=21444  CoopTick: CoopSyncProcessPackets
-  [12] -  0.078s  tid=21444  CoopTick: NetTick
-  [13] -  0.078s  tid=21444  CoopTick: TickSaveTransfer
-  [14] -  0.078s  tid=21444  CoopTick: TickEconomySync
-  [15] -  0.078s  tid=21444  CoopTick: CoopSyncProcessPackets
-  [16] -  0.078s  tid=21444  CoopTick: NetTick
-  [17] -  0.094s  tid=21444  CoopTick: TickSaveTransfer
-  [18] -  0.094s  tid=21444  CoopTick: TickEconomySync
-  [19] -  0.094s  tid=21444  CoopTick: CoopSyncProcessPackets
-  [20] -  0.094s  tid=21444  CoopTick: NetTick
-  [21] -  0.094s  tid=21444  CoopTick: TickSaveTransfer
-  [22] -  0.094s  tid=21444  CoopTick: TickEconomySync
-  [23] -  0.094s  tid=21444  CoopTick: CoopSyncProcessPackets
-  [24] -  0.094s  tid=21444  CoopTick: NetTick
-  [25] -  0.109s  tid=21444  CoopTick: TickSaveTransfer
-  [26] -  0.109s  tid=21444  CoopTick: TickEconomySync
-  [27] -  0.109s  tid=21444  CoopTick: CoopSyncProcessPackets
-  [28] -  0.109s  tid=21444  CoopTick: NetTick
-  [29] -  0.109s  tid=21444  CoopTick: TickSaveTransfer
-  [30] -  0.109s  tid=21444  CoopTick: TickEconomySync
-  [31] -  0.109s  tid=21444  CoopTick: CoopSyncProcessPackets
-  [32] -  0.125s  tid=21444  CoopTick: NetTick
-  [33] -  0.125s  tid=21444  CoopTick: TickSaveTransfer
-  [34] -  0.125s  tid=21444  CoopTick: TickEconomySync
-  [35] -  0.125s  tid=21444  CoopTick: CoopSyncProcessPackets
-  [36] -  0.125s  tid=21444  CoopTick: NetTick
-  [37] -  0.125s  tid=21444  CoopTick: TickSaveTransfer
-  [38] -  0.125s  tid=21444  CoopTick: TickEconomySync
-  [39] -  0.125s  tid=21444  CoopTick: CoopSyncProcessPackets
-  [40] -  0.141s  tid=21444  CoopTick: NetTick
-  [41] -  0.141s  tid=21444  CoopTick: TickSaveTransfer
-  [42] -  0.141s  tid=21444  CoopTick: TickEconomySync
-  [43] -  0.141s  tid=21444  CoopTick: CoopSyncProcessPackets
-  [44] -  0.141s  tid=21444  CoopTick: NetTick
-  [45] -  0.156s  tid=21444  CoopTick: TickSaveTransfer
-  [46] -  0.156s  tid=21444  CoopTick: TickEconomySync
-  [47] -  0.156s  tid=21444  CoopTick: CoopSyncProcessPackets
-  [48] -  0.156s  tid=21444  CoopTick: NetTick
-  [49] -  0.156s  tid=21444  CoopTick: TickSaveTransfer
-  [50] -  0.156s  tid=21444  CoopTick: TickEconomySync
-  [51] -  0.156s  tid=21444  CoopTick: CoopSyncProcessPackets
-  [52] -  0.172s  tid=21444  CoopTick: NetTick
-  [53] -  0.172s  tid=21444  CoopTick: TickSaveTransfer
-  [54] -  0.172s  tid=21444  CoopTick: TickEconomySync
-  [55] -  0.172s  tid=21444  CoopTick: CoopSyncProcessPackets
-  [56] -  0.172s  tid=21444  CoopTick: NetTick
-  [57] -  0.172s  tid=21444  CoopTick: TickSaveTransfer
-  [58] -  0.172s  tid=21444  CoopTick: TickEconomySync
-  [59] -  0.172s  tid=21444  CoopTick: CoopSyncProcessPackets
-  [60] -  0.188s  tid=21444  CoopTick: NetTick
-  [61] -  0.188s  tid=21444  CoopTick: TickSaveTransfer
-  [62] -  0.188s  tid=21444  CoopTick: TickEconomySync
-  [63] -  0.188s  tid=21444  CoopTick: CoopSyncProcessPackets
-  [64] -  0.188s  tid=21444  CoopTick: NetTick
-  [65] -  0.203s  tid=21444  CoopTick: TickSaveTransfer
-  [66] -  0.203s  tid=21444  CoopTick: TickEconomySync
-  [67] -  0.203s  tid=21444  CoopTick: CoopSyncProcessPackets
-  [68] -  0.203s  tid=21444  CoopTick: NetTick
-  [69] -  0.203s  tid=21444  CoopTick: TickSaveTransfer
-  [70] -  0.203s  tid=21444  CoopTick: TickEconomySync
-  [71] -  0.203s  tid=21444  CoopTick: CoopSyncProcessPackets
-  [72] -  0.219s  tid=21444  CoopTick: NetTick
-  [73] -  0.219s  tid=21444  CoopTick: TickSaveTransfer
-  [74] -  0.219s  tid=21444  CoopTick: TickEconomySync
-  [75] -  0.219s  tid=21444  CoopTick: CoopSyncProcessPackets
-  [76] -  0.219s  tid=21444  CoopTick: NetTick
-  [77] -  0.234s  tid=21444  CoopTick: TickSaveTransfer
-  [78] -  0.234s  tid=21444  CoopTick: TickEconomySync
-  [79] -  0.234s  tid=21444  CoopTick: CoopSyncProcessPackets
-  [80] -  0.234s  tid=21444  CoopTick: NetTick
-  [81] -  0.234s  tid=21444  CoopTick: TickSaveTransfer
-  [82] -  0.234s  tid=21444  CoopTick: TickEconomySync
-  [83] -  0.234s  tid=21444  CoopTick: CoopSyncProcessPackets
-  [84] -  0.234s  tid=21444  CoopTick: NetTick
-  [85] -  0.250s  tid=21444  CoopTick: TickSaveTransfer
-  [86] -  0.250s  tid=21444  CoopTick: TickEconomySync
-  [87] -  0.250s  tid=21444  CoopTick: CoopSyncProcessPackets
-  [88] -  0.250s  tid=21444  CoopTick: NetTick
-  [89] -  0.250s  tid=21444  CoopTick: TickSaveTransfer
-  [90] -  0.250s  tid=21444  CoopTick: TickEconomySync
-  [91] -  0.250s  tid=21444  CoopTick: CoopSyncProcessPackets
-  [92] -  0.266s  tid=21444  CoopTick: NetTick
-  [93] -  0.266s  tid=21444  CoopTick: TickSaveTransfer
-  [94] -  0.266s  tid=21444  CoopTick: TickEconomySync
-  [95] -  0.266s  tid=21444  CoopTick: CoopSyncProcessPackets
-  [96] -  0.266s  tid=21444  CoopTick: NetTick
-  [97] -  0.281s  tid=21444  CoopTick: TickSaveTransfer
-  [98] -  0.281s  tid=21444  CoopTick: TickEconomySync
-  [99] -  0.281s  tid=21444  CoopTick: CoopSyncProcessPackets
-  [100] -  0.281s  tid=21444  CoopTick: NetTick
-  [101] -  0.281s  tid=21444  CoopTick: TickSaveTransfer
-  [102] -  0.281s  tid=21444  CoopTick: TickEconomySync
-  [103] -  0.281s  tid=21444  CoopTick: CoopSyncProcessPackets
-  [104] -  0.297s  tid=21444  CoopTick: NetTick
-  [105] -  0.297s  tid=21444  CoopTick: TickSaveTransfer
-  [106] -  0.297s  tid=21444  CoopTick: TickEconomySync
-  [107] -  0.297s  tid=21444  CoopTick: CoopSyncProcessPackets
-  [108] -  0.297s  tid=21444  CoopTick: NetTick
-  [109] -  0.297s  tid=21444  CoopTick: TickSaveTransfer
-  [110] -  0.297s  tid=21444  CoopTick: TickEconomySync
-  [111] -  0.297s  tid=21444  CoopTick: CoopSyncProcessPackets
-  [112] -  0.313s  tid=21444  CoopTick: NetTick
-  [113] -  0.313s  tid=21444  CoopTick: TickSaveTransfer
-  [114] -  0.313s  tid=21444  CoopTick: TickEconomySync
-  [115] -  0.313s  tid=21444  CoopTick: CoopSyncProcessPackets
-  [116] -  0.313s  tid=21444  CoopTick: NetTick
-  [117] -  0.328s  tid=21444  CoopTick: TickSaveTransfer
-  [118] -  0.328s  tid=21444  CoopTick: TickEconomySync
-  [119] -  0.328s  tid=21444  CoopTick: CoopSyncProcessPackets
-  [120] -  0.328s  tid=21444  CoopTick: NetTick
-  [121] -  0.344s  tid=21444  CoopTick: TickSaveTransfer
-  [122] -  0.344s  tid=21444  CoopTick: TickEconomySync
-  [123] -  0.359s  tid=21444  CoopTick: CoopSyncProcessPackets
-  [124] -  0.375s  tid=21444  CoopTick: NetTick
-  [125] -  0.375s  tid=21444  CoopTick: TickSaveTransfer
-  [126] -  0.375s  tid=21444  CoopTick: TickEconomySync
-  [127] -  0.375s  tid=21444  CoopTick: CoopSyncProcessPackets
+  [ 0] -  0.015s  tid=35232  CoopTick: NetTick
+  [ 1] -  0.015s  tid=35232  CoopTick: TickSaveTransfer
+  [ 2] -  0.015s  tid=35232  CoopTick: TickEconomySync
+  [ 3] -  0.015s  tid=35232  CoopTick: CoopSyncProcessPackets
+  [ 4] -  0.031s  tid=35232  CoopTick: NetTick
+  [ 5] -  0.031s  tid=35232  CoopTick: TickSaveTransfer
+  [ 6] -  0.031s  tid=35232  CoopTick: TickEconomySync
+  [ 7] -  0.031s  tid=35232  CoopTick: CoopSyncProcessPackets
+  [ 8] -  0.031s  tid=35232  CoopTick: NetTick
+  [ 9] -  0.031s  tid=35232  CoopTick: TickSaveTransfer
+  [10] -  0.031s  tid=35232  CoopTick: TickEconomySync
+  [11] -  0.031s  tid=35232  CoopTick: CoopSyncProcessPackets
+  [12] -  0.046s  tid=35232  CoopTick: NetTick
+  [13] -  0.046s  tid=35232  CoopTick: TickSaveTransfer
+  [14] -  0.046s  tid=35232  CoopTick: TickEconomySync
+  [15] -  0.046s  tid=35232  CoopTick: CoopSyncProcessPackets
+  [16] -  0.046s  tid=35232  CoopTick: NetTick
+  [17] -  0.062s  tid=35232  CoopTick: TickSaveTransfer
+  [18] -  0.062s  tid=35232  CoopTick: TickEconomySync
+  [19] -  0.062s  tid=35232  CoopTick: CoopSyncProcessPackets
+  [20] -  0.062s  tid=35232  CoopTick: NetTick
+  [21] -  0.062s  tid=35232  CoopTick: TickSaveTransfer
+  [22] -  0.062s  tid=35232  CoopTick: TickEconomySync
+  [23] -  0.062s  tid=35232  CoopTick: CoopSyncProcessPackets
+  [24] -  0.078s  tid=35232  CoopTick: NetTick
+  [25] -  0.078s  tid=35232  CoopTick: TickSaveTransfer
+  [26] -  0.078s  tid=35232  CoopTick: TickEconomySync
+  [27] -  0.078s  tid=35232  CoopTick: CoopSyncProcessPackets
+  [28] -  0.078s  tid=35232  CoopTick: NetTick
+  [29] -  0.078s  tid=35232  CoopTick: TickSaveTransfer
+  [30] -  0.078s  tid=35232  CoopTick: TickEconomySync
+  [31] -  0.078s  tid=35232  CoopTick: CoopSyncProcessPackets
+  [32] -  0.093s  tid=35232  CoopTick: NetTick
+  [33] -  0.093s  tid=35232  CoopTick: TickSaveTransfer
+  [34] -  0.093s  tid=35232  CoopTick: TickEconomySync
+  [35] -  0.093s  tid=35232  CoopTick: CoopSyncProcessPackets
+  [36] -  0.093s  tid=35232  CoopTick: NetTick
+  [37] -  0.093s  tid=35232  CoopTick: TickSaveTransfer
+  [38] -  0.093s  tid=35232  CoopTick: TickEconomySync
+  [39] -  0.093s  tid=35232  CoopTick: CoopSyncProcessPackets
+  [40] -  0.109s  tid=35232  CoopTick: NetTick
+  [41] -  0.109s  tid=35232  CoopTick: TickSaveTransfer
+  [42] -  0.109s  tid=35232  CoopTick: TickEconomySync
+  [43] -  0.109s  tid=35232  CoopTick: CoopSyncProcessPackets
+  [44] -  0.140s  tid=35232  CoopTick: NetTick
+  [45] -  0.140s  tid=35232  CoopTick: TickSaveTransfer
+  [46] -  0.140s  tid=35232  CoopTick: TickEconomySync
+  [47] -  0.140s  tid=35232  CoopTick: CoopSyncProcessPackets
+  [48] -  0.140s  tid=35232  CoopTick: NetTick
+  [49] -  0.140s  tid=35232  CoopTick: TickSaveTransfer
+  [50] -  0.140s  tid=35232  CoopTick: TickEconomySync
+  [51] -  0.140s  tid=35232  CoopTick: CoopSyncProcessPackets
+  [52] -  0.156s  tid=35232  CoopTick: NetTick
+  [53] -  0.156s  tid=35232  CoopTick: TickSaveTransfer
+  [54] -  0.156s  tid=35232  CoopTick: TickEconomySync
+  [55] -  0.156s  tid=35232  CoopTick: CoopSyncProcessPackets
+  [56] -  0.156s  tid=35232  CoopTick: NetTick
+  [57] -  0.156s  tid=35232  CoopTick: TickSaveTransfer
+  [58] -  0.156s  tid=35232  CoopTick: TickEconomySync
+  [59] -  0.156s  tid=35232  CoopTick: CoopSyncProcessPackets
+  [60] -  0.171s  tid=35232  CoopTick: NetTick
+  [61] -  0.171s  tid=35232  CoopTick: TickSaveTransfer
+  [62] -  0.171s  tid=35232  CoopTick: TickEconomySync
+  [63] -  0.171s  tid=35232  CoopTick: CoopSyncProcessPackets
+  [64] -  0.171s  tid=35232  CoopTick: NetTick
+  [65] -  0.171s  tid=35232  CoopTick: TickSaveTransfer
+  [66] -  0.171s  tid=35232  CoopTick: TickEconomySync
+  [67] -  0.171s  tid=35232  CoopTick: CoopSyncProcessPackets
+  [68] -  0.187s  tid=35232  CoopTick: NetTick
+  [69] -  0.187s  tid=35232  CoopTick: TickSaveTransfer
+  [70] -  0.187s  tid=35232  CoopTick: TickEconomySync
+  [71] -  0.187s  tid=35232  CoopTick: CoopSyncProcessPackets
+  [72] -  0.187s  tid=35232  CoopTick: NetTick
+  [73] -  0.187s  tid=35232  CoopTick: TickSaveTransfer
+  [74] -  0.187s  tid=35232  CoopTick: TickEconomySync
+  [75] -  0.187s  tid=35232  CoopTick: CoopSyncProcessPackets
+  [76] -  0.203s  tid=35232  CoopTick: NetTick
+  [77] -  0.203s  tid=35232  CoopTick: TickSaveTransfer
+  [78] -  0.203s  tid=35232  CoopTick: TickEconomySync
+  [79] -  0.203s  tid=35232  CoopTick: CoopSyncProcessPackets
+  [80] -  0.203s  tid=35232  CoopTick: NetTick
+  [81] -  0.218s  tid=35232  CoopTick: TickSaveTransfer
+  [82] -  0.218s  tid=35232  CoopTick: TickEconomySync
+  [83] -  0.218s  tid=35232  CoopTick: CoopSyncProcessPackets
+  [84] -  0.218s  tid=35232  CoopTick: NetTick
+  [85] -  0.218s  tid=35232  CoopTick: TickSaveTransfer
+  [86] -  0.218s  tid=35232  CoopTick: TickEconomySync
+  [87] -  0.218s  tid=35232  CoopTick: CoopSyncProcessPackets
+  [88] -  0.218s  tid=35232  CoopTick: NetTick
+  [89] -  0.234s  tid=35232  CoopTick: TickSaveTransfer
+  [90] -  0.234s  tid=35232  CoopTick: TickEconomySync
+  [91] -  0.234s  tid=35232  CoopTick: CoopSyncProcessPackets
+  [92] -  0.234s  tid=35232  CoopTick: NetTick
+  [93] -  0.234s  tid=35232  CoopTick: TickSaveTransfer
+  [94] -  0.234s  tid=35232  CoopTick: TickEconomySync
+  [95] -  0.234s  tid=35232  CoopTick: CoopSyncProcessPackets
+  [96] -  0.250s  tid=35232  CoopTick: NetTick
+  [97] -  0.250s  tid=35232  CoopTick: TickSaveTransfer
+  [98] -  0.250s  tid=35232  CoopTick: TickEconomySync
+  [99] -  0.250s  tid=35232  CoopTick: CoopSyncProcessPackets
+  [100] -  0.250s  tid=35232  CoopTick: NetTick
+  [101] -  0.250s  tid=35232  CoopTick: TickSaveTransfer
+  [102] -  0.250s  tid=35232  CoopTick: TickEconomySync
+  [103] -  0.250s  tid=35232  CoopTick: CoopSyncProcessPackets
+  [104] -  0.265s  tid=35232  CoopTick: NetTick
+  [105] -  0.265s  tid=35232  CoopTick: TickSaveTransfer
+  [106] -  0.265s  tid=35232  CoopTick: TickEconomySync
+  [107] -  0.265s  tid=35232  CoopTick: CoopSyncProcessPackets
+  [108] -  0.265s  tid=35232  CoopTick: NetTick
+  [109] -  0.265s  tid=35232  CoopTick: TickSaveTransfer
+  [110] -  0.265s  tid=35232  CoopTick: TickEconomySync
+  [111] -  0.265s  tid=35232  CoopTick: CoopSyncProcessPackets
+  [112] -  0.281s  tid=35232  CoopTick: NetTick
+  [113] -  0.281s  tid=35232  CoopTick: TickSaveTransfer
+  [114] -  0.281s  tid=35232  CoopTick: TickEconomySync
+  [115] -  0.281s  tid=35232  CoopTick: CoopSyncProcessPackets
+  [116] -  0.296s  tid=35232  CoopTick: NetTick
+  [117] -  0.296s  tid=35232  CoopTick: TickSaveTransfer
+  [118] -  0.296s  tid=35232  CoopTick: TickEconomySync
+  [119] -  0.328s  tid=35232  CoopTick: CoopSyncProcessPackets
+  [120] -  0.328s  tid=35232  CoopTick: NetTick
+  [121] -  0.328s  tid=35232  CoopTick: TickSaveTransfer
+  [122] -  0.328s  tid=35232  CoopTick: TickEconomySync
+  [123] -  0.328s  tid=35232  CoopTick: CoopSyncProcessPackets
+  [124] -  0.328s  tid=35232  CoopTick: NetTick
+  [125] -  0.343s  tid=35232  CoopTick: TickSaveTransfer
+  [126] -  0.343s  tid=35232  CoopTick: TickEconomySync
+  [127] -  0.343s  tid=35232  CoopTick: CoopSyncProcessPackets
 
 === THREADS ===
-  TID= 3676  Priority= 8
-  TID=28380  Priority= 8
-  TID=17768  Priority= 8
-  TID=33148  Priority= 8
-  TID=13864  Priority=21
-  TID=35532  Priority=10
-  TID= 5096  Priority=10
-  TID= 5576  Priority= 8
-  TID=10728  Priority= 8
-  TID=10120  Priority=10
-  TID=19660  Priority= 8
-  TID= 5608  Priority= 8
-  TID=23628  Priority= 1
-  TID=11444  Priority= 1
-  TID= 8152  Priority= 1
-  TID=12876  Priority= 1
+  TID=35812  Priority= 8
+  TID=32920  Priority= 8
+  TID=32304  Priority= 8
+  TID=19984  Priority= 8
+  TID=14184  Priority=21
+  TID=35804  Priority=10
+  TID=18088  Priority=10
+  TID=18296  Priority= 8
+  TID= 9916  Priority= 8
+  TID=17556  Priority=10
+  TID=29752  Priority= 8
+  TID=  664  Priority= 8
+  TID= 3288  Priority= 1
+  TID=34784  Priority= 1
+  TID=33568  Priority= 1
+  TID= 3484  Priority= 1
+  TID=20248  Priority= 1
+  TID= 3472  Priority= 1
+  TID= 9804  Priority= 1
+  TID=23064  Priority= 1
+  TID=33328  Priority= 1
+  TID=27024  Priority= 1
+  TID=  668  Priority= 1
+  TID= 3828  Priority= 1
+  TID=26688  Priority= 1
+  TID=28092  Priority= 1
+  TID= 6780  Priority= 1
+  TID= 9320  Priority= 1
+  TID=13896  Priority= 9
+  TID= 4088  Priority= 9
+  TID= 9476  Priority= 1
+  TID= 3388  Priority= 1
+  TID= 6900  Priority= 1
+  TID=32644  Priority= 1
+  TID=26012  Priority= 1
+  TID=22028  Priority= 1
+  TID=14264  Priority= 1
+  TID=22088  Priority= 1
+  TID=13852  Priority= 1
+  TID=15192  Priority= 1
+  TID=34876  Priority= 1
+  TID=10392  Priority= 1
+  TID=18300  Priority= 1
+  TID=26172  Priority= 1
+  TID=13756  Priority= 1
   TID= 3896  Priority= 1
-  TID= 5928  Priority= 1
-  TID= 9520  Priority= 1
-  TID=18360  Priority= 1
-  TID=34116  Priority= 1
-  TID= 4648  Priority= 1
-  TID= 8272  Priority= 1
-  TID=20376  Priority= 1
-  TID=32028  Priority= 1
-  TID= 9356  Priority= 1
-  TID=16680  Priority= 1
-  TID=14088  Priority= 1
-  TID=30960  Priority= 9
-  TID=16624  Priority= 9
-  TID=17276  Priority= 1
-  TID= 4724  Priority= 1
-  TID=14136  Priority= 1
-  TID= 3980  Priority= 1
-  TID=20124  Priority= 1
-  TID=19940  Priority= 1
-  TID=34008  Priority= 1
-  TID=17732  Priority= 1
-  TID=31648  Priority= 1
-  TID= 3800  Priority= 1
-  TID=18016  Priority= 1
-  TID=24924  Priority= 1
-  TID= 5680  Priority= 1
-  TID=32640  Priority= 1
-  TID= 2820  Priority= 1
-  TID=34040  Priority= 1
-  TID=17176  Priority=15
-  TID= 9788  Priority=15
-  TID=17064  Priority= 8
-  TID=11168  Priority= 1
-  TID=11804  Priority= 1
-  TID=30468  Priority= 1
-  TID=14292  Priority= 1
-  TID=23164  Priority= 1
-  TID=18784  Priority= 1
-  TID=33516  Priority= 1
-  TID= 3148  Priority= 1
-  TID=32680  Priority= 1
-  TID=13328  Priority= 1
-  TID=22296  Priority= 1
-  TID=32224  Priority= 1
-  TID= 9624  Priority= 1
-  TID=16012  Priority= 1
-  TID=32692  Priority= 1
-  TID=22404  Priority= 1
-  TID=17116  Priority= 8
-  TID= 6100  Priority= 8
-  TID=27116  Priority=22
-  TID=20812  Priority= 8
-  TID=21444  Priority= 9 <<<< CRASH
-  TID= 9708  Priority= 9
-  TID=10404  Priority= 8
-  TID=13560  Priority= 8
-  TID=34032  Priority= 9
-  TID=30256  Priority= 9
-  TID= 5900  Priority= 9
-  TID=  644  Priority= 9
-  TID=29956  Priority= 9
-  TID=29560  Priority= 9
-  TID=20460  Priority= 8
-  TID= 7136  Priority= 8
-  TID=28500  Priority= 8
+  TID=28240  Priority=15
+  TID=30768  Priority=15
+  TID=20500  Priority= 8
+  TID=18788  Priority= 1
+  TID=12772  Priority= 1
+  TID=10404  Priority= 1
+  TID=28456  Priority= 1
+  TID= 7460  Priority= 1
+  TID=34580  Priority= 1
+  TID=32992  Priority= 1
+  TID=22608  Priority= 1
+  TID=10568  Priority= 1
+  TID=32868  Priority= 1
+  TID=21992  Priority= 1
+  TID=26860  Priority= 1
+  TID= 1404  Priority= 1
+  TID= 3024  Priority= 1
+  TID=34532  Priority= 1
+  TID=17888  Priority= 1
+  TID= 3584  Priority= 8
+  TID=20164  Priority= 8
+  TID= 5700  Priority=22
+  TID=29948  Priority= 8
+  TID=35232  Priority= 9 <<<< CRASH
+  TID=18216  Priority= 9
+  TID=26236  Priority= 8
+  TID=28260  Priority= 8
+  TID=22520  Priority= 8
+  TID= 3480  Priority= 8
+  TID=  700  Priority= 9
+  TID=23132  Priority= 9
+  TID=26988  Priority= 9
+  TID= 7544  Priority= 9
+  TID=10680  Priority= 9
+  TID=30516  Priority= 9
+  TID=26192  Priority= 8
 
 === LOADED MODULES ===
   0x105A0000 - 0x11C17000   23004 KB  BioshockHD.exe
@@ -327,8 +377,9 @@ EIP=11418FF8  EFLAGS=00010202
   0x76C50000 - 0x76F1D000    2868 KB  KERNELBASE.dll
   0x77A20000 - 0x77BF6000    1880 KB  USER32.dll
   0x76170000 - 0x7618B000     108 KB  win32u.dll
-  0x77160000 - 0x77182000     136 KB  GDI32.dll
   0x61910000 - 0x61AF0000    1920 KB  dbghelp.dll
+  0x77160000 - 0x77182000     136 KB  GDI32.dll
+  0x622D0000 - 0x624C1000    1988 KB  d3d11.dll
   0x6D4D0000 - 0x6D64A000    1512 KB  d3d9.dll
   0x76F20000 - 0x7700C000     944 KB  gdi32full.dll
   0x751C0000 - 0x752D0000    1088 KB  ucrtbase.dll
@@ -336,63 +387,62 @@ EIP=11418FF8  EFLAGS=00010202
   0x77360000 - 0x77427000     796 KB  msvcrt.dll
   0x77780000 - 0x77A13000    2636 KB  combase.dll
   0x77550000 - 0x775D3000     524 KB  sechost.dll
-  0x77010000 - 0x770CC000     752 KB  RPCRT4.dll
   0x77650000 - 0x77705000     724 KB  COMDLG32.dll
-  0x622D0000 - 0x624C1000    1988 KB  d3d11.dll
+  0x77010000 - 0x770CC000     752 KB  RPCRT4.dll
   0x77280000 - 0x77351000     836 KB  shcore.dll
   0x760C0000 - 0x7615F000     636 KB  OLEAUT32.dll
   0x76BF0000 - 0x76C42000     328 KB  SHLWAPI.dll
+  0x621C0000 - 0x622C9000    1060 KB  dxgi.dll
   0x759D0000 - 0x760B6000    7064 KB  Windows.Storage.dll
   0x76330000 - 0x763B2000     520 KB  advapi32.dll
   0x70390000 - 0x703B6000     152 KB  dwmapi.dll
   0x74F00000 - 0x74F08000      32 KB  VERSION.dll
   0x75370000 - 0x759B3000    6412 KB  SHELL32.dll
-  0x621C0000 - 0x622C9000    1060 KB  dxgi.dll
   0x77430000 - 0x77499000     420 KB  WS2_32.dll
-  0x769A0000 - 0x769C5000     148 KB  IMM32.dll
-  0x63160000 - 0x631F1000     580 KB  COMCTL32.dll
-  0x75060000 - 0x751B3000    1356 KB  ole32.dll
-  0x69210000 - 0x6927D000     436 KB  MSVCP140.dll
-  0x5AEC0000 - 0x5AF18000     352 KB  bink2w32.dll
-  0x5A7C0000 - 0x5A7FD000     244 KB  steam_api.dll
-  0x5AEB0000 - 0x5AEB8000      32 KB  WSOCK32.dll
-  0x70350000 - 0x70388000     224 KB  dxcore.dll
-  0x691F0000 - 0x69205000      84 KB  VCRUNTIME140.dll
   0x68FA0000 - 0x68FF5000     340 KB  powrprof.dll
-  0x5AE40000 - 0x5AE5C000     112 KB  amd_ags_x86.dll
+  0x769A0000 - 0x769C5000     148 KB  IMM32.dll
+  0x75060000 - 0x751B3000    1356 KB  ole32.dll
+  0x63160000 - 0x631F1000     580 KB  COMCTL32.dll
+  0x69210000 - 0x6927D000     436 KB  MSVCP140.dll
+  0x5AF10000 - 0x5AF18000      32 KB  WSOCK32.dll
+  0x691F0000 - 0x69205000      84 KB  VCRUNTIME140.dll
   0x633E0000 - 0x633E6000      24 KB  MSIMG32.dll
+  0x70350000 - 0x70388000     224 KB  dxcore.dll
+  0x5AEB0000 - 0x5AF08000     352 KB  bink2w32.dll
   0x61E10000 - 0x61E48000     224 KB  DINPUT8.dll
   0x5ABD0000 - 0x5AC46000     472 KB  DSOUND.dll
-  0x5A790000 - 0x5A7B6000     152 KB  XINPUT1_3.dll
-  0x5A610000 - 0x5A78A000    1512 KB  fmodex.dll
+  0x5A7D0000 - 0x5A7F6000     152 KB  XINPUT1_3.dll
+  0x5AE40000 - 0x5AE5C000     112 KB  amd_ags_x86.dll
+  0x5A5C0000 - 0x5A7C7000    2076 KB  D3DCOMPILER_43.dll
+  0x5A590000 - 0x5A5B7000     156 KB  WINMM.dll
   0x5AB30000 - 0x5ABCA000     616 KB  ResampleDmo.DLL
-  0x591A0000 - 0x593A7000    2076 KB  D3DCOMPILER_43.dll
   0x5AE60000 - 0x5AE85000     148 KB  winmmbase.dll
-  0x5A5F0000 - 0x5A60A000     104 KB  MSACM32.dll
   0x5ED30000 - 0x5ED39000      36 KB  msdmo.dll
-  0x5A5C0000 - 0x5A5E7000     156 KB  WINMM.dll
-  0x5A580000 - 0x5A5B0000     192 KB  dbgcore.DLL
+  0x59230000 - 0x593AA000    1512 KB  fmodex.dll
+  0x5A570000 - 0x5A58A000     104 KB  MSACM32.dll
+  0x591F0000 - 0x5922D000     244 KB  steam_api.dll
+  0x591B0000 - 0x591E0000     192 KB  dbgcore.DLL
   0x70300000 - 0x7030E000      56 KB  UMPDC.dll
   0x69000000 - 0x69033000     204 KB  winmm.dll
+  0x58CE0000 - 0x58E4E000    1464 KB  gameoverlayrenderer.dll
+  0x759C0000 - 0x759C6000      24 KB  PSAPI.DLL
+  0x73050000 - 0x7308E000     248 KB  CFGMGR32.dll
   0x61F40000 - 0x620B2000    1480 KB  inputhost.dll
   0x61E60000 - 0x61F3D000     884 KB  CoreMessaging.dll
   0x70640000 - 0x706C0000     512 KB  uxtheme.dll
-  0x76190000 - 0x76207000     476 KB  bcryptPrimitives.dll
-  0x720B0000 - 0x720BA000      40 KB  CRYPTBASE.DLL
-  0x74EB0000 - 0x74EC5000      84 KB  kernel.appcore.dll
   0x76220000 - 0x76329000    1060 KB  CRYPT32.dll
   0x77190000 - 0x771AB000     108 KB  imagehlp.dll
-  0x759C0000 - 0x759C6000      24 KB  PSAPI.DLL
-  0x70840000 - 0x70865000     148 KB  IPHLPAPI.DLL
   0x76540000 - 0x76991000    4420 KB  SETUPAPI.dll
+  0x70840000 - 0x70865000     148 KB  IPHLPAPI.DLL
   0x706D0000 - 0x70724000     336 KB  MSWSOCK.dll
   0x72090000 - 0x720AC000     112 KB  bcrypt.dll
-  0x73050000 - 0x7308E000     248 KB  cfgmgr32.DLL
-  0x5A550000 - 0x5A571000     132 KB  CSERHelper.dll
-  0x58DE0000 - 0x58F4E000    1464 KB  gameoverlayrenderer.dll
+  0x720B0000 - 0x720BA000      40 KB  CRYPTBASE.DLL
+  0x76190000 - 0x76207000     476 KB  bcryptPrimitives.dll
+  0x74EB0000 - 0x74EC5000      84 KB  kernel.appcore.dll
+  0x58B00000 - 0x58B21000     132 KB  CSERHelper.dll
   0x769D0000 - 0x76AE7000    1116 KB  MSCTF.dll
   0x61010000 - 0x61112000    1032 KB  textinputframework.dll
-  0x58B40000 - 0x58DD2000    2632 KB  CoreUIComponents.dll
+  0x56F00000 - 0x57192000    2632 KB  CoreUIComponents.dll
   0x71C60000 - 0x71D59000     996 KB  wintypes.dll
   0x63380000 - 0x633DB000     364 KB  Oleacc.dll
   0x746D0000 - 0x746DE000      56 KB  msasn1.dll
@@ -408,49 +458,49 @@ EIP=11418FF8  EFLAGS=00010202
   0x730A0000 - 0x730BD000     116 KB  profapi.dll
   0x64140000 - 0x64169000     164 KB  ntmarta.dll
   0x5EAD0000 - 0x5EC10000    1280 KB  nvppe.dll
-  0x10330000 - 0x10336000      24 KB  RICHED32.DLL
+  0x05E70000 - 0x05E76000      24 KB  RICHED32.DLL
   0x61220000 - 0x612A4000     528 KB  RICHED20.dll
-  0x611D0000 - 0x611FC000     176 KB  msls31.dll
   0x61200000 - 0x61217000      92 KB  USP10.dll
+  0x611D0000 - 0x611FC000     176 KB  msls31.dll
   0x61BE0000 - 0x61E09000    2212 KB  comctl32.DLL
   0x61120000 - 0x611C5000     660 KB  TextShaping.dll
   0x61E50000 - 0x61E5B000      44 KB  HID.DLL
-  0x5A520000 - 0x5A536000      88 KB  xinput1_4.dll
-  0x47800000 - 0x47886000     536 KB  clbcatq.dll
-  0x58AB0000 - 0x58B2E000     504 KB  MMDevApi.dll
-  0x58A70000 - 0x58AAD000     244 KB  wdmaud.drv
-  0x58A50000 - 0x58A6C000     112 KB  wdmaud2.drv
-  0x5A510000 - 0x5A519000      36 KB  AVRT.dll
-  0x57020000 - 0x5718E000    1464 KB  AUDIOSES.DLL
-  0x58A40000 - 0x58A4B000      44 KB  msacm32.drv
-  0x58A30000 - 0x58A38000      32 KB  midimap.dll
-  0x58A10000 - 0x58A20000      64 KB  resourcepolicyclient.dll
+  0x5A510000 - 0x5A526000      88 KB  xinput1_4.dll
+  0x47770000 - 0x477F6000     536 KB  clbcatq.dll
+  0x58A70000 - 0x58AEE000     504 KB  MMDevApi.dll
+  0x58A30000 - 0x58A6D000     244 KB  wdmaud.drv
+  0x590F0000 - 0x5910C000     112 KB  wdmaud2.drv
+  0x5A550000 - 0x5A559000      36 KB  AVRT.dll
+  0x56D80000 - 0x56EEE000    1464 KB  AUDIOSES.DLL
+  0x58A20000 - 0x58A2B000      44 KB  msacm32.drv
+  0x58A10000 - 0x58A18000      32 KB  midimap.dll
+  0x589F0000 - 0x58A00000      64 KB  resourcepolicyclient.dll
   0x62C70000 - 0x63155000    5012 KB  nvapi.dll
   0x6D430000 - 0x6D4CC000     624 KB  nvldumd.dll
   0x69430000 - 0x6D2C3000   64076 KB  nvgpucomp32.dll
   0x69040000 - 0x6912D000     948 KB  NvMemMapStorage.dll
-  0x53B90000 - 0x5701A000   53800 KB  nvwgf2um.dll
-  0x53A00000 - 0x53B8A000    1576 KB  dcomp.dll
-  0x589F0000 - 0x58A02000      72 KB  Microsoft.Internal.WarpPal.dll
+  0x538F0000 - 0x56D7A000   53800 KB  nvwgf2um.dll
+  0x53760000 - 0x538EA000    1576 KB  dcomp.dll
+  0x589D0000 - 0x589E2000      72 KB  Microsoft.Internal.WarpPal.dll
   0x571A0000 - 0x572B1000    1092 KB  Windows.UI.dll
-  0x624D0000 - 0x6284A000    3560 KB  BS1SDK.dll
-  0x62850000 - 0x62C45000    4052 KB  D3DCOMPILER_47.dll
+  0x624D0000 - 0x62851000    3588 KB  BS1SDK.dll
+  0x62860000 - 0x62C55000    4052 KB  D3DCOMPILER_47.dll
   0x70210000 - 0x702FC000     944 KB  DNSAPI.dll
   0x774A0000 - 0x774A7000      28 KB  NSI.dll
   0x70170000 - 0x701D2000     392 KB  fwpuclnt.dll
   0x701E0000 - 0x701E8000      32 KB  rasadhlp.dll
   0x572D0000 - 0x58754000   21008 KB  steamclient.dll
-  0x59100000 - 0x591A0000     640 KB  tier0_s.dll
+  0x59110000 - 0x591B0000     640 KB  tier0_s.dll
+  0x58C40000 - 0x58CD8000     608 KB  vstdlib_s.dll
   0x61900000 - 0x6190A000      40 KB  Secur32.dll
-  0x59060000 - 0x590F8000     608 KB  vstdlib_s.dll
   0x74ED0000 - 0x74EFB000     172 KB  SSPICLI.DLL
-  0x58F50000 - 0x59059000    1060 KB  steam.dll
+  0x58B30000 - 0x58C39000    1060 KB  steam.dll
 
 === MEMORY ===
-Physical:   25576 MB used / 65298 MB total (39% load)
-Virtual:    3284 MB used / 4095 MB total
-Working:    2442 MB  (peak 2565 MB)
-Private:    2317 MB
+Physical:   26820 MB used / 65298 MB total (41% load)
+Virtual:    3277 MB used / 4095 MB total
+Working:    2421 MB  (peak 2557 MB)
+Private:    2296 MB
 
 ╔══════════════════════════════════════════════════════════════╗
 ║  Report:     D:\SteamLibrary\steamapps\common\BioShock Remastered\Build\Final\BS1SDK_dumps\crash_report.txt ║
