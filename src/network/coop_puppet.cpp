@@ -63,6 +63,11 @@ static MoveActorFn s_MoveActorFn = nullptr;
 static void*       s_ULevel = nullptr;
 static int         s_XLevelOffset = -1;  // offset of XLevel on Actor
 
+// Diagnosis results (set by DiagnoseAndDiscover, used by UpdateGhostPuppet)
+static uintptr_t s_SetLocNativeAddr = 0;
+static uintptr_t s_SetRotNativeAddr = 0;
+static bool      s_MoveActorDiscovered = false;
+
 /// Scan the first N bytes of a native function for E8 (CALL rel32) instructions.
 /// Returns all call targets found.
 static std::vector<uintptr_t> ScanForCallTargets(uintptr_t funcAddr, int scanBytes)
@@ -164,6 +169,138 @@ static bool DiscoverMoveActor(uintptr_t setLocNativeAddr)
 
     LOG_WARN("[Puppet]   No CALL instructions found in SetLocation native!");
     return false;
+}
+
+/// Check if bytes at a pointer look like a valid x86 function prologue.
+static bool IsLikelyCode(const uint8_t* p)
+{
+    uint8_t b = p[0];
+    // Single-byte push instructions (common prologues)
+    if (b == 0x55 || b == 0x56 || b == 0x53 || b == 0x51 || b == 0x57) return true;
+    // push imm8
+    if (b == 0x6A) return true;
+    // sub esp, imm8 (83 EC XX)
+    if (b == 0x83 && p[1] == 0xEC) return true;
+    // sub esp, imm32 (81 EC XX XX XX XX)
+    if (b == 0x81 && p[1] == 0xEC) return true;
+    // mov reg, reg (8B XX) — common in prologues
+    if (b == 0x8B) return true;
+    // mov eax, imm32 (B8 XX XX XX XX)
+    if (b == 0xB8) return true;
+    return false;
+}
+
+/// One-time diagnosis: scan UFunction bytes to find the REAL Func pointer,
+/// discover MoveActor from it, and find ULevel.
+/// Separated from UpdateGhostPuppet because __try can't coexist with C++ unwinding.
+static void DiagnoseAndDiscover()
+{
+    const uint8_t* slRaw = reinterpret_cast<const uint8_t*>(s_SetLocFunc);
+
+    // Dump raw bytes +0x60 through +0x9F (64 bytes) for full analysis
+    LOG_INFO("[Puppet] SetLocation UFunction @ 0x{:08X}", (uint32_t)(uintptr_t)s_SetLocFunc);
+    for (int row = 0x60; row < 0xA0; row += 0x10) {
+        LOG_INFO("[Puppet]   +{:02X}: {:02X} {:02X} {:02X} {:02X}  {:02X} {:02X} {:02X} {:02X}  {:02X} {:02X} {:02X} {:02X}  {:02X} {:02X} {:02X} {:02X}",
+                 row,
+                 slRaw[row+0], slRaw[row+1], slRaw[row+2], slRaw[row+3],
+                 slRaw[row+4], slRaw[row+5], slRaw[row+6], slRaw[row+7],
+                 slRaw[row+8], slRaw[row+9], slRaw[row+10], slRaw[row+11],
+                 slRaw[row+12], slRaw[row+13], slRaw[row+14], slRaw[row+15]);
+    }
+
+    uint16_t iNative = *(uint16_t*)(slRaw + 0x68);
+    LOG_INFO("[Puppet]   iNative(+0x68)={}", iNative);
+
+    // Brute-force scan: find the REAL Func pointer by checking which value
+    // in the UFunction points to actual x86 code (valid function prologue).
+    uintptr_t bestFuncAddr = 0;
+    int bestFuncOffset = -1;
+
+    LOG_INFO("[Puppet] Scanning UFunction +0x60..+0x9C for x86 code pointers:");
+    for (int off = 0x60; off <= 0x9C; off += 4) {
+        uintptr_t val = *(uintptr_t*)(slRaw + off);
+        if (val < 0x00400000 || val > 0x7FFFFFFF) continue;
+        if (!IsSafeToRead(reinterpret_cast<const void*>(val), 16)) continue;
+
+        const uint8_t* codeAt = reinterpret_cast<const uint8_t*>(val);
+        bool looksLikeCode = IsLikelyCode(codeAt);
+
+        LOG_INFO("[Puppet]   +0x{:02X}: 0x{:08X} -> [{:02X} {:02X} {:02X} {:02X} {:02X} {:02X} {:02X} {:02X}] {}",
+                 off, (uint32_t)val,
+                 codeAt[0], codeAt[1], codeAt[2], codeAt[3],
+                 codeAt[4], codeAt[5], codeAt[6], codeAt[7],
+                 looksLikeCode ? "<<< LOOKS LIKE CODE" : "");
+
+        if (looksLikeCode && bestFuncAddr == 0) {
+            bestFuncAddr = val;
+            bestFuncOffset = off;
+        }
+    }
+
+    if (bestFuncAddr) {
+        s_SetLocNativeAddr = bestFuncAddr;
+        LOG_INFO("[Puppet] FOUND Func at +0x{:02X} = 0x{:08X}", bestFuncOffset, (uint32_t)bestFuncAddr);
+        s_MoveActorDiscovered = DiscoverMoveActor(bestFuncAddr);
+    } else {
+        LOG_WARN("[Puppet] No x86 code pointer found in UFunction! Dumping all pointer-like values:");
+        for (int off = 0x60; off <= 0x9C; off += 4) {
+            uintptr_t val = *(uintptr_t*)(slRaw + off);
+            if (val > 0x10000 && val < 0x7FFFFFFF) {
+                bool readable = IsSafeToRead(reinterpret_cast<const void*>(val), 4);
+                LOG_INFO("[Puppet]   +0x{:02X}: 0x{:08X} readable={}", off, (uint32_t)val, readable);
+            }
+        }
+    }
+
+    // Also probe SetRotation
+    if (s_SetRotFunc) {
+        const uint8_t* srRaw = reinterpret_cast<const uint8_t*>(s_SetRotFunc);
+        for (int off = 0x60; off <= 0x9C; off += 4) {
+            uintptr_t val = *(uintptr_t*)(srRaw + off);
+            if (val < 0x00400000 || val > 0x7FFFFFFF) continue;
+            if (!IsSafeToRead(reinterpret_cast<const void*>(val), 16)) continue;
+            const uint8_t* codeAt = reinterpret_cast<const uint8_t*>(val);
+            if (IsLikelyCode(codeAt)) {
+                s_SetRotNativeAddr = val;
+                LOG_INFO("[Puppet] SetRotation Func at +0x{:02X} = 0x{:08X} [{:02X} {:02X} {:02X} {:02X}]",
+                         off, (uint32_t)val, codeAt[0], codeAt[1], codeAt[2], codeAt[3]);
+                break;
+            }
+        }
+        if (!s_SetRotNativeAddr)
+            LOG_WARN("[Puppet] SetRotation: no x86 code pointer found");
+    }
+
+    // Find ULevel for direct MoveActor calls
+    s_ULevel = FindULevel(s_Puppet);
+    if (s_ULevel) {
+        LOG_INFO("[Puppet] ULevel = 0x{:08X}", (uint32_t)(uintptr_t)s_ULevel);
+    } else {
+        LOG_WARN("[Puppet] ULevel NOT found via property — scanning actor memory for Level object");
+        const uint8_t* actRaw = reinterpret_cast<const uint8_t*>(s_Puppet);
+        for (int off = 0x80; off <= 0x100; off += 4) {
+            uintptr_t val = *(uintptr_t*)(actRaw + off);
+            if (val < 0x10000 || val > 0x7FFFFFFF) continue;
+            if (!IsSafeToRead(reinterpret_cast<const void*>(val), 0x34)) continue;
+            UObject* maybeLevel = reinterpret_cast<UObject*>(val);
+            std::string cn = maybeLevel->GetObjClassName();
+            if (cn == "Level") {
+                s_ULevel = reinterpret_cast<void*>(val);
+                LOG_INFO("[Puppet] ULevel from actor+0x{:02X} = 0x{:08X}", off, (uint32_t)val);
+                break;
+            }
+        }
+    }
+
+    if (s_MoveActorDiscovered && s_ULevel) {
+        LOG_INFO("[Puppet] >>> Direct MoveActor READY: ULevel=0x{:08X} MoveActor=0x{:08X}",
+                 (uint32_t)(uintptr_t)s_ULevel, (uint32_t)(uintptr_t)s_MoveActorFn);
+    } else if (s_MoveActorDiscovered && !s_ULevel) {
+        LOG_WARN("[Puppet] >>> MoveActor found but NO ULevel — cannot call directly");
+        s_MoveActorDiscovered = false;
+    } else {
+        LOG_WARN("[Puppet] >>> No direct MoveActor — will try PE then raw write");
+    }
 }
 
 // ─── Helpers ───────────────────────────────────────────────────────────
@@ -585,65 +722,12 @@ void UpdateGhostPuppet(const PlayerStateData& remoteState)
     static bool s_Diagnosed = false;
     static bool s_SetLocSafe = true;
     static bool s_SetRotSafe = true;
-    static uintptr_t s_SetLocNativeAddr = 0;
-    static uintptr_t s_SetRotNativeAddr = 0;
-    static bool s_MoveActorDiscovered = false;
     ProcessEventFn origPE = GetOriginalProcessEvent();
 
     // One-time: diagnose UFunction layout, discover MoveActor, find ULevel
     if (!s_Diagnosed && s_SetLocFunc) {
         s_Diagnosed = true;
-        const uint8_t* slRaw = reinterpret_cast<const uint8_t*>(s_SetLocFunc);
-
-        // Dump raw bytes for analysis
-        LOG_INFO("[Puppet] SetLocation UFunction @ 0x{:08X}", (uint32_t)(uintptr_t)s_SetLocFunc);
-        LOG_INFO("[Puppet]   +60: {:02X} {:02X} {:02X} {:02X}  {:02X} {:02X} {:02X} {:02X}  {:02X} {:02X} {:02X} {:02X}  {:02X} {:02X} {:02X} {:02X}",
-                 slRaw[0x60], slRaw[0x61], slRaw[0x62], slRaw[0x63],
-                 slRaw[0x64], slRaw[0x65], slRaw[0x66], slRaw[0x67],
-                 slRaw[0x68], slRaw[0x69], slRaw[0x6A], slRaw[0x6B],
-                 slRaw[0x6C], slRaw[0x6D], slRaw[0x6E], slRaw[0x6F]);
-        LOG_INFO("[Puppet]   +70: {:02X} {:02X} {:02X} {:02X}  {:02X} {:02X} {:02X} {:02X}  {:02X} {:02X} {:02X} {:02X}  {:02X} {:02X} {:02X} {:02X}",
-                 slRaw[0x70], slRaw[0x71], slRaw[0x72], slRaw[0x73],
-                 slRaw[0x74], slRaw[0x75], slRaw[0x76], slRaw[0x77],
-                 slRaw[0x78], slRaw[0x79], slRaw[0x7A], slRaw[0x7B],
-                 slRaw[0x7C], slRaw[0x7D], slRaw[0x7E], slRaw[0x7F]);
-
-        uint16_t iNative = *(uint16_t*)(slRaw + 0x68);
-        uintptr_t nativeFunc = *(uintptr_t*)(slRaw + 0x70);
-        LOG_INFO("[Puppet]   iNative={} NativeFunc(+0x70)=0x{:08X}", iNative, (uint32_t)nativeFunc);
-
-        if (nativeFunc && IsSafeToRead(reinterpret_cast<const void*>(nativeFunc), 4)) {
-            s_SetLocNativeAddr = nativeFunc;
-            LOG_INFO("[Puppet]   NativeFunc is READABLE");
-
-            // Scan native code to discover MoveActor address
-            s_MoveActorDiscovered = DiscoverMoveActor(nativeFunc);
-        }
-
-        // Also get SetRotation native address
-        if (s_SetRotFunc) {
-            const uint8_t* srRaw = reinterpret_cast<const uint8_t*>(s_SetRotFunc);
-            uintptr_t rotNF = *(uintptr_t*)(srRaw + 0x70);
-            LOG_INFO("[Puppet] SetRotation NativeFunc(+0x70)=0x{:08X}", (uint32_t)rotNF);
-            if (rotNF && IsSafeToRead(reinterpret_cast<const void*>(rotNF), 4))
-                s_SetRotNativeAddr = rotNF;
-        }
-
-        // Find ULevel for direct MoveActor calls
-        if (s_MoveActorDiscovered) {
-            s_ULevel = FindULevel(s_Puppet);
-            if (s_ULevel) {
-                LOG_INFO("[Puppet] >>> Direct MoveActor available! ULevel=0x{:08X} MoveActor=0x{:08X}",
-                         (uint32_t)(uintptr_t)s_ULevel, (uint32_t)(uintptr_t)s_MoveActorFn);
-            } else {
-                LOG_WARN("[Puppet] >>> MoveActor found but ULevel NOT found — cannot call directly");
-                s_MoveActorDiscovered = false;
-            }
-        }
-
-        if (!s_MoveActorDiscovered) {
-            LOG_WARN("[Puppet] >>> No direct MoveActor — will try PE then raw write");
-        }
+        DiagnoseAndDiscover();
     }
 
     // Read current position from puppet (needed for MoveActor delta computation)
