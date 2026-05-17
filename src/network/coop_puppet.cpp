@@ -190,91 +190,113 @@ static bool IsLikelyCode(const uint8_t* p)
     return false;
 }
 
+/// Dump a UFunction's raw bytes and scan for x86 code pointers.
+/// Returns the first code pointer found (0 if none).
+static uintptr_t DumpUFunction(FILE* df, const char* label, UObject* func, int scanBytes = 0x140)
+{
+    char buf[512];
+    auto emit = [&](const char* line) {
+        LOG_INFO("{}", line);
+        if (df) { fprintf(df, "%s\n", line); fflush(df); }
+    };
+
+    const uint8_t* raw = reinterpret_cast<const uint8_t*>(func);
+    snprintf(buf, sizeof(buf), "=== %s UFunction @ 0x%08X ===", label, (uint32_t)(uintptr_t)func);
+    emit(buf);
+
+    // Name
+    std::string name = func->GetName();
+    snprintf(buf, sizeof(buf), "  Name: %s  Class: %s", name.c_str(), func->GetObjClassName().c_str());
+    emit(buf);
+
+    // Hex dump (0x00 to scanBytes)
+    for (int row = 0x00; row < scanBytes; row += 0x10) {
+        if (!IsSafeToRead(raw + row, 16)) {
+            snprintf(buf, sizeof(buf), "  +%03X: <unreadable>", row);
+            emit(buf);
+            break;
+        }
+        snprintf(buf, sizeof(buf),
+                 "  +%03X: %02X %02X %02X %02X  %02X %02X %02X %02X  %02X %02X %02X %02X  %02X %02X %02X %02X",
+                 row,
+                 raw[row+0], raw[row+1], raw[row+2], raw[row+3],
+                 raw[row+4], raw[row+5], raw[row+6], raw[row+7],
+                 raw[row+8], raw[row+9], raw[row+10], raw[row+11],
+                 raw[row+12], raw[row+13], raw[row+14], raw[row+15]);
+        emit(buf);
+    }
+
+    // Known fields
+    uint16_t iNat = *(uint16_t*)(raw + 0x68);
+    uint32_t flags80 = *(uint32_t*)(raw + 0x80);
+    snprintf(buf, sizeof(buf), "  iNative(+0x68)=%u  Flags(+0x80)=0x%08X", iNat, flags80);
+    emit(buf);
+
+    // Scan for x86 code pointers
+    emit("  --- Code pointer scan ---");
+    uintptr_t bestAddr = 0;
+    int bestOff = -1;
+    for (int off = 0x00; off < scanBytes; off += 4) {
+        if (!IsSafeToRead(raw + off, 4)) break;
+        uintptr_t val = *(uintptr_t*)(raw + off);
+        if (val < 0x00400000 || val > 0x7FFFFFFF) continue;
+        if (!IsSafeToRead(reinterpret_cast<const void*>(val), 16)) continue;
+
+        const uint8_t* codeAt = reinterpret_cast<const uint8_t*>(val);
+        bool isCode = IsLikelyCode(codeAt);
+
+        snprintf(buf, sizeof(buf),
+                 "  +0x%03X: 0x%08X -> [%02X %02X %02X %02X %02X %02X %02X %02X] %s",
+                 off, (uint32_t)val,
+                 codeAt[0], codeAt[1], codeAt[2], codeAt[3],
+                 codeAt[4], codeAt[5], codeAt[6], codeAt[7],
+                 isCode ? "<<< CODE" : "");
+        emit(buf);
+
+        if (isCode && bestAddr == 0) {
+            bestAddr = val;
+            bestOff = off;
+        }
+    }
+
+    if (bestAddr) {
+        snprintf(buf, sizeof(buf), "  >>> BEST code pointer: +0x%03X = 0x%08X", bestOff, (uint32_t)bestAddr);
+        emit(buf);
+    } else {
+        emit("  >>> NO code pointer found!");
+    }
+
+    emit("");
+    return bestAddr;
+}
+
 /// One-time diagnosis: scan UFunction bytes to find the REAL Func pointer,
 /// discover MoveActor from it, and find ULevel.
 /// Writes full dump to debug_dumps/puppet_diagnosis.txt for easy sharing.
 /// Separated from UpdateGhostPuppet because __try can't coexist with C++ unwinding.
 static void DiagnoseAndDiscover()
 {
-    // Open dump file
     CreateDirectoryA("debug_dumps", nullptr);
     FILE* df = fopen("debug_dumps/puppet_diagnosis.txt", "w");
 
-    // Helper: write to both log and file
+    char buf[512];
     auto emit = [&](const char* line) {
         LOG_INFO("{}", line);
         if (df) { fprintf(df, "%s\n", line); fflush(df); }
     };
 
-    char buf[512];
+    // ── Section 1: SetLocation (EXTENDED to 0x140 = 320 bytes) ──
+    uintptr_t slCode = DumpUFunction(df, "SetLocation", s_SetLocFunc, 0x140);
 
-    // ── Section 1: UFunction hex dump (full object 0x00-0xBF = 192 bytes) ──
-    const uint8_t* slRaw = reinterpret_cast<const uint8_t*>(s_SetLocFunc);
-    snprintf(buf, sizeof(buf), "=== SetLocation UFunction @ 0x%08X ===",
-             (uint32_t)(uintptr_t)s_SetLocFunc);
-    emit(buf);
-
-    for (int row = 0x00; row < 0xC0; row += 0x10) {
-        snprintf(buf, sizeof(buf),
-                 "  +%02X: %02X %02X %02X %02X  %02X %02X %02X %02X  %02X %02X %02X %02X  %02X %02X %02X %02X",
-                 row,
-                 slRaw[row+0], slRaw[row+1], slRaw[row+2], slRaw[row+3],
-                 slRaw[row+4], slRaw[row+5], slRaw[row+6], slRaw[row+7],
-                 slRaw[row+8], slRaw[row+9], slRaw[row+10], slRaw[row+11],
-                 slRaw[row+12], slRaw[row+13], slRaw[row+14], slRaw[row+15]);
-        emit(buf);
-    }
-
-    // Known fields
-    uint16_t iNative = *(uint16_t*)(slRaw + 0x68);
-    snprintf(buf, sizeof(buf), "iNative(+0x68)=%u", iNative);
-    emit(buf);
-
-    // UObject name for verification
-    std::string funcName = s_SetLocFunc->GetName();
-    snprintf(buf, sizeof(buf), "UFunction Name: %s", funcName.c_str());
-    emit(buf);
-
-    // ── Section 2: x86 prologue scan (+0x00 to +0xBC) ──
-    emit("");
-    emit("=== Scanning ALL UFunction offsets for x86 code pointers ===");
-
-    uintptr_t bestFuncAddr = 0;
-    int bestFuncOffset = -1;
-
-    for (int off = 0x00; off <= 0xBC; off += 4) {
-        uintptr_t val = *(uintptr_t*)(slRaw + off);
-        if (val < 0x00400000 || val > 0x7FFFFFFF) continue;
-        if (!IsSafeToRead(reinterpret_cast<const void*>(val), 16)) continue;
-
-        const uint8_t* codeAt = reinterpret_cast<const uint8_t*>(val);
-        bool looksLikeCode = IsLikelyCode(codeAt);
-
-        snprintf(buf, sizeof(buf),
-                 "  +0x%02X: 0x%08X -> [%02X %02X %02X %02X %02X %02X %02X %02X] %s",
-                 off, (uint32_t)val,
-                 codeAt[0], codeAt[1], codeAt[2], codeAt[3],
-                 codeAt[4], codeAt[5], codeAt[6], codeAt[7],
-                 looksLikeCode ? "<<< LOOKS LIKE CODE" : "");
+    if (slCode) {
+        s_SetLocNativeAddr = slCode;
+        snprintf(buf, sizeof(buf), "SetLocation native code found at 0x%08X", (uint32_t)slCode);
         emit(buf);
 
-        if (looksLikeCode && bestFuncAddr == 0) {
-            bestFuncAddr = val;
-            bestFuncOffset = off;
-        }
-    }
-
-    if (bestFuncAddr) {
-        s_SetLocNativeAddr = bestFuncAddr;
-        snprintf(buf, sizeof(buf), "FOUND Func at +0x%02X = 0x%08X",
-                 bestFuncOffset, (uint32_t)bestFuncAddr);
-        emit(buf);
-
-        // Dump 64 bytes of actual native code for analysis
-        emit("");
-        emit("=== Native code bytes (first 64) ===");
-        const uint8_t* nc = reinterpret_cast<const uint8_t*>(bestFuncAddr);
-        for (int row = 0; row < 64; row += 16) {
+        // Dump first 128 bytes of native code
+        emit("=== SetLocation Native Code (first 128 bytes) ===");
+        const uint8_t* nc = reinterpret_cast<const uint8_t*>(slCode);
+        for (int row = 0; row < 128; row += 16) {
             snprintf(buf, sizeof(buf),
                      "  +%02X: %02X %02X %02X %02X  %02X %02X %02X %02X  %02X %02X %02X %02X  %02X %02X %02X %02X",
                      row,
@@ -284,57 +306,33 @@ static void DiagnoseAndDiscover()
                      nc[row+12], nc[row+13], nc[row+14], nc[row+15]);
             emit(buf);
         }
+        emit("");
 
-        s_MoveActorDiscovered = DiscoverMoveActor(bestFuncAddr);
+        s_MoveActorDiscovered = DiscoverMoveActor(slCode);
     } else {
-        emit("WARNING: No x86 code pointer found in entire UFunction!");
-        emit("Dumping ALL pointer-like values for manual analysis:");
-        for (int off = 0x00; off <= 0xBC; off += 4) {
-            uintptr_t val = *(uintptr_t*)(slRaw + off);
-            if (val > 0x10000 && val < 0x7FFFFFFF) {
-                bool readable = IsSafeToRead(reinterpret_cast<const void*>(val), 4);
-                snprintf(buf, sizeof(buf), "  +0x%02X: 0x%08X readable=%s",
-                         off, (uint32_t)val, readable ? "YES" : "NO");
-                emit(buf);
-            }
-        }
+        emit("SetLocation: NO native code found — extending search failed too");
     }
 
-    // ── Section 3: SetRotation probe ──
-    emit("");
-    emit("=== SetRotation UFunction ===");
+    // ── Section 2: SetRotation ──
     if (s_SetRotFunc) {
-        const uint8_t* srRaw = reinterpret_cast<const uint8_t*>(s_SetRotFunc);
-        snprintf(buf, sizeof(buf), "SetRotation UFunction @ 0x%08X",
-                 (uint32_t)(uintptr_t)s_SetRotFunc);
-        emit(buf);
+        uintptr_t srCode = DumpUFunction(df, "SetRotation", s_SetRotFunc, 0x140);
+        if (srCode) s_SetRotNativeAddr = srCode;
+    }
 
-        for (int off = 0x00; off <= 0xBC; off += 4) {
-            uintptr_t val = *(uintptr_t*)(srRaw + off);
-            if (val < 0x00400000 || val > 0x7FFFFFFF) continue;
-            if (!IsSafeToRead(reinterpret_cast<const void*>(val), 16)) continue;
-            const uint8_t* codeAt = reinterpret_cast<const uint8_t*>(val);
-            if (IsLikelyCode(codeAt)) {
-                s_SetRotNativeAddr = val;
-                snprintf(buf, sizeof(buf),
-                         "SetRotation Func at +0x%02X = 0x%08X [%02X %02X %02X %02X]",
-                         off, (uint32_t)val, codeAt[0], codeAt[1], codeAt[2], codeAt[3]);
-                emit(buf);
-                break;
-            }
-        }
-        if (!s_SetRotNativeAddr)
-            emit("WARNING: SetRotation: no x86 code pointer found");
-    } else {
-        emit("SetRotation UFunction NOT found");
+    // ── Section 3: Comparison UFunctions (Spawn, Destroy — these work!) ──
+    // Dump known-working UFunctions so we can compare layouts and find Func offset
+    if (s_SpawnFunc) {
+        DumpUFunction(df, "Spawn (COMPARISON)", s_SpawnFunc, 0x140);
+    }
+    if (s_DestroyFunc) {
+        DumpUFunction(df, "Destroy (COMPARISON)", s_DestroyFunc, 0x140);
     }
 
     // ── Section 4: Puppet actor dump (first 512 bytes) ──
-    emit("");
     snprintf(buf, sizeof(buf), "=== Puppet Actor @ 0x%08X (%s) ===",
              (uint32_t)(uintptr_t)s_Puppet, s_Puppet->GetName().c_str());
     emit(buf);
-    snprintf(buf, sizeof(buf), "Puppet class: %s  LocOffset=%d RotOffset=%d",
+    snprintf(buf, sizeof(buf), "  Class: %s  LocOffset=%d RotOffset=%d",
              s_Puppet->GetObjClassName().c_str(), s_PuppetLocOffset, s_PuppetRotOffset);
     emit(buf);
 
@@ -360,7 +358,7 @@ static void DiagnoseAndDiscover()
         snprintf(buf, sizeof(buf), "ULevel = 0x%08X (from property)", (uint32_t)(uintptr_t)s_ULevel);
         emit(buf);
     } else {
-        emit("ULevel NOT found via property — scanning actor memory for Level object");
+        emit("ULevel NOT found via property — scanning actor memory");
         for (int off = 0x80; off <= 0x1FC; off += 4) {
             if (!IsSafeToRead(actRaw + off, 4)) break;
             uintptr_t val = *(uintptr_t*)(actRaw + off);
@@ -376,7 +374,7 @@ static void DiagnoseAndDiscover()
             }
         }
         if (!s_ULevel)
-            emit("ULevel NOT FOUND anywhere!");
+            emit("ULevel NOT FOUND");
     }
 
     // ── Summary ──
@@ -387,10 +385,10 @@ static void DiagnoseAndDiscover()
                  (uint32_t)(uintptr_t)s_ULevel, (uint32_t)(uintptr_t)s_MoveActorFn);
         emit(buf);
     } else if (s_MoveActorDiscovered && !s_ULevel) {
-        emit("MoveActor found but NO ULevel — cannot call directly");
+        emit("MoveActor found but NO ULevel");
         s_MoveActorDiscovered = false;
     } else {
-        emit("No direct MoveActor — will try PE then raw write");
+        emit("No direct MoveActor — raw write only");
     }
 
     if (df) {
@@ -644,7 +642,7 @@ bool SpawnGhostPuppet(float x, float y, float z)
     };
 
     UObject* bestCandidate = nullptr;
-    float bestDist = 0.0f;
+    float bestDist = 1e30f;  // Start at max, find NEAREST
     int candidatesScanned = 0;
     int totalChecked = 0;
     int nullPtrs = 0;
@@ -699,8 +697,10 @@ bool SpawnGhostPuppet(float x, float y, float z)
             float dx = ax - playerX, dy = ay - playerY, dz = az - playerZ;
             float dist = dx*dx + dy*dy + dz*dz;
 
-            // Pick the farthest one (least likely to be noticed missing)
-            if (dist > bestDist) {
+            // Pick the NEAREST one — must be close enough to share the
+            // same render octree region so the mesh doesn't get culled.
+            // Skip actors within 100 units (too close, might be underfoot).
+            if (dist > 100.0f * 100.0f && dist < bestDist) {
                 bestDist = dist;
                 bestCandidate = obj;
             }
@@ -755,8 +755,8 @@ bool SpawnGhostPuppet(float x, float y, float z)
     uint8_t ambientGlow = 254;
     SetPuppetProperty("AmbientGlow", &ambientGlow, 1);
 
-    // Keep at human-ish scale so it's easy to see
-    float drawScale = 1.0f;
+    // Make large enough to see clearly and expand bounding volume
+    float drawScale = 3.0f;
     SetPuppetProperty("DrawScale", &drawScale, 4);
 
     s_IsAIPuppet = false;
