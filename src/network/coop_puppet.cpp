@@ -727,21 +727,14 @@ bool SpawnGhostPuppet(float x, float y, float z)
     // Cache property offsets on the borrowed actor
     CachePuppetOffsets();
 
-    // ── Make movable: StaticMeshActors are bStatic=true by default,
-    //    which means UE2 never updates their render position when Location
-    //    changes. We must clear bStatic and give it physics so the engine
-    //    re-registers the actor in the render octree each frame.
+    // ── Configure puppet properties ──
+    // IMPORTANT: Do NOT change bStatic, bWorldGeometry, or Physics!
+    // Setting Physics=PHYS_Interpolating on a StaticMeshActor crashes the engine
+    // because the physics tick reads interpolation data that doesn't exist for
+    // actors loaded as static (null ptr deref at +0x234 in engine tick).
+    // MoveActor (discovered at UFunction+0xC0) handles all octree/hash updates.
     int32_t bFalse = 0;
     int32_t bTrue = 1;
-
-    // CRITICAL: allow the engine to move this actor's rendered mesh
-    SetPuppetProperty("bStatic", &bFalse, 4);
-    SetPuppetProperty("bWorldGeometry", &bFalse, 4);
-    // PHYS_Interpolating = 9 (confirmed via enum dump). Engine updates render pos each tick.
-    uint8_t physInterp = 9;
-    SetPuppetProperty("Physics", &physInterp, 1);
-    // Always render regardless of distance
-    SetPuppetProperty("bAlwaysRelevant", &bTrue, 4);
 
     // Disable collision so it doesn't block anything
     SetPuppetProperty("bCollideActors", &bFalse, 4);
@@ -755,7 +748,7 @@ bool SpawnGhostPuppet(float x, float y, float z)
     uint8_t ambientGlow = 254;
     SetPuppetProperty("AmbientGlow", &ambientGlow, 1);
 
-    // Make large enough to see clearly and expand bounding volume
+    // Scale up for visibility (also expands bounding volume)
     float drawScale = 3.0f;
     SetPuppetProperty("DrawScale", &drawScale, 4);
 

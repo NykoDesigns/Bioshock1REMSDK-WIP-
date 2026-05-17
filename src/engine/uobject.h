@@ -152,9 +152,11 @@ public:
 //     +0x6B: uint8  NumParms
 //     +0x6C: uint16 ParmsSize
 //     +0x6E: uint16 ReturnValueOffset
-//     +0x70: void*  Func (native function pointer)
-//     +0x74: int32  ScriptBytecodeSize  (optional padding)
-//     +0x78: FName  FriendlyName
+//     +0x70: void*  (unknown — NOT Func, points to UObject data)
+//     +0x80: uint32 FunctionFlags2 / iNative copy
+//     +0xA0: uint8[16] GUID (function signature hash)
+//     +0xB0: uint8[16] metadata
+//     +0xC0: void*  Func (native function pointer) [CONFIRMED on 4 UFunctions]
 
 class UFunction : public UStruct {
 public:
@@ -164,7 +166,7 @@ public:
     static constexpr size_t OFFSET_NUM_PARMS        = 0x6B;
     static constexpr size_t OFFSET_PARMS_SIZE       = 0x6C;
     static constexpr size_t OFFSET_RETURN_OFFSET    = 0x6E;
-    static constexpr size_t OFFSET_NATIVE_FUNC      = 0x70;
+    static constexpr size_t OFFSET_NATIVE_FUNC      = 0xC0; // [CONFIRMED] was wrongly assumed 0x70
 
     uint32_t GetFunctionFlags() const { return GetField<uint32_t>(OFFSET_FUNCTION_FLAGS); }
     uint16_t GetNativeIndex() const { return GetField<uint16_t>(OFFSET_INATIVE); }
