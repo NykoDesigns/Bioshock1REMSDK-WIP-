@@ -42,6 +42,11 @@ constexpr float AGGRO_INTERVAL = 2.0f;  // every 2 seconds
 constexpr float AGGRO_RANGE = 3000.0f;  // 30m radius
 static UFunction* s_AddForcedEnemyFunc = nullptr;
 static bool s_IsAIPuppet = false;       // true if puppet is a ShockPawn subclass
+static bool s_IsPawnPuppet = false;     // true if borrowed actor is a Pawn (dynamic, movable)
+
+// bStatic bitmask cache for transient clearing on StaticMeshActor puppets
+static int      s_bStaticOffset = -1;
+static uint32_t s_bStaticMask = 0;
 
 // Spawn retry cooldown — don't spam every frame
 static float s_SpawnRetryTimer = 999.0f;  // start high so first attempt is immediate
@@ -596,10 +601,9 @@ bool SpawnGhostPuppet(float x, float y, float z)
     // Already have one?
     if (s_Puppet) return true;
 
-    // ── Strategy: "Borrow" an existing world actor instead of spawning ──
-    // ProcessEvent(Spawn) doesn't work for native functions in BioShock
-    // Remastered. Instead, find a distant StaticMeshActor, claim it as
-    // our puppet, and move it to the partner's position.
+    // ── Strategy: "Borrow" an existing world actor as the puppet ──
+    // Tier 1: ShockPawn (splicer) — dynamic, humanoid, MoveActor works directly
+    // Tier 2: StaticMeshActor — fallback, needs transient bStatic clear
 
     UObject* player = FindObjectByClassName("ShockPlayer");
     if (!player) {
@@ -618,7 +622,7 @@ bool SpawnGhostPuppet(float x, float y, float z)
         }
     }
 
-    // Read player location to find the most distant actor
+    // Read player location
     float playerX = 0, playerY = 0, playerZ = 0;
     if (locOff > 0) {
         const uint8_t* raw = reinterpret_cast<const uint8_t*>(player);
@@ -627,93 +631,131 @@ bool SpawnGhostPuppet(float x, float y, float z)
         memcpy(&playerZ, raw + locOff + 8, 4);
     }
 
-    // Scan GObjects for a StaticMeshActor to borrow
     const auto& globals = GetEngineGlobals();
     if (!globals.IsValid()) return false;
 
     uintptr_t objData = *reinterpret_cast<uintptr_t*>(globals.GObjects);
     int32_t objCount = *reinterpret_cast<int32_t*>(globals.GObjects + 4);
 
-    // Prefer classes in this order — many fallbacks for different game states
-    const char* borrowClasses[] = {
-        "StaticMeshActor", "InterpActor", "KActor",
-        "Decoration", "Emitter", "Note",
-        "Trigger", "BlockingVolume", "PhysicsVolume"
+    // ── Tier 1: Find a ShockPawn (splicer) to borrow ──
+    // Prefer the FARTHEST one so it won't be encountered during gameplay
+    // (level is linear — far enemies haven't been triggered yet)
+    const char* pawnClasses[] = {
+        "MeleeThug", "SpawnedMeleeThug",
+        "RangedAggressorPistol", "SpawnedRangedAggressorPistol",
+        "RangedAggressorSMG", "SpawnedRangedAggressorSMG",
+        "CeilingCrawler", "SpawnedCeilingCrawler",
+        "Assassin", "SpawnedAssassin",
+        "Grenadier", "SpawnedGrenadier",
+        "Thug_Splicer", "SpawnedThug_Splicer",
+        "Nitro_Splicer", "SpawnedNitro_Splicer",
+        "Houdini_Splicer", "SpawnedHoudini_Splicer",
+        "Spider_Splicer", "SpawnedSpider_Splicer"
     };
 
-    UObject* bestCandidate = nullptr;
-    float bestDist = 1e30f;  // Start at max, find NEAREST
-    int candidatesScanned = 0;
+    // Tier 2 fallback classes (static/decorative)
+    const char* staticClasses[] = {
+        "StaticMeshActor", "InterpActor", "KActor",
+        "Decoration", "Emitter"
+    };
+
+    UObject* bestPawn = nullptr;
+    float bestPawnDist = 0.0f;  // find FARTHEST pawn
+    UObject* bestStatic = nullptr;
+    float bestStaticDist = 1e30f;  // find NEAREST static
+    int pawnCandidates = 0;
+    int staticCandidates = 0;
     int totalChecked = 0;
-    int nullPtrs = 0;
-    int badPtr = 0;
-    int noClass = 0;
-    int nameErrors = 0;
     static bool s_DiagLogged = false;
 
-    // Single-pass scan: check all objects once, matching any borrow class
     for (int i = 0; i < objCount && i < 120000; i++) {
         uintptr_t ptr = *reinterpret_cast<uintptr_t*>(objData + i * 4);
-        if (!ptr) { nullPtrs++; continue; }
+        if (!ptr || ptr < 0x10000u) continue;
 
-        // Quick validity check: reject obviously bad pointers (IsSafeToRead handles LAA range)
-        if (ptr < 0x10000u) { badPtr++; continue; }
-
-        UObject* obj = reinterpret_cast<UObject*>(ptr);
-        totalChecked++;
-
-        // Read class pointer directly at +0x30, with minimal safety check
-        if (!IsSafeToRead(reinterpret_cast<const void*>(ptr), 0x34)) { badPtr++; continue; }
+        if (!IsSafeToRead(reinterpret_cast<const void*>(ptr), 0x34)) continue;
         uintptr_t clsPtr = *reinterpret_cast<uintptr_t*>(ptr + UObject::OFFSET_CLASS);
-        if (!clsPtr || clsPtr < 0x10000u) { noClass++; continue; }
-        if (!IsSafeToRead(reinterpret_cast<const void*>(clsPtr), 0x30)) { noClass++; continue; }
+        if (!clsPtr || clsPtr < 0x10000u) continue;
+        if (!IsSafeToRead(reinterpret_cast<const void*>(clsPtr), 0x30)) continue;
 
-        // Read the class FName directly (at +0x28 on the class object)
         FName classFName = *reinterpret_cast<FName*>(clsPtr + UObject::OFFSET_NAME);
         std::string cn = classFName.ToString();
-        if (cn.empty() || cn[0] == '<') { nameErrors++; continue; }
+        if (cn.empty() || cn[0] == '<') continue;
+        totalChecked++;
 
-        // Log first few class names on first scan for diagnostics
-        if (!s_DiagLogged && i <= 4 && !cn.empty()) {
+        // Log first few for diagnostics
+        if (!s_DiagLogged && i <= 4) {
             LOG_INFO("[Puppet] GObj[{}] class='{}' ptr=0x{:08X}", i, cn, (uint32_t)ptr);
         }
 
-        // Check against all borrow classes
-        bool isMatch = false;
-        for (const char* bClass : borrowClasses) {
-            if (cn == bClass) { isMatch = true; break; }
-        }
-        if (!isMatch) continue;
+        UObject* obj = reinterpret_cast<UObject*>(ptr);
         if (obj == player) continue;
-        candidatesScanned++;
 
-        if (locOff > 0) {
+        // Check Tier 1: Pawn (splicer)
+        bool isPawn = false;
+        for (const char* pc : pawnClasses) {
+            if (cn == pc) { isPawn = true; break; }
+        }
+
+        if (isPawn && locOff > 0) {
+            pawnCandidates++;
             const uint8_t* raw = reinterpret_cast<const uint8_t*>(obj);
             float ax, ay, az;
             memcpy(&ax, raw + locOff, 4);
             memcpy(&ay, raw + locOff + 4, 4);
             memcpy(&az, raw + locOff + 8, 4);
-
             float dx = ax - playerX, dy = ay - playerY, dz = az - playerZ;
             float dist = dx*dx + dy*dy + dz*dz;
-
-            // Pick the NEAREST one — must be close enough to share the
-            // same render octree region so the mesh doesn't get culled.
-            // Skip actors within 100 units (too close, might be underfoot).
-            if (dist > 100.0f * 100.0f && dist < bestDist) {
-                bestDist = dist;
-                bestCandidate = obj;
+            // Prefer farthest (won't be encountered for a while)
+            if (dist > bestPawnDist && dist > 500.0f * 500.0f) {
+                bestPawnDist = dist;
+                bestPawn = obj;
             }
-        } else {
-            // No location offset — just grab first one
-            bestCandidate = obj;
-            break;
+            continue;
+        }
+
+        // Check Tier 2: StaticMeshActor etc.
+        bool isStatic = false;
+        for (const char* sc : staticClasses) {
+            if (cn == sc) { isStatic = true; break; }
+        }
+
+        if (isStatic && locOff > 0) {
+            staticCandidates++;
+            const uint8_t* raw = reinterpret_cast<const uint8_t*>(obj);
+            float ax, ay, az;
+            memcpy(&ax, raw + locOff, 4);
+            memcpy(&ay, raw + locOff + 4, 4);
+            memcpy(&az, raw + locOff + 8, 4);
+            float dx = ax - playerX, dy = ay - playerY, dz = az - playerZ;
+            float dist = dx*dx + dy*dy + dz*dz;
+            // Nearest (for render octree proximity)
+            if (dist > 100.0f * 100.0f && dist < bestStaticDist) {
+                bestStaticDist = dist;
+                bestStatic = obj;
+            }
         }
     }
 
-    LOG_INFO("[Puppet] Scanned {} candidates, locOff={} (total={}, null={}, badPtr={}, noClass={}, nameErr={}, objCount={})",
-             candidatesScanned, locOff, totalChecked, nullPtrs, badPtr, noClass, nameErrors, objCount);
     s_DiagLogged = true;
+    LOG_INFO("[Puppet] Scan: {} pawns, {} statics (total={}, objCount={})",
+             pawnCandidates, staticCandidates, totalChecked, objCount);
+
+    // Select best candidate: prefer Pawn over Static
+    UObject* bestCandidate = nullptr;
+    float bestDist = 0;
+    if (bestPawn) {
+        bestCandidate = bestPawn;
+        bestDist = bestPawnDist;
+        s_IsPawnPuppet = true;
+        LOG_INFO("[Puppet] Selected PAWN: {} ({}) dist={:.0f}",
+                 bestPawn->GetName(), bestPawn->GetObjClassName(), sqrtf(bestPawnDist));
+    } else if (bestStatic) {
+        bestCandidate = bestStatic;
+        bestDist = bestStaticDist;
+        s_IsPawnPuppet = false;
+        LOG_INFO("[Puppet] No pawns available, using static: {} ({}) dist={:.0f}",
+                 bestStatic->GetName(), bestStatic->GetObjClassName(), sqrtf(bestStaticDist));
+    }
 
     if (!bestCandidate) {
         LOG_WARN("[Puppet] No world actor found to borrow as puppet");
@@ -721,35 +763,73 @@ bool SpawnGhostPuppet(float x, float y, float z)
     }
 
     s_Puppet = bestCandidate;
-    LOG_INFO("[Puppet] Borrowed world actor: {} ({}) dist={:.0f}",
-             s_Puppet->GetName(), s_Puppet->GetObjClassName(), sqrtf(bestDist));
+    LOG_INFO("[Puppet] Borrowed world actor: {} ({}) isPawn={}",
+             s_Puppet->GetName(), s_Puppet->GetObjClassName(), s_IsPawnPuppet ? "YES" : "NO");
 
     // Cache property offsets on the borrowed actor
     CachePuppetOffsets();
 
     // ── Configure puppet properties ──
-    // IMPORTANT: Do NOT change bStatic, bWorldGeometry, or Physics!
-    // Setting Physics=PHYS_Interpolating on a StaticMeshActor crashes the engine
-    // because the physics tick reads interpolation data that doesn't exist for
-    // actors loaded as static (null ptr deref at +0x234 in engine tick).
-    // MoveActor (discovered at UFunction+0xC0) handles all octree/hash updates.
     int32_t bFalse = 0;
     int32_t bTrue = 1;
 
-    // Disable collision so it doesn't block anything
+    if (s_IsPawnPuppet) {
+        // ─ Pawn configuration ─
+        // Stop autonomous movement: PHYS_None is SAFE on Pawns (they have
+        // full physics infrastructure). This prevents the AI from walking it.
+        uint8_t physNone = 0; // PHYS_None
+        SetPuppetProperty("Physics", &physNone, 1);
+        // Disable AI processing
+        SetPuppetProperty("bAITickEnabled", &bFalse, 4);
+        // Detach from any controller (prevents AI decisions)
+        // Write null to Controller property if it exists
+        uintptr_t nullPtr = 0;
+        SetPuppetProperty("Controller", &nullPtr, 4);
+    } else {
+        // ─ StaticMeshActor configuration ─
+        // Do NOT change bStatic, bWorldGeometry, or Physics!
+        // Setting Physics=PHYS_Interpolating crashes the engine (null deref at +0x234).
+        // Cache bStatic offset+bitmask for transient clearing during MoveActor.
+        UStruct* cls = reinterpret_cast<UStruct*>(s_Puppet->GetClass());
+        if (cls) {
+            UField* child = reinterpret_cast<UField*>(cls);
+            int depth = 0;
+            while (child && depth < 64) {
+                UStruct* current = reinterpret_cast<UStruct*>(child);
+                UField* prop = current->GetChildren();
+                int limit = 2000;
+                while (prop && limit-- > 0) {
+                    if (prop->GetName() == "bStatic") {
+                        UProperty* p = reinterpret_cast<UProperty*>(prop);
+                        s_bStaticOffset = p->GetPropertyOffset();
+                        s_bStaticMask = p->GetField<uint32_t>(0x78); // UBoolProperty bitmask
+                        if (s_bStaticMask == 0) s_bStaticMask = 1;
+                        LOG_INFO("[Puppet] bStatic: offset={} mask=0x{:08X}", s_bStaticOffset, s_bStaticMask);
+                        break;
+                    }
+                    prop = prop->GetNext();
+                }
+                if (s_bStaticOffset >= 0) break;
+                child = reinterpret_cast<UField*>(current->GetSuperField());
+                depth++;
+            }
+        }
+    }
+
+    // Common: disable collision, make visible and glowing
     SetPuppetProperty("bCollideActors", &bFalse, 4);
     SetPuppetProperty("bBlockActors", &bFalse, 4);
     SetPuppetProperty("bBlockPlayers", &bFalse, 4);
     SetPuppetProperty("bBlockHavok", &bFalse, 4);
     SetPuppetProperty("bHidden", &bFalse, 4);
 
-    // Make it bright and fully lit so it's always visible as "the partner"
+    // Make bright and fully lit — distinguishes from regular enemies
     SetPuppetProperty("bUnlit", &bTrue, 4);
     uint8_t ambientGlow = 254;
     SetPuppetProperty("AmbientGlow", &ambientGlow, 1);
 
-    // Scale up for visibility (also expands bounding volume)
-    float drawScale = 3.0f;
+    // Scale: bigger for StaticMesh (random prop), normal for Pawn (already human-sized)
+    float drawScale = s_IsPawnPuppet ? 1.0f : 3.0f;
     SetPuppetProperty("DrawScale", &drawScale, 4);
 
     s_IsAIPuppet = false;
@@ -805,9 +885,9 @@ void UpdateGhostPuppet(const PlayerStateData& remoteState)
     s_InterpZ += (s_TargetZ - s_InterpZ) * t;
 
     // ─── Move puppet ───
-    // ProcessEvent + SetLocation crashes on borrowed StaticMeshActors because
-    // they're in the static octree and MoveActor can't manipulate them there.
-    // Solution: call MoveActor DIRECTLY, bypassing ProcessEvent entirely.
+    // For Pawns: MoveActor works directly (dynamic actors, no bStatic issue).
+    // For StaticMeshActors: temporarily clear bStatic bit → MoveActor → restore.
+    // This is same-thread so the engine's tick never sees bStatic=false.
     static bool s_Diagnosed = false;
     static bool s_SetLocSafe = true;
     static bool s_SetRotSafe = true;
@@ -838,6 +918,16 @@ void UpdateGhostPuppet(const PlayerStateData& remoteState)
 
         // Skip if delta is negligible
         if (dX * dX + dY * dY + dZ * dZ > 0.01f) {
+            // For StaticMeshActor: transiently clear bStatic so MoveActor updates octree
+            uint32_t savedStatic = 0;
+            uint32_t* staticPtr = nullptr;
+            if (!s_IsPawnPuppet && s_bStaticOffset >= 0 && s_bStaticMask) {
+                staticPtr = reinterpret_cast<uint32_t*>(
+                    reinterpret_cast<uint8_t*>(s_Puppet) + s_bStaticOffset);
+                savedStatic = *staticPtr;
+                *staticPtr &= ~s_bStaticMask; // clear bStatic
+            }
+
             __try {
                 s_MoveActorFn(s_ULevel, s_Puppet,
                               dX, dY, dZ,
@@ -848,6 +938,11 @@ void UpdateGhostPuppet(const PlayerStateData& remoteState)
                 DWORD exCode = GetExceptionCode();
                 LOG_WARN("[Puppet] MoveActor CRASHED (exception=0x{:08X}) — disabling", exCode);
                 s_MoveActorDiscovered = false;
+            }
+
+            // Restore bStatic immediately (engine tick never sees it cleared)
+            if (staticPtr) {
+                *staticPtr = savedStatic;
             }
         } else {
             locWritten = true; // no movement needed
@@ -916,6 +1011,9 @@ void DestroyGhostPuppet()
     s_PuppetLocOffset = -1;
     s_PuppetRotOffset = -1;
     s_HasTarget = false;
+    s_IsPawnPuppet = false;
+    s_bStaticOffset = -1;
+    s_bStaticMask = 0;
 }
 
 bool HasGhostPuppet()
