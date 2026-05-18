@@ -7,6 +7,7 @@
 #include <MinHook.h>
 #include <vector>
 #include <mutex>
+#include <atomic>
 #include <chrono>
 #include <algorithm>
 
@@ -65,68 +66,81 @@ static int SafeCallHook(const std::function<bool(UObject*, UFunction*, void*)>& 
 
 // ─── Our replacement ProcessEvent ───────────────────────────────────────
 // x86 __thiscall: 'this' in ECX. We use __fastcall to capture ECX + EDX.
+//
+// PERFORMANCE CRITICAL: This runs for every UFunction call in the engine
+// (~3000-5000 per frame). Must be as lean as possible.
+//   - No std::string allocations
+//   - No mutex on the hot path
+//   - No SEH / IsSafeToRead probes (engine pointers are valid)
+//   - Zero-allocation FName lookup via raw wchar_t*
+//   - Cached snapshot of hooks (copy-on-write) to avoid lock
+
+// Lock-free hook snapshot: updated when hooks change, read without locking
+static std::vector<std::pair<int, ProcessEventHook>> s_HookSnapshot;
+static std::atomic<bool> s_HooksDirty{false};
+
+static void RefreshHookSnapshot()
+{
+    std::lock_guard<std::mutex> lock(s_HookMutex);
+    s_HookSnapshot = s_Hooks;
+    s_HooksDirty = false;
+}
 
 static void __fastcall HookedProcessEvent(UObject* thisObj, void* /*edx*/,
                                            UFunction* function, void* parms, void* result)
 {
     s_Stats.TotalCalls++;
 
-    // Safety: validate pointers before any dereference
+    // Null check only — no IsSafeToRead (engine pointers are always valid)
     if (!thisObj || !function) {
-        if (s_OriginalProcessEvent) {
+        if (s_OriginalProcessEvent)
             s_OriginalProcessEvent(thisObj, function, parms, result);
-        }
         return;
     }
 
-    // Validate pointers are actually readable memory
-    if (!IsSafeToRead(thisObj, 8) || !IsSafeToRead(function, 8)) {
-        if (s_OriginalProcessEvent) {
-            s_OriginalProcessEvent(thisObj, function, parms, result);
-        }
+    // Fast path: no hooks → just call original
+    if (s_HookSnapshot.empty() && !s_HooksDirty) {
+        s_OriginalProcessEvent(thisObj, function, parms, result);
         return;
     }
 
-    // Only resolve names if we have hooks or every Nth call for stats display
-    bool needNames = !s_Hooks.empty() || (s_Stats.TotalCalls % 64 == 0);
-    std::string funcName;
+    // Refresh snapshot if hooks changed (rare — only during init)
+    if (s_HooksDirty)
+        RefreshHookSnapshot();
 
-    if (needNames) {
-        // Probe that name memory is readable before calling GetName()
-        char probeBuf[4];
-        if (SafeGetOneName(reinterpret_cast<UObject*>(function), probeBuf, 4) != 0 ||
-            SafeGetOneName(thisObj, probeBuf, 4) != 0) {
-            // Memory not readable — skip hooks, call original
-            if (s_OriginalProcessEvent) {
-                s_OriginalProcessEvent(thisObj, function, parms, result);
-            }
-            return;
-        }
-        // Memory is safe, call GetName() normally
-        funcName = function->GetName();
-        s_Stats.LastFunctionName = funcName;
-        s_Stats.LastObjectName = thisObj->GetName();
+    // Read function FName index directly (zero allocation — just a uint32 read)
+    // UFunction inherits UObject: FName at +0x28, Index is first int32
+    int32_t funcNameIdx = *reinterpret_cast<int32_t*>(
+        reinterpret_cast<uint8_t*>(function) + UObject::OFFSET_NAME);
+
+    // Look up raw wide string from GNames (no allocation)
+    const wchar_t* funcNameW = GetFNameRaw(funcNameIdx);
+    if (!funcNameW) {
+        s_OriginalProcessEvent(thisObj, function, parms, result);
+        return;
     }
 
+    // Stats name tracking removed — GetName() does heap allocations which
+    // add up at 5000 PE calls/frame. TotalCalls counter still increments above.
+
+    // Dispatch to hooks — NO mutex lock (we use the snapshot)
     bool blocked = false;
-
-    if (!s_Hooks.empty() && !funcName.empty()) {
-        std::lock_guard<std::mutex> lock(s_HookMutex);
-        for (auto& [id, hook] : s_Hooks) {
-            if (!hook.FunctionFilter.empty() && hook.FunctionFilter != funcName)
+    for (auto& [id, hook] : s_HookSnapshot) {
+        // Fast filter check using raw wide string compare (no std::string)
+        if (!hook.FunctionFilter.empty()) {
+            if (!WideMatchesAscii(funcNameW, hook.FunctionFilter.c_str()))
                 continue;
+        }
 
-            if (hook.Callback) {
-                if (SafeCallHook(hook.Callback, thisObj, function, parms)) {
-                    blocked = true;
-                    s_Stats.BlockedCalls++;
-                    break;
-                }
+        if (hook.Callback) {
+            if (hook.Callback(thisObj, function, parms)) {
+                blocked = true;
+                s_Stats.BlockedCalls++;
+                break;
             }
         }
     }
 
-    // Call original unless blocked
     if (!blocked && s_OriginalProcessEvent) {
         s_OriginalProcessEvent(thisObj, function, parms, result);
     }
@@ -178,23 +192,35 @@ static uintptr_t DiscoverProcessEventAddress()
             const uint8_t* code = reinterpret_cast<const uint8_t*>(funcAddr);
             bool found = false;
 
-            for (int b = 0; b < 2048; b++) {
-                // cmp eax, 0xFA (3D FA000000)
+            for (int b = 0; b < 8192; b++) {
+                // cmp eax, 0xFA (3D FA000000) — most common encoding
                 if (code[b] == 0x3D && *reinterpret_cast<const uint32_t*>(code + b + 1) == 250) {
                     found = true; break;
                 }
-                // cmp [reg], 0xFA various encodings
-                if (code[b] == 0x81 && b + 6 < 2048) {
-                    uint32_t imm = *reinterpret_cast<const uint32_t*>(code + b + 2);
-                    if (imm == 250) { found = true; break; }
-                }
-                // cmp byte 0xFA
-                if (code[b] == 0x83 && b + 3 < 2048) {
-                    if (code[b + 2] == 0xFA) { found = true; break; }
+                // 81 XX imm32: cmp reg/mem, 250 — check at multiple offsets
+                // ModRM variants: +2 (reg), +3 (reg+disp8), +6 (reg+disp32)
+                if (code[b] == 0x81 && b + 7 < 8192) {
+                    if (*reinterpret_cast<const uint32_t*>(code + b + 2) == 250) { found = true; break; }
+                    if (*reinterpret_cast<const uint32_t*>(code + b + 3) == 250) { found = true; break; }
+                    if (*reinterpret_cast<const uint32_t*>(code + b + 6) == 250) { found = true; break; }
                 }
             }
 
             if (found) {
+                // Validate function starts with a valid prologue (avoids false positives in data)
+                bool validStart = false;
+                if (code[0] == 0x55 && code[1] == 0x8B && code[2] == 0xEC) validStart = true;
+                if (code[0] == 0x53 || code[0] == 0x56 || code[0] == 0x57) validStart = true;
+                if (code[0] == 0x83 && code[1] == 0xEC) validStart = true;
+                if (code[0] == 0x81 && code[1] == 0xEC) validStart = true;
+                if (code[0] == 0x6A) validStart = true;
+                if (code[0] == 0x8B) validStart = true;
+                if (code[0] == 0xE9) validStart = true;
+                if (!validStart) {
+                    LOG_INFO("ProcessEvent: vtable[{}] has recursion pattern but bad prologue ({:02X} {:02X} {:02X}), skipping",
+                             idx, code[0], code[1], code[2]);
+                    continue;
+                }
                 LOG_INFO("ProcessEvent: Found via heuristic at vtable[{}] = 0x{:08X}", idx, funcAddr);
                 return funcAddr;
             }
@@ -211,14 +237,37 @@ static uintptr_t DiscoverProcessEventAddress()
     int bestIdx = -1;
     size_t bestSize = 0;
 
-    for (int idx = 55; idx < 85; idx++) {
+    for (int idx = 60; idx < 73; idx++) {
         __try {
             uintptr_t funcAddr = vtableEntries[idx];
             if (funcAddr < modBase || funcAddr >= modEnd) continue;
 
+            const uint8_t* code = reinterpret_cast<const uint8_t*>(funcAddr);
+
+            // Validate this looks like actual code, not data/zeros.
+            // NOTE: Do NOT use VirtualQuery here — Steam DRM can report code
+            // pages as non-executable during early init. Prologue check is
+            // sufficient: data regions (zeros, pointers) never start with
+            // valid x86 function prologues.
+            bool validPrologue = false;
+            if (code[0] == 0x55 && code[1] == 0x8B && code[2] == 0xEC) validPrologue = true; // push ebp; mov ebp, esp
+            if (code[0] == 0x8B && code[1] == 0xFF && code[2] == 0x55) validPrologue = true; // mov edi,edi; push ebp
+            if (code[0] == 0x53 || code[0] == 0x56 || code[0] == 0x57) validPrologue = true; // push ebx/esi/edi
+            if (code[0] == 0x83 && code[1] == 0xEC) validPrologue = true; // sub esp, imm8
+            if (code[0] == 0x81 && code[1] == 0xEC) validPrologue = true; // sub esp, imm32
+            if (code[0] == 0x6A) validPrologue = true; // push imm8
+            if (code[0] == 0x8B && (code[1] == 0x44 || code[1] == 0x4C)) validPrologue = true; // mov reg, [esp+x]
+            if (code[0] == 0x8B && code[1] == 0xD1) validPrologue = true; // mov edx, ecx (thiscall)
+            if (code[0] == 0xE9) validPrologue = true; // jmp rel32 (hotpatch trampoline)
+
+            if (!validPrologue) {
+                LOG_INFO("ProcessEvent: vtable[{}] = 0x{:08X} — no valid prologue (bytes: {:02X} {:02X} {:02X}), skipping",
+                         idx, funcAddr, code[0], code[1], code[2]);
+                continue;
+            }
+
             // Estimate function size by scanning for the next function prologue
             // (push ebp / mov ebp, esp = 55 8B EC) or next vtable entry
-            const uint8_t* code = reinterpret_cast<const uint8_t*>(funcAddr);
             size_t estSize = 0;
 
             for (size_t b = 16; b < 65536; b++) {
@@ -234,8 +283,8 @@ static uintptr_t DiscoverProcessEventAddress()
                 }
             }
 
-            if (estSize > 1000 && estSize > bestSize) {
-                // ProcessEvent is always a large function (>1KB)
+            if (estSize > 300 && estSize > bestSize) {
+                // ProcessEvent is a large function — pick the biggest candidate
                 bestSize = estSize;
                 bestAddr = funcAddr;
                 bestIdx = idx;
@@ -247,7 +296,7 @@ static uintptr_t DiscoverProcessEventAddress()
         }
     }
 
-    if (bestAddr && bestSize > 1000) {
+    if (bestAddr && bestSize > 300) {
         LOG_INFO("ProcessEvent: Using size-based fallback vtable[{}] = 0x{:08X} (~{}B)",
                  bestIdx, bestAddr, bestSize);
         return bestAddr;
@@ -329,7 +378,11 @@ bool InitProcessEventHook()
     }
 
     // Store original function pointer
-    s_OriginalProcessEvent = reinterpret_cast<ProcessEventFn>(*vtableSlot);
+    // NOTE: Do NOT check VirtualQuery here — Steam DRM can report valid code
+    // pages as non-executable during early initialization.
+    uintptr_t origAddr = *vtableSlot;
+    s_OriginalProcessEvent = reinterpret_cast<ProcessEventFn>(origAddr);
+    LOG_INFO("ProcessEvent: vtable fallback — original at 0x{:08X}", origAddr);
 
     // Make vtable writable and patch it
     DWORD oldProtect;
@@ -384,6 +437,7 @@ int RegisterProcessEventHook(const ProcessEventHook& hook)
     std::lock_guard<std::mutex> lock(s_HookMutex);
     int id = s_NextHookId++;
     s_Hooks.push_back({id, hook});
+    s_HooksDirty = true;
     LOG_INFO("ProcessEvent hook registered: '{}' (filter: '{}')", hook.Name,
              hook.FunctionFilter.empty() ? "*" : hook.FunctionFilter);
     return id;
@@ -396,6 +450,7 @@ void UnregisterProcessEventHook(int id)
         std::remove_if(s_Hooks.begin(), s_Hooks.end(),
                        [id](const auto& p) { return p.first == id; }),
         s_Hooks.end());
+    s_HooksDirty = true;
 }
 
 ProcessEventFn GetOriginalProcessEvent()

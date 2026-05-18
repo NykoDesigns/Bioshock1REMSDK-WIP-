@@ -4,6 +4,7 @@
 #include "coop_puppet.h"
 #include "coop_economy.h"
 #include "coop_save.h"
+#include "coop_true.h"
 #include "net_manager.h"
 #include "net_common.h"
 #include "../core/log.h"
@@ -34,7 +35,8 @@ static OnChatFunc s_LocalChatCallback;
 static int s_LocOffset = -1;     // Location (Vector)
 static int s_RotOffset = -1;     // Rotation (Rotator)
 static int s_HealthOffset = -1;  // Health (float)
-// static int s_EveOffset = -1;     // EVE (float) - TODO: find property name
+static int s_FlashCountOffset = -1; // FlashCount (byte) — increments on weapon fire
+static uint8_t s_LastFlashCount = 0; // Track changes for fire detection
 
 // Level tracking
 static std::string s_LocalLevelName;
@@ -89,9 +91,14 @@ static bool CachePlayerOffsets()
         auto* pi = FindProperty(cls, "Health", allProps);
         if (pi) s_HealthOffset = pi->Offset;
     }
+    if (s_FlashCountOffset < 0) {
+        auto* pi = FindProperty(cls, "FlashCount", allProps);
+        if (pi) s_FlashCountOffset = pi->Offset;
+    }
 
     if (s_LocOffset > 0) {
-        LOG_INFO("[Co-op] Cached offsets: Loc={}, Rot={}, Health={}", s_LocOffset, s_RotOffset, s_HealthOffset);
+        LOG_INFO("[Co-op] Cached offsets: Loc={}, Rot={}, Health={}, FlashCount={}", 
+                 s_LocOffset, s_RotOffset, s_HealthOffset, s_FlashCountOffset);
     }
     return s_LocOffset > 0;
 }
@@ -144,6 +151,17 @@ static PlayerStateData ReadLocalPlayerState()
                 memcpy(&state.health, raw + s_HealthOffset, 4);
             }
 
+            // Read FlashCount for fire detection
+            if (s_FlashCountOffset > 0) {
+                const uint8_t* raw = reinterpret_cast<const uint8_t*>(obj);
+                uint8_t flashCount = *(raw + s_FlashCountOffset);
+                // isFiring = 1 if FlashCount changed this frame
+                if (flashCount != s_LastFlashCount) {
+                    state.isFiring = 1;
+                    s_LastFlashCount = flashCount;
+                }
+            }
+
             break;
         }
     }
@@ -158,6 +176,16 @@ static void UpdatePuppet(const PlayerStateData& remoteState)
     // Update the rendering system with remote state (overlay marker)
     const NetPeer* peer = GetRemotePeer();
     SetRemoteRenderState(remoteState, peer ? peer->name.c_str() : "Partner");
+
+    // Detect firing — isFiring=1 means FlashCount changed on sender side
+    if (remoteState.isFiring) {
+        PlayerActionData action{};
+        action.action = ActionType::WeaponFire;
+        action.dirX = cosf(remoteState.rotYaw * 3.14159f / 180.0f);
+        action.dirY = sinf(remoteState.rotYaw * 3.14159f / 180.0f);
+        action.dirZ = sinf(remoteState.rotPitch * 3.14159f / 180.0f);
+        NotifyPuppetAction(action);
+    }
 
     // Update the in-world ghost puppet (3D model)
     UpdateGhostPuppet(remoteState);
@@ -191,6 +219,37 @@ static void OnPeerConnectionEvent(const NetPeer& peer, bool connected)
     }
 }
 
+// ─── Crash Info Provider ──────────────────────────────────────────────
+
+static void CrashProvider_CoopState(FILE* f1, FILE* f2)
+{
+    #define CE(...) CRASH_EMIT(f1, f2, __VA_ARGS__)
+    CE("  Active:       %s\n", s_Active ? "YES" : "no");
+    CE("  Net Role:     %s\n", GetNetRole() == NetRole::Host ? "HOST" :
+                                GetNetRole() == NetRole::Client ? "CLIENT" : "NONE");
+    CE("  Connected:    %s\n", IsNetConnected() ? "YES" : "no");
+    CE("  Has Puppet:   %s\n", HasGhostPuppet() ? "YES" : "no");
+    CE("  Local Level:  %s\n", s_LocalLevelName.empty() ? "(unknown)" : s_LocalLevelName.c_str());
+    CE("  Remote Level: %s\n", s_RemoteLevelName.empty() ? "(unknown)" : s_RemoteLevelName.c_str());
+    CE("  Level Match:  %s\n", s_LevelMismatch ? "MISMATCH" : "ok");
+
+    const NetPeer* peer = GetRemotePeer();
+    if (peer) {
+        CE("  Remote Peer:  %s:%u (%s)\n", peer->ip.c_str(), peer->port, peer->name.c_str());
+        CE("  Last Recv:    %.1fs ago\n", peer->lastRecvTime);
+        CE("  Remote Pos:   (%.0f, %.0f, %.0f)\n",
+             peer->lastState.posX, peer->lastState.posY, peer->lastState.posZ);
+    } else {
+        CE("  Remote Peer:  (none)\n");
+    }
+
+    std::string puppetDiag = GetPuppetDiagnostics();
+    if (!puppetDiag.empty()) {
+        CE("  Puppet Info:  %s\n", puppetDiag.c_str());
+    }
+    #undef CE
+}
+
 // ─── Public API ────────────────────────────────────────────────────────
 
 bool InitCoopBridge()
@@ -207,63 +266,21 @@ bool InitCoopBridge()
         if (s_LocalChatCallback) s_LocalChatCallback(sender, msg);
     });
 
-    // Register a ProcessEvent hook for reading player state on Tick
-    if (IsProcessEventHooked()) {
-        ProcessEventHook hook;
-        hook.Name = "CoopBridge";
-        hook.Callback = [](UObject* obj, UFunction* func, void* parms) -> bool {
-            if (!obj || !func || !IsSafeToRead(obj, 32) || !IsSafeToRead(func, 32))
-                return false;
-            // We use PlayerTick to read state at the right time
-            std::string funcName = func->GetName();
-            if (funcName == "PlayerTick" || funcName == "Tick") {
-                std::string cn = obj->GetObjClassName();
-                if (cn == "ShockPlayer" || cn == "ShockPlayerController") {
-                    // Cache property offsets on first encounter
-                    UStruct* cls = reinterpret_cast<UStruct*>(obj->GetClass());
-                    if (cls) {
-                        std::vector<PropertyInfo> allProps = WalkProperties(cls);
-                        if (s_LocOffset < 0) {
-                            auto* pi = FindProperty(cls, "Location", allProps);
-                            if (pi) s_LocOffset = pi->Offset;
-                        }
-                        if (s_RotOffset < 0) {
-                            auto* pi = FindProperty(cls, "Rotation", allProps);
-                            if (pi) s_RotOffset = pi->Offset;
-                        }
-                        if (s_HealthOffset < 0) {
-                            auto* pi = FindProperty(cls, "Health", allProps);
-                            if (pi) s_HealthOffset = pi->Offset;
-                        }
-                    }
-
-                    // Update camera for rendering (use player pos + rotation as camera)
-                    if (s_LocOffset > 0 && s_RotOffset > 0) {
-                        const uint8_t* raw = reinterpret_cast<const uint8_t*>(obj);
-                        float px, py, pz;
-                        memcpy(&px, raw + s_LocOffset, 4);
-                        memcpy(&py, raw + s_LocOffset + 4, 4);
-                        memcpy(&pz, raw + s_LocOffset + 8, 4);
-                        int32_t rPitch, rYaw;
-                        memcpy(&rPitch, raw + s_RotOffset, 4);
-                        memcpy(&rYaw, raw + s_RotOffset + 4, 4);
-                        float pitchDeg = rPitch * (360.0f / 65536.0f);
-                        float yawDeg = rYaw * (360.0f / 65536.0f);
-                        SetLocalCamera(px, py, pz, pitchDeg, yawDeg, 90.0f);
-                    }
-                }
-            }
-            return false; // don't block
-        };
-        s_HookId = RegisterProcessEventHook(hook);
-    }
+    // NO PE hooks needed — CoopTick already reads player state every frame
+    // via ReadLocalPlayerState() + SetLocalCamera(). PE hooks add dispatch
+    // overhead on every single ProcessEvent call even with filters.
 
     s_Initialized = true;
     InitCoopRender();
-    InitCoopSync();
     InitGhostPuppet();
-    InitEconomySync();
-    LOG_INFO("[Co-op] Bridge initialized (render + sync + puppet + economy)");
+    // NOTE: InitCoopSync() and InitEconomySync() disabled — they register
+    // unfiltered PE hooks that cause ~50K heap allocations/frame and tank FPS.
+    // Re-enable once those hooks use FunctionFilter or zero-alloc FName checks.
+
+    // Register crash info provider for co-op state
+    RegisterCrashInfoProvider("CO-OP STATE", CrashProvider_CoopState);
+
+    LOG_INFO("[Co-op] Bridge initialized (render + puppet)");
     return true;
 }
 
@@ -359,10 +376,16 @@ void CoopTick(float deltaTime)
     CrashBreadcrumb("CoopTick: NetTick");
     NetTick(deltaTime);
 
+    // Drive TrueCoopTick directly (no PE-based tick callback needed)
+    CrashBreadcrumb("CoopTick: TrueCoopTick");
+    TrueCoopTick(deltaTime);
+
     // Read local player state every frame (needed for camera + send)
+    CrashBreadcrumb("CoopTick: ReadLocalPlayerState");
     auto localState = ReadLocalPlayerState();
 
     // Always update camera for overlay marker rendering
+    CrashBreadcrumb("CoopTick: SetLocalCamera");
     if (localState.posX != 0 || localState.posY != 0 || localState.posZ != 0) {
         SetLocalCamera(localState.posX, localState.posY, localState.posZ,
                        localState.rotPitch, localState.rotYaw, 90.0f);
@@ -409,6 +432,7 @@ void CoopTick(float deltaTime)
         // Tick save file transfer if active
         CrashBreadcrumb("CoopTick: TickSaveTransfer");
         TickSaveTransfer();
+
     }
 }
 

@@ -41,4 +41,23 @@ struct ScopedCrashContext {
 
 #define CRASH_SCOPE(name) ::bs1sdk::ScopedCrashContext _crash_scope_##__LINE__(name)
 
+// ─── Crash Info Providers ────────────────────────────────────────────────
+// Subsystems (co-op, engine patches, etc.) register callbacks that dump
+// diagnostic state into the crash report. This avoids the crash handler
+// needing headers for every subsystem.
+
+/// Callback that writes diagnostic info to two FILE* streams (game dir + dev dir).
+/// Either file may be NULL. Use the CRASH_EMIT macro inside providers.
+using CrashInfoProviderFn = void(*)(FILE* f1, FILE* f2);
+
+/// Register a named crash info provider. Call during subsystem init.
+/// Max 16 providers. name is NOT copied — must be a static string.
+void RegisterCrashInfoProvider(const char* name, CrashInfoProviderFn fn);
+
+/// Macro for use inside CrashInfoProviderFn implementations
+#define CRASH_EMIT(f1, f2, ...) do { \
+    if (f1) fprintf(f1, __VA_ARGS__); \
+    if (f2) fprintf(f2, __VA_ARGS__); \
+} while(0)
+
 } // namespace bs1sdk

@@ -14,6 +14,7 @@ add_library(BS1SDK SHARED
     engine/function_caller.cpp
     engine/class_factory.cpp
     engine/world.cpp
+    engine/engine_patch.cpp
     sdk/sdk_generator.cpp
     scripting/lua_bridge.cpp
     gameplay/teleport_plasmid.cpp

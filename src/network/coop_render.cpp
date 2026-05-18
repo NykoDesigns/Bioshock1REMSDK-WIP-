@@ -1,5 +1,6 @@
 #include "coop_render.h"
 #include "coop_puppet.h"
+#include "net_manager.h"
 #include "../core/log.h"
 
 #include <imgui.h>
@@ -123,12 +124,15 @@ static float Lerp(float a, float b, float t) { return a + (b - a) * t; }
 
 void RenderCoopOverlay()
 {
-    // One-time diagnostic log
-    static int s_DiagCounter = 0;
-    if (s_DiagCounter < 3) {
-        s_DiagCounter++;
-        LOG_INFO("[Co-op Render] RenderCoopOverlay called: hasRemote={} hasCam={} camPos=({:.0f},{:.0f},{:.0f})",
-                 s_HasRemoteState, s_HasCamera, s_CamX, s_CamY, s_CamZ);
+    // Periodic diagnostic log (every 5 seconds)
+    static float s_DiagTimer = 0;
+    static bool s_PrevHasRemote = false;
+    s_DiagTimer += 1.0f / 60.0f; // approximate frame time
+    if (s_DiagTimer >= 5.0f || s_HasRemoteState != s_PrevHasRemote) {
+        s_DiagTimer = 0;
+        s_PrevHasRemote = s_HasRemoteState;
+        LOG_INFO("[Co-op Render] hasRemote={} hasCam={} camPos=({:.0f},{:.0f},{:.0f}) connected={}",
+                 s_HasRemoteState, s_HasCamera, s_CamX, s_CamY, s_CamZ, IsNetConnected());
         if (s_HasRemoteState) {
             LOG_INFO("[Co-op Render] Remote: ({:.0f},{:.0f},{:.0f}) name={}",
                      s_RemoteState.posX, s_RemoteState.posY, s_RemoteState.posZ, s_RemoteName);

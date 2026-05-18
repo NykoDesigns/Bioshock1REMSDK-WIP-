@@ -35,6 +35,19 @@ struct FNameEntry {
     std::string GetAnsiName() const;
 };
 
+/// Zero-allocation FName lookup — returns raw wide string pointer from GNames.
+/// Returns nullptr if index is invalid. For hot-path use (no std::string).
+const wchar_t* GetFNameRaw(int32_t nameIndex);
+
+/// Fast wide-string compare against an ASCII literal (e.g. L"Tick" vs "Tick").
+/// Returns true if the wide string matches the ASCII string exactly.
+inline bool WideMatchesAscii(const wchar_t* wide, const char* ascii) {
+    for (; *ascii; ++wide, ++ascii) {
+        if ((wchar_t)*ascii != *wide) return false;
+    }
+    return *wide == L'\0';
+}
+
 // ─── UObject ──────────────────────────────────────────────────────────────
 // BioShock Remastered (UE2.5 Vengeance) UObject layout, 32-bit:
 // Total size: 0x40 (64 bytes)

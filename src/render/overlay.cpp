@@ -2113,16 +2113,12 @@ void Overlay::RenderConsole()
                 // Use 'p2spawn' command to manually test splicer commandeering
                 LogInfo("Ghost puppet will track remote player position");
 
-                // Auto-start coopanalysis (10 min capture window)
+                // Debug dumps (one-shot, no ongoing PE hooks)
                 DumpInteractionEvents();
-                StartEventCatalog(600.0f);
-                StartStateDiff("", 600.0f);
-                LogInfo("[Auto] Co-op analysis recording (10 min). Run 'coopanalysis' to stop/dump.");
-
-                // Auto-dump PE disasm (now that world is loaded, UFunctions are bound)
                 DumpProcessEventDisasm();
                 DumpStructValidation();
                 DumpFunctionAddresses();
+                LogInfo("Debug dumps written. Use 'coopanalysis' to start live event recording.");
             } else {
                 LogRed("Failed to start true co-op host");
                 LogRed("Check: Is port " + std::to_string(port) + " already in use?");

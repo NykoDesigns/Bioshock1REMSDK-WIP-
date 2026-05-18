@@ -49,6 +49,19 @@ std::string FName::ToString() const
     return name;
 }
 
+const wchar_t* GetFNameRaw(int32_t nameIndex)
+{
+    auto& globals = GetEngineGlobals();
+    if (!globals.GNames || nameIndex < 0) return nullptr;
+    int32_t count = *reinterpret_cast<int32_t*>(globals.GNames + 4);
+    if (nameIndex >= count) return nullptr;
+    uintptr_t dataPtr = *reinterpret_cast<uintptr_t*>(globals.GNames);
+    uintptr_t entryPtr = *reinterpret_cast<uintptr_t*>(dataPtr + nameIndex * 4);
+    if (!entryPtr) return nullptr;
+    FNameEntry* entry = reinterpret_cast<FNameEntry*>(entryPtr);
+    return entry->GetWideName();
+}
+
 // ─── UObject ─────────────────────────────────────────────────────────────
 
 std::string UObject::GetName() const

@@ -129,6 +129,26 @@ ScopedCrashContext::~ScopedCrashContext()
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+//  Crash Info Provider Registry
+// ═══════════════════════════════════════════════════════════════════════════
+
+static constexpr int MAX_PROVIDERS = 16;
+struct ProviderEntry {
+    const char*         name;
+    CrashInfoProviderFn fn;
+};
+static ProviderEntry s_Providers[MAX_PROVIDERS] = {};
+static int           s_ProviderCount = 0;
+
+void RegisterCrashInfoProvider(const char* name, CrashInfoProviderFn fn)
+{
+    if (s_ProviderCount >= MAX_PROVIDERS) return;
+    s_Providers[s_ProviderCount].name = name;
+    s_Providers[s_ProviderCount].fn   = fn;
+    s_ProviderCount++;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 //  Safe Memory Probing
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -320,6 +340,141 @@ static void WriteDbgHelpStackTrace(FILE* f, CONTEXT* ctx)
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+//  All-Thread Stack Traces
+// ═══════════════════════════════════════════════════════════════════════════
+
+static void DumpThreadStack(FILE* f, DWORD tid, HANDLE hProc)
+{
+    HANDLE hThread = OpenThread(
+        THREAD_SUSPEND_RESUME | THREAD_GET_CONTEXT | THREAD_QUERY_INFORMATION,
+        FALSE, tid);
+    if (!hThread) {
+        fprintf(f, "  (could not open thread %lu)\n", tid);
+        return;
+    }
+
+    SuspendThread(hThread);
+
+    CONTEXT ctx = {};
+    ctx.ContextFlags = CONTEXT_FULL;
+    if (GetThreadContext(hThread, &ctx)) {
+        STACKFRAME frame = {};
+        frame.AddrPC.Offset    = ctx.Eip;
+        frame.AddrPC.Mode      = AddrModeFlat;
+        frame.AddrFrame.Offset = ctx.Ebp;
+        frame.AddrFrame.Mode   = AddrModeFlat;
+        frame.AddrStack.Offset = ctx.Esp;
+        frame.AddrStack.Mode   = AddrModeFlat;
+
+        fprintf(f, "  EIP=0x%08X ESP=0x%08X EBP=0x%08X\n",
+                (unsigned)ctx.Eip, (unsigned)ctx.Esp, (unsigned)ctx.Ebp);
+
+        char symBuf[sizeof(SYMBOL_INFO) + 256];
+        SYMBOL_INFO* sym = (SYMBOL_INFO*)symBuf;
+        sym->SizeOfStruct = sizeof(SYMBOL_INFO);
+        sym->MaxNameLen = 255;
+
+        for (int i = 0; i < 20; i++) {
+            if (!StackWalk(IMAGE_FILE_MACHINE_I386, hProc, hThread, &frame,
+                           &ctx, NULL, SymFunctionTableAccess, SymGetModuleBase, NULL))
+                break;
+            if (frame.AddrPC.Offset == 0) break;
+
+            uintptr_t pc = (uintptr_t)frame.AddrPC.Offset;
+            char addrBuf[256];
+            ResolveAddr(pc, addrBuf, sizeof(addrBuf));
+
+            DWORD64 displacement = 0;
+            if (SymFromAddr(hProc, pc, &displacement, sym))
+                fprintf(f, "    #%2d  %s  %s+0x%X\n", i, addrBuf, sym->Name, (unsigned)displacement);
+            else
+                fprintf(f, "    #%2d  %s\n", i, addrBuf);
+        }
+    } else {
+        fprintf(f, "  (could not get thread context)\n");
+    }
+
+    ResumeThread(hThread);
+    CloseHandle(hThread);
+}
+
+static void WriteAllThreadStacks(FILE* f, DWORD crashTid)
+{
+    HANDLE hProc = GetCurrentProcess();
+    SymSetOptions(SYMOPT_UNDNAME | SYMOPT_DEFERRED_LOADS);
+    SymInitialize(hProc, NULL, TRUE);
+
+    HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
+    if (hSnap == INVALID_HANDLE_VALUE) {
+        fprintf(f, "  (could not enumerate threads)\n");
+        SymCleanup(hProc);
+        return;
+    }
+
+    THREADENTRY32 te = { sizeof(THREADENTRY32) };
+    DWORD pid = GetCurrentProcessId();
+    int count = 0;
+
+    if (Thread32First(hSnap, &te)) {
+        do {
+            if (te.th32OwnerProcessID != pid) continue;
+            if (te.th32ThreadID == crashTid) {
+                fprintf(f, "  --- TID %lu (CRASH THREAD — see stack trace above) ---\n\n", te.th32ThreadID);
+                continue;
+            }
+
+            fprintf(f, "  --- TID %lu (priority=%ld) ---\n", te.th32ThreadID, te.tpBasePri);
+            __try {
+                DumpThreadStack(f, te.th32ThreadID, hProc);
+            } __except(EXCEPTION_EXECUTE_HANDLER) {
+                fprintf(f, "    (exception during stack walk)\n");
+            }
+            fprintf(f, "\n");
+            count++;
+
+            if (count >= 30) {
+                fprintf(f, "  (truncated after 30 threads)\n");
+                break;
+            }
+        } while (Thread32Next(hSnap, &te));
+    }
+
+    CloseHandle(hSnap);
+    SymCleanup(hProc);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  Memory Region Dump (around an address)
+// ═══════════════════════════════════════════════════════════════════════════
+
+static void DumpMemoryRegion(FILE* f, uintptr_t centerAddr, int bytesAround)
+{
+    uintptr_t start = (centerAddr > (uintptr_t)bytesAround) ? centerAddr - bytesAround : 0;
+    uintptr_t end   = centerAddr + bytesAround;
+
+    for (uintptr_t row = start & ~0xFULL; row < end; row += 16) {
+        if (!IsSafeToRead((void*)row, 16)) {
+            fprintf(f, "    %08X: ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ??\n", (unsigned)row);
+            continue;
+        }
+        fprintf(f, "    %08X: ", (unsigned)row);
+        const uint8_t* p = (const uint8_t*)row;
+        for (int j = 0; j < 16; j++) {
+            if (row + j == centerAddr)
+                fprintf(f, "[%02X]", p[j]);
+            else
+                fprintf(f, " %02X ", p[j]);
+        }
+        fprintf(f, "  ");
+        for (int j = 0; j < 16; j++) {
+            char c = (p[j] >= 0x20 && p[j] < 0x7F) ? (char)p[j] : '.';
+            fprintf(f, "%c", c);
+        }
+        fprintf(f, "\n");
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 //  Main Crash Report Writer
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -340,7 +495,7 @@ static void WriteCrashReport(EXCEPTION_POINTERS* ep)
     CONTEXT* ctx = ep->ContextRecord;
 
     EMIT("╔══════════════════════════════════════════════════════════════╗\n");
-    EMIT("║              BS1SDK CRASH REPORT v2.0                      ║\n");
+    EMIT("║              BS1SDK CRASH REPORT v3.0                      ║\n");
     EMIT("╚══════════════════════════════════════════════════════════════╝\n\n");
 
     // ─── Timestamp & Identity ─────────────────────────────────────────
@@ -384,6 +539,38 @@ static void WriteCrashReport(EXCEPTION_POINTERS* ep)
              ExceptionName(ep->ExceptionRecord->ExceptionRecord->ExceptionCode));
     }
     EMIT("\n");
+
+    // ─── Access Violation Target Memory ───────────────────────────────
+    if (code == EXCEPTION_ACCESS_VIOLATION && ep->ExceptionRecord->NumberParameters >= 2) {
+        ULONG_PTR avTarget = ep->ExceptionRecord->ExceptionInformation[1];
+        if (avTarget >= 0x10000 && avTarget < 0x80000000u) {
+            EMIT("=== MEMORY AROUND AV TARGET (0x%08X ± 64 bytes) ===\n", (unsigned)avTarget);
+            DumpMemoryRegion(f, (uintptr_t)avTarget, 64);
+            if (fDev) DumpMemoryRegion(fDev, (uintptr_t)avTarget, 64);
+            EMIT("\n");
+        } else if (avTarget >= 0x10000) {
+            EMIT("=== AV TARGET 0x%08X (kernel/unmapped — cannot dump) ===\n\n", (unsigned)avTarget);
+        } else {
+            // Near-null — dump what the base pointer (register) SHOULD have been
+            // Try all registers to see which one was the base
+            EMIT("=== NULL POINTER ANALYSIS (target offset 0x%X) ===\n", (unsigned)avTarget);
+            struct { const char* name; DWORD val; } regs[] = {
+                {"EAX", ctx->Eax}, {"EBX", ctx->Ebx}, {"ECX", ctx->Ecx}, {"EDX", ctx->Edx},
+                {"ESI", ctx->Esi}, {"EDI", ctx->Edi}
+            };
+            for (auto& r : regs) {
+                if (r.val == 0) {
+                    EMIT("  %s = NULL  *** LIKELY BASE REGISTER (NULL + 0x%X = 0x%08X) ***\n",
+                         r.name, (unsigned)avTarget, (unsigned)avTarget);
+                } else if (IsSafeToRead((void*)(r.val + avTarget), 4)) {
+                    uint32_t deref = *(uint32_t*)(r.val + avTarget);
+                    EMIT("  %s = 0x%08X  [%s+0x%X] = 0x%08X\n",
+                         r.name, r.val, r.name, (unsigned)avTarget, deref);
+                }
+            }
+            EMIT("\n");
+        }
+    }
 
     // ─── Crash Module ─────────────────────────────────────────────────
     EMIT("=== CRASH MODULE ===\n");
@@ -584,6 +771,27 @@ static void WriteCrashReport(EXCEPTION_POINTERS* ep)
         EMIT("Private:    %lu MB\n", (unsigned long)(pmc.PrivateUsage / (1024*1024)));
     }
     EMIT("\n");
+
+    // ─── All-Thread Stack Traces ─────────────────────────────────────
+    EMIT("=== ALL THREAD STACKS ===\n");
+    __try {
+        WriteAllThreadStacks(f, GetCurrentThreadId());
+        if (fDev) WriteAllThreadStacks(fDev, GetCurrentThreadId());
+    } __except(EXCEPTION_EXECUTE_HANDLER) {
+        EMIT("  (exception during all-thread stack walk)\n");
+    }
+    EMIT("\n");
+
+    // ─── Crash Info Providers ────────────────────────────────────────
+    for (int i = 0; i < s_ProviderCount; i++) {
+        EMIT("=== %s ===\n", s_Providers[i].name);
+        __try {
+            s_Providers[i].fn(f, fDev);
+        } __except(EXCEPTION_EXECUTE_HANDLER) {
+            EMIT("  (exception in provider '%s')\n", s_Providers[i].name);
+        }
+        EMIT("\n");
+    }
 
     // ─── Dump Paths ───────────────────────────────────────────────────
     EMIT("╔══════════════════════════════════════════════════════════════╗\n");

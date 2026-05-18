@@ -49,24 +49,11 @@ void SetTrueCoopRole(TrueCoopRole role)
     LOG_INFO("[TrueCoop] Role set to: {}", names[(int)role]);
     DebugSessionLogf("TrueCoop role: %s", names[(int)role]);
 
-    // Initialize subsystems and activate hooks now that a co-op session is starting
+    // Initialize subsystems (no PE hooks — TrueCoopTick is driven by CoopTick directly)
     if (role != TrueCoopRole::None) {
         EnsureSubsystemsReady();
-        ActivateTransitionHooks();
-
-        // Register tick callback so TrueCoopTick runs every frame
-        if (s_TickCallbackId < 0 && IsTickHookActive()) {
-            s_TickCallbackId = RegisterTickCallback([](float dt) {
-                TrueCoopTick(dt);
-            });
-            LOG_INFO("[TrueCoop] Tick callback registered (id={})", s_TickCallbackId);
-        }
-    } else {
-        // Role set to None — unregister tick callback
-        if (s_TickCallbackId >= 0) {
-            UnregisterTickCallback(s_TickCallbackId);
-            s_TickCallbackId = -1;
-        }
+        // NOTE: No PE tick callback needed. TrueCoopTick is called from
+        // CoopTick which runs from the D3D Present hook every frame.
     }
 }
 
@@ -100,9 +87,24 @@ static bool ShouldBlockFunction(const std::string& className, const std::string&
     if (funcName == "PlayerCalcView") return false;
     if (funcName == "PostRender") return false;
     if (funcName == "DrawHUD") return false;
-    if (funcName == "Tick" && (className == "ShockPlayer" || className == "ShockPlayerController"))
-        return false;
     if (funcName == "PostBeginPlay" || funcName == "PreBeginPlay") return false;
+
+    // NEVER block player-related classes — input, HUD, camera, interaction
+    if (className.find("Player") != std::string::npos) return false;
+    if (className.find("Input") != std::string::npos) return false;
+    if (className.find("HUD") != std::string::npos) return false;
+    if (className.find("Camera") != std::string::npos) return false;
+    if (className.find("Interaction") != std::string::npos) return false;
+    if (className.find("Inventory") != std::string::npos) return false;
+    if (className.find("Weapon") != std::string::npos) return false;
+
+    // NEVER block input/rendering function names
+    if (funcName.find("Input") != std::string::npos) return false;
+    if (funcName.find("Camera") != std::string::npos) return false;
+    if (funcName.find("View") != std::string::npos) return false;
+    if (funcName.find("Render") != std::string::npos) return false;
+    if (funcName.find("Draw") != std::string::npos) return false;
+    if (funcName.find("HUD") != std::string::npos) return false;
 
     // Block Tick on everything else (AI, pawns, spawners, controllers)
     if (funcName == "Tick") return true;
@@ -215,6 +217,16 @@ std::vector<std::string> GetFrozenFunctions()
 void TrueCoopTick(float deltaTime)
 {
     if (s_Role == TrueCoopRole::None) return;
+
+    // Periodic connection-state diagnostics (every 5s)
+    static float s_DiagAccum = 0;
+    s_DiagAccum += deltaTime;
+    if (s_DiagAccum >= 5.0f) {
+        s_DiagAccum = 0;
+        bool connected = IsNetConnected();
+        LOG_INFO("[TrueCoop] tick: role={} connected={} frame={}",
+                 IsTrueHost() ? "Host" : "Client", connected, s_HostFrameNum);
+    }
 
     // Phase 6: Transitions (both roles)
     TransitionsTick(deltaTime);

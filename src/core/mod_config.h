@@ -28,7 +28,7 @@ struct ModConfig {
     float chainDamageFalloff = 0.5f;
 
     // General
-    bool autoInitMods = true;   // Init gameplay mods on startup
+    bool autoInitMods = false;  // DISABLED — PE hook tanks FPS. Use 'initmods' command instead.
     bool showOverlay = true;    // Show ImGui overlay (F1)
 };
 

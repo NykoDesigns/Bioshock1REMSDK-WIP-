@@ -740,21 +740,22 @@ bool SpawnGhostPuppet(float x, float y, float z)
     LOG_INFO("[Puppet] Scan: {} pawns, {} statics (total={}, objCount={})",
              pawnCandidates, staticCandidates, totalChecked, objCount);
 
-    // Select best candidate: prefer Pawn over Static
+    // Select best candidate: ONLY use StaticMeshActors.
+    // Pawns are unsafe: disabling AI causes the engine to detach Controller
+    // (sets it null), then the native tick loop reads Controller->member at
+    // offset 0x234 without null-checking → ACCESS_VIOLATION crash.
     UObject* bestCandidate = nullptr;
     float bestDist = 0;
-    if (bestPawn) {
-        bestCandidate = bestPawn;
-        bestDist = bestPawnDist;
-        s_IsPawnPuppet = true;
-        LOG_INFO("[Puppet] Selected PAWN: {} ({}) dist={:.0f}",
-                 bestPawn->GetName(), bestPawn->GetObjClassName(), sqrtf(bestPawnDist));
-    } else if (bestStatic) {
+    if (bestStatic) {
         bestCandidate = bestStatic;
         bestDist = bestStaticDist;
         s_IsPawnPuppet = false;
-        LOG_INFO("[Puppet] No pawns available, using static: {} ({}) dist={:.0f}",
+        LOG_INFO("[Puppet] Selected STATIC: {} ({}) dist={:.0f}",
                  bestStatic->GetName(), bestStatic->GetObjClassName(), sqrtf(bestStaticDist));
+    }
+    if (bestPawn) {
+        LOG_INFO("[Puppet] (Skipped pawn {} — unsafe due to Controller null crash)",
+                 bestPawn->GetName());
     }
 
     if (!bestCandidate) {
@@ -769,71 +770,15 @@ bool SpawnGhostPuppet(float x, float y, float z)
     // Cache property offsets on the borrowed actor
     CachePuppetOffsets();
 
-    // ── Configure puppet properties ──
-    int32_t bFalse = 0;
-    int32_t bTrue = 1;
-
-    if (s_IsPawnPuppet) {
-        // ─ Pawn configuration ─
-        // Stop autonomous movement: PHYS_None is SAFE on Pawns (they have
-        // full physics infrastructure). This prevents the AI from walking it.
-        uint8_t physNone = 0; // PHYS_None
-        SetPuppetProperty("Physics", &physNone, 1);
-        // Disable AI processing
-        SetPuppetProperty("bAITickEnabled", &bFalse, 4);
-        // Detach from any controller (prevents AI decisions)
-        // Write null to Controller property if it exists
-        uintptr_t nullPtr = 0;
-        SetPuppetProperty("Controller", &nullPtr, 4);
-    } else {
-        // ─ StaticMeshActor configuration ─
-        // Do NOT change bStatic, bWorldGeometry, or Physics!
-        // Setting Physics=PHYS_Interpolating crashes the engine (null deref at +0x234).
-        // Cache bStatic offset+bitmask for transient clearing during MoveActor.
-        UStruct* cls = reinterpret_cast<UStruct*>(s_Puppet->GetClass());
-        if (cls) {
-            UField* child = reinterpret_cast<UField*>(cls);
-            int depth = 0;
-            while (child && depth < 64) {
-                UStruct* current = reinterpret_cast<UStruct*>(child);
-                UField* prop = current->GetChildren();
-                int limit = 2000;
-                while (prop && limit-- > 0) {
-                    if (prop->GetName() == "bStatic") {
-                        UProperty* p = reinterpret_cast<UProperty*>(prop);
-                        s_bStaticOffset = p->GetPropertyOffset();
-                        s_bStaticMask = p->GetField<uint32_t>(0x78); // UBoolProperty bitmask
-                        if (s_bStaticMask == 0) s_bStaticMask = 1;
-                        LOG_INFO("[Puppet] bStatic: offset={} mask=0x{:08X}", s_bStaticOffset, s_bStaticMask);
-                        break;
-                    }
-                    prop = prop->GetNext();
-                }
-                if (s_bStaticOffset >= 0) break;
-                child = reinterpret_cast<UField*>(current->GetSuperField());
-                depth++;
-            }
-        }
-    }
-
-    // Common: disable collision, make visible and glowing
-    SetPuppetProperty("bCollideActors", &bFalse, 4);
-    SetPuppetProperty("bBlockActors", &bFalse, 4);
-    SetPuppetProperty("bBlockPlayers", &bFalse, 4);
-    SetPuppetProperty("bBlockHavok", &bFalse, 4);
-    SetPuppetProperty("bHidden", &bFalse, 4);
-
-    // Make bright and fully lit — distinguishes from regular enemies
-    SetPuppetProperty("bUnlit", &bTrue, 4);
-    uint8_t ambientGlow = 254;
-    SetPuppetProperty("AmbientGlow", &ambientGlow, 1);
-
-    // Scale: bigger for StaticMesh (random prop), normal for Pawn (already human-sized)
-    float drawScale = s_IsPawnPuppet ? 1.0f : 3.0f;
-    SetPuppetProperty("DrawScale", &drawScale, 4);
-
+    // ── DO NOT modify any puppet actor properties! ──
+    // Setting ANY property (collision, glow, scale, hidden) on a borrowed
+    // StaticMeshActor triggers Havok/render worker threads to re-process the
+    // actor. This puts the actor into a state where internal pointers become
+    // NULL, and worker threads spin in degraded code paths that tank FPS
+    // from 60+ to 2-5. The diamond HUD overlay is the sole visual indicator
+    // for the remote player — it works perfectly without touching any actors.
     s_IsAIPuppet = false;
-    LOG_INFO("[Puppet] Puppet configured: no collision, glowing, scale={:.2f}", drawScale);
+    LOG_INFO("[Puppet] Puppet tracked (NO property mods — diamond overlay only)");
 
     // Set initial position
     s_InterpX = x; s_InterpY = y; s_InterpZ = z;
@@ -884,110 +829,12 @@ void UpdateGhostPuppet(const PlayerStateData& remoteState)
     s_InterpY += (s_TargetY - s_InterpY) * t;
     s_InterpZ += (s_TargetZ - s_InterpZ) * t;
 
-    // ─── Move puppet ───
-    // For Pawns: MoveActor works directly (dynamic actors, no bStatic issue).
-    // For StaticMeshActors: temporarily clear bStatic bit → MoveActor → restore.
-    // This is same-thread so the engine's tick never sees bStatic=false.
-    static bool s_Diagnosed = false;
-    static bool s_SetLocSafe = true;
-    static bool s_SetRotSafe = true;
-    ProcessEventFn origPE = GetOriginalProcessEvent();
-
-    // One-time: diagnose UFunction layout, discover MoveActor, find ULevel
-    if (!s_Diagnosed && s_SetLocFunc) {
-        s_Diagnosed = true;
-        DiagnoseAndDiscover();
-    }
-
-    // Read current position from puppet (needed for MoveActor delta computation)
-    float curX = 0, curY = 0, curZ = 0;
-    if (s_PuppetLocOffset > 0) {
-        const uint8_t* raw = reinterpret_cast<const uint8_t*>(s_Puppet);
-        memcpy(&curX, raw + s_PuppetLocOffset, 4);
-        memcpy(&curY, raw + s_PuppetLocOffset + 4, 4);
-        memcpy(&curZ, raw + s_PuppetLocOffset + 8, 4);
-    }
-
-    bool locWritten = false;
-
-    // Attempt 1: Direct MoveActor call (bypasses ProcessEvent entirely)
-    if (!locWritten && s_MoveActorDiscovered && s_MoveActorFn && s_ULevel) {
-        float dX = s_InterpX - curX;
-        float dY = s_InterpY - curY;
-        float dZ = s_InterpZ - curZ;
-
-        // Skip if delta is negligible
-        if (dX * dX + dY * dY + dZ * dZ > 0.01f) {
-            // For StaticMeshActor: transiently clear bStatic so MoveActor updates octree
-            uint32_t savedStatic = 0;
-            uint32_t* staticPtr = nullptr;
-            if (!s_IsPawnPuppet && s_bStaticOffset >= 0 && s_bStaticMask) {
-                staticPtr = reinterpret_cast<uint32_t*>(
-                    reinterpret_cast<uint8_t*>(s_Puppet) + s_bStaticOffset);
-                savedStatic = *staticPtr;
-                *staticPtr &= ~s_bStaticMask; // clear bStatic
-            }
-
-            __try {
-                s_MoveActorFn(s_ULevel, s_Puppet,
-                              dX, dY, dZ,
-                              0, 0, 0,      // no rotation delta
-                              0, nullptr);   // no flags, no hit result
-                locWritten = true;
-            } __except(EXCEPTION_EXECUTE_HANDLER) {
-                DWORD exCode = GetExceptionCode();
-                LOG_WARN("[Puppet] MoveActor CRASHED (exception=0x{:08X}) — disabling", exCode);
-                s_MoveActorDiscovered = false;
-            }
-
-            // Restore bStatic immediately (engine tick never sees it cleared)
-            if (staticPtr) {
-                *staticPtr = savedStatic;
-            }
-        } else {
-            locWritten = true; // no movement needed
-        }
-    }
-
-    // Attempt 2: ProcessEvent + SetLocation (may crash on static actors)
-    if (!locWritten && origPE && s_SetLocFunc && s_SetLocSafe) {
-        struct {
-            float X, Y, Z;
-            uint32_t bNoCheck;
-            uint32_t ReturnValue;
-        } locParms{};
-        locParms.X = s_InterpX;
-        locParms.Y = s_InterpY;
-        locParms.Z = s_InterpZ;
-        locParms.bNoCheck = 1;
-        __try {
-            origPE(s_Puppet, s_SetLocFunc, &locParms, nullptr);
-            locWritten = true;
-        } __except(EXCEPTION_EXECUTE_HANDLER) {
-            DWORD exCode = GetExceptionCode();
-            LOG_WARN("[Puppet] SetLocation PE crashed (exception=0x{:08X}) — disabling PE path", exCode);
-            s_SetLocSafe = false;
-        }
-    }
-
-    // Fallback: raw memory write (position data correct, but mesh won't move visually)
-    if (!locWritten && s_PuppetLocOffset > 0) {
-        uint8_t* raw = reinterpret_cast<uint8_t*>(s_Puppet);
-        memcpy(raw + s_PuppetLocOffset, &s_InterpX, 4);
-        memcpy(raw + s_PuppetLocOffset + 4, &s_InterpY, 4);
-        memcpy(raw + s_PuppetLocOffset + 8, &s_InterpZ, 4);
-    }
-
-    // Rotation: raw write (SetRotation via PE also crashes, and MoveActor handles rotation delta)
-    if (s_PuppetRotOffset > 0) {
-        int32_t pitch = (int32_t)(s_TargetPitch * (65536.0f / 360.0f));
-        int32_t yaw = (int32_t)(s_TargetYaw * (65536.0f / 360.0f));
-        int32_t roll = 0;
-        uint8_t* raw = reinterpret_cast<uint8_t*>(s_Puppet);
-        memcpy(raw + s_PuppetRotOffset, &pitch, 4);
-        memcpy(raw + s_PuppetRotOffset + 4, &yaw, 4);
-        memcpy(raw + s_PuppetRotOffset + 8, &roll, 4);
-    }
+    // ─── NO puppet movement ───
+    // Do NOT write to the puppet actor's location or rotation.
+    // ANY modification to a StaticMeshActor (even raw memcpy to location)
+    // can trigger Havok/render worker thread re-processing and cause
+    // massive FPS drops. The diamond HUD overlay tracks remote player
+    // position perfectly without touching any engine actor state.
 }
 
 void DestroyGhostPuppet()

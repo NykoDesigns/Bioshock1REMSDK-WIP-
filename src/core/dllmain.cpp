@@ -8,6 +8,7 @@
 #include "../gameplay/gameplay_mods.h"
 #include "../debug/coop_debug.h"
 #include "../debug/crash_handler.h"
+#include "../engine/engine_patch.h"
 #include "../debug/disasm_dump.h"
 #include "../hooks/process_event.h"
 #include "../network/coop_true.h"
@@ -80,6 +81,10 @@ void InitializeSDK()
 
     // Install crash handler FIRST so we catch any crashes during init
     InstallCrashHandler();
+
+    // Patch known engine bugs (null dereferences on worker threads)
+    InstallEnginePatches();
+
     CrashSetContext("init:scanning");
 
     LOG_INFO("Scanning for engine structures...");
