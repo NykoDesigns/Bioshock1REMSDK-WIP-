@@ -35,8 +35,9 @@ static OnChatFunc s_LocalChatCallback;
 static int s_LocOffset = -1;     // Location (Vector)
 static int s_RotOffset = -1;     // Rotation (Rotator)
 static int s_HealthOffset = -1;  // Health (float)
-static int s_FlashCountOffset = -1; // FlashCount (byte) — increments on weapon fire
-static uint8_t s_LastFlashCount = 0; // Track changes for fire detection
+// Fire detection via filtered PE hook (only fires on "BeginFiring" calls, not every PE)
+static int s_FireHookId = -1;
+static std::atomic<bool> s_LocalFired{false}; // Set by PE hook, consumed by CoopTick
 
 // Level tracking
 static std::string s_LocalLevelName;
@@ -91,14 +92,9 @@ static bool CachePlayerOffsets()
         auto* pi = FindProperty(cls, "Health", allProps);
         if (pi) s_HealthOffset = pi->Offset;
     }
-    if (s_FlashCountOffset < 0) {
-        auto* pi = FindProperty(cls, "FlashCount", allProps);
-        if (pi) s_FlashCountOffset = pi->Offset;
-    }
-
     if (s_LocOffset > 0) {
-        LOG_INFO("[Co-op] Cached offsets: Loc={}, Rot={}, Health={}, FlashCount={}", 
-                 s_LocOffset, s_RotOffset, s_HealthOffset, s_FlashCountOffset);
+        LOG_INFO("[Co-op] Cached offsets: Loc={}, Rot={}, Health={}", 
+                 s_LocOffset, s_RotOffset, s_HealthOffset);
     }
     return s_LocOffset > 0;
 }
@@ -151,15 +147,9 @@ static PlayerStateData ReadLocalPlayerState()
                 memcpy(&state.health, raw + s_HealthOffset, 4);
             }
 
-            // Read FlashCount for fire detection
-            if (s_FlashCountOffset > 0) {
-                const uint8_t* raw = reinterpret_cast<const uint8_t*>(obj);
-                uint8_t flashCount = *(raw + s_FlashCountOffset);
-                // isFiring = 1 if FlashCount changed this frame
-                if (flashCount != s_LastFlashCount) {
-                    state.isFiring = 1;
-                    s_LastFlashCount = flashCount;
-                }
+            // Check if BeginFiring PE hook fired since last tick
+            if (s_LocalFired.exchange(false)) {
+                state.isFiring = 1;
             }
 
             break;
@@ -179,6 +169,7 @@ static void UpdatePuppet(const PlayerStateData& remoteState)
 
     // Detect firing — isFiring=1 means FlashCount changed on sender side
     if (remoteState.isFiring) {
+        LOG_INFO("[Co-op] Remote player fired! (isFiring=1)");
         PlayerActionData action{};
         action.action = ActionType::WeaponFire;
         action.dirX = cosf(remoteState.rotYaw * 3.14159f / 180.0f);
@@ -273,6 +264,23 @@ bool InitCoopBridge()
     s_Initialized = true;
     InitCoopRender();
     InitGhostPuppet();
+
+    // Register a FILTERED PE hook for fire detection — only fires when
+    // BeginFiring is called, not on every PE call. Zero FPS impact.
+    {
+        ProcessEventHook fireHook;
+        fireHook.Name = "CoopFireDetect";
+        fireHook.FunctionFilter = "LeftMousePressed";
+        fireHook.Callback = [](UObject* obj, UFunction* func, void* parms) -> bool {
+            s_LocalFired = true;
+            static int count = 0;
+            if (++count <= 10) LOG_INFO("[Co-op] LeftMousePressed detected (#{})!", count);
+            return false; // don't block
+        };
+        s_FireHookId = RegisterProcessEventHook(fireHook);
+        LOG_INFO("[Co-op] Registered BeginFiring PE hook (id={})", s_FireHookId);
+    }
+
     // NOTE: InitCoopSync() and InitEconomySync() disabled — they register
     // unfiltered PE hooks that cause ~50K heap allocations/frame and tank FPS.
     // Re-enable once those hooks use FunctionFilter or zero-alloc FName checks.
@@ -292,6 +300,10 @@ void ShutdownCoopBridge()
     ShutdownGhostPuppet();
     ShutdownEconomySync();
     ShutdownCoopSync();
+    if (s_FireHookId >= 0) {
+        UnregisterProcessEventHook(s_FireHookId);
+        s_FireHookId = -1;
+    }
     if (s_HookId >= 0) {
         UnregisterProcessEventHook(s_HookId);
         s_HookId = -1;
