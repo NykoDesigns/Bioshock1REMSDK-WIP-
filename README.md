@@ -31,6 +31,7 @@
 - **Gameplay Mods** — Decoy→Teleport, Chain Lightning, Friendly Bots, Rivet Pistol, Splicer Factions
 - **Mod Distribution** — winmm.dll proxy loader (no injector needed) + JSON config + packager script
 - **Co-op Framework** — UDP transport, player state sync, ghost puppet system, damage forwarding
+- **Level Editor** — Standalone BSM map viewer/editor with OpenGL 3.3 rendering, BSP geometry, 569 static meshes with textures, fly camera, actor picking/spawning/deletion, loading overlay, ImGui UI (scene tree, properties, content browser)
 
 ### Implemented Gameplay Mods
 
@@ -87,6 +88,7 @@ sdk_gen/
 - Damage and world state synchronization
 
 **Additional Content**
+- Level editor enhancements — BSP texturing from Catalog.bdc/.blk, undo/redo, gizmo transforms
 - Custom map creation — build new .bsm packages from scratch
 - IBF archive repacker — inject modified INI files back into archives
 - External companion GUI — desktop window via IPC with injected DLL
@@ -116,6 +118,8 @@ Dependencies (MinHook, ImGui, Lua 5.4) are fetched automatically via CMake Fetch
 - `build/bin/Release/bsm_tool.exe` — BSM/UE package analyzer + spawn patcher (v0.5.0)
 - `build/bin/Release/ini_tool.exe` — INI config tool + IBF archive support (v2.0.0)
 - `build/bin/Release/winmm.dll` — Proxy loader (drop in game folder, no injector needed)
+- `tools/level_editor/build/Release/BS1LevelEditor.exe` — Standalone level editor
+- `tools/level_editor/build/Release/ParseTest.exe` — BSM parsing diagnostics
 
 ## Usage
 
@@ -249,8 +253,9 @@ BS1SDK/
 ├── scripts/        — Example Lua scripts
 ├── injector/       — Standalone DLL injector
 ├── tools/
-│   ├── bsm_tool/   — BSM package analyzer + spawn patcher + prop editor
-│   └── ini_tool/   — INI config parser + patcher (weapons, AI, loot)
+│   ├── bsm_tool/      — BSM package analyzer + spawn patcher + prop editor
+│   ├── ini_tool/      — INI config parser + patcher (weapons, AI, loot)
+│   └── level_editor/  — Standalone BSM map viewer/editor (OpenGL 3.3 + ImGui)
 ├── docs/
 │   └── reverse-engineering/
 │       ├── bsm-format.md        — BSM file format specification
