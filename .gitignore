@@ -33,6 +33,15 @@ Thumbs.db
 *.ilk
 *.exp
 
+# Level editor build output
+tools/level_editor/build/
+build_editor/
+editor_log.txt
+editor_stdout.txt
+editor_stderr.txt
+imgui.ini
+tools/level_editor/*.txt
+
 # Decompiled game source (generated, copyrighted)
 docs/reverse-engineering/decompiled/
 docs/reverse-engineering/engine-dump/
