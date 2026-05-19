@@ -71,7 +71,7 @@ void Camera::FlyMove(float forward, float right, float up, float dt)
 void Camera::FlyLook(float dx, float dy)
 {
     yaw -= dx * 0.15f;
-    pitch -= dy * 0.15f;
+    pitch += dy * 0.15f;
     if (pitch > 89.0f) pitch = 89.0f;
     if (pitch < -89.0f) pitch = -89.0f;
 }

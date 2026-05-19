@@ -153,6 +153,9 @@ bool BSMDocument::Load(const std::string& filepath)
     m_Loaded = false;
     m_Actors.clear();
     m_ParsedExports.clear();
+    m_Meshes.clear();
+    m_MeshNameToIndex.clear();
+    m_BSPMeshes.clear();
     m_FilePath = filepath;
     m_MapName = std::filesystem::path(filepath).filename().string();
 
