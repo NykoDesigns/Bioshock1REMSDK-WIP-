@@ -67,6 +67,17 @@ public:
     const std::vector<ParsedMesh>& GetBSPMeshes() const { return m_BSPMeshes; }
     bool HasBSP() const { return !m_BSPMeshes.empty(); }
 
+    // BSP tree traversal for zone detection
+    struct BSPTreeNode {
+        float planeX, planeY, planeZ, planeW;
+        int32_t iFront, iBack;
+        uint8_t zoneMask[16];
+        uint8_t iZone;
+    };
+    // Returns the zone index (0-127) for the camera position, or -1 if no tree
+    int FindCameraZone(Vec3 pos) const;
+    const std::vector<BSPTreeNode>& GetBSPTree() const { return m_BSPTree; }
+
     // Resolve texture names using UEViewer export directory
     void ResolveTextures(const std::string& umodelExportDir);
 
@@ -85,6 +96,7 @@ private:
     std::vector<EditorActor> m_Actors;
     std::vector<ParsedMesh> m_Meshes;
     std::vector<ParsedMesh> m_BSPMeshes;
+    std::vector<BSPTreeNode> m_BSPTree;
     std::unordered_map<std::string, int> m_MeshNameToIndex;
     std::vector<uint8_t> m_RawData;
 

@@ -36,11 +36,16 @@ uniform vec3 uColor;
 uniform int uLit;
 uniform int uHasTexture;
 uniform sampler2D uTexture;
+uniform float uClipMinZ;
+uniform float uClipMaxZ;
 in vec3 vNormal;
 in vec3 vWorldPos;
 in vec2 vUV;
 out vec4 FragColor;
 void main() {
+    // Section clip: discard fragments outside Z range
+    if (vWorldPos.z < uClipMinZ || vWorldPos.z > uClipMaxZ) discard;
+
     if (uLit == 0) {
         FragColor = vec4(uColor, 1.0);
         return;
@@ -107,6 +112,9 @@ bool Viewport::Init()
     m_LocLit = glGetUniformLocation(m_ShaderProgram, "uLit");
     m_LocTexSampler = glGetUniformLocation(m_ShaderProgram, "uTexture");
     m_LocHasTexture = glGetUniformLocation(m_ShaderProgram, "uHasTexture");
+    m_LocTexScale = glGetUniformLocation(m_ShaderProgram, "uTexScale");
+    m_LocClipMinZ = glGetUniformLocation(m_ShaderProgram, "uClipMinZ");
+    m_LocClipMaxZ = glGetUniformLocation(m_ShaderProgram, "uClipMaxZ");
 
     // Unit cube VAO (for actor boxes)
     float cubeVerts[] = {
@@ -262,6 +270,15 @@ void Viewport::Render(BSMDocument& doc, int selectedActor)
 
     glUseProgram(m_ShaderProgram);
 
+    // Set clip plane uniforms
+    if (m_ClipEnabled) {
+        glUniform1f(m_LocClipMinZ, m_ClipMinZ);
+        glUniform1f(m_LocClipMaxZ, m_ClipMaxZ);
+    } else {
+        glUniform1f(m_LocClipMinZ, -1e9f);
+        glUniform1f(m_LocClipMaxZ, 1e9f);
+    }
+
     // Get viewport size from GL
     int vp[4];
     glGetIntegerv(GL_VIEWPORT, vp);
@@ -287,18 +304,44 @@ void Viewport::Render(BSMDocument& doc, int selectedActor)
 
     // Draw BSP geometry (level shell - walls, floors, ceilings)
     if (!m_BSPGPU.empty()) {
-        glDisable(GL_CULL_FACE); // BSP faces can face either direction
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+        glFrontFace(GL_CCW); // BSP winding confirmed CCW
         glUniform1i(m_LocLit, 1);
-        glUniform1i(m_LocHasTexture, 0);
-        glUniform3f(m_LocColor, 0.45f, 0.45f, 0.5f); // neutral gray for BSP
+        glUniform1i(m_LocTexSampler, 0);
         glUniformMatrix4fv(m_LocMVP, 1, GL_FALSE, vp_mat.m);
         glUniformMatrix4fv(m_LocModel, 1, GL_FALSE, identity.m);
+
+        // Distance-based culling: only draw BSP chunks near the camera
+        Vec3 camPos = m_Camera.GetPosition();
+        float radiusSq = m_DrawRadius * m_DrawRadius;
+
         for (auto& gpu : m_BSPGPU) {
             if (gpu.vao == 0 || gpu.indexCount == 0) continue;
+            if (!gpu.textureId) continue; // skip untextured BSP (water cubemaps etc.)
+
+            // Distance cull: skip chunks whose center is too far from camera
+            if (m_DrawRadiusEnabled) {
+                float dx = gpu.centerX - camPos.x;
+                float dy = gpu.centerY - camPos.y;
+                float dz = gpu.centerZ - camPos.z;
+                if (dx*dx + dy*dy + dz*dz > radiusSq) continue;
+            }
+
+            // Zone visibility: check if camera's zone bit is set in chunk's ZoneMask
+            if (m_ZoneFilterEnabled && m_CameraZone >= 0 && m_CameraZone < 128) {
+                int byteIdx = m_CameraZone / 8;
+                int bitIdx = m_CameraZone % 8;
+                if (!(gpu.zoneMask[byteIdx] & (1 << bitIdx))) continue;
+            }
+
             glBindVertexArray(gpu.vao);
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, gpu.textureId);
+            glUniform1i(m_LocHasTexture, 1);
+            glUniform3f(m_LocColor, 1.0f, 1.0f, 1.0f);
             glDrawElements(GL_TRIANGLES, gpu.indexCount, GL_UNSIGNED_SHORT, nullptr);
         }
-        glEnable(GL_CULL_FACE);
     }
 
     // Draw actors - solid lit meshes like a real level editor
@@ -436,7 +479,7 @@ void Viewport::UploadMeshes(const std::vector<ParsedMesh>& meshes, const std::st
     printf("[Viewport] Uploaded %d meshes to GPU (%d textured, %d untextured)\n", (int)meshes.size(), texturedCount, (int)meshes.size() - texturedCount);
 }
 
-void Viewport::UploadBSP(const std::vector<ParsedMesh>& bspMeshes)
+void Viewport::UploadBSP(const std::vector<ParsedMesh>& bspMeshes, const std::string& textureDir)
 {
     // Clear old BSP data
     for (auto& gpu : m_BSPGPU) {
@@ -446,24 +489,49 @@ void Viewport::UploadBSP(const std::vector<ParsedMesh>& bspMeshes)
     }
     m_BSPGPU.clear();
 
+    int bspTextured = 0;
     for (auto& mesh : bspMeshes) {
         if (mesh.vertices.empty() || mesh.triangles.empty()) continue;
 
         MeshGPU gpu = {};
+
+        // Load texture first to get dimensions for UV normalization
+        int texW = 256, texH = 256;
+        if (!mesh.textureName.empty()) {
+            LoadedTexture texInfo = m_TextureCache.GetTextureInfo(mesh.textureName);
+            gpu.textureId = texInfo.glTexture;
+            if (gpu.textureId) {
+                texW = texInfo.width > 0 ? texInfo.width : 256;
+                texH = texInfo.height > 0 ? texInfo.height : 256;
+                gpu.texWidth = texW;
+                gpu.texHeight = texH;
+                bspTextured++;
+            }
+        }
+
+        // Normalize BSP UVs from texels to [0,1] on CPU (avoids GPU float precision loss)
+        std::vector<MeshVertex> verts = mesh.vertices; // copy to modify UVs
+        float invW = 1.0f / (float)texW;
+        float invH = 1.0f / (float)texH;
+        for (auto& v : verts) {
+            v.u *= invW;
+            v.v *= invH;
+        }
+
         glGenVertexArrays(1, &gpu.vao);
         glGenBuffers(1, &gpu.vbo);
 
         glBindVertexArray(gpu.vao);
         glBindBuffer(GL_ARRAY_BUFFER, gpu.vbo);
-        glBufferData(GL_ARRAY_BUFFER, mesh.vertices.size() * sizeof(MeshVertex),
-                     mesh.vertices.data(), GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(MeshVertex),
+                     verts.data(), GL_STATIC_DRAW);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(MeshVertex), (void*)0);
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(MeshVertex), (void*)(3 * sizeof(float)));
         glEnableVertexAttribArray(1);
         glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(MeshVertex), (void*)(6 * sizeof(float)));
         glEnableVertexAttribArray(2);
-        gpu.vertCount = (int)mesh.vertices.size();
+        gpu.vertCount = (int)verts.size();
 
         glGenBuffers(1, &gpu.ibo);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gpu.ibo);
@@ -471,9 +539,44 @@ void Viewport::UploadBSP(const std::vector<ParsedMesh>& bspMeshes)
                      mesh.triangles.data(), GL_STATIC_DRAW);
         gpu.indexCount = (int)mesh.triangles.size() * 3;
 
+        gpu.centerX = (mesh.boundsMin.x + mesh.boundsMax.x) * 0.5f;
+        gpu.centerY = (mesh.boundsMin.y + mesh.boundsMax.y) * 0.5f;
+        gpu.centerZ = (mesh.boundsMin.z + mesh.boundsMax.z) * 0.5f;
+        memcpy(gpu.zoneMask, mesh.zoneMask, 16);
         m_BSPGPU.push_back(gpu);
     }
-    printf("[Viewport] Uploaded %d BSP chunks to GPU\n", (int)m_BSPGPU.size());
+    printf("[Viewport] Uploaded %d BSP chunks to GPU (%d textured)\n", (int)m_BSPGPU.size(), bspTextured);
+    fflush(stdout);
+
+    // Write BSP texture log to file for GUI debugging
+    FILE* logF = fopen("bsp_texture_log.txt", "w");
+    if (logF) {
+        fprintf(logF, "BSP chunks: %d, textured: %d\n", (int)m_BSPGPU.size(), bspTextured);
+        for (int i = 0; i < (int)m_BSPGPU.size() && i < (int)bspMeshes.size(); i++) {
+            fprintf(logF, "  [%d] tex='%s' glId=%u %dx%d verts=%d\n", i,
+                    bspMeshes[i].textureName.c_str(), m_BSPGPU[i].textureId,
+                    m_BSPGPU[i].texWidth, m_BSPGPU[i].texHeight,
+                    m_BSPGPU[i].vertCount);
+        }
+        // Show UV ranges for first 5 textured chunks (after CPU normalization)
+        int shown = 0;
+        for (int ci = 0; ci < (int)bspMeshes.size() && shown < 5; ci++) {
+            if (m_BSPGPU.size() <= (size_t)ci) break;
+            if (!m_BSPGPU[ci].textureId) continue;
+            float uMin=1e9f, uMax=-1e9f, vMin=1e9f, vMax=-1e9f;
+            int tw = m_BSPGPU[ci].texWidth, th = m_BSPGPU[ci].texHeight;
+            float invW = 1.0f/(float)tw, invH = 1.0f/(float)th;
+            for (auto& v : bspMeshes[ci].vertices) {
+                float u = v.u * invW, vv = v.v * invH;
+                if (u < uMin) uMin = u; if (u > uMax) uMax = u;
+                if (vv < vMin) vMin = vv; if (vv > vMax) vMax = vv;
+            }
+            fprintf(logF, "  UV[%d] normalized: u=[%.2f..%.2f] v=[%.2f..%.2f] texSize=%dx%d\n",
+                    ci, uMin, uMax, vMin, vMax, tw, th);
+            shown++;
+        }
+        fclose(logF);
+    }
 }
 
 void Viewport::ClearMeshes()

@@ -42,6 +42,10 @@ editor_stderr.txt
 imgui.ini
 tools/level_editor/*.txt
 
+# Ghidra project files (large binary analysis data)
+tools/level_editor/ghidra_project.gpr
+tools/level_editor/ghidra_project.rep/
+
 # Decompiled game source (generated, copyrighted)
 docs/reverse-engineering/decompiled/
 docs/reverse-engineering/engine-dump/

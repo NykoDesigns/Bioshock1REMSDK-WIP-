@@ -23,6 +23,8 @@ struct ParsedMesh {
     Vec3 boundsMin = {0,0,0};
     Vec3 boundsMax = {0,0,0};
     bool valid = false;
+    uint8_t zoneMask[16] = {}; // BSP: union of zone visibility masks for all nodes in this chunk
+    uint8_t zoneIndex = 0;     // BSP: zone this chunk belongs to (byte at +96)
 };
 
 // Parse a StaticMesh export's serial data into vertices + triangles.

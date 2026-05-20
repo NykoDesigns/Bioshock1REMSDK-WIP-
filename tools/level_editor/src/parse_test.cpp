@@ -129,6 +129,30 @@ int main(int argc, char* argv[])
         if (++shown >= 10) break;
     }
 
+    // ─── BSP Texture Resolution Test ───
+    {
+        // Derive map name and export dir
+        std::string path = mapPath;
+        size_t sl = path.find_last_of("\\/");
+        std::string fname = (sl != std::string::npos) ? path.substr(sl + 1) : path;
+        size_t dp = fname.find_last_of('.');
+        if (dp != std::string::npos) fname = fname.substr(0, dp);
+        std::string exportDir = "Z:\\UEViewer\\export\\" + fname;
+        printf("\n=== TEXTURE RESOLUTION ===\n");
+        printf("Export dir: %s\n", exportDir.c_str());
+        doc.ResolveTextures(exportDir);
+
+        // Show BSP chunk texture results
+        if (doc.HasBSP()) {
+            int bspHasTex = 0;
+            for (auto& b : doc.GetBSPMeshes())
+                if (!b.textureName.empty()) bspHasTex++;
+            printf("BSP chunks with texName: %d/%d\n", bspHasTex, (int)doc.GetBSPMeshes().size());
+            for (int i = 0; i < 10 && i < (int)doc.GetBSPMeshes().size(); i++)
+                printf("  BSP[%d] tex='%s'\n", i, doc.GetBSPMeshes()[i].textureName.c_str());
+        }
+    }
+
     printf("\n=== DONE ===\n");
     return 0;
 }

@@ -54,6 +54,15 @@ unsigned int TextureCache::GetTexture(const std::string& textureName)
     return tex.glTexture;
 }
 
+LoadedTexture TextureCache::GetTextureInfo(const std::string& textureName)
+{
+    // Ensure texture is loaded first
+    GetTexture(textureName);
+    auto it = m_Cache.find(textureName);
+    if (it != m_Cache.end()) return it->second;
+    return LoadedTexture{};
+}
+
 void TextureCache::Clear()
 {
     for (auto& pair : m_Cache) {

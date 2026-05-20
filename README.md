@@ -31,7 +31,7 @@
 - **Gameplay Mods** — Decoy→Teleport, Chain Lightning, Friendly Bots, Rivet Pistol, Splicer Factions
 - **Mod Distribution** — winmm.dll proxy loader (no injector needed) + JSON config + packager script
 - **Co-op Framework** — UDP transport, player state sync, ghost puppet system, damage forwarding
-- **Level Editor** — Standalone BSM map viewer/editor with OpenGL 3.3 rendering, BSP geometry, 569 static meshes with textures, fly camera, actor picking/spawning/deletion, loading overlay, ImGui UI (scene tree, properties, content browser)
+- **Level Editor** — Standalone BSM map viewer/editor with OpenGL 3.3 rendering, BSP geometry with zone-based visibility filtering (ZoneMask bit testing), 569 static meshes with textures, fly camera, distance culling, section clipping, actor picking/spawning/deletion, loading overlay, ImGui UI (scene tree, properties, content browser)
 
 ### Implemented Gameplay Mods
 
@@ -88,9 +88,8 @@ sdk_gen/
 - Damage and world state synchronization
 
 **Additional Content**
-- Level editor enhancements — BSP texturing from Catalog.bdc/.blk, undo/redo, gizmo transforms
+- Level editor enhancements — undo/redo, gizmo transforms, multi-map support
 - Custom map creation — build new .bsm packages from scratch
-- IBF archive repacker — inject modified INI files back into archives
 - External companion GUI — desktop window via IPC with injected DLL
 
 ## Building

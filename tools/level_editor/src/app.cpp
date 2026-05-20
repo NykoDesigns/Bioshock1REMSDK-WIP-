@@ -6,6 +6,7 @@
 #include "gl_funcs.h"
 #include <cmath>
 #include <cstdio>
+#include <algorithm>
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -95,7 +96,7 @@ bool App::Init()
         m_Viewport.UploadMeshes(m_Document.GetMeshes(), texDir);
         LogMsg("[App] Meshes uploaded");
         if (m_Document.HasBSP())
-            m_Viewport.UploadBSP(m_Document.GetBSPMeshes());
+            m_Viewport.UploadBSP(m_Document.GetBSPMeshes(), texDir);
         m_ContentBrowser.ScanDirectory(m_ExportDir);
     }
 
@@ -127,6 +128,11 @@ void App::Run()
         glViewport(0, 0, w, h);
         glClearColor(0.1f, 0.1f, 0.12f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        // Update camera zone for zone-based BSP visibility
+        if (m_Viewport.m_ZoneFilterEnabled && m_Document.IsLoaded()) {
+            m_Viewport.m_CameraZone = m_Document.FindCameraZone(m_Viewport.GetCamera().GetPosition());
+        }
 
         // Render 3D viewport (full background)
         m_Viewport.Render(m_Document, m_SelectedActor);
@@ -227,6 +233,40 @@ void App::ProcessEvents()
             if (e.key.keysym.sym == SDLK_DELETE && m_SelectedActor >= 0) {
                 DeleteSelectedActor();
             }
+            // Draw radius: Z toggles, [ and ] adjust radius
+            if (e.key.keysym.sym == SDLK_z && !(e.key.keysym.mod & KMOD_CTRL)) {
+                m_Viewport.m_DrawRadiusEnabled = !m_Viewport.m_DrawRadiusEnabled;
+            }
+            // Zone filter: V toggles zone-based BSP visibility
+            if (e.key.keysym.sym == SDLK_v && !(e.key.keysym.mod & KMOD_CTRL)) {
+                m_Viewport.m_ZoneFilterEnabled = !m_Viewport.m_ZoneFilterEnabled;
+            }
+            if (e.key.keysym.sym == SDLK_LEFTBRACKET) {
+                m_Viewport.m_DrawRadius = (m_Viewport.m_DrawRadius - 2000.0f > 2000.0f) ? m_Viewport.m_DrawRadius - 2000.0f : 2000.0f;
+            }
+            if (e.key.keysym.sym == SDLK_RIGHTBRACKET) {
+                m_Viewport.m_DrawRadius += 2000.0f;
+            }
+            // Section clip: C toggles, PageUp/PageDown adjust height
+            if (e.key.keysym.sym == SDLK_c && !(e.key.keysym.mod & KMOD_CTRL)) {
+                m_Viewport.m_ClipEnabled = !m_Viewport.m_ClipEnabled;
+                if (m_Viewport.m_ClipEnabled) {
+                    // Default: clip to camera Z ± 2000 units
+                    float camZ = m_Viewport.GetCamera().GetPosition().z;
+                    m_Viewport.m_ClipMinZ = camZ - 2000.0f;
+                    m_Viewport.m_ClipMaxZ = camZ + 2000.0f;
+                }
+            }
+            if (e.key.keysym.sym == SDLK_PAGEUP) {
+                m_Viewport.m_ClipEnabled = true;
+                m_Viewport.m_ClipMaxZ += 1000.0f;
+                m_Viewport.m_ClipMinZ += 1000.0f;
+            }
+            if (e.key.keysym.sym == SDLK_PAGEDOWN) {
+                m_Viewport.m_ClipEnabled = true;
+                m_Viewport.m_ClipMaxZ -= 1000.0f;
+                m_Viewport.m_ClipMinZ -= 1000.0f;
+            }
         }
     }
 }
@@ -266,6 +306,25 @@ void App::RenderUI()
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("View")) {
+            ImGui::MenuItem("Draw Radius", "Z", &m_Viewport.m_DrawRadiusEnabled);
+            if (m_Viewport.m_DrawRadiusEnabled) {
+                ImGui::SliderFloat("Radius", &m_Viewport.m_DrawRadius, 2000.0f, 100000.0f);
+            }
+            ImGui::MenuItem("Zone Filter", "V", &m_Viewport.m_ZoneFilterEnabled);
+            if (m_Viewport.m_ZoneFilterEnabled) {
+                ImGui::Text("Camera Zone: %d", m_Viewport.m_CameraZone);
+            }
+            ImGui::Separator();
+            ImGui::MenuItem("Section Clip", "C", &m_Viewport.m_ClipEnabled);
+            if (m_Viewport.m_ClipEnabled) {
+                ImGui::SliderFloat("Clip Max Z", &m_Viewport.m_ClipMaxZ, -50000.0f, 50000.0f);
+                ImGui::SliderFloat("Clip Min Z", &m_Viewport.m_ClipMinZ, -50000.0f, 50000.0f);
+                if (ImGui::Button("Reset Clip")) {
+                    m_Viewport.m_ClipMinZ = -500000.0f;
+                    m_Viewport.m_ClipMaxZ = 500000.0f;
+                }
+            }
+            ImGui::Separator();
             ImGui::MenuItem("ImGui Demo", nullptr, &m_ShowDemo);
             ImGui::EndMenu();
         }
@@ -281,6 +340,10 @@ void App::RenderUI()
             ImGui::Text("Delete: Remove selected actor");
             ImGui::Text("Double-click mesh in Content Browser: Spawn");
             ImGui::Text("Ctrl+O: Open | Ctrl+S: Save");
+            ImGui::Separator();
+            ImGui::Text("C: Toggle section clip (show one floor)");
+            ImGui::Text("PageUp/Down: Move clip plane up/down");
+            ImGui::Text("View menu: Fine-tune clip range");
             ImGui::EndMenu();
         }
         ImGui::EndMainMenuBar();
@@ -313,6 +376,19 @@ void App::RenderUI()
             ImGui::TextColored(ImVec4(0.4f, 1.0f, 0.4f, 1.0f), "FLY (%.0f u/s)", cam.flySpeed);
         }
         ImGui::Text("Pos: %.0f, %.0f, %.0f", pos.x, pos.y, pos.z);
+        if (m_Viewport.m_DrawRadiusEnabled) {
+            ImGui::SameLine(0, 20);
+            ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "RADIUS:%.0f", m_Viewport.m_DrawRadius);
+        }
+        if (m_Viewport.m_ZoneFilterEnabled) {
+            ImGui::SameLine(0, 20);
+            ImGui::TextColored(ImVec4(0.6f, 1.0f, 0.6f, 1.0f), "ZONE:%d", m_Viewport.m_CameraZone);
+        }
+        if (m_Viewport.m_ClipEnabled) {
+            ImGui::SameLine(0, 20);
+            ImGui::TextColored(ImVec4(1.0f, 0.8f, 0.2f, 1.0f), "CLIP Z:[%.0f..%.0f]",
+                               m_Viewport.m_ClipMinZ, m_Viewport.m_ClipMaxZ);
+        }
     } else {
         ImGui::Text("No map loaded. Press Ctrl+O to open a .bsm file.");
     }
@@ -392,7 +468,7 @@ void App::OpenFileDialog()
 
             m_Viewport.UploadMeshes(m_Document.GetMeshes(), texDir2);
             if (m_Document.HasBSP())
-                m_Viewport.UploadBSP(m_Document.GetBSPMeshes());
+                m_Viewport.UploadBSP(m_Document.GetBSPMeshes(), texDir2);
             m_ContentBrowser.ScanDirectory(m_ExportDir);
         } else {
             printf("[App] FAILED to load!\n");

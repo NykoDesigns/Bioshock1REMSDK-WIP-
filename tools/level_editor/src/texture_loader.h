@@ -19,6 +19,9 @@ public:
     // Get or load a texture by name. Returns 0 if not found.
     unsigned int GetTexture(const std::string& textureName);
     
+    // Get texture info including dimensions. Returns default (0,0,0) if not found.
+    LoadedTexture GetTextureInfo(const std::string& textureName);
+    
     // Release all loaded textures
     void Clear();
 

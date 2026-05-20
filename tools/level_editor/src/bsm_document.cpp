@@ -394,11 +394,37 @@ bool BSMDocument::Load(const std::string& filepath)
             if (pe.serialOffset + pe.serialSize <= (int)fileSize) {
                 printf("[BSM] Parsing BSP from Model export '%s' (%d bytes)...\n",
                        pe.objectName.c_str(), pe.serialSize);
-                m_BSPMeshes = ParseBSPGeometry(d + pe.serialOffset, pe.serialSize, names);
+
+                // Build export/import info for BSP material resolution
+                std::vector<BSPExportInfo> bspExports;
+                bspExports.reserve(m_ParsedExports.size());
+                for (auto& ex : m_ParsedExports)
+                    bspExports.push_back({ex.className, ex.objectName});
+                std::vector<std::string> importNames;
+                importNames.reserve(imports.size());
+                for (auto& im : imports)
+                    importNames.push_back(im.objectName);
+
+                std::vector<BSPTreeNodeOut> treeOut;
+                m_BSPMeshes = ParseBSPGeometry(d + pe.serialOffset, pe.serialSize, names,
+                                                bspExports, importNames, &treeOut);
+                // Store BSP tree for zone traversal
+                m_BSPTree.resize(treeOut.size());
+                for (size_t ti = 0; ti < treeOut.size(); ti++) {
+                    m_BSPTree[ti].planeX = treeOut[ti].planeX;
+                    m_BSPTree[ti].planeY = treeOut[ti].planeY;
+                    m_BSPTree[ti].planeZ = treeOut[ti].planeZ;
+                    m_BSPTree[ti].planeW = treeOut[ti].planeW;
+                    m_BSPTree[ti].iFront = treeOut[ti].iFront;
+                    m_BSPTree[ti].iBack = treeOut[ti].iBack;
+                    memcpy(m_BSPTree[ti].zoneMask, treeOut[ti].zoneMask, 16);
+                    m_BSPTree[ti].iZone = treeOut[ti].iZone;
+                }
                 if (!m_BSPMeshes.empty()) {
                     int tv = 0, tt = 0;
                     for (auto& c : m_BSPMeshes) { tv += (int)c.vertices.size(); tt += (int)c.triangles.size(); }
-                    printf("[BSM] BSP loaded: %d verts, %d tris in %d chunks\n", tv, tt, (int)m_BSPMeshes.size());
+                    printf("[BSM] BSP loaded: %d verts, %d tris in %d chunks, tree: %d nodes\n",
+                           tv, tt, (int)m_BSPMeshes.size(), (int)m_BSPTree.size());
                 } else {
                     printf("[BSM] BSP parsing failed\n");
                 }
@@ -639,4 +665,74 @@ void BSMDocument::ResolveTextures(const std::string& umodelExportDir)
         resolved++;
     }
     printf("[BSM] Resolved %d/%d mesh texture names\n", resolved, (int)m_Meshes.size());
+
+    // Step 3: Resolve BSP chunk texture names (already set by BSP parser from surf Material refs)
+    int bspResolved = 0;
+    std::string texDir = umodelExportDir + "\\Texture";
+    for (auto& chunk : m_BSPMeshes) {
+        if (chunk.textureName.empty()) continue;
+        std::string candidate = chunk.textureName;
+
+        // Check if it directly matches a TGA
+        if (fs::exists(texDir + "\\" + candidate + ".tga")) {
+            bspResolved++;
+            continue;
+        }
+
+        // Try shader→diffuse lookup via .mat files
+        // The chunk.textureName was already stripped of _Shader by the BSP parser,
+        // but the .mat file uses the full shader name. Try both.
+        std::string shaderName = candidate + "_Shader";
+        auto it = shaderToDiffuse.find(shaderName);
+        if (it == shaderToDiffuse.end()) {
+            shaderName = candidate + "_shader";
+            it = shaderToDiffuse.find(shaderName);
+        }
+        if (it == shaderToDiffuse.end()) {
+            // Try the candidate itself as a shader name
+            it = shaderToDiffuse.find(candidate);
+        }
+        if (it != shaderToDiffuse.end() && fs::exists(texDir + "\\" + it->second + ".tga")) {
+            chunk.textureName = it->second;
+            bspResolved++;
+        } else if (fs::exists(texDir + "\\" + candidate + ".tga")) {
+            bspResolved++;
+        }
+        // else leave textureName as-is; TextureCache will try suffixes
+    }
+    // Diagnostic: show first 10 unresolved BSP texture names
+    int unresLog = 0;
+    for (auto& chunk : m_BSPMeshes) {
+        if (chunk.textureName.empty()) continue;
+        if (!fs::exists(texDir + "\\" + chunk.textureName + ".tga") && unresLog < 10) {
+            printf("[BSP-TEX] Unresolved: '%s'\n", chunk.textureName.c_str());
+            unresLog++;
+        }
+    }
+    printf("[BSM] BSP textures: %d/%d chunks resolved\n", bspResolved, (int)m_BSPMeshes.size());
+}
+
+int BSMDocument::FindCameraZone(Vec3 pos) const
+{
+    if (m_BSPTree.empty()) return -1;
+
+    // Traverse BSP tree from root (node 0) to find the camera's zone
+    int nodeIdx = 0;
+    int lastValidNode = 0;
+    int depth = 0;
+    const int maxDepth = 128;
+
+    while (nodeIdx >= 0 && nodeIdx < (int)m_BSPTree.size() && depth < maxDepth) {
+        auto& node = m_BSPTree[nodeIdx];
+        float side = pos.x * node.planeX + pos.y * node.planeY + pos.z * node.planeZ - node.planeW;
+        lastValidNode = nodeIdx;
+        if (side >= 0.0f) {
+            nodeIdx = node.iFront;
+        } else {
+            nodeIdx = node.iBack;
+        }
+        depth++;
+    }
+
+    return (int)m_BSPTree[lastValidNode].iZone;
 }

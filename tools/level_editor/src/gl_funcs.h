@@ -34,6 +34,8 @@ extern void (APIENTRY *glLinkProgram)(GLuint);
 extern void (APIENTRY *glUseProgram)(GLuint);
 extern GLint (APIENTRY *glGetUniformLocation)(GLuint, const GLchar*);
 extern void (APIENTRY *glUniform1i)(GLint, GLint);
+extern void (APIENTRY *glUniform1f)(GLint, GLfloat);
+extern void (APIENTRY *glUniform2f)(GLint, GLfloat, GLfloat);
 extern void (APIENTRY *glUniform3f)(GLint, GLfloat, GLfloat, GLfloat);
 extern void (APIENTRY *glUniformMatrix4fv)(GLint, GLsizei, GLboolean, const GLfloat*);
 extern void (APIENTRY *glGetShaderiv)(GLuint, GLenum, GLint*);

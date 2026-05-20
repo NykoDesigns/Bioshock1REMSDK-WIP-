@@ -22,6 +22,8 @@ void (APIENTRY *glLinkProgram)(GLuint) = nullptr;
 void (APIENTRY *glUseProgram)(GLuint) = nullptr;
 GLint (APIENTRY *glGetUniformLocation)(GLuint, const GLchar*) = nullptr;
 void (APIENTRY *glUniform1i)(GLint, GLint) = nullptr;
+void (APIENTRY *glUniform1f)(GLint, GLfloat) = nullptr;
+void (APIENTRY *glUniform2f)(GLint, GLfloat, GLfloat) = nullptr;
 void (APIENTRY *glUniform3f)(GLint, GLfloat, GLfloat, GLfloat) = nullptr;
 void (APIENTRY *glUniformMatrix4fv)(GLint, GLsizei, GLboolean, const GLfloat*) = nullptr;
 void (APIENTRY *glGetShaderiv)(GLuint, GLenum, GLint*) = nullptr;
@@ -55,6 +57,8 @@ bool LoadGLFunctions()
     LOAD(glUseProgram);
     LOAD(glGetUniformLocation);
     LOAD(glUniform1i);
+    LOAD(glUniform1f);
+    LOAD(glUniform2f);
     LOAD(glUniform3f);
     LOAD(glUniformMatrix4fv);
     LOAD(glGetShaderiv);

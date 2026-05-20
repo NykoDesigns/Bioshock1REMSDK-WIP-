@@ -312,3 +312,59 @@ Label                  Name       = 'AggressorSpawner'
 |------|---------------|-------------|--------|
 | 1-Welcome.bsm | AggressorSpawner #5091, #5433 | 11-12 props each | ✅ |
 | 1-Medical.bsm | 27 spawners, 60 ActionSpawnAI | All props readable | ✅ |
+
+### 2026-05-19: FBspNode Layout — CONFIRMED (100 bytes)
+
+Reverse-engineered via Ghidra decompilation + brute-force data correlation against ZoneMask bits.
+
+**Vengeance FBspNode (100 bytes) vs stock UE2 FBspNode (64 bytes):**
+
+| Offset | Size | Field | Notes |
+|--------|------|-------|-------|
+| +0 | 16B | FPlane Plane | Same as UE2 |
+| +16 | 16B | ZoneMask | **Expanded from 8B** (128-bit, MAX_ZONES=128) |
+| +32 | 4B | INT32 iVertPool | UE2 was at +24 (+8 shift from ZoneMask) |
+| +36 | 4B | INT32 iSurf | UE2 was at +28 |
+| +40 | 4B | INT32 iBack | UE2 was at +32 |
+| +44 | 4B | INT32 iFront | UE2 was at +36 |
+| +48 | 4B | INT32 iPlane | UE2 was at +40 |
+| +52 | 4B | float BoundOrigin.X | **Vengeance-added** bounding sphere |
+| +56 | 4B | float BoundOrigin.Y | |
+| +60 | 4B | float BoundOrigin.Z | |
+| +64 | 4B | float BoundRadius | |
+| +68 | 4B | INT32 ??? | Often -1 (INDEX_NONE) |
+| +72 | 4B | INT32 ??? | 0 or -1 |
+| +76 | 1B | BYTE ??? | Unknown |
+| **+77** | **1B** | **BYTE iZone[0]** | **CONFIRMED 100% ZoneMask correlation** |
+| +78 | 1B | BYTE ??? | NOT iZone[1] (2% correlation) |
+| +79 | 1B | BYTE ??? | Unknown |
+| +80 | 4B | INT32 ??? | Often -1 |
+| +84 | 4B | INT32 ??? | Often -1 |
+| +88 | 4B | INT32 NumVertices | Expanded from BYTE to INT32 |
+| +92 | 4B | INT32 ??? | Increasing values |
+| +96 | 4B | INT32 ??? | Small values 0-127, NOT iZone |
+
+**Key discovery method:** Brute-force tested ALL byte offsets 52-99 for correlation with ZoneMask bit presence. Only byte offset +77 showed 100% match (4768/4768 polygon nodes on 1-Medical). Offset +96 (previously hypothesized as iZone) showed only 1% correlation.
+
+**Zone visibility filtering:**
+1. Traverse BSP tree from root (node 0): at each node, compute `PlaneDot(camera)`, follow iFront (positive) or iBack (negative)
+2. When reaching -1 (leaf), take `iZone` (+77) from last valid node = camera's zone
+3. For each BSP chunk, check if camera zone bit is SET in chunk's ZoneMask: `zoneMask[camZone/8] & (1 << (camZone%8))`
+4. If bit is set → render; if not → cull
+
+**Stock UE2 FBspNode for reference (64 bytes):**
+```
++0:  FPlane Plane (16B)
++16: QWORD ZoneMask (8B)
++24: INT iVertPool (4B)
++28: INT iSurf (4B)
++32: INT iBack (4B)
++36: INT iFront (4B)
++40: INT iPlane (4B)
++44: INT iCollisionBound (4B)
++48: INT iRenderBound (4B)
++52: BYTE iZone[2] (2B)
++54: BYTE NumVertices (1B)
++55: BYTE NodeFlags (1B)
++56: INT iLeaf[2] (8B)
+```
