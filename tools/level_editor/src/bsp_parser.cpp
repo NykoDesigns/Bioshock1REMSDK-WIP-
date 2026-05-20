@@ -113,16 +113,36 @@ static bool ReadTArrayVectors(const uint8_t* data, size_t& pos, size_t endPos,
     return true;
 }
 
-// FBspNode: fields needed for triangulation + BSP tree traversal + zone filtering
+// Vengeance FBspNode (100 bytes) — fully resolved layout:
+//   +0:  FPlane (16B)           — plane equation
+//   +16: ZoneMask (16B)         — 128-bit zone visibility bitmask
+//   +32: INT32 iVertPool        — vertex pool index
+//   +36: INT32 iSurf            — surface index
+//   +40: INT32 iBack            — back child (-1 = leaf)
+//   +44: INT32 iFront           — front child (-1 = leaf)
+//   +48: INT32 iPlane           — coplanar node index
+//   +52: float BoundOrigin XYZ  — Vengeance-added bounding sphere (12B)
+//   +64: float BoundRadius      — Vengeance-added
+//   +68: INT32 iCollisionBound  — often -1
+//   +72: INT32 iRenderBound     — 0 or -1
+//   +76: BYTE  NodeFlags
+//   +77: BYTE  iZone[0]         — back-side zone (100% ZoneMask correlation)
+//   +78: BYTE  iZone[1]         — front-side zone
+//   +79: BYTE  Pad
+//   +80: INT32 iLeaf[0]         — often -1
+//   +84: INT32 iLeaf[1]         — often -1
+//   +88: INT32 NumVertices      — expanded from UE2 BYTE
+//   +92: INT32 iContentBound    — Vengeance-added
+//   +96: INT32 iRenderZone      — Vengeance-added (0-127)
 struct BSPNode {
     float planeX, planeY, planeZ, planeW;
-    uint8_t zoneMask[16]; // 128-bit zone visibility mask at +16
+    uint8_t zoneMask[16]; // +16: 128-bit zone visibility mask
     int32_t iVertPool;    // +32
     int32_t iSurf;        // +36
     int32_t iBack;        // +40 (back child, -1 = leaf)
     int32_t iFront;       // +44 (front child, -1 = leaf)
-    uint8_t numVertices;  // +88 (INT32)
-    uint8_t iZone;        // +77 (BYTE, zone index - 100% ZoneMask correlation)
+    uint8_t numVertices;  // +88: INT32 in file, clamped to uint8
+    uint8_t iZone;        // +77: back-zone byte (100% ZoneMask correlation confirmed)
 };
 
 static bool ParseNodes(const uint8_t* data, size_t& pos, size_t endPos,
@@ -135,6 +155,24 @@ static bool ParseNodes(const uint8_t* data, size_t& pos, size_t endPos,
     size_t nodeBytes = (size_t)numNodes * 100;
     if (pos + nodeBytes > endPos) return false;
 
+    // Probe: compare +88 vs +92 for numVertices
+    {
+        int poly88 = 0, poly92 = 0;
+        int maxNV88 = 0, maxNV92 = 0;
+        long long sumNV88 = 0, sumNV92 = 0;
+        for (int i = 0; i < numNodes; i++) {
+            size_t noff = pos + (size_t)i * 100;
+            int32_t nv88, nv92;
+            memcpy(&nv88, data + noff + 88, 4);
+            memcpy(&nv92, data + noff + 92, 4);
+            if (nv88 >= 3 && nv88 < 256) { poly88++; sumNV88 += nv88; if (nv88 > maxNV88) maxNV88 = nv88; }
+            if (nv92 >= 3 && nv92 < 256) { poly92++; sumNV92 += nv92; if (nv92 > maxNV92) maxNV92 = nv92; }
+        }
+        printf("[BSP] NumVerts offset probe: +88: %d polys (avg=%.1f max=%d), +92: %d polys (avg=%.1f max=%d)\n",
+               poly88, poly88 ? (double)sumNV88/poly88 : 0.0, maxNV88,
+               poly92, poly92 ? (double)sumNV92/poly92 : 0.0, maxNV92);
+    }
+
     nodes.resize(numNodes);
     for (int i = 0; i < numNodes; i++) {
         size_t noff = pos + (size_t)i * 100;
@@ -143,14 +181,7 @@ static bool ParseNodes(const uint8_t* data, size_t& pos, size_t endPos,
         memcpy(&nodes[i].planeY, data + noff + 4, 4);
         memcpy(&nodes[i].planeZ, data + noff + 8, 4);
         memcpy(&nodes[i].planeW, data + noff + 12, 4);
-        // Vengeance FBspNode layout (100B total, validated by scan):
-        //   +0:  FPlane (16B)
-        //   +16: ZoneMask (16B, 128-bit)
-        //   +32: INT32 iVertPool
-        //   +36: INT32 iSurf
-        //   +40-+84: tree links, collision, zones, etc.
-        //   +88: INT32 NumVertices
-        //   +92-+96: remaining fields
+        // See struct comment above for full 100B layout
         memcpy(nodes[i].zoneMask, data + noff + 16, 16);
         memcpy(&nodes[i].iVertPool, data + noff + 32, 4);
         memcpy(&nodes[i].iSurf, data + noff + 36, 4);
@@ -293,135 +324,8 @@ std::vector<ParsedMesh> ParseBSPGeometry(const uint8_t* serialData, int serialSi
     if (!ReadTArrayVectors(serialData, pos, endPos, points)) return results;
     int numPoints = (int)points.size() / 3;
     printf("[BSP] Vectors: %d, Points: %d\n", numVectors, numPoints);
-    // Diagnostic: print first few vectors and points
-    for (int vi = 0; vi < 6 && vi < numVectors; vi++)
-        printf("[BSP]   Vec[%d] = (%.6f, %.6f, %.6f)\n", vi,
-               vectors[vi*3+0], vectors[vi*3+1], vectors[vi*3+2]);
-    for (int pi = 0; pi < 3 && pi < numPoints; pi++)
-        printf("[BSP]   Pt[%d] = (%.1f, %.1f, %.1f)\n", pi,
-               points[pi*3+0], points[pi*3+1], points[pi*3+2]);
 
     // ─── 6. Nodes (100B each) ───
-    printf("[BSP] Pre-nodes pos: 0x%X\n", (int)pos);
-    // Peek at CompactIndex and first node bytes
-    {
-        size_t br;
-        int peekCount = ReadCompactIndex(serialData + pos, endPos - pos, br);
-        printf("[BSP] Node count CI: %d (CI size: %d bytes)\n", peekCount, (int)br);
-        size_t dataStart = pos + br;
-        printf("[BSP] Node[0] raw (100 bytes):\n");
-        for (int b = 0; b < 100 && dataStart + b + 4 <= endPos; b += 4) {
-            float fv; int32_t iv;
-            memcpy(&fv, serialData + dataStart + b, 4);
-            memcpy(&iv, serialData + dataStart + b, 4);
-            printf("  +%2d: float=%12.3f  int=%10d  hex=0x%08X\n", b, fv, iv, (unsigned)iv);
-        }
-        // Vengeance FBspNode layout (100 bytes) based on UE2 source + 8-byte ZoneMask expansion:
-        // +0:FPlane(16) +16:ZoneMask(16) +32:iVertPool(4) +36:iSurf(4)
-        // +40:iBack(4) +44:iFront(4) +48:iPlane(4)
-        // +52:iCollBound(4) +56:iRendBound(4) +60:iZone[2](2B) +62:NumVert(1B) +63:NodeFlags(1B)
-        // +64:iLeaf[2](8B) +72..+87:unknown(16B) +88:NumVerticesINT(4) +92:NodeFlagsINT(4) +96:iLeafINT(4)
-        printf("[BSP] Vengeance FBspNode layout probe (UE2+8 shift theory):\n");
-        int shown = 0;
-        for (int ni = 0; ni < peekCount && shown < 10; ni++) {
-            size_t noff = dataStart + (size_t)ni * 100;
-            int32_t nv; memcpy(&nv, serialData + noff + 88, 4);
-            int32_t iBack2, iFront2;
-            memcpy(&iBack2, serialData + noff + 40, 4);
-            memcpy(&iFront2, serialData + noff + 44, 4);
-            if (nv < 3 && iBack2 == -1 && iFront2 == -1) continue;
-            int32_t iPlane2, iCollB, iRendB;
-            memcpy(&iPlane2, serialData + noff + 48, 4);
-            memcpy(&iCollB, serialData + noff + 52, 4);
-            memcpy(&iRendB, serialData + noff + 56, 4);
-            uint8_t zoneBack = serialData[noff + 60];
-            uint8_t zoneFront = serialData[noff + 61];
-            uint8_t numVertByte = serialData[noff + 62];
-            uint8_t flagsByte = serialData[noff + 63];
-            int32_t iLeaf0, iLeaf1;
-            memcpy(&iLeaf0, serialData + noff + 64, 4);
-            memcpy(&iLeaf1, serialData + noff + 68, 4);
-            uint8_t realZone0 = serialData[noff + 77]; // confirmed iZone[0]
-            uint8_t realZone1 = serialData[noff + 78]; // probable iZone[1]
-            printf("  node[%d] nv=%d iB=%d iF=%d iPlane=%d | iZone=[%d,%d](+77,+78)\n",
-                   ni, nv, iBack2, iFront2, iPlane2, realZone0, realZone1);
-            // Print +52..+76 as floats to check if bounding box
-            float f52,f56,f60,f64,f68,f72,f76,f80,f84;
-            memcpy(&f52, serialData+noff+52, 4);
-            memcpy(&f56, serialData+noff+56, 4);
-            memcpy(&f60, serialData+noff+60, 4);
-            memcpy(&f64, serialData+noff+64, 4);
-            memcpy(&f68, serialData+noff+68, 4);
-            memcpy(&f72, serialData+noff+72, 4);
-            memcpy(&f76, serialData+noff+76, 4);
-            memcpy(&f80, serialData+noff+80, 4);
-            memcpy(&f84, serialData+noff+84, 4);
-            printf("    floats: +52=%.1f +56=%.1f +60=%.1f +64=%.1f +68=%.1f +72=%.1f\n",
-                   f52, f56, f60, f64, f68, f72);
-            printf("    floats: +76=%.1f +80=%.1f +84=%.1f | INT: +88=%d +92=%d +96=%d\n",
-                   f76, f80, f84,
-                   *(int32_t*)(serialData+noff+88), *(int32_t*)(serialData+noff+92),
-                   *(int32_t*)(serialData+noff+96));
-            shown++;
-        }
-        // Explicitly check +77 and +78 for iZone correlation
-        {
-            int match77=0,miss77=0,match78=0,miss78=0,total=0;
-            for (int ni = 0; ni < peekCount; ni++) {
-                size_t noff = dataStart + (size_t)ni * 100;
-                int32_t nv; memcpy(&nv, serialData + noff + 88, 4);
-                if (nv < 3) continue;
-                total++;
-                uint8_t z0 = serialData[noff + 77], z1 = serialData[noff + 78];
-                if (z0 < 128 && (serialData[noff+16+(z0/8)] & (1<<(z0%8)))) match77++; else miss77++;
-                if (z1 < 128 && (serialData[noff+16+(z1/8)] & (1<<(z1%8)))) match78++; else miss78++;
-            }
-            printf("[BSP] iZone correlation: +77=%d/%d (%.0f%%), +78=%d/%d (%.0f%%)\n",
-                   match77, total, 100.0f*match77/total, match78, total, 100.0f*match78/total);
-        }
-        // Try ALL possible byte offsets for iZone by checking correlation with ZoneMask bits
-        printf("[BSP] Scanning all byte offsets 52..99 for iZone correlation with ZoneMask:\n");
-        for (int testOff = 52; testOff < 100; testOff++) {
-            int matchCount = 0, testTotal = 0;
-            for (int ni = 0; ni < peekCount; ni++) {
-                size_t noff = dataStart + (size_t)ni * 100;
-                int32_t nv; memcpy(&nv, serialData + noff + 88, 4);
-                if (nv < 3) continue;
-                uint8_t val = serialData[noff + testOff];
-                if (val >= 128) continue;
-                testTotal++;
-                int byteIdx = val / 8;
-                int bitIdx = val % 8;
-                if (serialData[noff + 16 + byteIdx] & (1 << bitIdx)) matchCount++;
-            }
-            if (testTotal > 50 && matchCount > testTotal / 2) {
-                printf("  +%d: %d/%d match (%.0f%%)\n", testOff, matchCount, testTotal,
-                       100.0f * matchCount / testTotal);
-            }
-        }
-        // Also try INT32 offsets
-        for (int testOff = 52; testOff <= 96; testOff += 4) {
-            int matchCount = 0, testTotal = 0;
-            int maxVal = 0;
-            for (int ni = 0; ni < peekCount; ni++) {
-                size_t noff = dataStart + (size_t)ni * 100;
-                int32_t nv; memcpy(&nv, serialData + noff + 88, 4);
-                if (nv < 3) continue;
-                int32_t val; memcpy(&val, serialData + noff + testOff, 4);
-                if (val < 0 || val >= 128) continue;
-                if (val > maxVal) maxVal = val;
-                testTotal++;
-                int byteIdx = val / 8;
-                int bitIdx = val % 8;
-                if (serialData[noff + 16 + byteIdx] & (1 << bitIdx)) matchCount++;
-            }
-            if (testTotal > 50) {
-                printf("  INT32 +%d: %d/%d match (%.0f%%) maxVal=%d\n", testOff, matchCount, testTotal,
-                       100.0f * matchCount / testTotal, maxVal);
-            }
-        }
-    }
-
     std::vector<BSPNode> nodes;
     if (!ParseNodes(serialData, pos, endPos, nodes)) return results;
 
@@ -447,16 +351,22 @@ std::vector<ParsedMesh> ParseBSPGeometry(const uint8_t* serialData, int serialSi
     printf("[BSP] Nodes: %d, Surfs: %d\n", (int)nodes.size(), (int)surfs.size());
 
     // ─── 8. Read FVert array (C.1.4: CI count + N × 8B) ───
+    // Only consider POLYGON nodes (numVertices >= 3) for pool size calculation
     int minVertCount = 0;
+    int totalVertRefs = 0;
     for (auto& n : nodes) {
+        if (n.numVertices < 3) continue; // skip branch/leaf nodes
         int end = n.iVertPool + (int)n.numVertices;
         if (end > minVertCount) minVertCount = end;
+        totalVertRefs += (int)n.numVertices;
     }
+    printf("[BSP] FVert pool: minRequired=%d, totalVertRefs=%d\n", minVertCount, totalVertRefs);
 
     std::vector<BSPVert> verts;
     {
         size_t br2;
         int numVerts = ReadCompactIndex(serialData + pos, endPos - pos, br2);
+        printf("[BSP] FVert CI at 0x%X: count=%d (min needed=%d)\n", (int)pos, numVerts, minVertCount);
         if (numVerts >= minVertCount && numVerts < 1000000) {
             pos += br2;
             size_t vertBytes = (size_t)numVerts * 8;
@@ -468,6 +378,14 @@ std::vector<ParsedMesh> ParseBSPGeometry(const uint8_t* serialData, int serialSi
                     memcpy(&verts[i].iSide, serialData + pos + (size_t)i * 8 + 4, 4);
                 }
                 pos += vertBytes;
+                // Validate: count out-of-range pVertex values
+                int badCount = 0, goodCount = 0;
+                for (int i = 0; i < numVerts; i++) {
+                    if (verts[i].pVertex < 0 || verts[i].pVertex >= numPoints) badCount++;
+                    else goodCount++;
+                }
+                printf("[BSP] FVert validation: %d good, %d BAD (out of range) of %d total\n",
+                       goodCount, badCount, numVerts);
             }
         }
     }
@@ -502,53 +420,20 @@ std::vector<ParsedMesh> ParseBSPGeometry(const uint8_t* serialData, int serialSi
     // ─── Diagnostics ───
     {
         int valid3 = 0;
+        int nv3_7 = 0, nv8_15 = 0, nv16_31 = 0, nv32_63 = 0, nv64plus = 0;
         for (auto& n : nodes) {
             if (n.numVertices < 3) continue;
             if (n.iVertPool < 0 || n.iVertPool + n.numVertices > (int)verts.size()) continue;
             valid3++;
+            if (n.numVertices <= 7) nv3_7++;
+            else if (n.numVertices <= 15) nv8_15++;
+            else if (n.numVertices <= 31) nv16_31++;
+            else if (n.numVertices <= 63) nv32_63++;
+            else nv64plus++;
         }
         printf("[BSP] Polygon nodes: %d (of %d), FVerts: %d\n", valid3, (int)nodes.size(), (int)verts.size());
-    }
-
-    // Dump raw FBspNode fields for structure analysis
-    {
-        int numN = (int)nodes.size();
-        size_t nodeArrayStart = pos - (size_t)numN * 100;
-        printf("[BSP] FBspNode raw dump (numNodes=%d):\n", numN);
-        for (int ni = 0; ni < 3 && ni < numN; ni++) {
-            size_t noff = nodeArrayStart + (size_t)ni * 100;
-            printf("  Node[%d] INT32 at each offset:\n", ni);
-            for (int off = 0; off < 100; off += 4) {
-                int32_t val; memcpy(&val, serialData + noff + off, 4);
-                bool isNodeIdx = (val == -1 || (val >= 0 && val < numN));
-                bool isSurfIdx = (val >= 0 && val < (int)surfs.size());
-                bool isVertPool = (val >= 0 && val < (int)verts.size());
-                printf("    +%2d: %10d%s%s%s\n", off, val,
-                       isNodeIdx ? " [nodeIdx]" : "",
-                       isSurfIdx ? " [surfIdx]" : "",
-                       isVertPool ? " [vertPool]" : "");
-            }
-        }
-    }
-
-    // Winding order diagnostic: check cross product of first triangle vs plane normal
-    {
-        int cwCount = 0, ccwCount = 0;
-        for (int d = 0; d < (int)nodes.size(); d++) {
-            auto& node = nodes[d];
-            if (node.numVertices < 3) continue;
-            if (node.iVertPool < 0 || node.iVertPool + node.numVertices > (int)verts.size()) continue;
-            int v0i = verts[node.iVertPool].pVertex;
-            int v1i = verts[node.iVertPool + 1].pVertex;
-            int v2i = verts[node.iVertPool + 2].pVertex;
-            if (v0i < 0 || v0i >= numPoints || v1i < 0 || v1i >= numPoints || v2i < 0 || v2i >= numPoints) continue;
-            float e1x = points[v1i*3]-points[v0i*3], e1y = points[v1i*3+1]-points[v0i*3+1], e1z = points[v1i*3+2]-points[v0i*3+2];
-            float e2x = points[v2i*3]-points[v0i*3], e2y = points[v2i*3+1]-points[v0i*3+1], e2z = points[v2i*3+2]-points[v0i*3+2];
-            float cx = e1y*e2z - e1z*e2y, cy = e1z*e2x - e1x*e2z, cz = e1x*e2y - e1y*e2x;
-            float dot = cx * node.planeX + cy * node.planeY + cz * node.planeZ;
-            if (dot > 0) ccwCount++; else if (dot < 0) cwCount++;
-        }
-        printf("[BSP] Winding: %d CCW, %d CW (use %s)\n", ccwCount, cwCount, ccwCount > cwCount ? "GL_CCW" : "GL_CW");
+        printf("[BSP] NumVerts distribution: 3-7:%d  8-15:%d  16-31:%d  32-63:%d  64+:%d\n",
+               nv3_7, nv8_15, nv16_31, nv32_63, nv64plus);
     }
 
     // Count unique materials for diagnostics
@@ -575,14 +460,58 @@ std::vector<ParsedMesh> ParseBSPGeometry(const uint8_t* serialData, int serialSi
         std::vector<MeshTriangle> triangles;
         uint8_t zoneMask[16] = {}; // union of all nodes' ZoneMasks
     };
-    std::unordered_map<int, MaterialGroup> groups; // key: materialRef
+    std::unordered_map<int64_t, MaterialGroup> groups; // key: materialRef * 256 + iZone
 
     int totalVerts = 0, totalTris = 0;
+
+    // Compute level bounding box for dynamic degenerate threshold
+    float levelMinX=1e30f, levelMinY=1e30f, levelMinZ=1e30f;
+    float levelMaxX=-1e30f, levelMaxY=-1e30f, levelMaxZ=-1e30f;
+    for (int i = 0; i < numPoints; i++) {
+        float px = points[i*3], py = points[i*3+1], pz = points[i*3+2];
+        if (px < levelMinX) levelMinX = px; if (px > levelMaxX) levelMaxX = px;
+        if (py < levelMinY) levelMinY = py; if (py > levelMaxY) levelMaxY = py;
+        if (pz < levelMinZ) levelMinZ = pz; if (pz > levelMaxZ) levelMaxZ = pz;
+    }
+    float levelSpanX = levelMaxX - levelMinX;
+    float levelSpanY = levelMaxY - levelMinY;
+    float levelSpanZ = levelMaxZ - levelMinZ;
+    float maxLevelSpan = levelSpanX;
+    if (levelSpanY > maxLevelSpan) maxLevelSpan = levelSpanY;
+    if (levelSpanZ > maxLevelSpan) maxLevelSpan = levelSpanZ;
+    // A single polygon spanning more than 50% of the level in any axis is suspicious
+    float degenThreshold = maxLevelSpan * 0.5f;
+    if (degenThreshold < 10000.0f) degenThreshold = 10000.0f; // minimum floor
+    printf("[BSP] Level span: %.0f x %.0f x %.0f, degenerate threshold: %.0f\n",
+           levelSpanX, levelSpanY, levelSpanZ, degenThreshold);
+
+    int skippedBadVert = 0, skippedBBox = 0;
 
     for (auto& node : nodes) {
         if (node.numVertices < 3) continue;
         if (node.iVertPool < 0) continue;
         if (node.iVertPool + node.numVertices > (int)verts.size()) continue;
+
+        // Pre-check: validate all vertex indices and compute bounding box
+        {
+            float pMinX=1e30f, pMinY=1e30f, pMinZ=1e30f;
+            float pMaxX=-1e30f, pMaxY=-1e30f, pMaxZ=-1e30f;
+            bool badPoly = false;
+            for (int v = 0; v < node.numVertices; v++) {
+                int pi = verts[node.iVertPool + v].pVertex;
+                if (pi < 0 || pi >= numPoints) { badPoly = true; break; }
+                float px = points[pi*3], py = points[pi*3+1], pz = points[pi*3+2];
+                if (px < pMinX) pMinX = px; if (px > pMaxX) pMaxX = px;
+                if (py < pMinY) pMinY = py; if (py > pMaxY) pMaxY = py;
+                if (pz < pMinZ) pMinZ = pz; if (pz > pMaxZ) pMaxZ = pz;
+            }
+            if (badPoly) { skippedBadVert++; continue; }
+            float spanX = pMaxX - pMinX, spanY = pMaxY - pMinY, spanZ = pMaxZ - pMinZ;
+            if (spanX > degenThreshold || spanY > degenThreshold || spanZ > degenThreshold) {
+                skippedBBox++;
+                continue;
+            }
+        }
 
         // Get surf for this node (for texture vectors and material)
         int surfIdx = node.iSurf;
@@ -601,13 +530,14 @@ std::vector<ParsedMesh> ParseBSPGeometry(const uint8_t* serialData, int serialSi
                 continue;
         }
 
-        // Initialize group if new
-        if (groups.find(matRef) == groups.end()) {
+        // Group by (material, zone) so each chunk is spatially coherent
+        int64_t groupKey = (int64_t)matRef * 256 + (int64_t)node.iZone;
+        if (groups.find(groupKey) == groups.end()) {
             MaterialGroup g;
             g.matName = ResolveMaterialName(matRef, exports, importNames);
-            groups[matRef] = std::move(g);
+            groups[groupKey] = std::move(g);
         }
-        auto& group = groups[matRef];
+        auto& group = groups[groupKey];
 
         // Accumulate zone visibility: OR node's mask into group's mask
         for (int zi = 0; zi < 16; zi++) group.zoneMask[zi] |= node.zoneMask[zi];
@@ -725,7 +655,7 @@ std::vector<ParsedMesh> ParseBSPGeometry(const uint8_t* serialData, int serialSi
     }
 
     // ─── 10. Finalize all material groups into ParsedMesh results ────────────
-    for (auto& [matRef, group] : groups) {
+    for (auto& [groupKey, group] : groups) {
         if (group.triangles.empty()) continue;
 
         // Skip utility brush materials that shouldn't be rendered
@@ -764,49 +694,8 @@ std::vector<ParsedMesh> ParseBSPGeometry(const uint8_t* serialData, int serialSi
         results.push_back(std::move(chunk));
     }
 
-    printf("[BSP] Triangulated: %d vertices, %d triangles in %d material chunks\n",
-           totalVerts, totalTris, (int)results.size());
-
-    // Zone mask diversity diagnostic
-    {
-        int allBitsSet = 0, partial = 0, empty = 0;
-        for (auto& r : results) {
-            bool allOnes = true, allZeros = true;
-            for (int zi = 0; zi < 16; zi++) {
-                if (r.zoneMask[zi] != 0xFF) allOnes = false;
-                if (r.zoneMask[zi] != 0x00) allZeros = false;
-            }
-            if (allOnes) allBitsSet++;
-            else if (allZeros) empty++;
-            else partial++;
-        }
-        printf("[BSP] Zone masks: %d all-visible, %d partial, %d empty\n", allBitsSet, partial, empty);
-        // Show first 5 partial masks
-        int shown = 0;
-        for (int ri = 0; ri < (int)results.size() && shown < 5; ri++) {
-            bool allOnes = true;
-            for (int zi = 0; zi < 16; zi++) if (results[ri].zoneMask[zi] != 0xFF) { allOnes = false; break; }
-            if (!allOnes) {
-                printf("[BSP]   chunk[%d] '%s' mask: %02X%02X%02X%02X %02X%02X%02X%02X\n", ri,
-                       results[ri].textureName.c_str(),
-                       results[ri].zoneMask[3], results[ri].zoneMask[2], results[ri].zoneMask[1], results[ri].zoneMask[0],
-                       results[ri].zoneMask[7], results[ri].zoneMask[6], results[ri].zoneMask[5], results[ri].zoneMask[4]);
-                shown++;
-            }
-        }
-    }
-
-    // Diagnostic: show first 10 BSP chunk texture names and UV ranges
-    for (int d = 0; d < 10 && d < (int)results.size(); d++) {
-        float uMin = 1e9f, uMax = -1e9f, vMin = 1e9f, vMax = -1e9f;
-        for (auto& v : results[d].vertices) {
-            if (v.u < uMin) uMin = v.u; if (v.u > uMax) uMax = v.u;
-            if (v.v < vMin) vMin = v.v; if (v.v > vMax) vMax = v.v;
-        }
-        printf("[BSP] chunk[%d] texName='%s' uv=[%.3f..%.3f, %.3f..%.3f] (%d tris)\n", d,
-               results[d].textureName.c_str(), uMin, uMax, vMin, vMax,
-               (int)results[d].triangles.size());
-    }
+    printf("[BSP] Triangulated: %d vertices, %d triangles in %d material chunks (skipped: %d bad-vert, %d bbox>5k)\n",
+           totalVerts, totalTris, (int)results.size(), skippedBadVert, skippedBBox);
 
     return results;
 }

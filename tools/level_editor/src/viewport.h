@@ -70,10 +70,11 @@ public:
     float m_ClipMaxZ = 500000.0f;
     bool m_ClipEnabled = false;
     // Distance-based BSP culling
-    float m_DrawRadius = 15000.0f; // Show BSP within this radius of camera
+    float m_DrawRadius = 5000.0f; // Show BSP within this radius of camera
     bool m_DrawRadiusEnabled = true;
     // Zone-based BSP visibility
-    bool m_ZoneFilterEnabled = false;
+    bool m_ZoneFilterEnabled = true;
+    bool m_WireframeBSP = false; // W key: wireframe BSP rendering
     int m_CameraZone = -1; // current camera zone (updated each frame)
 private:
 

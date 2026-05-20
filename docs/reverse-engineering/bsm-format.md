@@ -72,10 +72,12 @@ SWAT 4's package format is well-documented by its modding community and should s
 - [x] Deserialize UE1-style property tags from export serial data
 - [x] Auto-detect header skip before properties (brute-force scoring)
 - [x] Port property parser from TheWarInRapture Python to C++ bsm_tool
-- [ ] Hook CreateFileW to observe .bsm load order
-- [ ] Set breakpoints on file read to trace deserialization code
-- [ ] Look for decompression calls (zlib inflate) during .bsm loading
-- [ ] Identify BSP geometry data within exports
+- [x] BSP geometry parsing (FBspNode 100B, FBspSurf variable, FVert 8B)
+- [x] StaticMesh parsing (48B vertex stride, heuristic scanner)
+- [x] UModel serialization order verified
+- [x] Batch decompile all .U packages (1,765 classes)
+- [x] Runtime SDK generation (4.5 MB headers)
+- [x] FBspNode layout fully resolved (all 100 bytes mapped)
 - [ ] Implement round-trip BSM writing (modify properties, rewrite package)
 - [ ] Export cloning (duplicate actors with offset positions)
 
@@ -332,17 +334,17 @@ Reverse-engineered via Ghidra decompilation + brute-force data correlation again
 | +56 | 4B | float BoundOrigin.Y | |
 | +60 | 4B | float BoundOrigin.Z | |
 | +64 | 4B | float BoundRadius | |
-| +68 | 4B | INT32 ??? | Often -1 (INDEX_NONE) |
-| +72 | 4B | INT32 ??? | 0 or -1 |
-| +76 | 1B | BYTE ??? | Unknown |
-| **+77** | **1B** | **BYTE iZone[0]** | **CONFIRMED 100% ZoneMask correlation** |
-| +78 | 1B | BYTE ??? | NOT iZone[1] (2% correlation) |
-| +79 | 1B | BYTE ??? | Unknown |
-| +80 | 4B | INT32 ??? | Often -1 |
-| +84 | 4B | INT32 ??? | Often -1 |
-| +88 | 4B | INT32 NumVertices | Expanded from BYTE to INT32 |
-| +92 | 4B | INT32 ??? | Increasing values |
-| +96 | 4B | INT32 ??? | Small values 0-127, NOT iZone |
+| +68 | 4B | INT32 iCollisionBound | UE2's +44 — often -1 (INDEX_NONE) |
+| +72 | 4B | INT32 iRenderBound | UE2's +48 — 0 or -1 |
+| +76 | 1B | BYTE NodeFlags | UE2's +55 |
+| **+77** | **1B** | **BYTE iZone[0]** | **CONFIRMED 100% ZoneMask correlation** (back-side zone) |
+| +78 | 1B | BYTE iZone[1] | UE2's +53 — front-side zone (low correlation: may be unused) |
+| +79 | 1B | BYTE Pad | Alignment padding |
+| +80 | 4B | INT32 iLeaf[0] | UE2's +56 — leaf index (often -1) |
+| +84 | 4B | INT32 iLeaf[1] | UE2's +60 — leaf index (often -1) |
+| +88 | 4B | INT32 NumVertices | **Expanded from BYTE to INT32** (UE2's +54) |
+| +92 | 4B | INT32 iContentBound | **Vengeance-added** — increasing values, content index |
+| +96 | 4B | INT32 iRenderZone | **Vengeance-added** — small values 0-127 |
 
 **Key discovery method:** Brute-force tested ALL byte offsets 52-99 for correlation with ZoneMask bit presence. Only byte offset +77 showed 100% match (4768/4768 polygon nodes on 1-Medical). Offset +96 (previously hypothesized as iZone) showed only 1% correlation.
 

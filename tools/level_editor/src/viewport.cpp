@@ -302,46 +302,62 @@ void Viewport::Render(BSMDocument& doc, int selectedActor)
     glBindVertexArray(m_GridVAO);
     glDrawArrays(GL_LINES, 0, m_GridVertCount);
 
+    // Camera position and draw radius for distance culling (used by both BSP and actors)
+    Vec3 camPos = m_Camera.GetPosition();
+    float radiusSq = m_DrawRadius * m_DrawRadius;
+
     // Draw BSP geometry (level shell - walls, floors, ceilings)
     if (!m_BSPGPU.empty()) {
+        // Backface culling ON: walls properly occlude adjacent rooms
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
-        glFrontFace(GL_CCW); // BSP winding confirmed CCW
         glUniform1i(m_LocLit, 1);
         glUniform1i(m_LocTexSampler, 0);
         glUniformMatrix4fv(m_LocMVP, 1, GL_FALSE, vp_mat.m);
         glUniformMatrix4fv(m_LocModel, 1, GL_FALSE, identity.m);
 
-        // Distance-based culling: only draw BSP chunks near the camera
-        Vec3 camPos = m_Camera.GetPosition();
-        float radiusSq = m_DrawRadius * m_DrawRadius;
+        if (m_WireframeBSP)
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-        for (auto& gpu : m_BSPGPU) {
-            if (gpu.vao == 0 || gpu.indexCount == 0) continue;
-            if (!gpu.textureId) continue; // skip untextured BSP (water cubemaps etc.)
+        // Two-pass rendering: CCW faces (majority) then CW faces (4% reversed winding)
+        for (int pass = 0; pass < 2; pass++) {
+            glFrontFace(pass == 0 ? GL_CCW : GL_CW);
 
-            // Distance cull: skip chunks whose center is too far from camera
-            if (m_DrawRadiusEnabled) {
-                float dx = gpu.centerX - camPos.x;
-                float dy = gpu.centerY - camPos.y;
-                float dz = gpu.centerZ - camPos.z;
-                if (dx*dx + dy*dy + dz*dz > radiusSq) continue;
+            for (auto& gpu : m_BSPGPU) {
+                if (gpu.vao == 0 || gpu.indexCount == 0) continue;
+
+                // Distance cull: skip chunks whose center is too far from camera
+                if (m_DrawRadiusEnabled) {
+                    float dx = gpu.centerX - camPos.x;
+                    float dy = gpu.centerY - camPos.y;
+                    float dz = gpu.centerZ - camPos.z;
+                    if (dx*dx + dy*dy + dz*dz > radiusSq) continue;
+                }
+
+                // Zone visibility: check if camera's zone bit is set in chunk's ZoneMask
+                if (m_ZoneFilterEnabled && m_CameraZone >= 0 && m_CameraZone < 128) {
+                    int byteIdx = m_CameraZone / 8;
+                    int bitIdx = m_CameraZone % 8;
+                    if (!(gpu.zoneMask[byteIdx] & (1 << bitIdx))) continue;
+                }
+
+                glBindVertexArray(gpu.vao);
+                if (gpu.textureId) {
+                    glActiveTexture(GL_TEXTURE0);
+                    glBindTexture(GL_TEXTURE_2D, gpu.textureId);
+                    glUniform1i(m_LocHasTexture, 1);
+                    glUniform3f(m_LocColor, 1.0f, 1.0f, 1.0f);
+                } else {
+                    glUniform1i(m_LocHasTexture, 0);
+                    glUniform3f(m_LocColor, 0.45f, 0.45f, 0.50f);
+                }
+                glDrawElements(GL_TRIANGLES, gpu.indexCount, GL_UNSIGNED_SHORT, nullptr);
             }
-
-            // Zone visibility: check if camera's zone bit is set in chunk's ZoneMask
-            if (m_ZoneFilterEnabled && m_CameraZone >= 0 && m_CameraZone < 128) {
-                int byteIdx = m_CameraZone / 8;
-                int bitIdx = m_CameraZone % 8;
-                if (!(gpu.zoneMask[byteIdx] & (1 << bitIdx))) continue;
-            }
-
-            glBindVertexArray(gpu.vao);
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, gpu.textureId);
-            glUniform1i(m_LocHasTexture, 1);
-            glUniform3f(m_LocColor, 1.0f, 1.0f, 1.0f);
-            glDrawElements(GL_TRIANGLES, gpu.indexCount, GL_UNSIGNED_SHORT, nullptr);
         }
+
+        if (m_WireframeBSP)
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        glFrontFace(GL_CCW);
     }
 
     // Draw actors - solid lit meshes like a real level editor
@@ -361,7 +377,22 @@ void Viewport::Render(BSMDocument& doc, int selectedActor)
             if (gpu.vao == 0 || gpu.indexCount == 0) continue;
 
             bool isSel = (i == selectedActor);
-            
+
+            // Skip actors with NaN/Inf in transform (corrupted properties)
+            if (std::isnan(a.location.x) || std::isnan(a.location.y) || std::isnan(a.location.z) ||
+                std::isnan(a.rotation.x) || std::isnan(a.rotation.y) || std::isnan(a.rotation.z) ||
+                std::isnan(a.scale.x) || std::isnan(a.scale.y) || std::isnan(a.scale.z) ||
+                std::isinf(a.location.x) || std::isinf(a.location.y) || std::isinf(a.location.z) ||
+                a.scale.x < 0.0001f || a.scale.y < 0.0001f || a.scale.z < 0.0001f) continue;
+
+            // Distance cull actors too (use same radius as BSP)
+            if (m_DrawRadiusEnabled) {
+                float dx = a.location.x - camPos.x;
+                float dy = a.location.y - camPos.y;
+                float dz = a.location.z - camPos.z;
+                if (dx*dx + dy*dy + dz*dz > radiusSq) continue;
+            }
+
             Mat4 model = BuildActorTransform(a.location, a.rotation, a.scale);
             Mat4 mvp = MulMat4(vp_mat, model);
             glUniformMatrix4fv(m_LocMVP, 1, GL_FALSE, mvp.m);

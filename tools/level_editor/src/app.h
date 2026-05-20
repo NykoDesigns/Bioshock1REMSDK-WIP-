@@ -12,7 +12,7 @@ typedef void* SDL_GLContext;
 // Main application class
 class App {
 public:
-    bool Init();
+    bool Init(const char* mapPath = nullptr);
     void Run();
     void Shutdown();
 

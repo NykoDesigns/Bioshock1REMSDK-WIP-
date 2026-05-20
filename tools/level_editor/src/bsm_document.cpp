@@ -2,6 +2,7 @@
 #include <fstream>
 #include <filesystem>
 #include <algorithm>
+#include <cmath>
 
 // ─── Inline BSM parser (extracted from bsm_tool for self-contained build) ───
 // This is a minimal version that parses enough to extract actor positions.
@@ -298,6 +299,12 @@ bool BSMDocument::Load(const std::string& filepath)
         actor.serialSize = pe.serialSize;
         actor.serialOffset = pe.serialOffset;
 
+        // Collect scale properties independently to avoid ordering dependency
+        float drawScale = 1.0f;
+        bool hasDrawScale = false;
+        Vec3 drawScale3D = {1.0f, 1.0f, 1.0f};
+        bool hasDrawScale3D = false;
+
         for (auto& p : props) {
             if (p.name == "Location" && p.size == 12) {
                 memcpy(&actor.location.x, d + p.valueOffset, 4);
@@ -317,20 +324,24 @@ bool BSMDocument::Load(const std::string& filepath)
                 pe.rotationValueFileOffset = (int)p.valueOffset;
             }
             if (p.name == "DrawScale" && p.size == 4) {
-                float ds;
-                memcpy(&ds, d + p.valueOffset, 4);
-                if (ds > 0.001f && ds < 1000.0f) {
-                    actor.scale = {ds, ds, ds};
-                }
+                memcpy(&drawScale, d + p.valueOffset, 4);
+                hasDrawScale = true;
             }
             if (p.name == "DrawScale3D" && p.size == 12) {
-                float sx, sy, sz;
-                memcpy(&sx, d + p.valueOffset, 4);
-                memcpy(&sy, d + p.valueOffset + 4, 4);
-                memcpy(&sz, d + p.valueOffset + 8, 4);
-                if (sx > 0.001f && sx < 1000.0f) actor.scale.x *= sx;
-                if (sy > 0.001f && sy < 1000.0f) actor.scale.y *= sy;
-                if (sz > 0.001f && sz < 1000.0f) actor.scale.z *= sz;
+                memcpy(&drawScale3D.x, d + p.valueOffset, 4);
+                memcpy(&drawScale3D.y, d + p.valueOffset + 4, 4);
+                memcpy(&drawScale3D.z, d + p.valueOffset + 8, 4);
+                hasDrawScale3D = true;
+            }
+        }
+
+        // Combine: final scale = DrawScale * DrawScale3D (order-independent)
+        if (hasDrawScale || hasDrawScale3D) {
+            float absDS = std::abs(drawScale);
+            if (absDS > 0.0001f && absDS < 10000.0f) {
+                actor.scale.x = drawScale * drawScale3D.x;
+                actor.scale.y = drawScale * drawScale3D.y;
+                actor.scale.z = drawScale * drawScale3D.z;
             }
         }
 
@@ -502,6 +513,22 @@ bool BSMDocument::Load(const std::string& filepath)
         }
     }
     printf("[BSM] Linked %d actors to mesh geometry (%d no ref, %d bad ref, %d unmatched)\n", linked, noRef, badRef, noMatch);
+
+    // Validation: print first 5 StaticMeshActors with transforms for cross-referencing
+    {
+        int shown = 0;
+        for (auto& a : m_Actors) {
+            if (a.className.find("StaticMeshActor") == std::string::npos) continue;
+            if (a.meshIndex < 0) continue;
+            if (shown++ >= 5) break;
+            printf("[VALIDATE] Export[%d] '%s' mesh='%s' loc=(%.1f, %.1f, %.1f) rot=(%.1f, %.1f, %.1f) scale=(%.3f, %.3f, %.3f)\n",
+                   a.exportIndex, a.objectName.c_str(),
+                   (a.meshIndex >= 0 && a.meshIndex < (int)m_Meshes.size()) ? m_Meshes[a.meshIndex].name.c_str() : "???",
+                   a.location.x, a.location.y, a.location.z,
+                   a.rotation.x, a.rotation.y, a.rotation.z,
+                   a.scale.x, a.scale.y, a.scale.z);
+        }
+    }
 
     m_Loaded = true;
     return true;

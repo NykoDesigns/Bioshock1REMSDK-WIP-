@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "dgSpecHash": "ITRe52O9QeM=",
+  "success": true,
+  "projectFilePath": "Z:\\Bioshock1SDK\\tools\\ue_decompiler\\UEDecompiler.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Owner\\.nuget\\packages\\eliot.uelib\\1.12.0\\eliot.uelib.1.12.0.nupkg.sha512",
+    "C:\\Users\\Owner\\.nuget\\packages\\microsoft.csharp\\4.7.0\\microsoft.csharp.4.7.0.nupkg.sha512",
+    "C:\\Users\\Owner\\.nuget\\packages\\system.numerics.vectors\\4.6.1\\system.numerics.vectors.4.6.1.nupkg.sha512",
+    "C:\\Users\\Owner\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\6.1.2\\system.runtime.compilerservices.unsafe.6.1.2.nupkg.sha512",
+    "C:\\Users\\Owner\\.nuget\\packages\\system.text.encoding.codepages\\9.0.9\\system.text.encoding.codepages.9.0.9.nupkg.sha512"
+  ],
+  "logs": []
+}

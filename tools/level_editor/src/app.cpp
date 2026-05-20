@@ -15,7 +15,7 @@
 
 extern void LogMsg(const char* msg);
 
-bool App::Init()
+bool App::Init(const char* mapPath)
 {
     LogMsg("[App] Init start");
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0) { LogMsg("[App] SDL_Init failed"); return false; }
@@ -64,10 +64,14 @@ bool App::Init()
     m_Running = true;
     LogMsg("[App] Viewport init done, loading map...");
 
-    // Auto-load default map for development
-    const char* defaultMap = "D:\\SteamLibrary\\steamapps\\common\\BioShock Remastered\\ContentBaked\\pc\\Maps\\1-Medical.bsm";
+    // Load map: use command-line path if provided, otherwise default to Medical
+    const char* defaultMap = mapPath ? mapPath : "D:\\SteamLibrary\\steamapps\\common\\BioShock Remastered\\ContentBaked\\pc\\Maps\\1-Medical.bsm";
+    printf("[App] Loading map: %s\n", defaultMap);
     LogMsg("[App] About to load BSM file");
-    RenderLoadingFrame("Loading 1-Medical.bsm...");
+    {
+        std::string loadMsg = std::string("Loading ") + defaultMap + "...";
+        RenderLoadingFrame(loadMsg.c_str());
+    }
     if (m_Document.Load(defaultMap)) {
         LogMsg("[App] BSM loaded successfully");
         auto& actors = m_Document.GetActors();
@@ -240,22 +244,38 @@ void App::ProcessEvents()
             // Zone filter: V toggles zone-based BSP visibility
             if (e.key.keysym.sym == SDLK_v && !(e.key.keysym.mod & KMOD_CTRL)) {
                 m_Viewport.m_ZoneFilterEnabled = !m_Viewport.m_ZoneFilterEnabled;
+                printf("[App] Zone filter %s\n", m_Viewport.m_ZoneFilterEnabled ? "ON" : "OFF");
+                fflush(stdout);
+            }
+            // Wireframe BSP: F1 toggles
+            if (e.key.keysym.sym == SDLK_F1) {
+                m_Viewport.m_WireframeBSP = !m_Viewport.m_WireframeBSP;
+                printf("[App] BSP wireframe %s\n", m_Viewport.m_WireframeBSP ? "ON" : "OFF");
+                fflush(stdout);
             }
             if (e.key.keysym.sym == SDLK_LEFTBRACKET) {
-                m_Viewport.m_DrawRadius = (m_Viewport.m_DrawRadius - 2000.0f > 2000.0f) ? m_Viewport.m_DrawRadius - 2000.0f : 2000.0f;
+                m_Viewport.m_DrawRadius = (m_Viewport.m_DrawRadius - 1000.0f > 1000.0f) ? m_Viewport.m_DrawRadius - 1000.0f : 1000.0f;
+                printf("[App] Draw radius: %.0f\n", m_Viewport.m_DrawRadius);
+                fflush(stdout);
             }
             if (e.key.keysym.sym == SDLK_RIGHTBRACKET) {
-                m_Viewport.m_DrawRadius += 2000.0f;
+                m_Viewport.m_DrawRadius += 1000.0f;
+                printf("[App] Draw radius: %.0f\n", m_Viewport.m_DrawRadius);
+                fflush(stdout);
             }
             // Section clip: C toggles, PageUp/PageDown adjust height
             if (e.key.keysym.sym == SDLK_c && !(e.key.keysym.mod & KMOD_CTRL)) {
                 m_Viewport.m_ClipEnabled = !m_Viewport.m_ClipEnabled;
                 if (m_Viewport.m_ClipEnabled) {
-                    // Default: clip to camera Z ± 2000 units
+                    // Clip to camera Z ± 500 units (single floor)
                     float camZ = m_Viewport.GetCamera().GetPosition().z;
-                    m_Viewport.m_ClipMinZ = camZ - 2000.0f;
-                    m_Viewport.m_ClipMaxZ = camZ + 2000.0f;
+                    m_Viewport.m_ClipMinZ = camZ - 500.0f;
+                    m_Viewport.m_ClipMaxZ = camZ + 500.0f;
                 }
+                printf("[App] Section clip %s (Z: %.0f to %.0f)\n",
+                       m_Viewport.m_ClipEnabled ? "ON" : "OFF",
+                       m_Viewport.m_ClipMinZ, m_Viewport.m_ClipMaxZ);
+                fflush(stdout);
             }
             if (e.key.keysym.sym == SDLK_PAGEUP) {
                 m_Viewport.m_ClipEnabled = true;
@@ -308,9 +328,10 @@ void App::RenderUI()
         if (ImGui::BeginMenu("View")) {
             ImGui::MenuItem("Draw Radius", "Z", &m_Viewport.m_DrawRadiusEnabled);
             if (m_Viewport.m_DrawRadiusEnabled) {
-                ImGui::SliderFloat("Radius", &m_Viewport.m_DrawRadius, 2000.0f, 100000.0f);
+                ImGui::SliderFloat("Radius", &m_Viewport.m_DrawRadius, 1000.0f, 50000.0f);
             }
             ImGui::MenuItem("Zone Filter", "V", &m_Viewport.m_ZoneFilterEnabled);
+            ImGui::MenuItem("BSP Wireframe", "F1", &m_Viewport.m_WireframeBSP);
             if (m_Viewport.m_ZoneFilterEnabled) {
                 ImGui::Text("Camera Zone: %d", m_Viewport.m_CameraZone);
             }
@@ -388,6 +409,10 @@ void App::RenderUI()
             ImGui::SameLine(0, 20);
             ImGui::TextColored(ImVec4(1.0f, 0.8f, 0.2f, 1.0f), "CLIP Z:[%.0f..%.0f]",
                                m_Viewport.m_ClipMinZ, m_Viewport.m_ClipMaxZ);
+        }
+        if (m_Viewport.m_WireframeBSP) {
+            ImGui::SameLine(0, 20);
+            ImGui::TextColored(ImVec4(1.0f, 0.5f, 1.0f, 1.0f), "WIRE");
         }
     } else {
         ImGui::Text("No map loaded. Press Ctrl+O to open a .bsm file.");

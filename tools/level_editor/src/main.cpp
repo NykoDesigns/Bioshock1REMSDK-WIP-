@@ -12,10 +12,10 @@ void LogMsg(const char* msg) {
     if (g_LogFile) { fputs(msg, g_LogFile); fputc('\n', g_LogFile); fflush(g_LogFile); }
 }
 
-static int RunApp()
+static int RunApp(const char* mapPath)
 {
     App app;
-    if (!app.Init()) {
+    if (!app.Init(mapPath)) {
         LogMsg("[Main] Init failed");
         return 1;
     }
@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
 #ifdef _WIN32
     __try {
 #endif
-        return RunApp();
+        return RunApp(argc > 1 ? argv[1] : nullptr);
 #ifdef _WIN32
     } __except(EXCEPTION_EXECUTE_HANDLER) {
         char buf[256];

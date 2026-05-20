@@ -1,5 +1,7 @@
 # Engine Source Recovery — BioShock Remastered (Vengeance UE2.5)
 
+## Status: COMPLETED — 1,765 classes decompiled (4.97 MB UnrealScript source)
+
 ## What Exists
 
 BioShock Remastered ships 12 compiled UnrealScript packages at:
@@ -16,15 +18,43 @@ D:\SteamLibrary\steamapps\common\BioShock Remastered\Build\Final\BakedScripts\pc
 | **Scripting.U** | 505 KB | 99 | 359 | 2 | Kismet visual scripting system |
 | **VengeanceShared.U** | 735 KB | 80 | 460 | 5 | Shared Vengeance engine extensions |
 | **Tyrion.U** | 97 KB | 27 | 30 | 14 | AI behavior tree system |
-| **FMODAudio.U** | 406 KB | — | — | — | FMOD audio integration |
-| **IGEffectsSystem.U** | 75 KB | — | — | — | Visual/sound effects framework |
-| **IGSoundEffectsSubsystem.U** | 619 KB | — | — | — | Sound effects |
-| **IGVisualEffectsSubsystem.U** | 201 KB | — | — | — | Visual effects |
-| **IGModEffectsSubsystem.U** | 61 KB | — | — | — | Mod effects |
+| **FMODAudio.U** | 406 KB | 1 | — | — | FMOD audio integration |
+| **IGEffectsSystem.U** | 75 KB | 8 | 26 | 0 | Visual/sound effects framework |
+| **IGSoundEffectsSubsystem.U** | 619 KB | 14 | 91 | 0 | Sound effects |
+| **IGVisualEffectsSubsystem.U** | 201 KB | 9 | 7 | 0 | Visual effects |
+| **IGModEffectsSubsystem.U** | 61 KB | 3 | 6 | 0 | Mod effects |
 
-**TOTAL: ~1,730 classes, ~9,463 functions, ~258 states**
+**TOTAL: 1,765 classes, ~9,463 functions, ~272 states**
 
 This IS the game logic source — just compiled to bytecode.
+
+### Decompilation Status: ✅ COMPLETE
+
+All 12 packages have been batch-decompiled using UELib v1.12.0 (NuGet).
+
+**Output location:** `docs/reverse-engineering/decompiled/`
+
+| Package | Classes | Output Size | Quality |
+|---------|---------|-------------|--------|
+| Core | 10 | 46.8 KB | Good (some native function body errors) |
+| Engine | 320 | 895.7 KB | Good |
+| ShockGame | 654 | 1,822.3 KB | Good (main game logic fully recovered) |
+| ShockAI | 540 | 1,842.4 KB | Good (all AI states and behaviors) |
+| Scripting | 99 | 192.7 KB | Good |
+| VengeanceShared | 80 | 190.5 KB | Good |
+| Tyrion | 27 | 28.0 KB | Good |
+| FMODAudio | 1 | 6.2 KB | Good |
+| IGEffectsSystem | 8 | 17.1 KB | Good |
+| IGModEffectsSubsystem | 3 | 4.0 KB | Good |
+| IGSoundEffectsSubsystem | 14 | 30.2 KB | Good |
+| IGVisualEffectsSubsystem | 9 | 9.0 KB | Good |
+
+**Known issues:**
+- Some native function calls show as `__NFUN_XXX__` (need native table mapping)
+- A few function bodies have partial decompilation errors (bytecode format differences)
+- Default properties generally decompile correctly
+
+**Decompiler tool:** `tools/ue_decompiler/` (.NET 9 console app using UELib NuGet)
 
 ---
 
@@ -144,13 +174,20 @@ With decompiled source, we can:
 
 ---
 
-## Immediate Next Steps
+## Completed Steps
 
-1. **Download UE Explorer** and open ShockGame.U — verify decompilation works
-2. **Export all classes** from ShockGame.U and ShockAI.U as .uc source files
-3. **Store decompiled source** in `docs/reverse-engineering/decompiled/` for reference
-4. **Cross-reference** decompiled function bodies with our ProcessEvent hooks
-5. **Fix parameter struct layouts** in coop_sync.cpp based on actual TakeDamage/Died signatures
+1. ✅ **Batch decompile all .U packages** — 1,765 classes exported to `docs/reverse-engineering/decompiled/`
+2. ✅ **Runtime SDK generation** — Complete class/function/property dump in `sdk_gen/` (4.5 MB)
+3. ✅ **BSP struct layouts** — FBspNode (100B), FBspSurf (variable), FVert (8B) confirmed
+4. ✅ **Package format** — Full BSM/U parsing in bsm_tool
+
+## Remaining Steps
+
+1. **Map __NFUN_XXX__ to actual function names** using SDK_NativeFunctions.txt
+2. **Cross-reference** decompiled function bodies with our ProcessEvent hooks
+3. **Fix parameter struct layouts** in coop_sync.cpp based on actual TakeDamage/Died signatures
+4. **Resolve remaining FBspNode fields** (+68, +72, +76, +78-79, +80, +84, +92, +96)
+5. **Verify UModel::Serialize** field order via Ghidra
 
 ---
 
