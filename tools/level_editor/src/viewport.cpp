@@ -540,13 +540,30 @@ void Viewport::UploadBSP(const std::vector<ParsedMesh>& bspMeshes, const std::st
             }
         }
 
-        // Normalize BSP UVs from texels to [0,1] on CPU (avoids GPU float precision loss)
+        // Normalize BSP UVs from texels to [0,1] and shift near zero
         std::vector<MeshVertex> verts = mesh.vertices; // copy to modify UVs
         float invW = 1.0f / (float)texW;
         float invH = 1.0f / (float)texH;
         for (auto& v : verts) {
             v.u *= invW;
             v.v *= invH;
+        }
+        // Shift UVs close to 0 to avoid GPU interpolation precision loss.
+        // Large UV offsets (e.g. u=53.0) cause the GPU to lose fractional
+        // precision during rasterization, producing horizontal stripe artifacts.
+        // With GL_REPEAT, subtracting the integer floor is visually identical.
+        {
+            float uMin = 1e30f, vMin = 1e30f;
+            for (auto& v : verts) {
+                if (v.u < uMin) uMin = v.u;
+                if (v.v < vMin) vMin = v.v;
+            }
+            float uShift = std::floor(uMin);
+            float vShift = std::floor(vMin);
+            for (auto& v : verts) {
+                v.u -= uShift;
+                v.v -= vShift;
+            }
         }
 
         glGenVertexArrays(1, &gpu.vao);

@@ -267,13 +267,46 @@ bool BSMDocument::Load(const std::string& filepath)
     }
 
     // Extract actors (exports with Location property)
-    // Skip structural classes
+    // Skip classes that use binary serialization (not tagged properties).
+    // Parsing their raw data as properties produces false matches.
     static const char* skipClasses[] = {
+        // UObject infrastructure
         "Class","Function","Struct","State","Enum","Const","ScriptStruct",
         "ByteProperty","IntProperty","FloatProperty","StrProperty","NameProperty",
         "BoolProperty","ObjectProperty","ClassProperty","ArrayProperty",
         "StructProperty","DelegateProperty","Package","TextBuffer",
-        "ComponentProperty","InterfaceProperty"
+        "ComponentProperty","InterfaceProperty",
+        // Mesh/Model data (binary vertex/index buffers)
+        "StaticMesh","StaticMeshComponent","Model","Polys","Brush",
+        "SkeletalMesh","AnimSequence","AnimTree","AnimNodeBlendList",
+        "AnimNodeSequence","AnimSet","MorphTarget","PhysicsAsset",
+        // Textures & Materials (binary pixel data / shader trees)
+        "Texture","Texture2D","TextureCube","TextureMovie","TextureRenderTarget2D",
+        "Shader","Material","MaterialInstance","MaterialInstanceConstant",
+        "MaterialInstanceTimeVarying","MaterialExpression",
+        // Sound (binary audio data)
+        "SoundCue","SoundNodeWave","SoundNodeConcatenator","SoundNodeMixer",
+        "SoundNodeAmbient","SoundNodeAttenuation","SoundNodeLooping",
+        "SoundNodeModulator","SoundNodeRandom","SoundNodeWavePlayer",
+        "SoundEffectSpecification","SoundNodeDelay","SoundNodeEnveloper",
+        // Havok physics (binary collision data)
+        "HavokRigidBodyComponent","HavokConstraint","RB_BodySetup",
+        "HkMeshProxy","HkMesh","PhysicsVolume",
+        // FX/Particles (binary emitter data)
+        "ParticleSystem","ParticleEmitter","ParticleSpriteEmitter",
+        "ParticleModuleColor","ParticleModuleSize","ParticleModuleLifetime",
+        // Level infrastructure
+        "Level","LevelStreaming","LevelStreamingDistance","LevelStreamingPersistent",
+        // Sequences / Kismet (binary graph data)
+        "Sequence","SequenceAction","SequenceEvent","SequenceCondition",
+        "SequenceVariable","SequenceOp","SequenceFrame",
+        // Event/Effect subsystems
+        "EventResponse_VisualEffectsSubsystem",
+        "EventResponse_SoundEffectsSubsystem",
+        "EventResponse_ModEffectsSubsystem",
+        "VisualEffectsSubsystemSpecification",
+        "SoundEffectsSubsystemSpecification",
+        "ObjectPool","SoundGroup",
     };
 
     for (int i = 0; i < (int)m_ParsedExports.size(); i++) {
@@ -347,14 +380,16 @@ bool BSMDocument::Load(const std::string& filepath)
 
         // Check for StaticMesh property (object reference to a StaticMesh export)
         for (auto& p : props) {
-            if (p.name == "StaticMesh" && p.size >= 1) {
-                // Read compact index from value
+            // CI-encoded object refs are 1-5 bytes; reject bogus matches
+            if (p.name == "StaticMesh" && p.size >= 1 && p.size <= 5) {
                 size_t vpos = 0;
                 size_t remaining = p.size;
                 int ref = ReadCompactIndex(d + p.valueOffset, remaining, vpos);
                 if (ref > 0 && ref <= (int)m_ParsedExports.size()) {
-                    // Export reference (1-based) — store name for later linking
-                    actor.meshIndex = ref - 1; // will be resolved to mesh index later
+                    // Validate: the referenced export must actually be a StaticMesh
+                    if (m_ParsedExports[ref - 1].className == "StaticMesh") {
+                        actor.meshIndex = ref - 1;
+                    }
                 }
             }
         }
@@ -513,6 +548,35 @@ bool BSMDocument::Load(const std::string& filepath)
         }
     }
     printf("[BSM] Linked %d actors to mesh geometry (%d no ref, %d bad ref, %d unmatched)\n", linked, noRef, badRef, noMatch);
+
+    // Diagnostic: count actors per mesh to find over-represented meshes
+    {
+        std::unordered_map<int, int> meshCounts;
+        for (auto& a : m_Actors)
+            if (a.meshIndex >= 0) meshCounts[a.meshIndex]++;
+        std::vector<std::pair<int,int>> sorted(meshCounts.begin(), meshCounts.end());
+        std::sort(sorted.begin(), sorted.end(), [](auto& a, auto& b) { return a.second > b.second; });
+        printf("[MESH-COUNTS] Top 15 meshes by actor count:\n");
+        for (int i = 0; i < (int)sorted.size() && i < 15; i++) {
+            auto& m = m_Meshes[sorted[i].first];
+            printf("  %3d actors -> mesh[%d] '%s'\n", sorted[i].second, sorted[i].first, m.name.c_str());
+        }
+    }
+
+    // Diagnostic: show actors linked to sign_surgery
+    {
+        int cnt = 0;
+        for (auto& a : m_Actors) {
+            if (a.meshIndex >= 0 && a.meshIndex < (int)m_Meshes.size() &&
+                m_Meshes[a.meshIndex].name.find("sign_surgery") != std::string::npos) {
+                if (cnt < 20)
+                    printf("[SURGERY-DIAG] class='%s' name='%s' exportIdx=%d\n",
+                           a.className.c_str(), a.objectName.c_str(), a.exportIndex);
+                cnt++;
+            }
+        }
+        if (cnt > 0) printf("[SURGERY-DIAG] Total actors with sign_surgery mesh: %d\n", cnt);
+    }
 
     // Validation: print first 5 StaticMeshActors with transforms for cross-referencing
     {
