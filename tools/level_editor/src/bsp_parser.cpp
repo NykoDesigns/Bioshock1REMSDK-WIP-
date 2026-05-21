@@ -128,11 +128,11 @@ static bool ReadTArrayVectors(const uint8_t* data, size_t& pos, size_t endPos,
 //   +72: INT32 iRenderBound     — 0 or -1
 //   +76: BYTE  NodeFlags
 //   +77: BYTE  iZone[0]         — back-side zone (100% ZoneMask correlation)
-//   +78: BYTE  iZone[1]         — front-side zone
-//   +79: BYTE  Pad
+//   +78: BYTE  NumVertices      — polygon vertex count (100% planarity match confirmed)
+//   +79: BYTE  iZone[1]         — front-side zone (or Pad)
 //   +80: INT32 iLeaf[0]         — often -1
 //   +84: INT32 iLeaf[1]         — often -1
-//   +88: INT32 NumVertices      — expanded from UE2 BYTE
+//   +88: INT32 (unknown)        — NOT NumVertices; was misidentified
 //   +92: INT32 iContentBound    — Vengeance-added
 //   +96: INT32 iRenderZone      — Vengeance-added (0-127)
 struct BSPNode {
@@ -142,7 +142,7 @@ struct BSPNode {
     int32_t iSurf;        // +36
     int32_t iBack;        // +40 (back child, -1 = leaf)
     int32_t iFront;       // +44 (front child, -1 = leaf)
-    uint8_t numVertices;  // +88: INT32 in file, clamped to uint8
+    uint8_t numVertices;  // +78: BYTE (NOT +88 which was a misidentification)
     uint8_t iZone;        // +77: back-zone byte (100% ZoneMask correlation confirmed)
 };
 
@@ -213,8 +213,7 @@ static bool ParseNodes(const uint8_t* data, size_t& pos, size_t endPos,
         memcpy(&nodes[i].iSurf, data + noff + 36, 4);
         memcpy(&nodes[i].iBack, data + noff + 40, 4);
         memcpy(&nodes[i].iFront, data + noff + 44, 4);
-        int32_t nv; memcpy(&nv, data + noff + 88, 4);
-        nodes[i].numVertices = (nv >= 0 && nv < 256) ? (uint8_t)nv : 0;
+        nodes[i].numVertices = data[noff + 78]; // +78: NumVertices BYTE (100% planarity match confirmed by probe)
         nodes[i].iZone = data[noff + 77]; // +77: back-zone byte, 100% ZoneMask correlation confirmed
     }
     pos += nodeBytes;
@@ -352,8 +351,10 @@ std::vector<ParsedMesh> ParseBSPGeometry(const uint8_t* serialData, int serialSi
     printf("[BSP] Vectors: %d, Points: %d\n", numVectors, numPoints);
 
     // ─── 6. Nodes (100B each) ───
+    size_t preNodePos = pos; // save for later probing
     std::vector<BSPNode> nodes;
     if (!ParseNodes(serialData, pos, endPos, nodes)) return results;
+    int numNodes_saved = (int)nodes.size(); // save count for probing
 
     // Output BSP tree for zone traversal
     if (outTree) {
@@ -467,6 +468,53 @@ std::vector<ParsedMesh> ParseBSPGeometry(const uint8_t* serialData, int serialSi
     }
     if (verts.empty()) return results;
 
+    // ─── Probe: find real numVertices offset by testing every byte position ───
+    // For each byte offset, interpret it as numVertices and check planarity match
+    {
+        // Find node data start: preNodePos has CI prefix, skip it to get to raw node data
+        size_t br_tmp;
+        ReadCompactIndex(serialData + preNodePos, endPos - preNodePos, br_tmp);
+        size_t nodesStart = preNodePos + br_tmp; // start of first node's 100B data
+        printf("[BSP-PROBE] Testing byte offsets for numVertices (nodes at 0x%X)...\n", (int)nodesStart);
+        int bestByteOff = -1;
+        float bestScore = 0;
+        for (int byteOff = 32; byteOff < 100; byteOff++) {
+            int tested = 0, matched = 0;
+            for (int ni = 0; ni < numNodes_saved && tested < 800; ni++) {
+                size_t noff = nodesStart + (size_t)ni * 100;
+                uint8_t candidate = serialData[noff + byteOff];
+                if (candidate < 3 || candidate > 200) continue;
+                // Read iVertPool from +32
+                int32_t pool; memcpy(&pool, serialData + noff + 32, 4);
+                if (pool < 0 || pool + candidate > (int)verts.size()) continue;
+                // Read plane from +0
+                float plX, plY, plZ, plW;
+                memcpy(&plX, serialData+noff, 4); memcpy(&plY, serialData+noff+4, 4);
+                memcpy(&plZ, serialData+noff+8, 4); memcpy(&plW, serialData+noff+12, 4);
+                float nrm = std::sqrt(plX*plX + plY*plY + plZ*plZ);
+                if (nrm < 0.5f) continue;
+                int goodVerts = 0;
+                bool bad = false;
+                for (int v = 0; v < candidate; v++) {
+                    int pi = verts[pool + v].pVertex;
+                    if (pi < 0 || pi >= numPoints) { bad = true; break; }
+                    float px = points[pi*3], py = points[pi*3+1], pz = points[pi*3+2];
+                    float d = std::abs(px*plX + py*plY + pz*plZ - plW);
+                    if (d <= 1.0f) goodVerts++;
+                    else break;
+                }
+                if (bad) continue;
+                tested++;
+                if (goodVerts == candidate) matched++;
+            }
+            float score = tested > 50 ? (float)matched / tested : 0;
+            if (score > bestScore) { bestScore = score; bestByteOff = byteOff; }
+            if (tested > 50 && score > 0.3f)
+                printf("[BSP-PROBE] byte+%d: %d/%d matched (%.1f%%)\n", byteOff, matched, tested, score*100);
+        }
+        printf("[BSP-PROBE] Best numVerts byte offset: +%d (%.1f%% planarity match)\n", bestByteOff, bestScore*100);
+    }
+
     // ─── Diagnostics ───
     {
         int valid3 = 0;
@@ -501,13 +549,19 @@ std::vector<ParsedMesh> ParseBSPGeometry(const uint8_t* serialData, int serialSi
                 if (planarBad <= 3) {
                     printf("[BSP-PLANAR-FAIL] Node[%d]: plane=(%.4f,%.4f,%.4f,%.4f) iVertPool=%d nv=%d\n",
                            (int)(&n - &nodes[0]), n.planeX, n.planeY, n.planeZ, n.planeW, n.iVertPool, n.numVertices);
-                    for (int v = 0; v < std::min((int)n.numVertices, 4); v++) {
-                        int pi = verts[n.iVertPool + v].pVertex;
+                    for (int v = 0; v < std::min((int)n.numVertices + 2, 12); v++) {
+                        int vIdx = n.iVertPool + v;
+                        if (vIdx < 0 || vIdx >= (int)verts.size()) break;
+                        int pi = verts[vIdx].pVertex;
+                        int si = verts[vIdx].iSide;
                         if (pi >= 0 && pi < numPoints) {
                             float px = points[pi*3], py = points[pi*3+1], pz = points[pi*3+2];
                             float dist = px * n.planeX + py * n.planeY + pz * n.planeZ - n.planeW;
-                            printf("    vert[%d] pIdx=%d pos=(%.1f,%.1f,%.1f) planeDist=%.1f\n",
-                                   v, pi, px, py, pz, dist);
+                            printf("    vert[%d] pIdx=%d iSide=%d pos=(%.1f,%.1f,%.1f) planeDist=%.1f%s\n",
+                                   v, pi, si, px, py, pz, dist, v >= n.numVertices ? " (BEYOND)" : "");
+                        } else {
+                            printf("    vert[%d] pIdx=%d iSide=%d (OUT OF RANGE)%s\n",
+                                   v, pi, si, v >= n.numVertices ? " (BEYOND)" : "");
                         }
                     }
                 }
@@ -530,6 +584,27 @@ std::vector<ParsedMesh> ParseBSPGeometry(const uint8_t* serialData, int serialSi
         printf("[BSP] Polygon nodes: %d (of %d), FVerts: %d\n", valid3, (int)nodes.size(), (int)verts.size());
         printf("[BSP] NumVerts distribution: 3-7:%d  8-15:%d  16-31:%d  32-63:%d  64+:%d\n",
                nv3_7, nv8_15, nv16_31, nv32_63, nv64plus);
+        // Analyze how many extra verts each failing polygon has
+        int extraHist[8] = {}; // 0=all bad, 1=1 extra, 2=2 extra, ...
+        for (auto& n : nodes) {
+            if (n.numVertices < 3) continue;
+            if (n.iVertPool < 0 || n.iVertPool + n.numVertices > (int)verts.size()) continue;
+            int goodCount = 0;
+            for (int v = 0; v < n.numVertices; v++) {
+                int pi = verts[n.iVertPool + v].pVertex;
+                if (pi < 0 || pi >= numPoints) break;
+                float px = points[pi*3], py = points[pi*3+1], pz = points[pi*3+2];
+                float dist = std::abs(px * n.planeX + py * n.planeY + pz * n.planeZ - n.planeW);
+                if (dist > 1.0f) break;
+                goodCount++;
+            }
+            int extra = n.numVertices - goodCount;
+            if (extra > 0 && extra < 8) extraHist[extra]++;
+            else if (extra >= 8) extraHist[7]++;
+        }
+        printf("[BSP] Extra vert distribution: ");
+        for (int i = 1; i < 8; i++) printf("+%d=%d ", i, extraHist[i]);
+        printf("\n");
         printf("[BSP] Planarity: %d OK, %d BAD (maxDist=%.2f)\n", planarOK, planarBad, maxPlaneDist);
         printf("[BSP] Area dist: <100=%d  100-10K=%d  10K-1M=%d  >1M=%d  total=%.0f\n",
                areaSmall, areaMed, areaLarge, areaHuge, totalArea);
