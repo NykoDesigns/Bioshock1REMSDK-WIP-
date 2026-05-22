@@ -199,6 +199,11 @@ static ParsedMesh ParseStaticMeshSpec(const uint8_t* serialData, int serialSize,
         memcpy(&mesh.vertices[i].nx, serialData + voff + 12, 4);
         memcpy(&mesh.vertices[i].ny, serialData + voff + 16, 4);
         memcpy(&mesh.vertices[i].nz, serialData + voff + 20, 4);
+        // TangentX at offset 24 (12 bytes, full FVector)
+        memcpy(&mesh.vertices[i].tx, serialData + voff + 24, 4);
+        memcpy(&mesh.vertices[i].ty, serialData + voff + 28, 4);
+        memcpy(&mesh.vertices[i].tz, serialData + voff + 32, 4);
+        mesh.vertices[i].tw = 1.0f; // handedness default
         // UVs will be filled from UV stream below
         mesh.vertices[i].u = 0;
         mesh.vertices[i].v = 0;

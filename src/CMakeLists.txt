@@ -36,6 +36,7 @@ add_library(BS1SDK SHARED
     debug/coop_debug.cpp
     debug/crash_handler.cpp
     debug/disasm_dump.cpp
+    debug/nearby_scanner.cpp
 )
 
 target_include_directories(BS1SDK PRIVATE

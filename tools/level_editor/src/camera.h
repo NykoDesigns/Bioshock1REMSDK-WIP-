@@ -40,6 +40,7 @@ public:
     // Utility
     static Mat4 LookAt(Vec3 eye, Vec3 center, Vec3 up);
     static Mat4 Perspective(float fovDeg, float aspect, float near, float far);
+    static Mat4 Orthographic(float halfW, float halfH, float near, float far);
 
 private:
     Vec3 m_FlyPos = {0, 0, 0}; // camera position in fly mode

@@ -150,10 +150,11 @@ ParsedMesh LoadMeshFromGLTF(const std::string& gltfPath, const std::string& mesh
     mesh.textureName = matName;
 
     // Find index accessor (componentType 5123 = uint16, type SCALAR)
-    // Find position accessor (first VEC3), normal accessor (second VEC3), UV accessor (VEC2)
+    // Find position accessor (first VEC3), normal accessor (second VEC3), tangent (VEC4), UV accessor (VEC2)
     int idxAccessorIdx = -1;
     int posAccessorIdx = -1;
     int nrmAccessorIdx = -1;
+    int tanAccessorIdx = -1;
     int uvAccessorIdx = -1;
     for (int i = 0; i < (int)accessors.size(); i++) {
         if (accessors[i].componentType == 5123 && accessors[i].type == "SCALAR")
@@ -164,6 +165,8 @@ ParsedMesh LoadMeshFromGLTF(const std::string& gltfPath, const std::string& mesh
             else if (nrmAccessorIdx < 0)
                 nrmAccessorIdx = i;
         }
+        if (accessors[i].componentType == 5126 && accessors[i].type == "VEC4" && tanAccessorIdx < 0)
+            tanAccessorIdx = i;
         if (accessors[i].componentType == 5126 && accessors[i].type == "VEC2" && uvAccessorIdx < 0)
             uvAccessorIdx = i;
     }
@@ -227,6 +230,17 @@ ParsedMesh LoadMeshFromGLTF(const std::string& gltfPath, const std::string& mesh
         }
     }
     
+    // Get tangent data if available (VEC4: xyz = tangent direction, w = handedness)
+    const float* tanData = nullptr;
+    if (tanAccessorIdx >= 0) {
+        auto& tanAcc = accessors[tanAccessorIdx];
+        if (tanAcc.bufferView >= 0 && tanAcc.bufferView < (int)bufferViews.size()) {
+            auto& tanBV = bufferViews[tanAcc.bufferView];
+            if (tanBV.byteOffset + numVerts * 16 <= (int)binSize)
+                tanData = (const float*)(binData.data() + tanBV.byteOffset);
+        }
+    }
+    
     float minX = 1e9f, minY = 1e9f, minZ = 1e9f;
     float maxX = -1e9f, maxY = -1e9f, maxZ = -1e9f;
     
@@ -254,6 +268,22 @@ ParsedMesh LoadMeshFromGLTF(const std::string& gltfPath, const std::string& mesh
             mesh.vertices[i].nx = 0;
             mesh.vertices[i].ny = 0;
             mesh.vertices[i].nz = 1;
+        }
+        
+        // Tangent (same axis swap as normals + handedness in w)
+        if (tanData) {
+            float gtx = tanData[i * 4 + 0];
+            float gty = tanData[i * 4 + 1];
+            float gtz = tanData[i * 4 + 2];
+            mesh.vertices[i].tx = gtx;
+            mesh.vertices[i].ty = -gtz;
+            mesh.vertices[i].tz = gty;
+            mesh.vertices[i].tw = tanData[i * 4 + 3]; // handedness ±1
+        } else {
+            mesh.vertices[i].tx = 1;
+            mesh.vertices[i].ty = 0;
+            mesh.vertices[i].tz = 0;
+            mesh.vertices[i].tw = 1;
         }
         
         // UV coordinates

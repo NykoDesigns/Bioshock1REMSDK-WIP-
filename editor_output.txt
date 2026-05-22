@@ -1,0 +1,143 @@
+﻿[Viewport] Shader compiled OK (program=3)
+[App] Loading map: D:\SteamLibrary\steamapps\common\BioShock Remastered\ContentBaked\pc\Maps\1-Medical.bsm
+[BSM] Parsing StaticMesh exports directly from BSM...
+[BSM] StaticMesh parsing: 610 found, 569 successfully parsed (581457 verts, 631436 tris)
+[BSM] Parsing BSP from Model export 'Model_1' (8608268 bytes)...
+[BSP] Vectors: 590, Points: 11652
+[BSP] NumVerts offset probe: +88: 4768 polys (avg=26.8 max=104), +92: 1929 polys (avg=97.6 max=255)
+[BSP-NODE-RAW] Node[0] at 0x23E31:
+  +0:  BF800000 80000000 80000000 46C0B000 (FPlane)
+  +16: FFFFFFFEFFFFFFFF000001FF00000000 (ZoneMask)
+  +32=68625 +36=3275 +40=3363 +44=11 +48=1
+  +52=(-24664.0,-40.0,7991.0) +64=98.8 (BoundSphere)
+  +76=0x0E +77=60 +78=5 +88=0 +92=0 +96=0
+[BSP-NODE-RAW] Node[1] at 0x23E95:
+  +0:  BF800000 80000000 80000000 46C0B000 (FPlane)
+  +16: 00004000100000000000000000000000 (ZoneMask)
+  +32=68447 +36=3275 +40=-1 +44=-1 +48=2
+  +52=(-24664.0,-196.0,8132.3) +64=175.1 (BoundSphere)
+  +76=0x0E +77=60 +78=5 +88=0 +92=5 +96=0
+[BSP-NODE-RAW] Node[2] at 0x23EF9:
+  +0:  BF800000 80000000 80000000 46C0B000 (FPlane)
+  +16: 00004000100000000000000000000000 (ZoneMask)
+  +32=68467 +36=3275 +40=-1 +44=-1 +48=3
+  +52=(-24664.0,133.7,8019.5) +64=93.3 (BoundSphere)
+  +76=0x0E +77=60 +78=5 +88=0 +92=10 +96=0
+[BSP] Parsed 3386 surfs (189646 bytes), Pan: 309 zero, 0 small(<=512), 3077 large(>512)
+[BSP] Nodes: 7125, Surfs: 3386
+[BSP] FVert pool: minRequired=101725, totalVertRefs=34934
+[BSP] FVert CI at 0x100235: count=857526 (min needed=101725)
+[BSP] FVert direct probe: count=857526, referenced validity=100.0%
+[BSP] FVerts: 857526 (direct read at 0x100235)
+[BSP-PROBE] Testing byte offsets for numVertices (nodes at 0x23E31)...
+[BSP-PROBE] byte+37: 356/800 matched (44.5%)
+[BSP-PROBE] byte+45: 398/800 matched (49.8%)
+[BSP-PROBE] byte+49: 656/800 matched (82.0%)
+[BSP-PROBE] byte+52: 253/488 matched (51.8%)
+[BSP-PROBE] byte+54: 254/800 matched (31.8%)
+[BSP-PROBE] byte+62: 531/800 matched (66.4%)
+[BSP-PROBE] byte+73: 725/800 matched (90.6%)
+[BSP-PROBE] byte+78: 800/800 matched (100.0%)
+[BSP-PROBE] byte+79: 136/184 matched (73.9%)
+[BSP-PROBE] byte+85: 448/452 matched (99.1%)
+[BSP-PROBE] byte+88: 559/800 matched (69.9%)
+[BSP-PROBE] byte+93: 548/800 matched (68.5%)
+[BSP-PROBE] byte+97: 800/800 matched (100.0%)
+[BSP-PROBE] Best numVerts byte offset: +78 (100.0% planarity match)
+[BSP] Polygon nodes: 7125 (of 7125), FVerts: 857526
+[BSP] NumVerts distribution: 3-7:6763  8-15:362  16-31:0  32-63:0  64+:0
+[BSP] Extra vert distribution: +1=0 +2=0 +3=0 +4=0 +5=0 +6=0 +7=0 
+[BSP] Planarity: 7125 OK, 0 BAD (maxDist=0.25)
+[BSP] Area dist: <100=1292  100-10K=3666  10K-1M=2137  >1M=30  total=193241941
+[BSP] Zone masks: avg 1.3 bits/node, 72 unique zones used
+[BSP] Top 5 zones: zone18=522 zone38=471 zone58=445 zone31=349 zone16=342 
+[BSP] Unique materials: 70 (+ 0 null)
+[BSP-UV] numVectors=590, numPoints=11652
+[BSP-UV] First 10 surfs raw field values:
+  Surf[0]: matRef=3347 polyFlags=0x0 pBase=0 vNormal=0 vTextureU=1 vTextureV=2 panU=0 panV=-16512
+    texU=(-0.000001,2.666663,0.000000 |2.666663|) texV=(0.000000,0.000000,-2.666667 |2.666667|)
+  Surf[1]: matRef=3347 polyFlags=0x0 pBase=1 vNormal=3 vTextureU=4 vTextureV=5 panU=0 panV=-32768
+    texU=(2.666667,0.000217,0.000000 |2.666667|) texV=(0.000001,-2.666664,0.000000 |2.666664|)
+  Surf[2]: matRef=3347 polyFlags=0x0 pBase=0 vNormal=9 vTextureU=5 vTextureV=2 panU=-1 panV=16255
+    texU=(0.000001,-2.666664,0.000000 |2.666664|) texV=(0.000000,0.000000,-2.666667 |2.666667|)
+  Surf[3]: matRef=3347 polyFlags=0x0 pBase=2 vNormal=12 vTextureU=13 vTextureV=5 panU=0 panV=-32768
+    texU=(-2.666663,-0.000001,0.000000 |2.666663|) texV=(0.000001,-2.666664,0.000000 |2.666664|)
+  Surf[4]: matRef=3348 polyFlags=0x0 pBase=3 vNormal=0 vTextureU=14 vTextureV=15 panU=-1 panV=-16513
+    texU=(0.000000,5.000000,0.000000 |5.000000|) texV=(0.000000,0.000000,-5.000000 |5.000000|)
+  Surf[5]: matRef=3348 polyFlags=0x0 pBase=4 vNormal=10 vTextureU=16 vTextureV=15 panU=-12399 panV=-18758
+    texU=(5.000000,0.000002,0.000000 |5.000000|) texV=(0.000000,0.000000,-5.000000 |5.000000|)
+  Surf[6]: matRef=3363 polyFlags=0x0 pBase=6 vNormal=3 vTextureU=19 vTextureV=20 panU=0 panV=-32768
+    texU=(-0.000000,-3.000000,-0.000000 |3.000000|) texV=(-3.000000,-0.000000,-0.000000 |3.000000|)
+  Surf[7]: matRef=3375 polyFlags=0x0 pBase=6 vNormal=12 vTextureU=21 vTextureV=22 panU=0 panV=-32768
+    texU=(-4.000000,-0.000007,-0.000003 |4.000000|) texV=(-0.000007,-4.000000,-0.000002 |4.000000|)
+  Surf[8]: matRef=3347 polyFlags=0x0 pBase=7 vNormal=23 vTextureU=5 vTextureV=2 panU=-1 panV=16255
+    texU=(0.000001,-2.666664,0.000000 |2.666664|) texV=(0.000000,0.000000,-2.666667 |2.666667|)
+  Surf[9]: matRef=3347 polyFlags=0x0 pBase=8 vNormal=25 vTextureU=4 vTextureV=2 panU=941 panV=-16587
+    texU=(2.666667,0.000217,0.000000 |2.666667|) texV=(0.000000,0.000000,-2.666667 |2.666667|)
+[BSP] Triangulated: 29726 vertices, 17706 triangles in 361 material chunks (skipped: 0 bad-vert)
+[BSM] BSP loaded: 29726 verts, 17706 tris in 361 chunks, tree: 7125 nodes
+[BSM] Unmatched mesh: 'puddle_alt' (norm: 'puddle_alt')
+[BSM] Unmatched mesh: 'LongPuddleDrippy' (norm: 'longpuddledrippy')
+[BSM] Unmatched mesh: 'Int_WindowBreak_128x_256' (norm: 'int_windowbreak128x256')
+[BSM] Unmatched mesh: 'LongPuddleDrippy' (norm: 'longpuddledrippy')
+[BSM] Unmatched mesh: 'Cascade__512' (norm: 'cascade_512')
+[BSM] Unmatched mesh: 'WaterSpewB' (norm: 'waterspewb')
+[BSM] Unmatched mesh: 'WaterSpewB' (norm: 'waterspewb')
+[BSM] Unmatched mesh: 'Plane' (norm: 'plane')
+[BSM] Unmatched mesh: 'Plane' (norm: 'plane')
+[BSM] Unmatched mesh: 'railing_stairs_open' (norm: 'railing_stairs_open')
+[BSM] Linked 3599 actors to mesh geometry (3859 no ref, 0 bad ref, 171 unmatched)
+[MESH-COUNTS] Top 15 meshes by actor count:
+  158 actors -> mesh[0] 'med_pillar_full'
+  152 actors -> mesh[1] 'Medical_pillar'
+  134 actors -> mesh[2] 'med_pillar_large_base'
+  109 actors -> mesh[3] 'medical_pillar_arch_half'
+   88 actors -> mesh[4] 'CWS_platform_128'
+   83 actors -> mesh[12] 'Wall_Leak__1024'
+   81 actors -> mesh[5] 'medical_pillar_doorarch'
+   67 actors -> mesh[6] 'light_wall'
+   65 actors -> mesh[23] 'Med_Floor_Signs'
+   64 actors -> mesh[7] 'med_pillar_large'
+   57 actors -> mesh[8] 'Light_Wall_02'
+   47 actors -> mesh[31] 'Wall_Leak__512'
+   46 actors -> mesh[9] 'Pipe__512'
+   43 actors -> mesh[10] 'beforeafterphotos'
+   42 actors -> mesh[11] 'stairs_texswap'
+[SURGERY-DIAG] class='StaticMeshActor' name='StaticMeshActor_3688' exportIdx=7626
+[SURGERY-DIAG] class='StaticMeshActor' name='StaticMeshActor_1465' exportIdx=9597
+[SURGERY-DIAG] class='StaticMeshActor' name='StaticMeshActor_652' exportIdx=9958
+[SURGERY-DIAG] class='StaticMeshActor' name='StaticMeshActor_591' exportIdx=10464
+[SURGERY-DIAG] class='StaticMeshActor' name='StaticMeshActor_950' exportIdx=11238
+[SURGERY-DIAG] class='StaticMeshActor' name='StaticMeshActor_1461' exportIdx=12081
+[SURGERY-DIAG] class='StaticMeshActor' name='StaticMeshActor_1472' exportIdx=12093
+[SURGERY-DIAG] class='StaticMeshActor' name='StaticMeshActor_1064' exportIdx=12283
+[SURGERY-DIAG] class='StaticMeshActor' name='StaticMeshActor_257' exportIdx=12301
+[SURGERY-DIAG] class='StaticMeshActor' name='StaticMeshActor_623' exportIdx=12603
+[SURGERY-DIAG] class='StaticMeshActor' name='StaticMeshActor_2308' exportIdx=12647
+[SURGERY-DIAG] class='NonPhysicalReactiveActor' name='NonPhysicalReactiveActor_24' exportIdx=13661
+[SURGERY-DIAG] Total actors with sign_surgery mesh: 12
+[VALIDATE] Export[5747] 'StaticMeshActor_4622' mesh='Cracked_BW_Tile_Pile' loc=(-33363.2, 482.1, 8005.0) rot=(0.0, -174.4, 0.0) scale=(0.900, 0.900, 0.900)
+[VALIDATE] Export[5751] 'StaticMeshActor_3589' mesh='Long_Couch' loc=(-26702.8, 1242.1, 8034.8) rot=(0.0, -93.7, -13.1) scale=(1.000, 1.000, 1.000)
+[VALIDATE] Export[6455] 'StaticMeshActor_4670' mesh='ConcreteWall_Hole' loc=(-33004.0, 704.0, 8396.0) rot=(0.0, 0.0, -90.0) scale=(1.000, 1.000, 1.000)
+[VALIDATE] Export[6456] 'StaticMeshActor_503' mesh='sf_shelving02' loc=(-25676.0, 3758.3, 8182.0) rot=(0.0, 0.0, 0.0) scale=(1.250, 1.250, 1.250)
+[VALIDATE] Export[6458] 'StaticMeshActor_1807' mesh='Tablefold_2' loc=(-24792.0, 6756.0, 7552.0) rot=(0.0, 90.0, 0.0) scale=(1.000, 1.000, 1.000)
+[BSM] Resolved 521/569 mesh texture names
+[BSM] BSP textures: 361/361 chunks resolved
+[Viewport] No texture for: '4_poster_cover_front' (mesh: 4_poster_cover_front)
+[Viewport] No texture for: 'Light_Beams' (mesh: Light_Beams)
+[Viewport] No texture for: 'Grass_Clump_01' (mesh: Grass_Clump_01)
+[Viewport] No texture for: 'GroundCover_plantSingle' (mesh: GroundCover_plantSingle)
+[Viewport] No texture for: 'LS_BurnetteWigRimShader' (mesh: LP_LS_Hair)
+[Viewport] No texture for: 'Flowers' (mesh: Flowers)
+[Viewport] No texture for: 'autopsytable_waterplane' (mesh: autopsytable_waterplane)
+[Viewport] No texture for: 'tommygun_ammo_standard' (mesh: tommygun_ammo_standard)
+[Viewport] No texture for: 'WP_AI_Pistol' (mesh: WP_AI_Pistol)
+[Viewport] No texture for: 'light_beam_02' (mesh: light_beam_02)
+[Viewport] No texture for: 'IcicleNew' (mesh: IcicleNew)
+[Viewport] No texture for: 'invisible' (mesh: FireBigBox)
+[Viewport] No texture for: 'banners' (mesh: banners)
+[Viewport] No texture for: 'BJ_BlackWigRimShader' (mesh: Wig_BJ_ShortHair)
+[Viewport] No texture for: 'Cam_Beam' (mesh: Cam_Beam)
+[Viewport] Uploaded 569 meshes to GPU (471 textured, 98 untextured)
+[Viewport] Uploaded 361 BSP chunks to GPU (361 textured)
+[ContentBrowser] Found 607 meshes in Z:\UEViewer\export\1-Medical\StaticMesh

@@ -77,6 +77,9 @@ static int DecodePackedSize(const uint8_t* d, size_t& pos, int sizeBits)
     }
 }
 
+// Forward declaration
+static const char* RenderTypeName(ActorRenderType rt);
+
 struct SimpleProp {
     std::string name;
     int type;
@@ -378,25 +381,126 @@ bool BSMDocument::Load(const std::string& filepath)
             }
         }
 
-        // Check for StaticMesh property (object reference to a StaticMesh export)
-        for (auto& p : props) {
-            // CI-encoded object refs are 1-5 bytes; reject bogus matches
-            if (p.name == "StaticMesh" && p.size >= 1 && p.size <= 5) {
+        // Extract light properties for Light actors
+        if (pe.className.find("Light") != std::string::npos) {
+            actor.isLight = true;
+            for (auto& p : props) {
+                if (p.name == "LightBrightness" && p.size == 1) {
+                    actor.lightBrightness = d[p.valueOffset] / 255.0f;
+                } else if (p.name == "LightBrightness" && p.size == 4) {
+                    memcpy(&actor.lightBrightness, d + p.valueOffset, 4);
+                    // Normalize if stored as 0-255 float
+                    if (actor.lightBrightness > 1.5f) actor.lightBrightness /= 255.0f;
+                }
+                if (p.name == "LightRadius" && p.size == 1) {
+                    actor.lightRadius = d[p.valueOffset] * 25.0f; // UE2 byte radius * 25
+                } else if (p.name == "LightRadius" && p.size == 4) {
+                    memcpy(&actor.lightRadius, d + p.valueOffset, 4);
+                    if (actor.lightRadius < 10.0f) actor.lightRadius *= 25.0f;
+                }
+                if (p.name == "LightColor" && p.size >= 3) {
+                    // UE2 Color struct: B,G,R,A
+                    actor.lightColorB = d[p.valueOffset];
+                    actor.lightColorG = d[p.valueOffset + 1];
+                    actor.lightColorR = d[p.valueOffset + 2];
+                }
+                if (p.name == "LightHue" && p.size == 1) {
+                    // HSB hue byte (UE2 legacy) — convert to approximate RGB
+                    uint8_t hue = d[p.valueOffset];
+                    float h = hue / 255.0f * 6.0f;
+                    float r = 0, g = 0, b = 0;
+                    int hi = (int)h % 6;
+                    float f = h - (int)h;
+                    switch (hi) {
+                        case 0: r=1; g=f; b=0; break;
+                        case 1: r=1-f; g=1; b=0; break;
+                        case 2: r=0; g=1; b=f; break;
+                        case 3: r=0; g=1-f; b=1; break;
+                        case 4: r=f; g=0; b=1; break;
+                        case 5: r=1; g=0; b=1-f; break;
+                    }
+                    actor.lightColorR = (uint8_t)(r * 255);
+                    actor.lightColorG = (uint8_t)(g * 255);
+                    actor.lightColorB = (uint8_t)(b * 255);
+                }
+            }
+        }
+
+        // Check for mesh properties: multiple property names may reference mesh exports
+        // Priority: StaticMesh > Mesh > StaticMeshComponent > Display
+        static const char* meshPropNames[] = {
+            "StaticMesh", "Mesh", "StaticMeshComponent",
+            "PickupMesh", "ThirdPersonMesh", "PickupViewMesh",
+        };
+        for (auto& propName : meshPropNames) {
+            if (actor.meshIndex >= 0) break; // already found one
+            for (auto& p : props) {
+                if (actor.meshIndex >= 0) break;
+                if (p.name != propName) continue;
+                if (p.size < 1 || p.size > 5) continue;
                 size_t vpos = 0;
                 size_t remaining = p.size;
                 int ref = ReadCompactIndex(d + p.valueOffset, remaining, vpos);
                 if (ref > 0 && ref <= (int)m_ParsedExports.size()) {
-                    // Validate: the referenced export must actually be a StaticMesh
-                    if (m_ParsedExports[ref - 1].className == "StaticMesh") {
+                    auto& refExport = m_ParsedExports[ref - 1];
+                    if (actor.meshRefName.empty()) actor.meshRefName = refExport.objectName;
+                    if (refExport.className == "StaticMesh") {
                         actor.meshIndex = ref - 1;
+                    } else if (refExport.className == "StaticMeshComponent" ||
+                               refExport.className == "StaticMeshActor") {
+                        // Follow indirect: parse the component's properties to find its StaticMesh
+                        if (refExport.serialOffset + refExport.serialSize <= (int)fileSize) {
+                            int compSkip = DetectHeaderSkip(d, refExport.serialOffset, refExport.serialSize, names);
+                            auto compProps = ParsePropsMinimal(d, refExport.serialOffset + compSkip, names,
+                                                               refExport.serialOffset + refExport.serialSize);
+                            for (auto& cp : compProps) {
+                                if (cp.name == "StaticMesh" && cp.size >= 1 && cp.size <= 5) {
+                                    size_t cvpos = 0;
+                                    size_t cremaining = cp.size;
+                                    int cref = ReadCompactIndex(d + cp.valueOffset, cremaining, cvpos);
+                                    if (cref > 0 && cref <= (int)m_ParsedExports.size() &&
+                                        m_ParsedExports[cref - 1].className == "StaticMesh") {
+                                        actor.meshIndex = cref - 1;
+                                        actor.meshRefName = m_ParsedExports[cref - 1].objectName;
+                                    }
+                                    break;
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
 
-        if (actor.hasLocation) {
-            m_Actors.push_back(actor);
+        // Parse Projector/Decal properties
+        if (actor.className.find("Projector") != std::string::npos ||
+            actor.className.find("Decal") != std::string::npos) {
+            actor.isProjector = true;
+            for (auto& p : props) {
+                if (p.name == "ProjTexture" && p.size >= 1 && p.size <= 5) {
+                    size_t vpos = 0;
+                    int ref = ReadCompactIndex(d + p.valueOffset, p.size, vpos);
+                    if (ref > 0 && ref <= (int)m_ParsedExports.size())
+                        actor.projTextureName = m_ParsedExports[ref - 1].objectName;
+                }
+                if (p.name == "FOV" && p.size == 4) {
+                    float val;
+                    memcpy(&val, d + p.valueOffset, 4);
+                    if (val > 0 && val < 180) actor.projFOV = val;
+                }
+                if ((p.name == "MaxTraceDistance" || p.name == "ProjectDistance") && p.size == 4) {
+                    float val;
+                    memcpy(&val, d + p.valueOffset, 4);
+                    if (val > 0 && val < 100000) actor.projMaxDist = val;
+                }
+            }
         }
+
+        // Classify render type early to decide if this is a real actor
+        bool hasMesh = actor.meshIndex >= 0;
+        actor.renderType = ResolveActorRenderType(pe.className, hasMesh, actor.isLight);
+        // Include all actors — even without Location — for matching against runtime scan
+        m_Actors.push_back(actor);
     }
 
     // ─── Parse StaticMesh geometry directly from BSM (C.4 spec) ────────────────
@@ -548,6 +652,11 @@ bool BSMDocument::Load(const std::string& filepath)
         }
     }
     printf("[BSM] Linked %d actors to mesh geometry (%d no ref, %d bad ref, %d unmatched)\n", linked, noRef, badRef, noMatch);
+    {
+        int withLoc = 0, withoutLoc = 0;
+        for (auto& a : m_Actors) { if (a.hasLocation) withLoc++; else withoutLoc++; }
+        printf("[BSM] Actor location: %d with Location, %d without (total %d)\n", withLoc, withoutLoc, (int)m_Actors.size());
+    }
 
     // Diagnostic: count actors per mesh to find over-represented meshes
     {
@@ -578,20 +687,95 @@ bool BSMDocument::Load(const std::string& filepath)
         if (cnt > 0) printf("[SURGERY-DIAG] Total actors with sign_surgery mesh: %d\n", cnt);
     }
 
-    // Validation: print first 5 StaticMeshActors with transforms for cross-referencing
+    // ─── Assign render types and build diagnostic ─────────────────────────────
     {
+        int totalActors = (int)m_Actors.size();
+        std::unordered_map<std::string, int> typeCounts; // RenderType → count
+        std::unordered_map<std::string, int> placeholderClasses; // class → count (missing mesh)
+        int visibleResolved = 0, visibleMissing = 0, hiddenCount = 0, unknownCount = 0;
+
+        for (auto& a : m_Actors) {
+            bool hasMesh = a.meshIndex >= 0 && a.meshIndex < (int)m_Meshes.size();
+            a.renderType = ResolveActorRenderType(a.className, hasMesh, a.isLight);
+            typeCounts[RenderTypeName(a.renderType)]++;
+
+            if (IsVisibleInGame(a.renderType)) {
+                if (hasMesh || a.renderType == ActorRenderType::LightOnly ||
+                    a.renderType == ActorRenderType::VisibleEmitter ||
+                    a.renderType == ActorRenderType::VisibleDecal) {
+                    visibleResolved++;
+                } else {
+                    visibleMissing++;
+                }
+            } else if (a.renderType == ActorRenderType::UnknownPlaceholder) {
+                unknownCount++;
+                placeholderClasses[a.className]++;
+            } else {
+                hiddenCount++;
+            }
+        }
+
+        printf("\n");
+        printf("╔══════════════════════════════════════════════════════════╗\n");
+        printf("║              ACTOR RENDER CLASSIFICATION                ║\n");
+        printf("╠══════════════════════════════════════════════════════════╣\n");
+        printf("║ Total actors:               %5d                       ║\n", totalActors);
+        printf("║ Visible + resolved:         %5d (3D geometry / light)  ║\n", visibleResolved);
+        printf("║ Visible but missing mesh:   %5d (placeholder)         ║\n", visibleMissing);
+        printf("║ Hidden (editor/trigger/col): %4d                       ║\n", hiddenCount);
+        printf("║ Unknown placeholder:        %5d                       ║\n", unknownCount);
+        printf("╠══════════════════════════════════════════════════════════╣\n");
+        // Sort and print type counts
+        std::vector<std::pair<std::string,int>> sorted(typeCounts.begin(), typeCounts.end());
+        std::sort(sorted.begin(), sorted.end(), [](auto& a, auto& b) { return b.second < a.second; });
+        for (auto& [name, cnt] : sorted)
+            printf("║   %-20s  %5d                       ║\n", name.c_str(), cnt);
+        printf("╚══════════════════════════════════════════════════════════╝\n");
+
+        if (!placeholderClasses.empty()) {
+            printf("\n[UNKNOWN PLACEHOLDERS] Unclassified actor classes:\n");
+            std::vector<std::pair<std::string,int>> pSorted(placeholderClasses.begin(), placeholderClasses.end());
+            std::sort(pSorted.begin(), pSorted.end(), [](auto& a, auto& b) { return a.second > b.second; });
+            for (auto& [cn, cnt] : pSorted)
+                printf("  %4d  %s\n", cnt, cn.c_str());
+        }
+
+        // Show actors that should have meshes but failed to resolve
+        printf("\n[MISSING MESH] Visible actors with unresolved mesh (first 20):\n");
         int shown = 0;
         for (auto& a : m_Actors) {
-            if (a.className.find("StaticMeshActor") == std::string::npos) continue;
-            if (a.meshIndex < 0) continue;
-            if (shown++ >= 5) break;
-            printf("[VALIDATE] Export[%d] '%s' mesh='%s' loc=(%.1f, %.1f, %.1f) rot=(%.1f, %.1f, %.1f) scale=(%.3f, %.3f, %.3f)\n",
-                   a.exportIndex, a.objectName.c_str(),
-                   (a.meshIndex >= 0 && a.meshIndex < (int)m_Meshes.size()) ? m_Meshes[a.meshIndex].name.c_str() : "???",
-                   a.location.x, a.location.y, a.location.z,
-                   a.rotation.x, a.rotation.y, a.rotation.z,
-                   a.scale.x, a.scale.y, a.scale.z);
+            if (shown >= 20) break;
+            if (a.renderType == ActorRenderType::UnknownPlaceholder) continue; // not expected to have mesh
+            bool hasMesh = a.meshIndex >= 0 && a.meshIndex < (int)m_Meshes.size();
+            if (hasMesh) continue;
+            if (!IsVisibleInGame(a.renderType)) continue;
+            if (a.renderType == ActorRenderType::LightOnly) continue;
+            if (a.renderType == ActorRenderType::VisibleEmitter) continue;
+            if (a.renderType == ActorRenderType::VisibleDecal) continue;
+            printf("  [%d] class='%s' name='%s' meshRef='%s' type=%s\n",
+                   a.exportIndex, a.className.c_str(), a.objectName.c_str(),
+                   a.meshRefName.c_str(), RenderTypeName(a.renderType));
+            shown++;
         }
+
+        // Projector/Decal actors summary
+        int projCount = 0;
+        for (auto& a : m_Actors) {
+            if (a.isProjector) projCount++;
+        }
+        if (projCount > 0) {
+            printf("\n[PROJECTORS/DECALS] Found %d projector/decal actors:\n", projCount);
+            int pshown = 0;
+            for (auto& a : m_Actors) {
+                if (!a.isProjector) continue;
+                if (pshown++ >= 30) { printf("  ... (%d more)\n", projCount - 30); break; }
+                printf("  [%d] class='%s' name='%s' tex='%s' fov=%.1f dist=%.0f loc=(%.0f,%.0f,%.0f)\n",
+                       a.exportIndex, a.className.c_str(), a.objectName.c_str(),
+                       a.projTextureName.c_str(), a.projFOV, a.projMaxDist,
+                       a.location.x, a.location.y, a.location.z);
+            }
+        }
+        printf("\n");
     }
 
     m_Loaded = true;
@@ -643,17 +827,55 @@ bool BSMDocument::SetActorRotation(int actorIdx, Vec3 newRot)
 
 ActorCategory CategorizeActor(const std::string& cn)
 {
-    if (cn.find("Spawner") != std::string::npos) return ActorCategory::Spawner;
-    if (cn.find("Trigger") != std::string::npos) return ActorCategory::Trigger;
+    // Player starts / navigation (check BEFORE "Spawn" to avoid false match)
+    if (cn.find("PlayerStart") != std::string::npos || cn.find("NavigationPoint") != std::string::npos ||
+        cn.find("PathNode") != std::string::npos || cn.find("Teleporter") != std::string::npos)
+        return ActorCategory::PlayerStart;
+
+    // Spawners / enemies / AI
+    if (cn.find("Spawner") != std::string::npos || cn.find("Spawn") != std::string::npos) return ActorCategory::Spawner;
+    if (cn.find("BigDaddy") != std::string::npos || cn.find("Splicer") != std::string::npos ||
+        cn.find("Turret") != std::string::npos || cn.find("Security") != std::string::npos ||
+        cn.find("Enemy") != std::string::npos || cn.find("AI") != std::string::npos ||
+        cn.find("Bot") != std::string::npos || cn.find("NPC") != std::string::npos)
+        return ActorCategory::Spawner;
+
+    // Triggers / volumes
+    if (cn.find("Trigger") != std::string::npos || cn.find("Volume") != std::string::npos ||
+        cn.find("Zone") != std::string::npos || cn.find("PhysicsVolume") != std::string::npos)
+        return ActorCategory::Trigger;
+
+    // Lights
     if (cn.find("Light") != std::string::npos) return ActorCategory::Light;
-    if (cn.find("Door") != std::string::npos) return ActorCategory::Door;
-    if (cn.find("Pickup") != std::string::npos || cn.find("Loot") != std::string::npos)
+
+    // Doors / movers
+    if (cn.find("Door") != std::string::npos || cn.find("Mover") != std::string::npos ||
+        cn.find("Lift") != std::string::npos || cn.find("Elevator") != std::string::npos)
+        return ActorCategory::Door;
+
+    // Pickups / items / loot / weapons / ammo
+    if (cn.find("Pickup") != std::string::npos || cn.find("Loot") != std::string::npos ||
+        cn.find("Weapon") != std::string::npos || cn.find("Ammo") != std::string::npos ||
+        cn.find("HealthStation") != std::string::npos || cn.find("VendingMachine") != std::string::npos ||
+        cn.find("Item") != std::string::npos || cn.find("Audio") != std::string::npos ||
+        cn.find("Diary") != std::string::npos || cn.find("Plasmid") != std::string::npos ||
+        cn.find("Tonic") != std::string::npos || cn.find("Gene") != std::string::npos)
         return ActorCategory::Pickup;
+
+    // Effects / emitters / sounds / particles
     if (cn.find("Emitter") != std::string::npos || cn.find("Effect") != std::string::npos ||
-        cn.find("Particle") != std::string::npos)
+        cn.find("Particle") != std::string::npos || cn.find("Sound") != std::string::npos ||
+        cn.find("Ambient") != std::string::npos || cn.find("Fog") != std::string::npos ||
+        cn.find("Smoke") != std::string::npos || cn.find("Fire") != std::string::npos ||
+        cn.find("Water") != std::string::npos || cn.find("Steam") != std::string::npos ||
+        cn.find("Beam") != std::string::npos || cn.find("Decal") != std::string::npos ||
+        cn.find("Camera") != std::string::npos || cn.find("Projector") != std::string::npos)
         return ActorCategory::Effect;
-    if (cn.find("PlayerStart") != std::string::npos) return ActorCategory::PlayerStart;
-    if (cn.find("StaticMesh") != std::string::npos) return ActorCategory::StaticMesh;
+
+    // Static meshes
+    if (cn.find("StaticMesh") != std::string::npos || cn.find("Brush") != std::string::npos)
+        return ActorCategory::StaticMesh;
+
     return ActorCategory::Other;
 }
 
@@ -671,6 +893,159 @@ Vec3 CategoryColor(ActorCategory cat)
         case ActorCategory::Other:       return {0.4f, 0.4f, 0.4f};
     }
     return {0.5f, 0.5f, 0.5f};
+}
+
+// ─── Actor Render Type Resolution ──────────────────────────────────────────
+
+ActorRenderType ResolveActorRenderType(const std::string& cn, bool hasMesh, bool isLight)
+{
+    // Lights → lighting contribution only
+    if (isLight) return ActorRenderType::LightOnly;
+
+    // Editor-only / navigation helpers
+    if (cn.find("PlayerStart") != std::string::npos ||
+        cn.find("PathNode") != std::string::npos ||
+        cn.find("NavigationPoint") != std::string::npos ||
+        cn.find("Teleporter") != std::string::npos ||
+        cn.find("Keypoint") != std::string::npos ||
+        cn.find("AIController") != std::string::npos ||
+        cn.find("GameReplicationInfo") != std::string::npos ||
+        cn == "LevelInfo" || cn == "ZoneInfo" ||
+        cn == "DefaultPhysicsVolume" ||
+        cn.find("Bookmark") != std::string::npos ||
+        cn.find("Note") != std::string::npos)
+        return ActorRenderType::EditorOnly;
+
+    // Triggers
+    if (cn.find("Trigger") != std::string::npos && cn.find("TriggerLight") == std::string::npos)
+        return ActorRenderType::TriggerOnly;
+
+    // Collision-only volumes
+    if (cn.find("BlockingVolume") != std::string::npos ||
+        cn.find("PhysicsVolume") != std::string::npos ||
+        cn.find("Volume") != std::string::npos)
+        return ActorRenderType::CollisionOnly;
+
+    // Zone actors (not visible geometry)
+    if (cn.find("ZoneInfo") != std::string::npos)
+        return ActorRenderType::EditorOnly;
+
+    // Emitters / particles
+    if (cn.find("Emitter") != std::string::npos ||
+        cn.find("Particle") != std::string::npos ||
+        cn.find("Smoke") != std::string::npos ||
+        cn.find("Fire") != std::string::npos ||
+        cn.find("Steam") != std::string::npos ||
+        cn.find("Beam") != std::string::npos)
+        return ActorRenderType::VisibleEmitter;
+
+    // Decals
+    if (cn.find("Decal") != std::string::npos ||
+        cn.find("Projector") != std::string::npos)
+        return ActorRenderType::VisibleDecal;
+
+    // Doors / movers
+    if (cn.find("Mover") != std::string::npos ||
+        cn.find("Door") != std::string::npos ||
+        cn.find("Lift") != std::string::npos ||
+        cn.find("Elevator") != std::string::npos ||
+        cn.find("InterpActor") != std::string::npos) {
+        return hasMesh ? ActorRenderType::VisibleMover : ActorRenderType::UnknownPlaceholder;
+    }
+
+    // Pickups / weapons / items
+    if (cn.find("Pickup") != std::string::npos ||
+        cn.find("Weapon") != std::string::npos ||
+        cn.find("Ammo") != std::string::npos ||
+        cn.find("Item") != std::string::npos ||
+        cn.find("Plasmid") != std::string::npos ||
+        cn.find("Tonic") != std::string::npos ||
+        cn.find("Gene") != std::string::npos ||
+        cn.find("HealthStation") != std::string::npos ||
+        cn.find("VendingMachine") != std::string::npos) {
+        return hasMesh ? ActorRenderType::VisiblePickup : ActorRenderType::UnknownPlaceholder;
+    }
+
+    // Decorations / debris / bodies
+    if (cn.find("Decoration") != std::string::npos ||
+        cn.find("DestroyableObject") != std::string::npos ||
+        cn.find("KActor") != std::string::npos ||
+        cn.find("Corpse") != std::string::npos ||
+        cn.find("Body") != std::string::npos ||
+        cn.find("Ragdoll") != std::string::npos) {
+        return hasMesh ? ActorRenderType::VisibleDecoration : ActorRenderType::UnknownPlaceholder;
+    }
+
+    // Static meshes (most common visible actor)
+    if (cn.find("StaticMesh") != std::string::npos) {
+        return hasMesh ? ActorRenderType::VisibleStaticMesh : ActorRenderType::UnknownPlaceholder;
+    }
+
+    // Sound / ambient (invisible in-game)
+    if (cn.find("Sound") != std::string::npos ||
+        cn.find("Ambient") != std::string::npos ||
+        cn.find("Audio") != std::string::npos ||
+        cn.find("Diary") != std::string::npos)
+        return ActorRenderType::EditorOnly;
+
+    // Spawners / AI enemies (have skeletal meshes in-game, but we can't render them yet)
+    if (cn.find("Spawner") != std::string::npos ||
+        cn.find("Spawn") != std::string::npos ||
+        cn.find("BigDaddy") != std::string::npos ||
+        cn.find("Splicer") != std::string::npos ||
+        cn.find("Turret") != std::string::npos ||
+        cn.find("Security") != std::string::npos ||
+        cn.find("Enemy") != std::string::npos ||
+        cn.find("NPC") != std::string::npos ||
+        cn.find("Bot") != std::string::npos)
+        return ActorRenderType::EditorOnly;
+
+    // Camera actors
+    if (cn.find("Camera") != std::string::npos)
+        return ActorRenderType::EditorOnly;
+
+    // Sequence / Kismet (logic only)
+    if (cn.find("Sequence") != std::string::npos)
+        return ActorRenderType::EditorOnly;
+
+    // Fallback: if it has a mesh, it's probably visible
+    if (hasMesh) return ActorRenderType::VisibleStaticMesh;
+
+    return ActorRenderType::UnknownPlaceholder;
+}
+
+bool IsVisibleInGame(ActorRenderType rt)
+{
+    switch (rt) {
+        case ActorRenderType::VisibleStaticMesh:
+        case ActorRenderType::VisibleMover:
+        case ActorRenderType::VisiblePickup:
+        case ActorRenderType::VisibleDecoration:
+        case ActorRenderType::VisibleEmitter:
+        case ActorRenderType::VisibleDecal:
+        case ActorRenderType::LightOnly:
+            return true;
+        default:
+            return false;
+    }
+}
+
+static const char* RenderTypeName(ActorRenderType rt)
+{
+    switch (rt) {
+        case ActorRenderType::VisibleStaticMesh: return "StaticMesh";
+        case ActorRenderType::VisibleMover:      return "Mover";
+        case ActorRenderType::VisiblePickup:     return "Pickup";
+        case ActorRenderType::VisibleDecoration: return "Decoration";
+        case ActorRenderType::VisibleEmitter:    return "Emitter";
+        case ActorRenderType::VisibleDecal:      return "Decal";
+        case ActorRenderType::LightOnly:         return "Light";
+        case ActorRenderType::CollisionOnly:     return "Collision";
+        case ActorRenderType::TriggerOnly:       return "Trigger";
+        case ActorRenderType::EditorOnly:        return "EditorOnly";
+        case ActorRenderType::UnknownPlaceholder:return "Unknown";
+    }
+    return "???";
 }
 
 void BSMDocument::ResolveTextures(const std::string& umodelExportDir)

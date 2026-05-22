@@ -76,6 +76,22 @@ void SceneTree::Render(BSMDocument& doc, int& selectedActor)
             if (ImGui::MenuItem("Focus (F)")) {
                 // Handled by app via key
             }
+            if (ImGui::MenuItem("Duplicate (Ctrl+D)")) {
+                EditorActor copy = doc.GetActors()[i];
+                copy.exportIndex = -1;
+                copy.objectName += "_copy";
+                copy.location.x += 100.0f;
+                copy.location.y += 100.0f;
+                doc.GetActors().push_back(copy);
+                selectedActor = (int)doc.GetActors().size() - 1;
+                ImGui::EndPopup();
+                ImGui::PopStyleColor();
+                break;
+            }
+            if (ImGui::MenuItem(a.visible ? "Hide" : "Show")) {
+                a.visible = !a.visible;
+            }
+            ImGui::Separator();
             if (ImGui::MenuItem("Delete")) {
                 doc.GetActors().erase(doc.GetActors().begin() + i);
                 selectedActor = -1;

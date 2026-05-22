@@ -54,6 +54,59 @@ unsigned int TextureCache::GetTexture(const std::string& textureName)
     return tex.glTexture;
 }
 
+unsigned int TextureCache::GetNormalMap(const std::string& textureName)
+{
+    if (textureName.empty()) return 0;
+    
+    std::string cacheKey = textureName + "_NRM";
+    auto it = m_Cache.find(cacheKey);
+    if (it != m_Cache.end()) return it->second.glTexture;
+    
+    // Try multiple naming conventions for normal map files
+    LoadedTexture tex;
+    std::string candidates[] = {
+        m_TextureDir + "\\" + textureName + "_NormalMap.tga",
+        m_TextureDir + "\\" + textureName + "_normalmap.tga",
+        m_TextureDir + "\\" + textureName + "_Normal.tga",
+        m_TextureDir + "\\" + textureName + "_normal.tga",
+        m_TextureDir + "\\" + textureName + "_norm.tga",
+        m_TextureDir + "\\" + textureName + "_Norm.tga",
+        m_TextureDir + "\\" + textureName + "_n.tga",
+        m_TextureDir + "\\" + textureName + "_N.tga",
+    };
+    for (auto& path : candidates) {
+        tex = LoadTGA(path);
+        if (tex.glTexture) break;
+    }
+    m_Cache[cacheKey] = tex;
+    return tex.glTexture;
+}
+
+unsigned int TextureCache::GetSpecularMap(const std::string& textureName)
+{
+    if (textureName.empty()) return 0;
+    
+    std::string cacheKey = textureName + "_SPEC";
+    auto it = m_Cache.find(cacheKey);
+    if (it != m_Cache.end()) return it->second.glTexture;
+    
+    LoadedTexture tex;
+    std::string candidates[] = {
+        m_TextureDir + "\\" + textureName + "_Specular.tga",
+        m_TextureDir + "\\" + textureName + "_specular.tga",
+        m_TextureDir + "\\" + textureName + "_spec.tga",
+        m_TextureDir + "\\" + textureName + "_Spec.tga",
+        m_TextureDir + "\\" + textureName + "_s.tga",
+        m_TextureDir + "\\" + textureName + "_S.tga",
+    };
+    for (auto& path : candidates) {
+        tex = LoadTGA(path);
+        if (tex.glTexture) break;
+    }
+    m_Cache[cacheKey] = tex;
+    return tex.glTexture;
+}
+
 LoadedTexture TextureCache::GetTextureInfo(const std::string& textureName)
 {
     // Ensure texture is loaded first
@@ -149,6 +202,14 @@ LoadedTexture TextureCache::LoadTGA(const std::string& path)
         }
     }
     
+    // Check if texture has meaningful alpha (not all 255)
+    bool hasAlpha = false;
+    if (channels == 4) {
+        for (int i = 0; i < width * height; i++) {
+            if (rgbaData[i * 4 + 3] < 250) { hasAlpha = true; break; }
+        }
+    }
+
     // Upload to OpenGL
     GLuint tex;
     glGenTextures(1, &tex);
@@ -158,10 +219,12 @@ LoadedTexture TextureCache::LoadTGA(const std::string& path)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 16.0f); // Anisotropic filtering
     glGenerateMipmap(GL_TEXTURE_2D);
     
     result.glTexture = tex;
     result.width = width;
     result.height = height;
+    result.hasAlpha = hasAlpha;
     return result;
 }

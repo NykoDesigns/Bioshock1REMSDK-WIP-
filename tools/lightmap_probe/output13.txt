@@ -1,0 +1,495 @@
+﻿Lightmap Probe v0.3 - BSM Texture BulkData Header Parser
+
+BSM: 214215598 bytes
+PackagePatch: 23024902 bytes
+
+Names: 29295, Exports: 49140, Imports: 1381
+Parsed 29295 names
+Parsed 49140 exports
+
+=== Texture exports (Texture_4x, Texture_5x) ===
+  Export[4086] 'Texture_49' serial=3193 offset=0x261CC8F
+  Export[4335] 'Texture_46' serial=3193 offset=0x2A09C3F
+  Export[4439] 'Texture_47' serial=3193 offset=0x2A3B414
+  Export[5002] 'Texture_50' serial=3193 offset=0x3851057
+  Export[5163] 'Texture_48' serial=3193 offset=0x3913CF7
+  Export[5417] 'Texture_54' serial=3193 offset=0x3D06A61
+  Export[5481] 'Texture_44' serial=3193 offset=0x3D16190
+  Export[5529] 'Texture_43' serial=3193 offset=0x3E12B37
+  Export[5574] 'Texture_55' serial=3193 offset=0x3F63557
+  Export[5988] 'Texture_45' serial=3193 offset=0x441DA15
+  Export[8007] 'Texture_42' serial=3193 offset=0x57D5DC1
+  Export[8010] 'Texture_51' serial=3193 offset=0x57D6C53
+  Export[10984] 'Texture_52' serial=3193 offset=0x6D8FC26
+  Export[13804] 'Texture_53' serial=3193 offset=0x7FE3641
+Found 14 lightmap texture exports
+
+=== Parsing texture serial data for BulkData headers ===
+
+--- Texture_49 (export 4086, serial 3193 bytes at 0x261CC8F) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1
+  Native data: 3027 bytes remaining
+  NativeHeader: ver=4 subVer=1 totalBulkSize=696320 mipCount=9
+  Native bytes 100-220 (entry 3/4 boundary):
+    +0064: 00 01 00 00 00 01 00 00 08 08 04 00 00 00 02 00 
+    +0074: 00 00 B8 CD 61 02 00 00 00 00 40 80 01 00 00 80 
+    +0084: 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 
+    +0094: 00 D8 D5 61 02 00 00 00 00 40 20 00 00 40 20 00 
+    +00A4: 00 00 08 00 00 00 02 00 00 00 00 00 00 00 00 00 
+    +00B4: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 20 
+    +00C4: 00 00 00 D5 55 55 55 00 04 00 00 35 25 2D AD 80 
+    +00D4: 05 60 00 E0 C0 EA F5 2F 00 20 00 55 7D 63 63 20 
+  Parsing mip entries (variable-length):
+    [0] +17: selfOff=0x261CD5B b16-17=4080 raw[18..31]: 40 00 00 00 04 00 00 00 04 00 00 0A 0A 04 
+         CI at +47 = 10 (1 bytes)
+         INLINE data: 10 bytes at +48
+    [1] BAD signature at +58: 609, -2143289344
+  Final mip parse position: +58 (of 3027)
+
+--- Texture_46 (export 4335, serial 3193 bytes at 0x2A09C3F) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1
+  Native data: 3027 bytes remaining
+  NativeHeader: ver=4 subVer=1 totalBulkSize=696320 mipCount=9
+  Native bytes 100-220 (entry 3/4 boundary):
+    +0064: 00 01 00 00 00 01 00 00 08 08 04 00 00 00 02 00 
+    +0074: 00 00 68 9D A0 02 00 00 00 00 40 80 01 90 00 80 
+    +0084: 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 
+    +0094: 00 88 A5 A0 02 00 00 00 00 40 20 02 11 40 20 02 
+    +00A4: 11 6D 04 2E 17 00 AA E0 98 67 02 82 02 AA 55 22 
+    +00B4: 0C 61 08 83 FF 5F 5F C7 28 41 00 55 E5 8D DF 81 
+    +00C4: 00 23 30 90 00 00 00 00 08 A2 01 E2 60 AA 8B 05 
+    +00D4: 22 00 00 55 FA EA 42 0A 08 C0 00 F5 80 EA 55 A7 
+  Parsing mip entries (variable-length):
+    [0] +17: selfOff=0x2A09D0B b16-17=4080 raw[18..31]: 40 00 00 00 04 00 00 00 04 00 00 0A 0A 04 
+         CI at +47 = 10 (1 bytes)
+         INLINE data: 10 bytes at +48
+    [1] BAD signature at +58: 672, -2143289344
+  Final mip parse position: +58 (of 3027)
+
+--- Texture_47 (export 4439, serial 3193 bytes at 0x2A3B414) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1
+  Native data: 3027 bytes remaining
+  NativeHeader: ver=4 subVer=1 totalBulkSize=696320 mipCount=9
+  Native bytes 100-220 (entry 3/4 boundary):
+    +0064: 00 01 00 00 00 01 00 00 08 08 04 00 00 00 02 00 
+    +0074: 00 00 3D B5 A3 02 00 00 00 00 40 80 01 05 00 80 
+    +0084: 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 
+    +0094: 00 5D BD A3 02 00 00 00 00 40 20 00 C0 40 20 00 
+    +00A4: C0 02 08 55 55 B5 2F 41 20 80 0E 60 E0 28 28 E0 
+    +00B4: 05 40 00 78 7A 55 55 51 0A 61 08 35 15 35 B7 E1 
+    +00C4: 02 F9 01 2D 2D 0B 02 20 00 00 00 D5 55 55 D5 20 
+    +00D4: 01 00 00 7D 71 71 5D AA 00 00 00 55 55 D5 35 98 
+  Parsing mip entries (variable-length):
+    [0] +17: selfOff=0x2A3B4E0 b16-17=4080 raw[18..31]: 40 00 00 00 04 00 00 00 04 00 00 0A 0A 04 
+         CI at +47 = 10 (1 bytes)
+         INLINE data: 10 bytes at +48
+    [1] BAD signature at +58: 675, -2143289344
+  Final mip parse position: +58 (of 3027)
+
+--- Texture_50 (export 5002, serial 3193 bytes at 0x3851057) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1
+  Native data: 3027 bytes remaining
+  NativeHeader: ver=4 subVer=1 totalBulkSize=696320 mipCount=9
+  Native bytes 100-220 (entry 3/4 boundary):
+    +0064: 00 01 00 00 00 01 00 00 08 08 04 00 00 00 02 00 
+    +0074: 00 00 80 11 85 03 00 00 00 00 40 80 01 13 00 80 
+    +0084: 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 
+    +0094: 00 A0 19 85 03 00 00 00 00 40 20 18 D0 40 20 18 
+    +00A4: D0 0B B0 FD AB 02 00 15 C8 02 70 5A 58 50 50 00 
+    +00B4: 68 00 00 78 78 78 78 00 04 00 00 2D F5 55 55 20 
+    +00C4: 04 00 00 78 5F 55 55 20 00 00 00 55 55 57 55 00 
+    +00D4: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+  Parsing mip entries (variable-length):
+    [0] +17: selfOff=0x3851123 b16-17=4080 raw[18..31]: 40 09 00 00 04 00 00 00 04 00 00 0A 0A 04 
+         CI at +47 = 10 (1 bytes)
+         INLINE data: 10 bytes at +48
+    [1] BAD signature at +58: 901, -2143289344
+  Final mip parse position: +58 (of 3027)
+
+--- Texture_48 (export 5163, serial 3193 bytes at 0x3913CF7) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1
+  Native data: 3027 bytes remaining
+  NativeHeader: ver=4 subVer=1 totalBulkSize=696320 mipCount=9
+  Native bytes 100-220 (entry 3/4 boundary):
+    +0064: 00 01 00 00 00 01 00 00 08 08 04 00 00 00 02 00 
+    +0074: 00 00 20 3E 91 03 00 00 00 00 40 80 01 00 00 80 
+    +0084: 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 
+    +0094: 00 40 46 91 03 00 00 00 00 40 20 00 D8 40 20 00 
+    +00A4: D8 00 A8 01 01 01 09 00 E0 00 78 00 80 C0 40 00 
+    +00B4: D8 00 00 00 0F 0D 0D 00 E0 00 D0 80 A0 FA 7F 00 
+    +00C4: C8 0F 00 58 58 58 58 14 00 0C 00 55 7F EA 80 0F 
+    +00D4: 00 00 00 5E 5E F8 A0 05 00 00 00 55 55 56 5C 00 
+  Parsing mip entries (variable-length):
+    [0] +17: selfOff=0x3913DC3 b16-17=4080 raw[18..31]: 40 00 00 00 04 00 00 00 04 00 00 0A 0A 04 
+         CI at +47 = 10 (1 bytes)
+         INLINE data: 10 bytes at +48
+    [1] BAD signature at +58: 913, -2143289344
+  Final mip parse position: +58 (of 3027)
+
+--- Texture_54 (export 5417, serial 3193 bytes at 0x3D06A61) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1
+  Native data: 3027 bytes remaining
+  NativeHeader: ver=4 subVer=1 totalBulkSize=696320 mipCount=9
+  Native bytes 100-220 (entry 3/4 boundary):
+    +0064: 00 01 00 00 00 01 00 00 08 08 04 00 00 00 02 00 
+    +0074: 00 00 8A 6B D0 03 00 00 00 00 40 80 01 20 00 80 
+    +0084: 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 
+    +0094: 00 AA 73 D0 03 00 00 00 00 40 20 41 75 40 20 41 
+    +00A4: 75 60 33 BD AD 2B 0B E3 95 A1 6C F5 AF 0A 02 09 
+    +00B4: A6 81 95 55 AD 09 09 08 AE C1 73 7F 6A 40 40 28 
+    +00C4: 00 10 00 D7 B7 B6 2E 09 00 00 00 78 78 5E 56 00 
+    +00D4: 20 00 00 25 B5 D5 55 00 48 00 00 82 6A 5F 55 00 
+  Parsing mip entries (variable-length):
+    [0] +17: selfOff=0x3D06B2D b16-17=4080 raw[18..31]: 40 A0 00 00 04 00 00 00 04 00 00 0A 0A 04 
+         CI at +47 = 10 (1 bytes)
+         INLINE data: 10 bytes at +48
+    [1] BAD signature at +58: 976, -2143289344
+  Final mip parse position: +58 (of 3027)
+
+--- Texture_44 (export 5481, serial 3193 bytes at 0x3D16190) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1
+  Native data: 3027 bytes remaining
+  NativeHeader: ver=4 subVer=1 totalBulkSize=696320 mipCount=9
+  Native bytes 100-220 (entry 3/4 boundary):
+    +0064: 00 01 00 00 00 01 00 00 08 08 04 00 00 00 02 00 
+    +0074: 00 00 B9 62 D1 03 00 00 00 00 40 80 01 00 00 80 
+    +0084: 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 
+    +0094: 00 D9 6A D1 03 00 00 00 00 40 20 40 00 40 20 40 
+    +00A4: 00 00 00 55 55 D5 15 20 08 00 00 55 75 7F 7E 20 
+    +00B4: 00 00 00 55 55 D5 D5 80 00 00 00 55 55 55 35 00 
+    +00C4: 01 00 00 55 55 55 02 E0 00 00 00 55 55 55 78 12 
+    +00D4: 00 01 00 95 15 95 55 0E 08 E0 00 5C 58 70 7B 42 
+  Parsing mip entries (variable-length):
+    [0] +17: selfOff=0x3D1625C b16-17=4080 raw[18..31]: 40 00 00 00 04 00 00 00 04 00 00 0A 0A 04 
+         CI at +47 = 10 (1 bytes)
+         INLINE data: 10 bytes at +48
+    [1] BAD signature at +58: 977, -2143289344
+  Final mip parse position: +58 (of 3027)
+
+--- Texture_43 (export 5529, serial 3193 bytes at 0x3E12B37) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1
+  Native data: 3027 bytes remaining
+  NativeHeader: ver=4 subVer=1 totalBulkSize=696320 mipCount=9
+  Native bytes 100-220 (entry 3/4 boundary):
+    +0064: 00 01 00 00 00 01 00 00 08 08 04 00 00 00 02 00 
+    +0074: 00 00 60 2C E1 03 00 00 00 00 40 80 01 01 00 80 
+    +0084: 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 
+    +0094: 00 80 34 E1 03 00 00 00 00 40 20 00 00 40 20 00 
+    +00A4: 00 00 00 00 00 00 00 C2 02 00 00 B5 35 35 B5 4D 
+    +00B4: 04 C1 00 AB 02 0A B5 E1 04 30 05 00 02 09 09 A0 
+    +00C4: 05 20 01 EA E0 60 60 66 05 00 00 0A 02 FF 55 E4 
+    +00D4: 05 01 00 00 00 BF 55 A0 06 41 04 6A 40 40 43 C4 
+  Parsing mip entries (variable-length):
+    [0] +17: selfOff=0x3E12C03 b16-17=4080 raw[18..31]: 40 00 00 00 04 00 00 00 04 00 00 0A 0A 04 
+         CI at +47 = 10 (1 bytes)
+         INLINE data: 10 bytes at +48
+    [1] BAD signature at +58: 993, -2143289344
+  Final mip parse position: +58 (of 3027)
+
+--- Texture_55 (export 5574, serial 3193 bytes at 0x3F63557) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1
+  Native data: 3027 bytes remaining
+  NativeHeader: ver=4 subVer=1 totalBulkSize=696320 mipCount=9
+  Native bytes 100-220 (entry 3/4 boundary):
+    +0064: 00 01 00 00 00 01 00 00 08 08 04 00 00 00 02 00 
+    +0074: 00 00 80 36 F6 03 00 00 00 00 40 80 01 80 00 80 
+    +0084: 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 
+    +0094: 00 A0 3E F6 03 00 00 00 00 40 20 C0 2A 40 20 C0 
+    +00A4: 2A 80 10 0A 2B BD D5 C0 43 C0 29 0A AB FD 55 E1 
+    +00B4: 4B 00 32 00 AA FF 55 A2 4B C0 31 00 AA FF 55 E0 
+    +00C4: 42 A0 28 60 E8 7E 57 00 28 00 10 E0 E8 7A 5F 80 
+    +00D4: 06 20 08 25 25 25 25 A0 06 40 06 55 EF 8A 00 80 
+  Parsing mip entries (variable-length):
+    [0] +17: selfOff=0x3F63623 b16-17=4080 raw[18..31]: 40 20 00 00 04 00 00 00 04 00 00 0A 0A 04 
+         CI at +47 = 10 (1 bytes)
+         INLINE data: 10 bytes at +48
+    [1] BAD signature at +58: 1014, -2143289344
+  Final mip parse position: +58 (of 3027)
+
+--- Texture_45 (export 5988, serial 3193 bytes at 0x441DA15) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1
+  Native data: 3027 bytes remaining
+  NativeHeader: ver=4 subVer=1 totalBulkSize=696320 mipCount=9
+  Native bytes 100-220 (entry 3/4 boundary):
+    +0064: 00 01 00 00 00 01 00 00 08 08 04 00 00 00 02 00 
+    +0074: 00 00 3E DB 41 04 00 00 00 00 40 80 01 00 00 80 
+    +0084: 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 
+    +0094: 00 5E E3 41 04 00 00 00 00 40 20 C0 2C 40 20 C0 
+    +00A4: 2C 00 08 55 7F 62 55 60 3E 20 00 35 35 0D 25 60 
+    +00B4: 57 E0 16 5F EA A0 00 A0 3F 60 07 55 57 5E 78 20 
+    +00C4: 07 A0 00 50 50 50 50 00 00 00 00 00 00 00 00 00 
+    +00D4: 00 00 00 00 00 00 00 14 00 01 00 55 D5 95 15 35 
+  Parsing mip entries (variable-length):
+    [0] +17: selfOff=0x441DAE1 b16-17=4080 raw[18..31]: 40 00 00 00 04 00 00 00 04 00 00 0A 0A 04 
+         CI at +47 = 10 (1 bytes)
+         INLINE data: 10 bytes at +48
+    [1] BAD signature at +58: 1089, -2143289344
+  Final mip parse position: +58 (of 3027)
+
+--- Texture_42 (export 8007, serial 3193 bytes at 0x57D5DC1) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1
+  Native data: 3027 bytes remaining
+  NativeHeader: ver=4 subVer=1 totalBulkSize=696320 mipCount=9
+  Native bytes 100-220 (entry 3/4 boundary):
+    +0064: 00 01 00 00 00 01 00 00 08 08 04 00 00 00 02 00 
+    +0074: 00 00 EA 5E 7D 05 00 00 00 00 40 80 01 E9 00 80 
+    +0084: 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 
+    +0094: 00 0A 67 7D 05 00 00 00 00 40 20 A4 19 40 20 A4 
+    +00A4: 19 21 00 CB 55 55 77 C5 08 20 00 89 E1 6B 56 40 
+    +00B4: 09 01 08 5E 5C 57 55 61 01 01 08 49 55 55 56 E0 
+    +00C4: 10 01 08 50 5D FD DB E2 20 21 08 50 5B 75 55 25 
+    +00D4: 08 20 08 DE 5F 49 75 A2 08 00 00 A0 D5 D5 55 21 
+  Parsing mip entries (variable-length):
+    [0] +17: selfOff=0x57D5E8D b16-17=4080 raw[18..31]: 40 00 00 00 04 00 00 00 04 00 00 0A 0A 04 
+         CI at +47 = 10 (1 bytes)
+         INLINE data: 10 bytes at +48
+    [1] BAD signature at +58: 1405, -2143289344
+  Final mip parse position: +58 (of 3027)
+
+--- Texture_51 (export 8010, serial 3193 bytes at 0x57D6C53) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1
+  Native data: 3027 bytes remaining
+  NativeHeader: ver=4 subVer=1 totalBulkSize=696320 mipCount=9
+  Native bytes 100-220 (entry 3/4 boundary):
+    +0064: 00 01 00 00 00 01 00 00 08 08 04 00 00 00 02 00 
+    +0074: 00 00 7C 6D 7D 05 00 00 00 00 40 80 01 0D 00 80 
+    +0084: 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 
+    +0094: 00 9C 75 7D 05 00 00 00 00 40 20 13 00 40 20 13 
+    +00A4: 00 08 00 2D 2D AD B5 19 00 12 00 0B 2B AD F5 13 
+    +00B4: 00 00 00 54 54 56 E8 02 00 00 00 55 55 55 54 20 
+    +00C4: 00 00 00 55 55 55 F5 00 00 00 00 00 00 00 00 00 
+    +00D4: 00 00 00 00 00 00 00 05 00 00 00 35 95 55 55 0C 
+  Parsing mip entries (variable-length):
+    [0] +17: selfOff=0x57D6D1F b16-17=4080 raw[18..31]: 40 00 00 00 04 00 00 00 04 00 00 0A 0A 04 
+         CI at +47 = 10 (1 bytes)
+         INLINE data: 10 bytes at +48
+    [1] BAD signature at +58: 1405, -2143289344
+  Final mip parse position: +58 (of 3027)
+
+--- Texture_52 (export 10984, serial 3193 bytes at 0x6D8FC26) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1
+  Native data: 3027 bytes remaining
+  NativeHeader: ver=4 subVer=1 totalBulkSize=696320 mipCount=9
+  Native bytes 100-220 (entry 3/4 boundary):
+    +0064: 00 01 00 00 00 01 00 00 08 08 04 00 00 00 02 00 
+    +0074: 00 00 4F FD D8 06 00 00 00 00 40 80 01 00 00 80 
+    +0084: 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 
+    +0094: 00 6F 05 D9 06 00 00 00 00 40 20 00 C8 40 20 00 
+    +00A4: C8 00 08 65 E5 0B 02 00 C0 00 00 D5 BF 00 00 00 
+    +00B4: 00 00 B8 25 25 25 25 00 00 00 00 00 00 00 00 00 
+    +00C4: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+    +00D4: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+  Parsing mip entries (variable-length):
+    [0] +17: selfOff=0x6D8FCF2 b16-17=4080 raw[18..31]: 40 00 00 00 04 00 00 00 04 00 00 0A 0A 04 
+         CI at +47 = 10 (1 bytes)
+         INLINE data: 10 bytes at +48
+    [1] BAD signature at +58: 1752, -2143289344
+  Final mip parse position: +58 (of 3027)
+
+--- Texture_53 (export 13804, serial 3193 bytes at 0x7FE3641) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1
+  Native data: 3027 bytes remaining
+  NativeHeader: ver=4 subVer=1 totalBulkSize=696320 mipCount=9
+  Native bytes 100-220 (entry 3/4 boundary):
+    +0064: 00 01 00 00 00 01 00 00 08 08 04 00 00 00 02 00 
+    +0074: 00 00 6A 37 FE 07 00 00 00 00 40 80 01 00 00 80 
+    +0084: 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 
+    +0094: 00 8A 3F FE 07 00 00 00 00 40 20 00 00 40 20 00 
+    +00A4: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+    +00B4: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+    +00C4: 00 00 00 00 00 00 00 07 00 00 00 D5 D5 95 35 10 
+    +00D4: 20 08 00 F5 FD AB 0B 06 00 00 00 5C 57 57 57 00 
+  Parsing mip entries (variable-length):
+    [0] +17: selfOff=0x7FE370D b16-17=4080 raw[18..31]: 40 00 00 00 04 00 00 00 04 00 00 0A 0A 04 
+         CI at +47 = 10 (1 bytes)
+         INLINE data: 10 bytes at +48
+    [1] BAD signature at +58: 2046, -2143289344
+  Final mip parse position: +58 (of 3027)
+
+
+=== PackagePatch Analysis ===
+PackagePatch size: 23024902 bytes
+  Version: 2
+  Data offset: 29295 (0x726F)
+  Num patches: 27
+  Data offset2: 29295 (0x726F)
+  Bulk data region: 22995607 bytes (from offset 29295 to EOF)
+
+  Entropy at bulk start (0x726F): 7.037 [HIGH - likely compressed/pixel data]
+  First 8 DXT1 blocks at bulk start:
+    Block 0: c0=3F1B c1=9293 bits=BBBC3E92
+    Block 1: c0=3F3B c1=7574 bits=70B1426B
+    Block 2: c0=C2F8 c1=BFB1 bits=E1E24010
+    Block 3: c0=3F61 c1=9091 bits=EEEFBD10
+    Block 4: c0=BEEE c1=8A8B bits=DDDEBE8A
+    Block 5: c0=BF5D c1=DADB bits=C2C3BEDA
+    Block 6: c0=3EC2 c1=8182 bits=C5C6BF01
+    Block 7: c0=3F45 c1=8B29 bits=0000422B
+
+  Wrote DDS: tools/lightmap_probe/lightmap_test_offset0.dds (524288 bytes from offset 29295)
+
+=== PackagePatch raw hex dump (first 512 bytes) ===
+  0000: 02 00 00 00 6F 72 00 00 1B 00 00 00 6F 72 00 00  |....or......or..|
+  0010: 10 73 00 6D 00 61 00 6C 00 6C 00 5F 00 77 00 6F  |.s.m.a.l.l._.w.o|
+  0020: 00 6F 00 64 00 5F 00 53 00 70 00 65 00 63 00 00  |.o.d._.S.p.e.c..|
+  0030: 00 10 00 07 00 00 00 00 00 01 70 72 00 00 13 72  |..........pr...r|
+  0040: 00 65 00 73 00 5F 00 73 00 6B 00 79 00 62 00 6F  |.e.s._.s.k.y.b.o|
+  0050: 00 78 00 67 00 65 00 6F 00 6D 00 65 00 74 00 72  |.x.g.e.o.m.e.t.r|
+  0060: 00 79 00 00 00 10 00 07 00 00 00 00 00 01 71 72  |.y............qr|
+  0070: 00 00 0D 48 00 6B 00 4D 00 65 00 73 00 68 00 50  |...H.k.M.e.s.h.P|
+  0080: 00 72 00 6F 00 78 00 79 00 30 00 00 00 10 00 07  |.r.o.x.y.0......|
+  0090: 00 00 00 00 00 01 72 72 00 00 0A 75 00 6E 00 64  |......rr...u.n.d|
+  00A0: 00 65 00 72 00 73 00 65 00 61 00 31 00 00 00 10  |.e.r.s.e.a.1....|
+  00B0: 00 07 00 00 00 00 00 01 73 72 00 00 0C 43 00 6F  |........sr...C.o|
+  00C0: 00 6C 00 6F 00 72 00 43 00 79 00 63 00 6C 00 65  |.l.o.r.C.y.c.l.e|
+  00D0: 00 30 00 00 00 10 00 07 00 00 00 00 00 01 74 72  |.0............tr|
+  00E0: 00 00 18 61 00 6D 00 6D 00 6F 00 74 00 79 00 70  |...a.m.m.o.t.y.p|
+  00F0: 00 65 00 73 00 5F 00 66 00 72 00 6F 00 7A 00 65  |.e.s._.f.r.o.z.e|
+  0100: 00 6E 00 64 00 69 00 66 00 66 00 75 00 73 00 65  |.n.d.i.f.f.u.s.e|
+  0110: 00 00 00 10 00 07 00 00 00 00 00 01 75 72 00 00  |............ur..|
+  0120: 16 61 00 6D 00 6D 00 6F 00 74 00 79 00 70 00 65  |.a.m.m.o.t.y.p.e|
+  0130: 00 73 00 5F 00 72 00 69 00 6F 00 74 00 64 00 69  |.s._.r.i.o.t.d.i|
+  0140: 00 66 00 66 00 75 00 73 00 65 00 00 00 10 00 07  |.f.f.u.s.e......|
+  0150: 00 00 00 00 00 01 76 72 00 00 14 61 00 6D 00 6D  |......vr...a.m.m|
+  0160: 00 6F 00 73 00 74 00 61 00 6E 00 64 00 61 00 72  |.o.s.t.a.n.d.a.r|
+  0170: 00 64 00 5F 00 6E 00 6F 00 72 00 6D 00 61 00 6C  |.d._.n.o.r.m.a.l|
+  0180: 00 00 00 10 00 07 00 00 00 00 00 01 77 72 00 00  |............wr..|
+  0190: 16 61 00 6D 00 6D 00 6F 00 73 00 74 00 61 00 6E  |.a.m.m.o.s.t.a.n|
+  01A0: 00 64 00 61 00 72 00 64 00 5F 00 73 00 70 00 65  |.d.a.r.d._.s.p.e|
+  01B0: 00 63 00 75 00 6C 00 61 00 72 00 00 00 10 00 07  |.c.u.l.a.r......|
+  01C0: 00 00 00 00 00 01 78 72 00 00 1B 61 00 6D 00 6D  |......xr...a.m.m|
+  01D0: 00 6F 00 74 00 79 00 70 00 65 00 73 00 5F 00 66  |.o.t.y.p.e.s._.f|
+  01E0: 00 72 00 6F 00 7A 00 65 00 6E 00 5F 00 63 00 6F  |.r.o.z.e.n._.c.o|
+  01F0: 00 6C 00 6F 00 72 00 6D 00 61 00 73 00 6B 00 00  |.l.o.r.m.a.s.k..|
+
+=== Parsing PackagePatch name table ===
+  [ 0] "small_wood_Spec" flags=0x70010 idx=29296 (end=0x3E)
+  [ 1] "res_skyboxgeometry" flags=0x70010 idx=29297 (end=0x72)
+  [ 2] "HkMeshProxy0" flags=0x70010 idx=29298 (end=0x9A)
+  [ 3] "undersea1" flags=0x70010 idx=29299 (end=0xBC)
+  [ 4] "ColorCycle0" flags=0x70010 idx=29300 (end=0xE2)
+  [ 5] "ammotypes_frozendiffuse" flags=0x70010 idx=29301 (end=0x120)
+  [ 6] "ammotypes_riotdiffuse" flags=0x70010 idx=29302 (end=0x15A)
+  [ 7] "ammostandard_normal" flags=0x70010 idx=29303 (end=0x190)
+  [ 8] "ammostandard_specular" flags=0x70010 idx=29304 (end=0x1CA)
+  [ 9] "ammotypes_frozen_colormask" flags=0x70010 idx=29305 (end=0x20E)
+  [10] "ammotypes_riot" flags=0x70010 idx=29306 (end=0x23A)
+  [11] "ammotypes_frozen" flags=0x70010 idx=29307 (end=0x26A)
+  [12] "ammostandard_specular0" flags=0x70010 idx=29308 (end=0x2A6)
+  [13] "ammostandard_specular00" flags=0x70010 idx=29309 (end=0x2E4)
+  [14] "wood_plank2" flags=0x70010 idx=29310 (end=0x30A)
+  [15] "wood_plank_specular2" flags=0x70010 idx=29311 (end=0x342)
+  [16] "wood_plank_normal2" flags=0x70010 idx=29312 (end=0x376)
+  [17] "wood_plank_shader2" flags=0x70010 idx=29313 (end=0x3AA)
+  [18] "ProtectorBubbles" flags=0x70010 idx=29314 (end=0x3DA)
+  [19] "SpriteEmitter103" flags=0x70010 idx=29315 (end=0x40A)
+  [20] "HkMeshProxy1" flags=0x70010 idx=29316 (end=0x432)
+  [21] "MaterialColorFromLight6" flags=0x70010 idx=29317 (end=0x470)
+  [22] "FluidVolumeBelow" flags=0x70010 idx=29318 (end=0x4A0)
+  [23] "HeavyBubbles_O" flags=0x70010 idx=29319 (end=0x4CC)
+  [24] "HeavyBubbles_Normal" flags=0x70010 idx=29320 (end=0x502)
+  [25] "HeavyBubbles_Shader" flags=0x70010 idx=29321 (end=0x538)
+  [26] "SpriteEmitter13" flags=0x70010 idx=1381 (end=0x566)
+  Name table ended at offset 0x566 (1382), parsed 27 names
+
+=== Export Patch Section at 0x566 ===
+  Header: 0, 49140, numPatches=20, 49140
+  Parsing 20 export patch entries starting at 0x576:
+    [ 0] class=-19 super=0 pkg=3422 name='None'(0) num=1862270976 flags=0x40000
+         serialSize=15 serialOff=0x314B0000 extra=(-861559188,257) gen=0 (pos=0x59A)
+    [ 1] class=1 super=-4085 pkg=-754937088 name='Specification'(26) num=0 flags=0x3
+         serialSize=251659264 serialOff=0x0 extra=(-709798912,-1515820030) gen=-76 (pos=0x5C1)
+    [ 2] class=1 super=0 pkg=-167706624 name='?'(-63) num=9633792 flags=0x0
+         serialSize=248181 serialOff=0x4000000 extra=(3840,1174405120) gen=-43676 (pos=0x5E7)
+    [ 3] class=214215084 super=1 pkg=16777216 name='?'(-4087) num=-754937088 flags=0x78000000
+         serialSize=969 serialOff=0x40000 extra=(15,1566179328) gen=214215084 (pos=0x615)
+    [ 4] class=1 super=0 pkg=-134152192 name='?'(-63) num=9633792 flags=0x0
+         serialSize=248182 serialOff=0x4000000 extra=(3840,1761607680) gen=-53 (pos=0x639)
+    [ 5] class=-149 super=214215084 pkg=1 name='CheckpointTypePadding'(1) num=49145 flags=0x0
+         serialSize=-914948096 serialOff=0x3 extra=(251659264,0) gen=0 (pos=0x662)
+    [ 6] class=2796949 super=214215084 pkg=1 name='CheckpointTypePadding'(1) num=49146 flags=0x1A
+         serialSize=2030043136 serialOff=0x3C9 extra=(262144,15) gen=0 (pos=0x68D)
+    [ 7] class=0 super=153 pkg=-861559188 name='CheckpointTypePadding'(1) num=1 flags=0x1E400
+         serialSize=6867 serialOff=0x0 extra=(248186,67108864) gen=0 (pos=0x6B2)
+    [ 8] class=15 super=0 pkg=0 name='Operation'(164) num=-861559188 flags=0xBFFC0100
+         serialSize=9633792 serialOff=0xF78 extra=(0,248189) gen=0 (pos=0x6D7)
+    [ 9] class=0 super=0 pkg=983044 name='None'(0) num=1426063360 flags=0x1CCA5A6
+         serialSize=1 serialOff=0xBFFD01 extra=(2013303552,15) gen=0 (pos=0x6FB)
+    [10] class=0 super=0 pkg=248190 name='None'(0) num=262144 flags=0xB6550000
+         serialSize=-1502870827 serialOff=0x101CCA5 extra=(16777216,49150) gen=-19 (pos=0x71F)
+    [11] class=0 super=1016 pkg=0 name='None'(0) num=63536896 flags=0xF0004
+         serialSize=0 serialOff=0x2D5B655 extra=(-861559188,257) gen=0 (pos=0x744)
+    [12] class=1 super=-4095 pkg=2013308416 name='PhysicsVolume'(15) num=0 flags=0x3
+         serialSize=251659264 serialOff=0x0 extra=(1812035840,30188966) gen=1 (pos=0x76A)
+    [13] class=0 super=0 pkg=-1073741568 name='None'(0) num=1342220544 flags=0x50000000
+         serialSize=418 serialOff=0x40000 extra=(15,-1420230656) gen=5 (pos=0x78E)
+    [14] class=214215084 super=1 pkg=16777216 name='CheckpointTypePadding'(1) num=-1476394816 flags=0x0
+         serialSize=63587072 serialOff=0x0 extra=(458752,0) gen=844 (pos=0x7B7)
+    [15] class=214215084 super=1 pkg=16777216 name='Max'(2) num=-1241513792 flags=0x0
+         serialSize=63587328 serialOff=0x0 extra=(458756,0) gen=40 (pos=0x7DF)
+    [16] class=214215084 super=0 pkg=16777216 name='Min'(3) num=-1828716352 flags=0x0
+         serialSize=63587840 serialOff=0x0 extra=(983044,0) gen=44282 (pos=0x809)
+    [17] class=214215084 super=1 pkg=16777216 name='Range'(4) num=-1828716352 flags=0x0
+         serialSize=63588096 serialOff=0x0 extra=(983044,0) gen=3397 (pos=0x832)
+    [18] class=214215084 super=1 pkg=16777216 name='Vector'(5) num=-1509949248 flags=0x0
+         serialSize=63588352 serialOff=0x0 extra=(983044,0) gen=118 (pos=0x85B)
+    [19] class=214215084 super=1 pkg=16777216 name='Tag'(6) num=-1744830272 flags=0x0
+         serialSize=63588608 serialOff=0x0 extra=(458756,0) gen=923 (pos=0x884)
+  Export table ended at offset 0x884
+
+=== Region after export table (0x884) ===
+  Next 4 INT32s: -861559188, 257, -1073282816, 9961472
+  Hex: CCA5A66C 00000101 C0070100 00980000
+  Hex dump (first 256 bytes after export table):
+    0884: 6C A6 A5 CC 01 01 00 00 00 01 07 C0 00 00 98 00 
+    0894: 36 00 00 00 00 00 00 00 42 CA 03 00 00 00 00 04 
+    08A4: 00 07 00 00 00 00 00 59 0F 6C A6 A5 CC 01 01 00 
+    08B4: 00 00 01 A3 00 00 00 69 35 00 00 00 00 00 00 E0 
+    08C4: 00 00 00 04 00 00 00 03 00 00 00 04 00 00 00 01 
+    08D4: 00 00 00 00 00 00 00 00 00 00 00 00 6D 00 00 FF 
+    08E4: FF FF FF FF FF FF FF 00 00 00 00 00 36 36 6A D5 
+    08F4: 01 00 00 00 00 00 81 00 00 00 00 6A 02 00 00 00 
+    0904: 00 59 07 02 48 C4 03 46 C0 03 0B 00 00 00 00 15 
+    0914: 50 34 0C 00 00 00 00 5A 11 00 00 00 00 1E 0D 00 
+    0924: 00 00 00 15 6D 34 10 00 00 00 00 22 C5 03 00 00 
+    0934: 0E 00 00 00 00 01 2B 00 00 00 00 00 06 00 00 00 
+    0944: 00 56 06 6D 18 00 00 00 00 0F 00 00 00 00 15 51 
+    0954: 34 08 00 00 00 00 3A 05 00 00 00 00 00 20 DD C6 
+    0964: 00 00 E0 44 00 00 F6 45 45 01 00 00 00 00 24 00 
+    0974: 00 A0 40 09 00 00 00 00 56 06 7C 14 0B 00 00 00 
+
+  Scanning for section-like patterns:
+
+=== Scanning for pixel data start (256-byte steps, entropy > 7.0) ===
+  Pixel data starts at offset 0x10584 (66948) ΓÇö entropy 7.062
+  Gap from export table end: 64768 bytes
+
+=== Checking BSM end for bulk data ===
+  BSM file size: 214215598 (0xCC4ABAE)
+  BSM[0xC2FEBAE]: entropy=7.737 first8=75 4B 60 46 1D 8D 06 86 
+  BSM[0xCBA0BAE]: entropy=3.372 first8=00 07 00 00 00 00 00 24 
+  BSM[0xCBCABAE]: entropy=2.578 first8=00 5E F1 02 00 00 00 00 
+  BSM[0xCC3250E]: entropy=3.195 first8=00 5E B6 02 00 00 00 00 
+
+  Checking region after all export serial data...
+  BSM has 27948544 exports, export table at 0x0
+
+  Scanning BSM backwards for last high-entropy region...
+  High-entropy block ends around BSM[0xC83A7AE], starts around BSM[0xC82A7AE]
+  Block size estimate: 66560 bytes
+
+  Checking BSM at first lightmap mip0 self-offset region:

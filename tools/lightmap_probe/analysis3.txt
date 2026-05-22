@@ -1,0 +1,3558 @@
+﻿Lightmap Probe v0.3 - BSM Texture BulkData Header Parser
+
+BSM: 214215598 bytes
+PackagePatch: 23024902 bytes
+
+Names: 29295, Exports: 49140, Imports: 1381
+Parsed 29295 names
+Parsed 49140 exports
+
+=== Searching for LightMap/Shadow names ===
+  Name[97] = 'Light'
+  Name[134] = 'LightBrightness'
+  Name[135] = 'LightColor'
+  Name[138] = 'LightRadius'
+  Name[149] = 'bLightChanged'
+  Name[184] = 'MaxLightsStatic'
+  Name[187] = 'bCastStaticShadow'
+  Name[205] = 'MaxLightsDynamic'
+  Name[236] = 'EnableVertexLighting'
+  Name[271] = 'LightCone'
+  Name[277] = 'bLightingVisibility'
+  Name[287] = 'LightType'
+  Name[293] = 'bCastShadowMapShadow'
+  Name[307] = 'LightEffect'
+  Name[320] = 'LightActor'
+  Name[363] = 'EnablePerPixelLighting'
+  Name[392] = 'LightPeriod'
+  Name[414] = 'bCastsShadowMapShadows'
+  Name[469] = 'Lighting'
+  Name[512] = 'bCastSimpleShadow'
+  Name[527] = 'bImportantDynamicLight'
+  Name[542] = 'Level_0-Lighthouse'
+  Name[550] = 'LightTypeProperty'
+  Name[591] = '1_light_bathroom'
+  Name[641] = 'LightSquare'
+  Name[680] = 'LightWidth'
+  Name[685] = 'HighLightBrightness'
+  Name[688] = 'QuestLightOn'
+  Name[702] = 'HighLightColor'
+  Name[726] = 'DentalFoyerLights'
+  Name[735] = 'LightBrightnessProperty'
+  Name[747] = 'FoyerLight'
+  Name[764] = 'LightPhase'
+  Name[797] = 'FakeLightOffset'
+  Name[799] = 'FakeLightColor'
+  Name[825] = '1_smallcrosslight'
+  Name[845] = 'DynLightOut'
+  Name[916] = 'GoreLight_Decal'
+  Name[950] = 'ParamountLight'
+  Name[951] = '1_neonlight'
+  Name[1007] = 'LightsOn'
+  Name[1016] = '1_medgrouplight'
+  Name[1039] = '1_lightbuzz'
+  Name[1051] = 'EnableFakeLight'
+  Name[1056] = '1_framelight'
+  Name[1058] = '1_surgicallight'
+  Name[1110] = 'bUseLightingFromBaseWhenAttached'
+  Name[1145] = 'SteinmanFillLights'
+  Name[1146] = 'dyn_light_desk'
+  Name[1156] = 'LightFlickerOn'
+  Name[1179] = 'BackNookLight'
+  Name[1180] = 'DynamicLightSpark'
+  Name[1188] = 'SteinmanVignetteLight'
+  Name[1191] = '1_desklight'
+  Name[1193] = '1_sixtywattlight'
+  Name[1196] = 'LightAttachment'
+  Name[1234] = 'MedPavilionEntryHallLight01'
+  Name[1237] = 'MedPavilionEntryHallLight02'
+  Name[1267] = 'LowLightBrightness'
+  Name[1290] = '1_water_stream_light'
+  Name[1307] = 'HighLightType'
+  Name[1339] = 'HighLightPeriod'
+  Name[1372] = 'FoyerDoorwayLight'
+  Name[1396] = 'MedPavilionEntryHallLight01a'
+  Name[1438] = 'bForceStaticLighting'
+  Name[1441] = 'IgnoreLight'
+  Name[1482] = 'TwilightFields'
+  Name[1500] = 'DynamicLight_Fireball'
+  Name[1514] = 'Lights'
+  Name[1529] = 'lightvase'
+  Name[1572] = '1_dentalchairlight'
+  Name[1603] = 'MedPavilionEntryHallLight03'
+  Name[1608] = 'ShotgunAmbushSpotlight'
+  Name[1639] = 'TurnOnGrowthStationLights'
+  Name[1679] = 'ShadowplayDoctor'
+  Name[1719] = 'GhostLight'
+  Name[1724] = 'LightPeriodProperty'
+  Name[1770] = 'DefaultSecurityCameraSpotlight'
+  Name[1788] = 'ShockedLight'
+  Name[1801] = 'SteamRoomSurgicalLight'
+  Name[1812] = 'ambience_3_medpavilionlight'
+  Name[1836] = 'AccessDoorLight'
+  Name[1852] = 'Steam_LightRising'
+  Name[1859] = 'SignPurpleLight'
+  Name[1862] = 'HighLightPhase'
+  Name[1921] = '1_water_stream_light_2'
+  Name[1939] = 'LowLightColor'
+  Name[1942] = 'LowLightType'
+  Name[1952] = 'MergeDynamicLightGroup'
+  Name[1976] = 'ambience_1_medpavilionlight'
+  Name[1992] = 'LightsSparkOff'
+  Name[2066] = 'TwilightFieldsHUD'
+  Name[2068] = 'TwilightFieldsTheater'
+  Name[2077] = 'ObjectBurnLight'
+  Name[2263] = 'Beacon_Light'
+  Name[2373] = 'SecurityCamera_LightFlare'
+  Name[2388] = 'ambience_common_light_square'
+  Name[2390] = 'ambience_1_framelight'
+  Name[2435] = '1_lightsOut'
+  Name[2437] = 'SteinmanLightsOff'
+  Name[2455] = 'PostDestructionLight'
+  Name[2459] = 'IncineratorLightLeft'
+  Name[2463] = 'IncineratorLightRight'
+  Name[2517] = 'CoffinDimLight'
+  Name[2518] = 'Spotlight'
+  Name[2564] = 'MedPavilion_SignLight'
+  Name[2599] = 'FreezerDoorLight'
+  Name[2610] = 'SteamRoomSparkLight'
+  Name[2685] = 'LighthouseBathySwitch'
+  Name[2751] = 'DynamicLightFireBallExplode'
+  Name[2793] = 'MainIncineratorLight'
+  Name[2802] = 'bUseDynamicLights'
+  Name[2817] = 'Light-Ocean'
+  Name[2874] = 'BurningLight'
+  Name[2882] = 'PreDestructionLight'
+  Name[2883] = 'TV_Light'
+  Name[2913] = 'QuarBoardLights'
+  Name[2929] = 'DynamicLightArc'
+  Name[2942] = 'ambience_4_lightA'
+  Name[2952] = 'LeavingTwilightFieldsPatrol'
+  Name[2956] = 'ambience_3_surgicallight'
+  Name[2957] = 'ambience_3_plasmidadlight'
+  Name[2962] = 'ambience_3_medgrouplight'
+  Name[2979] = 'MedPavilion_Entry_LightRightSpot'
+  Name[3057] = 'Welcome_ElevatorLight'
+  Name[3095] = 'PilotLight'
+  Name[3106] = 'MedPavilion_Entry_LightLeftSpot'
+  Name[3119] = 'machines_turretMachineGun_light'
+  Name[3144] = 'ambience_1_plasmidadlight'
+  Name[3200] = 'ambience_3_neonlight'
+  Name[3208] = 'ambience_4_lightB'
+  Name[3209] = 'ambience_4_lightC'
+  Name[3234] = 'ambience_common_light_bathroom'
+  Name[3236] = 'ambience_common_light_vase'
+  Name[3283] = 'fxFlashlight'
+  Name[3286] = 'scripted_4_storeLightsOff'
+  Name[3350] = 'LightClass'
+  Name[3370] = 'SecCamLightY_Mesh'
+  Name[3372] = 'ChemWhiteLight'
+  Name[3397] = 'LightColorProperty'
+  Name[3399] = 'SecCamLightG_Mesh'
+  Name[3400] = 'LightPhaseProperty'
+  Name[3422] = 'DynamicLightOut'
+  Name[3445] = 'TwilightFieldsMorgue'
+  Name[3447] = 'SetupShadowplay'
+  Name[3449] = 'QuarSwitchLight'
+  Name[3461] = 'ambience_4_lightL'
+  Name[3471] = 'SecCamLightR_Mesh'
+  Name[3529] = 'FlashLight'
+  Name[3551] = 'TwilightFields_FreezerDoorTV'
+  Name[3562] = 'MedPavilion_Entry_LightLeftFill'
+  Name[3571] = 'AI_LeavingTwilightSpawnTV'
+  Name[3605] = 'LightFlickerLoop'
+  Name[3609] = 'LeavingTwilightFieldsSpawner'
+  Name[3634] = 'AI_ShotgunAmbush_TurnOnLights'
+  Name[3716] = 'TwilightFieldsKeypad'
+  Name[3719] = 'AccessDoorLightShine'
+  Name[3724] = 'Ghost_TurnLightsBackOn'
+  Name[3771] = 'TwilightFieldsSpawn'
+  Name[3825] = 'TwilightFieldsFoyer'
+  Name[3830] = 'MedPavilion_Entry_LightRightFill'
+  Name[3847] = 'AmbushSpotlightMesh'
+  Name[3851] = 'SteinmanLightsOn'
+  Name[3893] = 'TwilightFieldsBackHall'
+  Name[3908] = 'GrenSuicideLight'
+  Name[3984] = 'BathLight'
+  Name[4007] = 'Welcome_LiveWireLightB'
+  Name[4037] = 'TurretPilotLightDynamicLight'
+  Name[4040] = '1_Music_ShadowPlay'
+  Name[4042] = 'DynamicLightMuzzleFlash'
+  Name[4047] = '1_temperaturelight'
+  Name[4055] = '4_LightsOff'
+  Name[4140] = 'ElectricBoltLightHit'
+  Name[4145] = 'Medical_SpotlightTurnedOn'
+  Name[4176] = 'ambience_1_surgicallight'
+  Name[4178] = 'ambience_1_smallcrosslight'
+  Name[4203] = 'ambience_1_neonlight'
+  Name[4207] = 'ambience_1_medgrouplight'
+  Name[4215] = 'ambience_1_dentalchairlight'
+  Name[4292] = 'LightSwitch'
+  Name[4320] = '9_lightflicker'
+  Name[4425] = 'TailLight'
+  Name[4444] = 'ambience_1_water_stream_light'
+  Name[4452] = 'QuarPathLights'
+  Name[4476] = 'ambience_2_boxlight'
+  Name[4530] = 'TwilightFields_RummageInWallsTV'
+  Name[4539] = '1_light_square'
+  Name[4557] = 'MedPavilionEntryHallLight03***'
+  Name[4587] = 'TV_WallMountedWIthLight'
+  Name[4597] = '2_lightbuzz'
+  Name[4646] = 'ambience_2_neonfreezerlight'
+  Name[4675] = 'banner_lightair01'
+  Name[4677] = 'LightBeamShift'
+  Name[4701] = 'LightBeam'
+  Name[4730] = 'LightHouseRise'
+  Name[4752] = 'ambience_1_dS_twilight'
+  Name[4822] = 'SpawnedMeleeThugFlashlight'
+  Name[4859] = 'ambience_4_lightD'
+  Name[4861] = 'ambience_4_lightF'
+  Name[4863] = 'ambience_4_lightG'
+  Name[4931] = 'ambience_9_light'
+  Name[4932] = 'SpotlightOn'
+  Name[4955] = 'LighthouseFire'
+  Name[4959] = 'LightNeon'
+  Name[4963] = 'ambience_common_light_neon'
+  Name[4964] = 'LightPorthole'
+  Name[4965] = 'ambience_common_light_porthole'
+  Name[5087] = 'FlashlightC'
+  Name[5091] = 'FlashlightB'
+  Name[5096] = 'FlashlightA'
+  Name[5107] = 'RimLight'
+  Name[5155] = 'scripted_4_storeLightsOn'
+  Name[5184] = 'scripted_1_lightsOn'
+  Name[5256] = 'ambience_2_conveyorLight'
+  Name[5396] = 'SCRIPTED_Lighthouse'
+  Name[5452] = 'Shadows'
+  Name[5471] = 'scripted_5_lightsOut_A'
+  Name[5615] = 'ChemElecLight'
+  Name[5707] = 'ambience_4_lightH'
+  Name[5711] = 'ambience_4_lightE'
+  Name[5972] = 'DynamicLightBlueRim'
+  Name[6004] = 'CannonFlash_Light'
+  Name[6005] = 'FireHandLight'
+  Name[6125] = 'IncinerateLight'
+  Name[6150] = 'DynamicLightEffect'
+  Name[6155] = 'ElectricBoltLight'
+  Name[6156] = 'GrenFuseLight'
+  Name[6171] = 'TurretFlashlightBeam'
+  Name[6173] = 'TurretFlashlightDynamicLight'
+  Name[6188] = 'Burning_Light'
+  Name[6214] = 'ElectricBoltHit_Light'
+  Name[6220] = 'SecBotLightBeam'
+  Name[6235] = 'BeaconLightEnd'
+  Name[6242] = 'BeaconLightP'
+  Name[6297] = 'Wel_TunnelLight'
+  Name[6303] = 'BathLightOut'
+  Name[6309] = 'FlickerLight'
+  Name[6370] = 'BeaconLight'
+  Name[6573] = 'ShouldDisableLightsImmediatelyWhenKilled'
+  Name[7179] = 'lightswitch_'
+  Name[7277] = 'FrobHighlight'
+  Name[7369] = 'CarriageLights'
+  Name[7370] = 'CarriageLightsSetup'
+  Name[7411] = 'LightOut'
+  Name[7420] = 'Theater_Light_Illum'
+  Name[7422] = 'QuestLight'
+  Name[7508] = 'BulletHitHEdynamicLights'
+  Name[7581] = 'BeaconLightEndA'
+  Name[7639] = 'Shadowplay'
+  Name[7674] = 'OutLightFlicker'
+  Name[7675] = 'LightEnd'
+  Name[7676] = 'LightEnd_On'
+  Name[7678] = 'BathyLight'
+  Name[8085] = 'LightsOff'
+  Name[8146] = 'TheaterSpotlightController_Small'
+  Name[8163] = 'SpotlightClass'
+  Name[8166] = 'NotHackedSearchingSpotlightBrightness'
+  Name[8167] = 'HackedSearchingSpotlightBrightness'
+  Name[8168] = 'NotHackedSearchingSpotlightColor'
+  Name[8169] = 'HackedSearchingSpotlightColor'
+  Name[8519] = 'fxPilotLight'
+  Name[8541] = 'RedLight'
+  Name[8623] = 'amb_M11-twilight-medical_hallways'
+  Name[8630] = 'AI_LeavingTwilightSpawnEnabled'
+  Name[8694] = 'PlaneTailLight_Int'
+  Name[8792] = 'UIHighlightMoved'
+  Name[8832] = 'Startup_FoyerLights'
+  Name[8837] = 'TurretPilotLightA'
+  Name[8856] = 'PistolRimLight'
+  Name[8862] = 'ShockedLightP'
+  Name[8863] = 'ShockedLightPWater'
+  Name[8871] = 'TwilightFields_FreezerDoor'
+  Name[8879] = 'GreenLights'
+  Name[8881] = 'RedLights'
+  Name[8952] = 'ProgressLight'
+  Name[8953] = 'ProgressLightOn'
+  Name[8960] = 'TwilightFields_RagdollActiveTV'
+  Name[8995] = 'BotLightA'
+  Name[8997] = 'SecBotLightB'
+  Name[8998] = 'SecBotLightC'
+  Name[9002] = 'CameraRedLights'
+  Name[9005] = 'SecCameraHalfHealthLight'
+  Name[9015] = 'TwilightFields_LightOut'
+  Name[9029] = 'medical_globe_light'
+  Name[9175] = 'dyn_theater_light'
+  Name[9224] = 'FlashlightMeleeWeaponDynamicLight'
+  Name[9250] = 'paramount_lights'
+  Name[9295] = 'banner_Constrained_lightair01'
+  Name[9317] = 'TurretFlashlightOn'
+  Name[9339] = 'PlaneTailLight'
+  Name[9344] = 'RadioQuestLight'
+  Name[9361] = 'LivewireLight'
+  Name[9366] = 'frame_and_light'
+  Name[9389] = 'FlickerOutlightC'
+  Name[9390] = 'LightD'
+  Name[9391] = 'LightD_On'
+  Name[9392] = 'LightOutside'
+  Name[9393] = 'OutLightC_On'
+  Name[9398] = 'ChemicalThrowerLight'
+  Name[9406] = 'GhostLightBack'
+  Name[9449] = 'CoffinLightFlickerSCRIPT'
+  Name[9450] = 'SecGreenLight'
+  Name[9477] = 'CoffinLightDimTV'
+  Name[9490] = 'AccessDoorLightSetup'
+  Name[9500] = 'TwilightFieldsTurretDoor'
+  Name[9517] = 'Light_Wall_02'
+  Name[9529] = 'light_wall'
+  Name[9532] = 'light_ceiling'
+  Name[9551] = 'light_freestanding_tall'
+  Name[9618] = 'LightHouseRiseSettings'
+  Name[9726] = 'lightbulb_ceiling'
+  Name[9776] = 'TwilightFields_RagdollActive'
+  Name[9810] = 'lenslight'
+  Name[9878] = 'SteinmanVignetteLightTV'
+  Name[9903] = 'TwilightFields_NecroBreath'
+  Name[9909] = 'CoffinLightSteadySCRIPT'
+  Name[9910] = 'TwilightFields_LightOutTV'
+  Name[9912] = 'TurnOffLightOnDynamicTelevision'
+  Name[9919] = '10_electric_light_flicker'
+  Name[9920] = 'ambience_10_electriclight'
+  Name[9921] = '10_electric_light_loop'
+  Name[9922] = 'ambience_10_electric_light_loop'
+  Name[9953] = 'TurnOffShotgunAmbushSpotlight'
+  Name[9991] = 'AI_LeavingTwilightSpawn'
+  Name[9994] = 'amb_M11-medical_hallways-twilight'
+  Name[10029] = 'TwilightFieldsNookFreezer'
+  Name[10037] = 'AI_TwilightFieldsSpawnTV'
+  Name[10038] = 'TwilightFields_NecroBreathTV'
+  Name[10055] = 'AI_LeavingTwilightSpawnEnabledTV'
+  Name[10077] = '2_LightFlickerLoop'
+  Name[10078] = 'scripted_2_lightFlicker'
+  Name[10079] = '2_lightFlickerLoud'
+  Name[10080] = 'scripted_2_lightFlickerLoud'
+  Name[10175] = 'ambience_9_doorlight'
+  Name[10217] = 'ambience_common_lightFlicker'
+  Name[10218] = 'scripted_1_lightsOnShort'
+  Name[10225] = 'decorativeceilinglight_main'
+  Name[10250] = 'RedLightAudio'
+  Name[10251] = 'scripted_1_redlights'
+  Name[10255] = 'SteinmanLightsTV'
+  Name[10269] = 'TwilightFieldsKeypadScript'
+  Name[10406] = 'ambience_1_desklight'
+  Name[10432] = 'ambience_1_light_bathroom'
+  Name[10433] = '1_light_bathwel'
+  Name[10434] = 'ambience_1_light_bathwel'
+  Name[10435] = '1_lightbuzz_welcome'
+  Name[10436] = 'ambience_1_lightbuzz_welcome'
+  Name[10437] = 'Twilight'
+  Name[10451] = 'Lighted'
+  Name[10459] = 'MedPavilionEntryHallLightBurnoutMARKER'
+  Name[10464] = '1_medpavilionlight'
+  Name[10466] = 'quarantine_lighted_map'
+  Name[10485] = 'ambience_1_sixtywattlight'
+  Name[10488] = '1_smallcrosslight2'
+  Name[10494] = 'ambience_1_temperaturelight'
+  Name[10523] = 'ambience_1_water_stream_light_'
+  Name[10547] = '1_waterstreamlight'
+  Name[10549] = '1_welgrouplight'
+  Name[10550] = 'ambience_1_welgrouplight'
+  Name[10561] = '2_boxlight'
+  Name[10565] = '2_cavelight'
+  Name[10566] = 'ambience_2_cavelight'
+  Name[10586] = '2_framelight'
+  Name[10587] = 'ambience_2_framelight'
+  Name[10600] = '2_light_bathroom'
+  Name[10601] = 'ambience_2_light_bathroom'
+  Name[10603] = 'ambience_2_lightbuzz'
+  Name[10614] = '2_neonfreezerlight'
+  Name[10636] = '2_sixtywattlight'
+  Name[10637] = 'ambience_2_sixtywattlight'
+  Name[10687] = '2_water_stream_light'
+  Name[10688] = 'ambience_2_water_stream_light'
+  Name[10732] = '3_arcadiawallight'
+  Name[10733] = 'ambience_3_arcadiawallight'
+  Name[10911] = '3_desklight'
+  Name[10912] = 'ambience_3_desklight'
+  Name[10934] = 'SpawnedMinimumSecurityCameraSpotlight'
+  Name[10938] = '3_lightbuzz'
+  Name[10939] = 'ambience_3_lightbuzz'
+  Name[10948] = '3_medgrouplight'
+  Name[10950] = '3_medpavilionlight'
+  Name[10954] = '3_neonlight'
+  Name[10959] = '3_plantlight'
+  Name[10960] = 'ambience_3_plantlight'
+  Name[10961] = '3_plasmidadlight'
+  Name[10963] = '3_sixtywattlight'
+  Name[10964] = 'ambience_3_sixtywattlight'
+  Name[10965] = '3_smallcrosslight'
+  Name[10966] = 'ambience_3_smallcrosslight'
+  Name[10969] = '3_surgicallight'
+  Name[11021] = '3_water_stream_light'
+  Name[11022] = 'ambience_3_water_stream_light'
+  Name[11023] = '3_water_stream_light_mark'
+  Name[11024] = 'ambience_3_water_stream_light_mark'
+  Name[11025] = '3_water_stream_light_two'
+  Name[11026] = 'ambience_3_water_stream_light_two'
+  Name[11097] = '4_lightA'
+  Name[11101] = '4_lightB'
+  Name[11103] = '4_lightbuzz'
+  Name[11104] = 'ambience_4_lightbuzz'
+  Name[11105] = '4_lightC'
+  Name[11115] = '4_lightD'
+  Name[11117] = '4_lightF'
+  Name[11119] = '4_lightG'
+  Name[11121] = '4_lightJ'
+  Name[11122] = 'ambience_4_lightJ'
+  Name[11137] = '4_sixtywattlight'
+  Name[11140] = 'GUI_panelHighlightMoved'
+  Name[11144] = 'ambience_4_sixtywattlight'
+  Name[11186] = '4_water_stream_light'
+  Name[11187] = 'ambience_4_water_stream_light'
+  Name[11263] = '7_dentalchairlight'
+  Name[11264] = 'ambience_7_dentalchairlight'
+  Name[11318] = '7_lightbank_broken'
+  Name[11319] = 'ambience_7_lightbank_broken'
+  Name[11320] = '7_lightbuzz'
+  Name[11321] = 'ambience_7_lightbuzz'
+  Name[11322] = '7_lightporthole'
+  Name[11323] = 'ambience_7_lightporthole'
+  Name[11342] = '7_sixtywattlight'
+  Name[11343] = 'ambience_7_sixtywattlight'
+  Name[11384] = '7_water_stream_light'
+  Name[11385] = 'ambience_7_water_stream_light'
+  Name[11460] = '9_light1'
+  Name[11462] = '9_light2'
+  Name[11463] = '9_light3'
+  Name[11464] = 'ambience_9_lightFlicker'
+  Name[11497] = 'ambience_9_water_stream_light'
+  Name[11536] = 'lightbathroom'
+  Name[11538] = 'LighthouseBeacon'
+  Name[11542] = 'LighthouseInterior'
+  Name[11543] = 'LighthouseInteriorWater'
+  Name[11544] = 'LighthouseOcean'
+  Name[11546] = 'LighthouseWavelets'
+  Name[11548] = 'LighthouseWind'
+  Name[11595] = 'WaterStreamLight'
+  Name[11596] = 'ambience_common_water_stream_light'
+  Name[12112] = 'scripted_2_lightbuzz'
+  Name[12210] = '4_LightsOn'
+  Name[12511] = 'LightsOnSound'
+  Name[12518] = 'MimicLightsOn'
+  Name[12614] = 'StoreLightsOff'
+  Name[12615] = 'StoreLightsOn'
+  Name[12647] = 'UnderwaterLightsOn'
+  Name[12649] = 'UnderwaterLightsZap'
+  Name[12915] = 'Arc_LightBeamColor'
+  Name[13335] = 'DynamicLight_BrightElectric'
+  Name[13352] = 'UIInfoPanelHighlightMoved'
+  Name[13504] = 'music_1_lightsOut'
+  Name[13506] = 'music_1_shadowPlay'
+  Name[13516] = 'ProximityArmedLight'
+  Name[13517] = 'music_1_realShadowplay'
+  Name[13661] = '5_LightsOutA'
+  Name[13663] = '5_LightsOutB'
+  Name[13664] = 'scripted_5_lightsOut_B'
+  Name[13806] = '9_lights_off_1'
+  Name[13807] = '9_lights_off_2'
+  Name[13808] = '9_lights_on'
+  Name[14014] = 'ambience_4_dS_light'
+  Name[14039] = 'ChemColdLight'
+  Name[14074] = 'DynamicLightOutB'
+  Name[14085] = 'Beacon_LightEnd'
+  Name[14141] = 'PlayerFlashlight'
+  Name[14145] = 'ProtectorLightWound'
+  Name[14164] = 'Wel_IntWireLight'
+  Name[14168] = 'ChemBlueLight'
+  Name[14173] = 'ElectroBoltHandLight'
+  Name[14180] = 'QuestLightFX'
+  Name[14182] = 'SecurityCameraHitLight'
+  Name[14185] = 'ProtectorFriendlyEnd_Light'
+  Name[14186] = 'ChemPilotLight'
+  Name[14350] = 'GhostLightB'
+  Name[14380] = 'ambience_3_paramountlight'
+  Name[14381] = 'ambience_1_lightedmap'
+  Name[14384] = 'ambience_4_lightI'
+  Name[14386] = 'ambience_6_lightbulbhiss'
+  Name[14434] = 'scripted_4_spotLightOn'
+  Name[14469] = 'DynamicLight_Flashlight'
+  Name[14492] = 'ProtectorFriendly_Light'
+  Name[14497] = 'ProtectorHostile_Light'
+  Name[14499] = 'ProtectorNeutral_Light'
+  Name[14548] = 'PlayerCamera_LightHRise'
+  Name[14603] = 'BHDoor_BrokenLight'
+  Name[14607] = 'ProximityArmingLight'
+  Name[14630] = 'ChemRedLight'
+  Name[14684] = 'FrobHighlightOverlay'
+  Name[14701] = 'Arc_ProgressLight'
+  Name[14704] = 'DynamicLight_Camera'
+  Name[14741] = 'FortuneTellerLight'
+  Name[14811] = 'SecurityLight'
+  Name[14909] = 'Wel_BathyLight'
+  Name[15209] = 'TurretFlameDynamicLight'
+  Name[15326] = 'DynamicLight_FT'
+  Name[15588] = 'ShadowProjectionMask'
+  Name[15638] = 'EnablePressureSystemForAmbientLighting'
+  Name[15895] = 'ShockPlayerControllerUIHighlightMoved'
+  Name[15901] = 'ShockPlayerControllerUIInfoPanelHighlightMoved'
+  Name[15945] = 'ShockPlayerExitedWater_Lighthouse'
+  Name[15964] = 'ShockPlayerJumped_lighthouse'
+  Name[16614] = 'ShockPlayerScriptTrigger_1_lightsOut'
+  Name[16625] = 'ShockPlayerScriptTrigger_1_Music_ShadowPlay'
+  Name[16710] = 'ShockPlayerScriptTrigger_5_LightsOutA'
+  Name[16711] = 'ShockPlayerScriptTrigger_5_LightsOutB'
+  Name[16786] = 'ShockPlayerScriptTrigger_9_lights_off_'
+  Name[16787] = 'ShockPlayerScriptTrigger_9_lights_on'
+  Name[16952] = 'SoundMarkerDummyEvent_Lighthouse'
+  Name[17750] = 'StaticMeshActorAlive_decorativeceilinglight_main'
+  Name[17760] = 'StaticMeshActorAlive_frame_and_light'
+  Name[17769] = 'StaticMeshActorAlive_lenslight'
+  Name[17770] = 'StaticMeshActorAlive_light_ceiling'
+  Name[17771] = 'StaticMeshActorAlive_light_freestanding_tall'
+  Name[17772] = 'StaticMeshActorAlive_light_wall'
+  Name[17773] = 'StaticMeshActorAlive_Light_Wall_02'
+  Name[17788] = 'StaticMeshActorAlive_medical_globe_light'
+  Name[17798] = 'StaticMeshActorAlive_paramount_lights'
+  Name[17800] = 'StaticMeshActorAlive_quarantine_lighted_map'
+  Name[17822] = 'StaticMeshActorAlive_Theater_Light_Illum'
+  Name[17903] = 'TrainingMarkerScriptTrigger_LightFlickerOn'
+  Name[17992] = 'xxxxMarkerScriptTrigger_LighthouseBathySwitch_music'
+  Name[18457] = 'SecurityBotLightsOn'
+  Name[18458] = 'SecurityBotLightsOff'
+  Name[18675] = 'MarkerScriptTrigger_UnderwaterLightsZap'
+  Name[18676] = 'MarkerScriptTrigger_UnderwaterLightsOn'
+  Name[18699] = 'MarkerScriptTrigger_StoreLightsOn'
+  Name[18700] = 'MarkerScriptTrigger_StoreLightsOff'
+  Name[18757] = 'MarkerScriptTrigger_MimicLightsOn'
+  Name[18762] = 'MarkerScriptTrigger_LightsOnSound'
+  Name[18763] = 'MarkerScriptTrigger_LighthouseBathySwitch_leaver'
+  Name[18764] = 'MarkerScriptTrigger_LighthouseBathySwitch_launch'
+  Name[18765] = 'MarkerScriptTrigger_LighthouseBathySwitch_door'
+  Name[18968] = 'MarkerScriptTrigger_4_LightsOn'
+  Name[18969] = 'MarkerScriptTrigger_4_LightsOff'
+  Name[19565] = 'MarkerScriptTrigger_2_lightbuzz'
+  Name[19841] = 'scripted_1_redlights_01'
+  Name[19842] = 'scripted_1_redlights_02'
+  Name[19843] = 'scripted_1_redlights_03'
+  Name[20349] = 'machines_turretMachineGun_light_01'
+  Name[20638] = 'dyn_theater_lightCollided'
+  Name[20687] = 'dyn_light_deskCollided'
+  Name[20763] = 'DoorSwitchBeingUsed_LightSwitch'
+  Name[20945] = 'AmbientSoundSpawned_WaterStreamLight'
+  Name[20975] = 'AmbientSoundSpawned_LightVase'
+  Name[20976] = 'AmbientSoundSpawned_LightSquare'
+  Name[20977] = 'AmbientSoundSpawned_LightPorthole'
+  Name[20978] = 'AmbientSoundSpawned_LightNeon'
+  Name[20979] = 'AmbientSoundSpawned_LighthouseWind'
+  Name[20980] = 'AmbientSoundSpawned_LighthouseWavelets'
+  Name[20981] = 'AmbientSoundSpawned_LighthouseOcean'
+  Name[20982] = 'AmbientSoundSpawned_LighthouseInteriorWater'
+  Name[20983] = 'AmbientSoundSpawned_LighthouseInterior'
+  Name[20984] = 'AmbientSoundSpawned_LighthouseFire'
+  Name[20985] = 'AmbientSoundSpawned_LighthouseBeacon'
+  Name[20986] = 'AmbientSoundSpawned_lightbathroom'
+  Name[21030] = 'AmbientSoundSpawned_9_lightflicker'
+  Name[21031] = 'AmbientSoundSpawned_9_light'
+  Name[21067] = 'AmbientSoundSpawned_7_water_stream_light'
+  Name[21088] = 'AmbientSoundSpawned_7_sixtywattlight'
+  Name[21098] = 'AmbientSoundSpawned_7_lightporthole'
+  Name[21099] = 'AmbientSoundSpawned_7_lightbuzz'
+  Name[21100] = 'AmbientSoundSpawned_7_lightbank_broken'
+  Name[21128] = 'AmbientSoundSpawned_7_dentalchairlight'
+  Name[21163] = 'AmbientSoundSpawned_4_water_stream_light'
+  Name[21173] = 'AmbientSoundSpawned_4_sixtywattlight'
+  Name[21176] = 'AmbientSoundSpawned_4_lightJ'
+  Name[21177] = 'AmbientSoundSpawned_4_lightG'
+  Name[21178] = 'AmbientSoundSpawned_4_lightF'
+  Name[21179] = 'AmbientSoundSpawned_4_lightD'
+  Name[21180] = 'AmbientSoundSpawned_4_lightC'
+  Name[21181] = 'AmbientSoundSpawned_4_lightbuzz'
+  Name[21182] = 'AmbientSoundSpawned_4_lightB'
+  Name[21183] = 'AmbientSoundSpawned_4_lightA'
+  Name[21214] = 'AmbientSoundSpawned_3_water_stream_light_two'
+  Name[21215] = 'AmbientSoundSpawned_3_water_stream_light_mark'
+  Name[21216] = 'AmbientSoundSpawned_3_water_stream_light'
+  Name[21279] = 'AmbientSoundSpawned_3_surgicallight'
+  Name[21281] = 'AmbientSoundSpawned_3_smallcrosslight'
+  Name[21282] = 'AmbientSoundSpawned_3_sixtywattlight'
+  Name[21283] = 'AmbientSoundSpawned_3_plasmidadlight'
+  Name[21284] = 'AmbientSoundSpawned_3_plantlight'
+  Name[21286] = 'AmbientSoundSpawned_3_neonlight'
+  Name[21288] = 'AmbientSoundSpawned_3_medpavilionlight'
+  Name[21289] = 'AmbientSoundSpawned_3_medgrouplight'
+  Name[21294] = 'AmbientSoundSpawned_3_lightbuzz'
+  Name[21301] = 'AmbientSoundSpawned_3_desklight'
+  Name[21325] = 'AmbientSoundSpawned_3_arcadiawallight'
+  Name[21345] = 'AmbientSoundSpawned_2_water_stream_light'
+  Name[21369] = 'AmbientSoundSpawned_2_sixtywattlight'
+  Name[21373] = 'AmbientSoundSpawned_2_neonfreezerlight'
+  Name[21377] = 'AmbientSoundSpawned_2_lightbuzz'
+  Name[21378] = 'AmbientSoundSpawned_2_light_bathroom'
+  Name[21384] = 'AmbientSoundSpawned_2_framelight'
+  Name[21395] = 'AmbientSoundSpawned_2_cavelight'
+  Name[21397] = 'AmbientSoundSpawned_2_boxlight'
+  Name[21403] = 'AmbientSoundSpawned_1_welgrouplight'
+  Name[21405] = 'AmbientSoundSpawned_1_waterstreamlight'
+  Name[21423] = 'AmbientSoundSpawned_1_water_stream_light_'
+  Name[21424] = 'AmbientSoundSpawned_1_water_stream_light'
+  Name[21442] = 'AmbientSoundSpawned_1_temperaturelight'
+  Name[21443] = 'AmbientSoundSpawned_1_surgicallight'
+  Name[21446] = 'AmbientSoundSpawned_1_smallcrosslight'
+  Name[21447] = 'AmbientSoundSpawned_1_sixtywattlight'
+  Name[21453] = 'AmbientSoundSpawned_1_neonlight'
+  Name[21459] = 'AmbientSoundSpawned_1_medpavilionlight'
+  Name[21460] = 'AmbientSoundSpawned_1_medgrouplight'
+  Name[21463] = 'AmbientSoundSpawned_1_lightbuzz_welcome'
+  Name[21464] = 'AmbientSoundSpawned_1_light_bathwel'
+  Name[21465] = 'AmbientSoundSpawned_1_light_bathroom'
+  Name[21472] = 'AmbientSoundSpawned_1_framelight'
+  Name[21477] = 'AmbientSoundSpawned_1_desklight'
+  Name[21478] = 'AmbientSoundSpawned_1_dentalchairlight'
+  Name[21623] = 'ActorScriptTrigger_RedLightAudio'
+  Name[21636] = 'ActorScriptTrigger_Medical_SpotlightTurnedOn'
+  Name[21640] = 'ActorScriptTrigger_LightsSparkOff'
+  Name[21641] = 'ActorScriptTrigger_LightsOn'
+  Name[21642] = 'ActorScriptTrigger_LightFlickerOn'
+  Name[21667] = 'ActorScriptTrigger_9_lightflicker'
+  Name[21723] = 'ActorScriptTrigger_2_lightFlickerLoud'
+  Name[21724] = 'ActorScriptTrigger_2_LightFlickerLoop'
+  Name[21745] = 'ActorScriptTrigger_10_electric_light_loop'
+  Name[21746] = 'ActorScriptTrigger_10_electric_light_flicker'
+  Name[21796] = 'xxxwel_bathyspherealive_light'
+  Name[21812] = 'xxxSecurityCameraSearching_LightBeam'
+  Name[21813] = 'xxxSecurityCameraAlarmTargetVisible_Light'
+  Name[21845] = 'xxxGhostAlive_LightBack'
+  Name[21858] = 'xxxBathyIntroSpawned_Light'
+  Name[21859] = 'xxxBathyIntroScriptTrigger_OutLightC'
+  Name[21860] = 'xxxBathyIntroScriptTrigger_OutLight'
+  Name[21861] = 'xxxBathyIntroScriptTrigger_LightD'
+  Name[21862] = 'xxxBathyIntroScriptTrigger_FlickerLight_OutLightC'
+  Name[21898] = 'Wel_RadioAnimScriptTrigger_QuestLightOn'
+  Name[21900] = 'Wel_PlaneCrashTailLight_Bubbles'
+  Name[21901] = 'Wel_PlaneCrashTailLight'
+  Name[21930] = 'TurretLightsOn'
+  Name[21943] = 'TheaterSpotlightController_SmallSpotlightOn'
+  Name[21958] = 'StaticMeshActorScriptTrigger_LightBeamShift'
+  Name[21986] = 'SpawnedMeleeThugFlashlightAttachedToOwner_DynamicLight'
+  Name[22085] = 'ShockPlayerScriptTrigger_LightHouseRise'
+  Name[22196] = 'ShockAIAcquiredState_Shocked_LightWater'
+  Name[22197] = 'ShockAIAcquiredState_Shocked_Light'
+  Name[22209] = 'ShockAIAcquiredState_Burning_Light'
+  Name[22232] = 'SecurityCameraHalfHealth_Light'
+  Name[22236] = 'SecurityCameraCameraNotHacked_LightBeam'
+  Name[22245] = 'SecurityBotLightsOn_FlashlightC'
+  Name[22246] = 'SecurityBotLightsOn_FlashlightB'
+  Name[22247] = 'SecurityBotLightsOn_FlashlightA'
+  Name[22262] = 'SecCamLightY_MeshAcquiredState_Shocked'
+  Name[22263] = 'SecCamLightY_MeshAcquiredState_Burning'
+  Name[22264] = 'SecCamLightR_MeshAcquiredState_Shocked'
+  Name[22265] = 'SecCamLightR_MeshAcquiredState_Burning'
+  Name[22266] = 'SecCamLightG_MeshAcquiredState_Shocked'
+  Name[22267] = 'SecCamLightG_MeshAcquiredState_Burning'
+  Name[22339] = 'ReactiveActorScriptTrigger_ProgressLight'
+  Name[22369] = 'ReactiveActorDynLightOut'
+  Name[22376] = 'ReactiveActorAcquiredState_Burning_Light'
+  Name[22412] = 'ProtectorTaggedWithSecurityBeaconEnding_Light'
+  Name[22423] = 'ProtectorTaggedWithSecurityBeacon_Light'
+  Name[22449] = 'ProtectorAcquiredState_Shocked_LightWater'
+  Name[22450] = 'ProtectorAcquiredState_Shocked_Light'
+  Name[22461] = 'ProtectorAcquiredState_Burning_Light'
+  Name[22470] = 'PistolUnHidden_RimLight'
+  Name[22503] = 'MediumSecurityTurretOperating_PilotLightDynamicLight'
+  Name[22504] = 'MediumSecurityTurretAlive_PilotLightA'
+  Name[22645] = 'HypoPickupsAcquiredState_Burning_Light'
+  Name[22649] = 'HealthStationHackSucceeded_Light'
+  Name[22764] = 'HandsScriptTrigger_Flashlight'
+  Name[22845] = 'GhostParentAlive_Light'
+  Name[22856] = 'GathererTaggedWithSecurityBeacon_Light'
+  Name[23013] = 'Dyn_Nurm_NetAcquiredState_Burning_Light'
+  Name[23064] = 'DeadProAlive_Light'
+  Name[23076] = 'DeadBodyContainerAcquiredState_Burning_Light'
+  Name[23095] = 'CraftingComponentPickupsAcquiredState_Burning_Light'
+  Name[23098] = 'ConsumablePickupsAcquiredState_Burning_Light'
+  Name[23153] = 'BouncerTaggedWithSecurityBeaconEnding_Light'
+  Name[23163] = 'BouncerTaggedWithSecurityBeacon_Light'
+  Name[23189] = 'BouncerAcquiredState_Burning_Light'
+  Name[23206] = 'BathyIntroSpawned_Light'
+  Name[23208] = 'BathyIntroScriptTrigger_LightEnd'
+  Name[23209] = 'BathyIntroScriptTrigger_FlickerLight_OutLight'
+  Name[23296] = 'AmmoPickupsAcquiredState_Burning_Light'
+  Name[23306] = 'AggressorTaggedWithSecurityBeaconEnding_Light'
+  Name[23316] = 'AggressorTaggedWithSecurityBeacon_Light'
+  Name[23407] = 'ActorWeaponImpacted_Pistol_HighExplosive_DynamicLights'
+  Name[23471] = 'ActorWeaponImpacted_ElectricBoltTwoAbility_Light'
+  Name[23474] = 'ActorWeaponImpacted_ElectricBoltThreeAbility_Light'
+  Name[23477] = 'ActorWeaponImpacted_ElectricBoltAbility_Light'
+  Name[23556] = 'ActorSpotlightOn'
+  Name[23581] = 'ActorScriptTrigger_QuestLightOn'
+  Name[23591] = 'ActorScriptTrigger_LightOut'
+  Name[23628] = 'ActorScriptTrigger_CarriageLights'
+  Name[23806] = '_light'
+  Name[23821] = 'lightspecular'
+  Name[23822] = 'BathysphereLight_mat'
+  Name[23829] = 'lightemissive'
+  Name[23863] = 'lightswitch_specularemissive'
+  Name[23864] = 'lightswitch_normalmap'
+  Name[23865] = 'lightswitch_diffuse'
+  Name[23866] = 'lightswitch_diffuse_shader'
+  Name[23908] = 'WP_AI_FlashlightShader'
+  Name[23909] = 'FlashLight_Normal'
+  Name[23910] = 'FlashLight_Diffuse'
+  Name[23920] = 'WP_AI_Flashlight'
+  Name[23926] = 'SecurityCameraSpotlights'
+  Name[24592] = 'USharedSkeletonAnimationMetadata_banner_lightair01_reverse'
+  Name[24593] = 'USharedSkeletonAnimationMetadata_banner_wall_lightair01'
+  Name[24595] = 'USharedSkeletonAnimationMetadata_banner_lightair01'
+  Name[24893] = 'frame_light'
+  Name[24936] = 'paramount_lights_diffuse'
+  Name[24937] = 'paramount_lights_emissive'
+  Name[24938] = 'paramount_lights_normal'
+  Name[24940] = 'paramount_lights_corner'
+  Name[25131] = 'medical_globe_light_shader'
+  Name[25507] = 'TurretGrenadeLauncher_light'
+  Name[25515] = 'TurretFlameThrowerLightOn_Diffuse'
+  Name[25516] = 'TurretFlameThrowerLight_Normal'
+  Name[25517] = 'TurretFlameThrowerLight_Spec'
+  Name[25520] = 'TurretFlameThrowerLightOn_Shader'
+  Name[25939] = 'Theater_Light_Support_'
+  Name[25994] = 'Theatre_Light_Support_Diffuse_shader'
+  Name[25995] = 'Theatre_Light_Support_Diffuse'
+  Name[25996] = 'Theatre_Light_Support_Specular'
+  Name[25998] = 'lightswitch_1_normalmap'
+  Name[25999] = 'lightswitch_1_diffuse'
+  Name[26000] = 'lightswitch_1_spec'
+  Name[26200] = 'ReactionTurnOffLight'
+  Name[26229] = 'ActionSetLightProperties'
+  Name[26345] = 'banner_Constrained_lightair010'
+  Name[26363] = 'LightMaps_BSP'
+  Name[26386] = 'Designer_S_Light'
+  Name[26456] = 'Theater_Light_Support'
+  Name[26521] = 'light_ceiling_Diffuse_'
+  Name[26522] = 'light_ceiling_Emissive_'
+  Name[26523] = 'light_ceiling_Normal_'
+  Name[26524] = 'light_ceiling_Spec_'
+  Name[26525] = 'light_ceiling_2_shader'
+  Name[26526] = 'light_wall_Specular'
+  Name[26527] = 'light_wall_Normal'
+  Name[26528] = 'light_floor_Normal'
+  Name[26529] = 'light_floor_Specular'
+  Name[26530] = 'Theater_Light_Lit'
+  Name[26531] = 'Light_Beam_Falloff'
+  Name[26532] = 'Theatrelight_lit'
+  Name[26533] = 'Light_Beams_Science_Yellow'
+  Name[26534] = 'Light_beam_LowFalloff'
+  Name[26536] = 'light_beam_02'
+  Name[26537] = 'Light_Beam_01'
+  Name[26538] = 'lightbulb_ceiling_on'
+  Name[26539] = 'light_desk_diffuse_shader'
+  Name[26540] = 'Light_wall_shader'
+  Name[26541] = 'Light_ceiling_diffuse_shader'
+  Name[26543] = 'lightbulb_ceiling_on_lum'
+  Name[26544] = 'lightbulb_ceiling_diffuse'
+  Name[26545] = 'lightbulb_ceiling_normalmap'
+  Name[26547] = 'Light_ceiling_emissive'
+  Name[26548] = 'light_floor'
+  Name[26549] = 'Underwater_Light'
+  Name[26550] = 'Gen_Exterior_Light_Diffuse_02'
+  Name[26551] = 'Light_ceiling_diffuse'
+  Name[26552] = 'Light_ceiling_normal'
+  Name[26556] = 'light_floor_diffuse'
+  Name[26557] = 'light_floor_emissive'
+  Name[26558] = 'light_desk_normal'
+  Name[26559] = 'light_desk_diffuse'
+  Name[26560] = 'light_desk_emissive'
+  Name[26561] = 'light_wall_diffuse'
+  Name[26562] = 'light_wall_emissive'
+  Name[26565] = 'Light_Beams'
+  Name[26566] = 'Light_ceiling_Specular'
+  Name[26567] = 'light_desk'
+  Name[26568] = 'light_chandelier_wide'
+  Name[26569] = 'Theater_Light_Specular'
+  Name[26570] = 'Theater_Light_Diffuse'
+  Name[26571] = 'Theater_Light_Normal'
+  Name[26572] = 'Theater_Light_Emissive'
+  Name[26573] = 'neonlight_Diffuse'
+  Name[26584] = 'light_floor_diffuse_shader'
+  Name[26848] = 'Resurrection_Shader_NoLights'
+  Name[27087] = 'InvisibleShadows_Shader'
+  Name[27105] = 'Flashlight_Mask'
+  Name[27125] = 'ProtectorLightWound_Dif'
+  Name[27219] = 'LightDust_Dif'
+  Name[27283] = 'LightFlare_Diffuse'
+  Name[27315] = 'LightShaft_Falloff'
+  Name[27480] = 'ProxArmedLight_Dif'
+  Name[27481] = 'ProxArmLight_Dif'
+  Name[27488] = 'FrobHighlight_Shader'
+  Name[27498] = 'ProtectorLightHit_Shader'
+  Name[27524] = 'FlashlightTex_Dif'
+  Name[27714] = 'OrangeLightLoop'
+  Name[27715] = 'OrangeSparkLightLoop'
+  Name[27717] = 'PilotLight_LightLoop'
+  Name[27740] = 'HolyLight_Shader'
+  Name[28650] = 'Gen_Lights'
+  Name[28669] = 'CameraLightFlare_Dif'
+  Name[29127] = 'DynamicLight_MuzzleMGPulse'
+  Name[29151] = 'SecurityCameraLight'
+  Name[29246] = 'MaterialColorFromLight'
+  Name[29251] = 'LightBeamShader'
+  Import classes with Light/Shadow:
+    Import[14] = 'Light'
+    Import[53] = 'MaterialColorFromLight'
+    Import[77] = 'ActionSetLightProperties'
+    Import[126] = 'ReactionTurnOffLight'
+    Import[151] = 'DynamicLightEffect'
+    Import[158] = 'OrangeLightLoop'
+    Import[278] = 'ShockedLight'
+    Import[319] = 'LightBeamShader'
+    Import[498] = 'DynamicLight_MuzzleMGPulse'
+    Import[557] = 'DynamicLightMuzzleFlash'
+    Import[652] = 'SecurityCameraLight'
+
+=== All Texture-class exports (summary) ===
+  Texture: 1951 exports
+  TexturePanner: 165 exports
+  TextureRotator: 21 exports
+  TextureScalar: 22 exports
+  Total texture-like exports: 2159
+
+=== LightMaps_BSP found at export[4085] ===
+
+=== Lightmap Texture exports (outer=LightMaps_BSP) ===
+  Export[4086] 'Texture_49' serial=3193 offset=0x261CC8F
+  Export[4335] 'Texture_46' serial=3193 offset=0x2A09C3F
+  Export[4439] 'Texture_47' serial=3193 offset=0x2A3B414
+  Export[5002] 'Texture_50' serial=3193 offset=0x3851057
+  Export[5163] 'Texture_48' serial=3193 offset=0x3913CF7
+  Export[5417] 'Texture_54' serial=3193 offset=0x3D06A61
+  Export[5481] 'Texture_44' serial=3193 offset=0x3D16190
+  Export[5529] 'Texture_43' serial=3193 offset=0x3E12B37
+  Export[5574] 'Texture_55' serial=3193 offset=0x3F63557
+  Export[5988] 'Texture_45' serial=3193 offset=0x441DA15
+  Export[8007] 'Texture_42' serial=3193 offset=0x57D5DC1
+  Export[8010] 'Texture_51' serial=3193 offset=0x57D6C53
+  Export[10984] 'Texture_52' serial=3193 offset=0x6D8FC26
+  Export[13804] 'Texture_53' serial=3193 offset=0x7FE3641
+Found 14 lightmap texture exports
+
+=== Parsing texture serial data for BulkData headers ===
+
+--- Texture_49 (export 4086, serial 3193 bytes at 0x261CC8F) ---
+    PROP 'InternalTime' type=2 size=4 val=52 A8 3A 44 
+    PROP 'InternalTime' type=2 size=4 val=51 87 D5 40 
+    PROP 'ResourceCategory' type=6 size=6 val=55 07 00 00 00 00 
+    PROP 'MinLOD' type=2 size=4 val=04 00 00 00 
+    PROP 'StrippedNumMips' type=1 size=1 val=5
+    PROP 'CachedBulkDataSize' type=10 size=5 val=00 00 00 00 00 
+    PROP 'Format' type=1 size=1 val=3
+    PROP 'UClampMode' type=1 size=1 val=1
+    PROP 'VClampMode' type=1 size=1 val=1
+    PROP 'UBits' type=1 size=1 val=10
+    PROP 'VBits' type=1 size=1 val=10
+    PROP 'USize' type=2 size=4 val=00 04 00 00 
+    PROP 'VSize' type=2 size=4 val=00 04 00 00 
+    PROP 'CheckpointTypePadding' type=2 size=4 val=70 8A A1 19 
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1 UClamp=1 VClamp=1 LODSet=-1
+  Native data: 3027 bytes remaining
+  NativeHeader: ver=4 subVer=1 totalBulkSize=696320 mipCount=9
+  Native bytes 100-220 (entry 3/4 boundary):
+    +0064: 00 01 00 00 00 01 00 00 08 08 04 00 00 00 02 00 
+    +0074: 00 00 B8 CD 61 02 00 00 00 00 40 80 01 00 00 80 
+    +0084: 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 
+    +0094: 00 D8 D5 61 02 00 00 00 00 40 20 00 00 40 20 00 
+    +00A4: 00 00 08 00 00 00 02 00 00 00 00 00 00 00 00 00 
+    +00B4: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 20 
+    +00C4: 00 00 00 D5 55 55 55 00 04 00 00 35 25 2D AD 80 
+    +00D4: 05 60 00 E0 C0 EA F5 2F 00 20 00 55 7D 63 63 20 
+  Parsing mip entries (variable-length):
+    [0] +17: selfOff=0x261CD5B b16-17=4080 raw[18..31]: 40 00 00 00 04 00 00 00 04 00 00 0A 0A 04 
+         CI at +47 = 10 (1 bytes)
+         INLINE data: 10 bytes at +48
+    [1] BAD signature at +58: 609, -2143289344
+  Final mip parse position: +58 (of 3027)
+
+--- Texture_46 (export 4335, serial 3193 bytes at 0x2A09C3F) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1 UClamp=1 VClamp=1 LODSet=-1
+  Native data: 3027 bytes remaining
+  NativeHeader: ver=4 subVer=1 totalBulkSize=696320 mipCount=9
+  Native bytes 100-220 (entry 3/4 boundary):
+    +0064: 00 01 00 00 00 01 00 00 08 08 04 00 00 00 02 00 
+    +0074: 00 00 68 9D A0 02 00 00 00 00 40 80 01 90 00 80 
+    +0084: 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 
+    +0094: 00 88 A5 A0 02 00 00 00 00 40 20 02 11 40 20 02 
+    +00A4: 11 6D 04 2E 17 00 AA E0 98 67 02 82 02 AA 55 22 
+    +00B4: 0C 61 08 83 FF 5F 5F C7 28 41 00 55 E5 8D DF 81 
+    +00C4: 00 23 30 90 00 00 00 00 08 A2 01 E2 60 AA 8B 05 
+    +00D4: 22 00 00 55 FA EA 42 0A 08 C0 00 F5 80 EA 55 A7 
+  Parsing mip entries (variable-length):
+    [0] +17: selfOff=0x2A09D0B b16-17=4080 raw[18..31]: 40 00 00 00 04 00 00 00 04 00 00 0A 0A 04 
+         CI at +47 = 10 (1 bytes)
+         INLINE data: 10 bytes at +48
+    [1] BAD signature at +58: 672, -2143289344
+  Final mip parse position: +58 (of 3027)
+
+--- Texture_47 (export 4439, serial 3193 bytes at 0x2A3B414) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1 UClamp=1 VClamp=1 LODSet=-1
+  Native data: 3027 bytes remaining
+  NativeHeader: ver=4 subVer=1 totalBulkSize=696320 mipCount=9
+  Native bytes 100-220 (entry 3/4 boundary):
+    +0064: 00 01 00 00 00 01 00 00 08 08 04 00 00 00 02 00 
+    +0074: 00 00 3D B5 A3 02 00 00 00 00 40 80 01 05 00 80 
+    +0084: 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 
+    +0094: 00 5D BD A3 02 00 00 00 00 40 20 00 C0 40 20 00 
+    +00A4: C0 02 08 55 55 B5 2F 41 20 80 0E 60 E0 28 28 E0 
+    +00B4: 05 40 00 78 7A 55 55 51 0A 61 08 35 15 35 B7 E1 
+    +00C4: 02 F9 01 2D 2D 0B 02 20 00 00 00 D5 55 55 D5 20 
+    +00D4: 01 00 00 7D 71 71 5D AA 00 00 00 55 55 D5 35 98 
+  Parsing mip entries (variable-length):
+    [0] +17: selfOff=0x2A3B4E0 b16-17=4080 raw[18..31]: 40 00 00 00 04 00 00 00 04 00 00 0A 0A 04 
+         CI at +47 = 10 (1 bytes)
+         INLINE data: 10 bytes at +48
+    [1] BAD signature at +58: 675, -2143289344
+  Final mip parse position: +58 (of 3027)
+
+--- Texture_50 (export 5002, serial 3193 bytes at 0x3851057) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1 UClamp=1 VClamp=1 LODSet=-1
+  Native data: 3027 bytes remaining
+  NativeHeader: ver=4 subVer=1 totalBulkSize=696320 mipCount=9
+  Native bytes 100-220 (entry 3/4 boundary):
+    +0064: 00 01 00 00 00 01 00 00 08 08 04 00 00 00 02 00 
+    +0074: 00 00 80 11 85 03 00 00 00 00 40 80 01 13 00 80 
+    +0084: 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 
+    +0094: 00 A0 19 85 03 00 00 00 00 40 20 18 D0 40 20 18 
+    +00A4: D0 0B B0 FD AB 02 00 15 C8 02 70 5A 58 50 50 00 
+    +00B4: 68 00 00 78 78 78 78 00 04 00 00 2D F5 55 55 20 
+    +00C4: 04 00 00 78 5F 55 55 20 00 00 00 55 55 57 55 00 
+    +00D4: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+  Parsing mip entries (variable-length):
+    [0] +17: selfOff=0x3851123 b16-17=4080 raw[18..31]: 40 09 00 00 04 00 00 00 04 00 00 0A 0A 04 
+         CI at +47 = 10 (1 bytes)
+         INLINE data: 10 bytes at +48
+    [1] BAD signature at +58: 901, -2143289344
+  Final mip parse position: +58 (of 3027)
+
+--- Texture_48 (export 5163, serial 3193 bytes at 0x3913CF7) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1 UClamp=1 VClamp=1 LODSet=-1
+  Native data: 3027 bytes remaining
+  NativeHeader: ver=4 subVer=1 totalBulkSize=696320 mipCount=9
+  Native bytes 100-220 (entry 3/4 boundary):
+    +0064: 00 01 00 00 00 01 00 00 08 08 04 00 00 00 02 00 
+    +0074: 00 00 20 3E 91 03 00 00 00 00 40 80 01 00 00 80 
+    +0084: 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 
+    +0094: 00 40 46 91 03 00 00 00 00 40 20 00 D8 40 20 00 
+    +00A4: D8 00 A8 01 01 01 09 00 E0 00 78 00 80 C0 40 00 
+    +00B4: D8 00 00 00 0F 0D 0D 00 E0 00 D0 80 A0 FA 7F 00 
+    +00C4: C8 0F 00 58 58 58 58 14 00 0C 00 55 7F EA 80 0F 
+    +00D4: 00 00 00 5E 5E F8 A0 05 00 00 00 55 55 56 5C 00 
+  Parsing mip entries (variable-length):
+    [0] +17: selfOff=0x3913DC3 b16-17=4080 raw[18..31]: 40 00 00 00 04 00 00 00 04 00 00 0A 0A 04 
+         CI at +47 = 10 (1 bytes)
+         INLINE data: 10 bytes at +48
+    [1] BAD signature at +58: 913, -2143289344
+  Final mip parse position: +58 (of 3027)
+
+--- Texture_54 (export 5417, serial 3193 bytes at 0x3D06A61) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1 UClamp=1 VClamp=1 LODSet=-1
+  Native data: 3027 bytes remaining
+  NativeHeader: ver=4 subVer=1 totalBulkSize=696320 mipCount=9
+  Native bytes 100-220 (entry 3/4 boundary):
+    +0064: 00 01 00 00 00 01 00 00 08 08 04 00 00 00 02 00 
+    +0074: 00 00 8A 6B D0 03 00 00 00 00 40 80 01 20 00 80 
+    +0084: 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 
+    +0094: 00 AA 73 D0 03 00 00 00 00 40 20 41 75 40 20 41 
+    +00A4: 75 60 33 BD AD 2B 0B E3 95 A1 6C F5 AF 0A 02 09 
+    +00B4: A6 81 95 55 AD 09 09 08 AE C1 73 7F 6A 40 40 28 
+    +00C4: 00 10 00 D7 B7 B6 2E 09 00 00 00 78 78 5E 56 00 
+    +00D4: 20 00 00 25 B5 D5 55 00 48 00 00 82 6A 5F 55 00 
+  Parsing mip entries (variable-length):
+    [0] +17: selfOff=0x3D06B2D b16-17=4080 raw[18..31]: 40 A0 00 00 04 00 00 00 04 00 00 0A 0A 04 
+         CI at +47 = 10 (1 bytes)
+         INLINE data: 10 bytes at +48
+    [1] BAD signature at +58: 976, -2143289344
+  Final mip parse position: +58 (of 3027)
+
+--- Texture_44 (export 5481, serial 3193 bytes at 0x3D16190) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1 UClamp=1 VClamp=1 LODSet=-1
+  Native data: 3027 bytes remaining
+  NativeHeader: ver=4 subVer=1 totalBulkSize=696320 mipCount=9
+  Native bytes 100-220 (entry 3/4 boundary):
+    +0064: 00 01 00 00 00 01 00 00 08 08 04 00 00 00 02 00 
+    +0074: 00 00 B9 62 D1 03 00 00 00 00 40 80 01 00 00 80 
+    +0084: 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 
+    +0094: 00 D9 6A D1 03 00 00 00 00 40 20 40 00 40 20 40 
+    +00A4: 00 00 00 55 55 D5 15 20 08 00 00 55 75 7F 7E 20 
+    +00B4: 00 00 00 55 55 D5 D5 80 00 00 00 55 55 55 35 00 
+    +00C4: 01 00 00 55 55 55 02 E0 00 00 00 55 55 55 78 12 
+    +00D4: 00 01 00 95 15 95 55 0E 08 E0 00 5C 58 70 7B 42 
+  Parsing mip entries (variable-length):
+    [0] +17: selfOff=0x3D1625C b16-17=4080 raw[18..31]: 40 00 00 00 04 00 00 00 04 00 00 0A 0A 04 
+         CI at +47 = 10 (1 bytes)
+         INLINE data: 10 bytes at +48
+    [1] BAD signature at +58: 977, -2143289344
+  Final mip parse position: +58 (of 3027)
+
+--- Texture_43 (export 5529, serial 3193 bytes at 0x3E12B37) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1 UClamp=1 VClamp=1 LODSet=-1
+  Native data: 3027 bytes remaining
+  NativeHeader: ver=4 subVer=1 totalBulkSize=696320 mipCount=9
+  Native bytes 100-220 (entry 3/4 boundary):
+    +0064: 00 01 00 00 00 01 00 00 08 08 04 00 00 00 02 00 
+    +0074: 00 00 60 2C E1 03 00 00 00 00 40 80 01 01 00 80 
+    +0084: 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 
+    +0094: 00 80 34 E1 03 00 00 00 00 40 20 00 00 40 20 00 
+    +00A4: 00 00 00 00 00 00 00 C2 02 00 00 B5 35 35 B5 4D 
+    +00B4: 04 C1 00 AB 02 0A B5 E1 04 30 05 00 02 09 09 A0 
+    +00C4: 05 20 01 EA E0 60 60 66 05 00 00 0A 02 FF 55 E4 
+    +00D4: 05 01 00 00 00 BF 55 A0 06 41 04 6A 40 40 43 C4 
+  Parsing mip entries (variable-length):
+    [0] +17: selfOff=0x3E12C03 b16-17=4080 raw[18..31]: 40 00 00 00 04 00 00 00 04 00 00 0A 0A 04 
+         CI at +47 = 10 (1 bytes)
+         INLINE data: 10 bytes at +48
+    [1] BAD signature at +58: 993, -2143289344
+  Final mip parse position: +58 (of 3027)
+
+--- Texture_55 (export 5574, serial 3193 bytes at 0x3F63557) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1 UClamp=1 VClamp=1 LODSet=-1
+  Native data: 3027 bytes remaining
+  NativeHeader: ver=4 subVer=1 totalBulkSize=696320 mipCount=9
+  Native bytes 100-220 (entry 3/4 boundary):
+    +0064: 00 01 00 00 00 01 00 00 08 08 04 00 00 00 02 00 
+    +0074: 00 00 80 36 F6 03 00 00 00 00 40 80 01 80 00 80 
+    +0084: 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 
+    +0094: 00 A0 3E F6 03 00 00 00 00 40 20 C0 2A 40 20 C0 
+    +00A4: 2A 80 10 0A 2B BD D5 C0 43 C0 29 0A AB FD 55 E1 
+    +00B4: 4B 00 32 00 AA FF 55 A2 4B C0 31 00 AA FF 55 E0 
+    +00C4: 42 A0 28 60 E8 7E 57 00 28 00 10 E0 E8 7A 5F 80 
+    +00D4: 06 20 08 25 25 25 25 A0 06 40 06 55 EF 8A 00 80 
+  Parsing mip entries (variable-length):
+    [0] +17: selfOff=0x3F63623 b16-17=4080 raw[18..31]: 40 20 00 00 04 00 00 00 04 00 00 0A 0A 04 
+         CI at +47 = 10 (1 bytes)
+         INLINE data: 10 bytes at +48
+    [1] BAD signature at +58: 1014, -2143289344
+  Final mip parse position: +58 (of 3027)
+
+--- Texture_45 (export 5988, serial 3193 bytes at 0x441DA15) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1 UClamp=1 VClamp=1 LODSet=-1
+  Native data: 3027 bytes remaining
+  NativeHeader: ver=4 subVer=1 totalBulkSize=696320 mipCount=9
+  Native bytes 100-220 (entry 3/4 boundary):
+    +0064: 00 01 00 00 00 01 00 00 08 08 04 00 00 00 02 00 
+    +0074: 00 00 3E DB 41 04 00 00 00 00 40 80 01 00 00 80 
+    +0084: 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 
+    +0094: 00 5E E3 41 04 00 00 00 00 40 20 C0 2C 40 20 C0 
+    +00A4: 2C 00 08 55 7F 62 55 60 3E 20 00 35 35 0D 25 60 
+    +00B4: 57 E0 16 5F EA A0 00 A0 3F 60 07 55 57 5E 78 20 
+    +00C4: 07 A0 00 50 50 50 50 00 00 00 00 00 00 00 00 00 
+    +00D4: 00 00 00 00 00 00 00 14 00 01 00 55 D5 95 15 35 
+  Parsing mip entries (variable-length):
+    [0] +17: selfOff=0x441DAE1 b16-17=4080 raw[18..31]: 40 00 00 00 04 00 00 00 04 00 00 0A 0A 04 
+         CI at +47 = 10 (1 bytes)
+         INLINE data: 10 bytes at +48
+    [1] BAD signature at +58: 1089, -2143289344
+  Final mip parse position: +58 (of 3027)
+
+--- Texture_42 (export 8007, serial 3193 bytes at 0x57D5DC1) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1 UClamp=1 VClamp=1 LODSet=-1
+  Native data: 3027 bytes remaining
+  NativeHeader: ver=4 subVer=1 totalBulkSize=696320 mipCount=9
+  Native bytes 100-220 (entry 3/4 boundary):
+    +0064: 00 01 00 00 00 01 00 00 08 08 04 00 00 00 02 00 
+    +0074: 00 00 EA 5E 7D 05 00 00 00 00 40 80 01 E9 00 80 
+    +0084: 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 
+    +0094: 00 0A 67 7D 05 00 00 00 00 40 20 A4 19 40 20 A4 
+    +00A4: 19 21 00 CB 55 55 77 C5 08 20 00 89 E1 6B 56 40 
+    +00B4: 09 01 08 5E 5C 57 55 61 01 01 08 49 55 55 56 E0 
+    +00C4: 10 01 08 50 5D FD DB E2 20 21 08 50 5B 75 55 25 
+    +00D4: 08 20 08 DE 5F 49 75 A2 08 00 00 A0 D5 D5 55 21 
+  Parsing mip entries (variable-length):
+    [0] +17: selfOff=0x57D5E8D b16-17=4080 raw[18..31]: 40 00 00 00 04 00 00 00 04 00 00 0A 0A 04 
+         CI at +47 = 10 (1 bytes)
+         INLINE data: 10 bytes at +48
+    [1] BAD signature at +58: 1405, -2143289344
+  Final mip parse position: +58 (of 3027)
+
+--- Texture_51 (export 8010, serial 3193 bytes at 0x57D6C53) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1 UClamp=1 VClamp=1 LODSet=-1
+  Native data: 3027 bytes remaining
+  NativeHeader: ver=4 subVer=1 totalBulkSize=696320 mipCount=9
+  Native bytes 100-220 (entry 3/4 boundary):
+    +0064: 00 01 00 00 00 01 00 00 08 08 04 00 00 00 02 00 
+    +0074: 00 00 7C 6D 7D 05 00 00 00 00 40 80 01 0D 00 80 
+    +0084: 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 
+    +0094: 00 9C 75 7D 05 00 00 00 00 40 20 13 00 40 20 13 
+    +00A4: 00 08 00 2D 2D AD B5 19 00 12 00 0B 2B AD F5 13 
+    +00B4: 00 00 00 54 54 56 E8 02 00 00 00 55 55 55 54 20 
+    +00C4: 00 00 00 55 55 55 F5 00 00 00 00 00 00 00 00 00 
+    +00D4: 00 00 00 00 00 00 00 05 00 00 00 35 95 55 55 0C 
+  Parsing mip entries (variable-length):
+    [0] +17: selfOff=0x57D6D1F b16-17=4080 raw[18..31]: 40 00 00 00 04 00 00 00 04 00 00 0A 0A 04 
+         CI at +47 = 10 (1 bytes)
+         INLINE data: 10 bytes at +48
+    [1] BAD signature at +58: 1405, -2143289344
+  Final mip parse position: +58 (of 3027)
+
+--- Texture_52 (export 10984, serial 3193 bytes at 0x6D8FC26) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1 UClamp=1 VClamp=1 LODSet=-1
+  Native data: 3027 bytes remaining
+  NativeHeader: ver=4 subVer=1 totalBulkSize=696320 mipCount=9
+  Native bytes 100-220 (entry 3/4 boundary):
+    +0064: 00 01 00 00 00 01 00 00 08 08 04 00 00 00 02 00 
+    +0074: 00 00 4F FD D8 06 00 00 00 00 40 80 01 00 00 80 
+    +0084: 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 
+    +0094: 00 6F 05 D9 06 00 00 00 00 40 20 00 C8 40 20 00 
+    +00A4: C8 00 08 65 E5 0B 02 00 C0 00 00 D5 BF 00 00 00 
+    +00B4: 00 00 B8 25 25 25 25 00 00 00 00 00 00 00 00 00 
+    +00C4: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+    +00D4: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+  Parsing mip entries (variable-length):
+    [0] +17: selfOff=0x6D8FCF2 b16-17=4080 raw[18..31]: 40 00 00 00 04 00 00 00 04 00 00 0A 0A 04 
+         CI at +47 = 10 (1 bytes)
+         INLINE data: 10 bytes at +48
+    [1] BAD signature at +58: 1752, -2143289344
+  Final mip parse position: +58 (of 3027)
+
+--- Texture_53 (export 13804, serial 3193 bytes at 0x7FE3641) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1 UClamp=1 VClamp=1 LODSet=-1
+  Native data: 3027 bytes remaining
+  NativeHeader: ver=4 subVer=1 totalBulkSize=696320 mipCount=9
+  Native bytes 100-220 (entry 3/4 boundary):
+    +0064: 00 01 00 00 00 01 00 00 08 08 04 00 00 00 02 00 
+    +0074: 00 00 6A 37 FE 07 00 00 00 00 40 80 01 00 00 80 
+    +0084: 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 
+    +0094: 00 8A 3F FE 07 00 00 00 00 40 20 00 00 40 20 00 
+    +00A4: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+    +00B4: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+    +00C4: 00 00 00 00 00 00 00 07 00 00 00 D5 D5 95 35 10 
+    +00D4: 20 08 00 F5 FD AB 0B 06 00 00 00 5C 57 57 57 00 
+  Parsing mip entries (variable-length):
+    [0] +17: selfOff=0x7FE370D b16-17=4080 raw[18..31]: 40 00 00 00 04 00 00 00 04 00 00 0A 0A 04 
+         CI at +47 = 10 (1 bytes)
+         INLINE data: 10 bytes at +48
+    [1] BAD signature at +58: 2046, -2143289344
+  Final mip parse position: +58 (of 3027)
+
+
+=== PackagePatch Analysis ===
+PackagePatch size: 23024902 bytes
+  Version: 2
+  Data offset: 29295 (0x726F)
+  Num patches: 27
+  Data offset2: 29295 (0x726F)
+  Bulk data region: 22995607 bytes (from offset 29295 to EOF)
+
+  Entropy at bulk start (0x726F): 7.037 [HIGH - likely compressed/pixel data]
+  First 8 DXT1 blocks at bulk start:
+    Block 0: c0=3F1B c1=9293 bits=BBBC3E92
+    Block 1: c0=3F3B c1=7574 bits=70B1426B
+    Block 2: c0=C2F8 c1=BFB1 bits=E1E24010
+    Block 3: c0=3F61 c1=9091 bits=EEEFBD10
+    Block 4: c0=BEEE c1=8A8B bits=DDDEBE8A
+    Block 5: c0=BF5D c1=DADB bits=C2C3BEDA
+    Block 6: c0=3EC2 c1=8182 bits=C5C6BF01
+    Block 7: c0=3F45 c1=8B29 bits=0000422B
+
+  Wrote DDS: tools/lightmap_probe/lightmap_test_offset0.dds (524288 bytes from offset 29295)
+
+=== PackagePatch raw hex dump (first 512 bytes) ===
+  0000: 02 00 00 00 6F 72 00 00 1B 00 00 00 6F 72 00 00  |....or......or..|
+  0010: 10 73 00 6D 00 61 00 6C 00 6C 00 5F 00 77 00 6F  |.s.m.a.l.l._.w.o|
+  0020: 00 6F 00 64 00 5F 00 53 00 70 00 65 00 63 00 00  |.o.d._.S.p.e.c..|
+  0030: 00 10 00 07 00 00 00 00 00 01 70 72 00 00 13 72  |..........pr...r|
+  0040: 00 65 00 73 00 5F 00 73 00 6B 00 79 00 62 00 6F  |.e.s._.s.k.y.b.o|
+  0050: 00 78 00 67 00 65 00 6F 00 6D 00 65 00 74 00 72  |.x.g.e.o.m.e.t.r|
+  0060: 00 79 00 00 00 10 00 07 00 00 00 00 00 01 71 72  |.y............qr|
+  0070: 00 00 0D 48 00 6B 00 4D 00 65 00 73 00 68 00 50  |...H.k.M.e.s.h.P|
+  0080: 00 72 00 6F 00 78 00 79 00 30 00 00 00 10 00 07  |.r.o.x.y.0......|
+  0090: 00 00 00 00 00 01 72 72 00 00 0A 75 00 6E 00 64  |......rr...u.n.d|
+  00A0: 00 65 00 72 00 73 00 65 00 61 00 31 00 00 00 10  |.e.r.s.e.a.1....|
+  00B0: 00 07 00 00 00 00 00 01 73 72 00 00 0C 43 00 6F  |........sr...C.o|
+  00C0: 00 6C 00 6F 00 72 00 43 00 79 00 63 00 6C 00 65  |.l.o.r.C.y.c.l.e|
+  00D0: 00 30 00 00 00 10 00 07 00 00 00 00 00 01 74 72  |.0............tr|
+  00E0: 00 00 18 61 00 6D 00 6D 00 6F 00 74 00 79 00 70  |...a.m.m.o.t.y.p|
+  00F0: 00 65 00 73 00 5F 00 66 00 72 00 6F 00 7A 00 65  |.e.s._.f.r.o.z.e|
+  0100: 00 6E 00 64 00 69 00 66 00 66 00 75 00 73 00 65  |.n.d.i.f.f.u.s.e|
+  0110: 00 00 00 10 00 07 00 00 00 00 00 01 75 72 00 00  |............ur..|
+  0120: 16 61 00 6D 00 6D 00 6F 00 74 00 79 00 70 00 65  |.a.m.m.o.t.y.p.e|
+  0130: 00 73 00 5F 00 72 00 69 00 6F 00 74 00 64 00 69  |.s._.r.i.o.t.d.i|
+  0140: 00 66 00 66 00 75 00 73 00 65 00 00 00 10 00 07  |.f.f.u.s.e......|
+  0150: 00 00 00 00 00 01 76 72 00 00 14 61 00 6D 00 6D  |......vr...a.m.m|
+  0160: 00 6F 00 73 00 74 00 61 00 6E 00 64 00 61 00 72  |.o.s.t.a.n.d.a.r|
+  0170: 00 64 00 5F 00 6E 00 6F 00 72 00 6D 00 61 00 6C  |.d._.n.o.r.m.a.l|
+  0180: 00 00 00 10 00 07 00 00 00 00 00 01 77 72 00 00  |............wr..|
+  0190: 16 61 00 6D 00 6D 00 6F 00 73 00 74 00 61 00 6E  |.a.m.m.o.s.t.a.n|
+  01A0: 00 64 00 61 00 72 00 64 00 5F 00 73 00 70 00 65  |.d.a.r.d._.s.p.e|
+  01B0: 00 63 00 75 00 6C 00 61 00 72 00 00 00 10 00 07  |.c.u.l.a.r......|
+  01C0: 00 00 00 00 00 01 78 72 00 00 1B 61 00 6D 00 6D  |......xr...a.m.m|
+  01D0: 00 6F 00 74 00 79 00 70 00 65 00 73 00 5F 00 66  |.o.t.y.p.e.s._.f|
+  01E0: 00 72 00 6F 00 7A 00 65 00 6E 00 5F 00 63 00 6F  |.r.o.z.e.n._.c.o|
+  01F0: 00 6C 00 6F 00 72 00 6D 00 61 00 73 00 6B 00 00  |.l.o.r.m.a.s.k..|
+
+=== Parsing PackagePatch name table ===
+  [ 0] "small_wood_Spec" flags=0x70010 idx=29296 (end=0x3E)
+  [ 1] "res_skyboxgeometry" flags=0x70010 idx=29297 (end=0x72)
+  [ 2] "HkMeshProxy0" flags=0x70010 idx=29298 (end=0x9A)
+  [ 3] "undersea1" flags=0x70010 idx=29299 (end=0xBC)
+  [ 4] "ColorCycle0" flags=0x70010 idx=29300 (end=0xE2)
+  [ 5] "ammotypes_frozendiffuse" flags=0x70010 idx=29301 (end=0x120)
+  [ 6] "ammotypes_riotdiffuse" flags=0x70010 idx=29302 (end=0x15A)
+  [ 7] "ammostandard_normal" flags=0x70010 idx=29303 (end=0x190)
+  [ 8] "ammostandard_specular" flags=0x70010 idx=29304 (end=0x1CA)
+  [ 9] "ammotypes_frozen_colormask" flags=0x70010 idx=29305 (end=0x20E)
+  [10] "ammotypes_riot" flags=0x70010 idx=29306 (end=0x23A)
+  [11] "ammotypes_frozen" flags=0x70010 idx=29307 (end=0x26A)
+  [12] "ammostandard_specular0" flags=0x70010 idx=29308 (end=0x2A6)
+  [13] "ammostandard_specular00" flags=0x70010 idx=29309 (end=0x2E4)
+  [14] "wood_plank2" flags=0x70010 idx=29310 (end=0x30A)
+  [15] "wood_plank_specular2" flags=0x70010 idx=29311 (end=0x342)
+  [16] "wood_plank_normal2" flags=0x70010 idx=29312 (end=0x376)
+  [17] "wood_plank_shader2" flags=0x70010 idx=29313 (end=0x3AA)
+  [18] "ProtectorBubbles" flags=0x70010 idx=29314 (end=0x3DA)
+  [19] "SpriteEmitter103" flags=0x70010 idx=29315 (end=0x40A)
+  [20] "HkMeshProxy1" flags=0x70010 idx=29316 (end=0x432)
+  [21] "MaterialColorFromLight6" flags=0x70010 idx=29317 (end=0x470)
+  [22] "FluidVolumeBelow" flags=0x70010 idx=29318 (end=0x4A0)
+  [23] "HeavyBubbles_O" flags=0x70010 idx=29319 (end=0x4CC)
+  [24] "HeavyBubbles_Normal" flags=0x70010 idx=29320 (end=0x502)
+  [25] "HeavyBubbles_Shader" flags=0x70010 idx=29321 (end=0x538)
+  [26] "SpriteEmitter13" flags=0x70010 idx=1381 (end=0x566)
+  Name table ended at offset 0x566 (1382), parsed 27 names
+
+=== Export Patch Section at 0x566 ===
+  Header: 0, 49140, numPatches=20, 49140
+  Parsing 20 export patch entries starting at 0x576:
+    [ 0] class=-19 super=0 pkg=3422 name='None'(0) num=1862270976 flags=0x40000
+         serialSize=15 serialOff=0x314B0000 extra=(-861559188,257) gen=0 (pos=0x59A)
+    [ 1] class=1 super=-4085 pkg=-754937088 name='Specification'(26) num=0 flags=0x3
+         serialSize=251659264 serialOff=0x0 extra=(-709798912,-1515820030) gen=-76 (pos=0x5C1)
+    [ 2] class=1 super=0 pkg=-167706624 name='?'(-63) num=9633792 flags=0x0
+         serialSize=248181 serialOff=0x4000000 extra=(3840,1174405120) gen=-43676 (pos=0x5E7)
+    [ 3] class=214215084 super=1 pkg=16777216 name='?'(-4087) num=-754937088 flags=0x78000000
+         serialSize=969 serialOff=0x40000 extra=(15,1566179328) gen=214215084 (pos=0x615)
+    [ 4] class=1 super=0 pkg=-134152192 name='?'(-63) num=9633792 flags=0x0
+         serialSize=248182 serialOff=0x4000000 extra=(3840,1761607680) gen=-53 (pos=0x639)
+    [ 5] class=-149 super=214215084 pkg=1 name='CheckpointTypePadding'(1) num=49145 flags=0x0
+         serialSize=-914948096 serialOff=0x3 extra=(251659264,0) gen=0 (pos=0x662)
+    [ 6] class=2796949 super=214215084 pkg=1 name='CheckpointTypePadding'(1) num=49146 flags=0x1A
+         serialSize=2030043136 serialOff=0x3C9 extra=(262144,15) gen=0 (pos=0x68D)
+    [ 7] class=0 super=153 pkg=-861559188 name='CheckpointTypePadding'(1) num=1 flags=0x1E400
+         serialSize=6867 serialOff=0x0 extra=(248186,67108864) gen=0 (pos=0x6B2)
+    [ 8] class=15 super=0 pkg=0 name='Operation'(164) num=-861559188 flags=0xBFFC0100
+         serialSize=9633792 serialOff=0xF78 extra=(0,248189) gen=0 (pos=0x6D7)
+    [ 9] class=0 super=0 pkg=983044 name='None'(0) num=1426063360 flags=0x1CCA5A6
+         serialSize=1 serialOff=0xBFFD01 extra=(2013303552,15) gen=0 (pos=0x6FB)
+    [10] class=0 super=0 pkg=248190 name='None'(0) num=262144 flags=0xB6550000
+         serialSize=-1502870827 serialOff=0x101CCA5 extra=(16777216,49150) gen=-19 (pos=0x71F)
+    [11] class=0 super=1016 pkg=0 name='None'(0) num=63536896 flags=0xF0004
+         serialSize=0 serialOff=0x2D5B655 extra=(-861559188,257) gen=0 (pos=0x744)
+    [12] class=1 super=-4095 pkg=2013308416 name='PhysicsVolume'(15) num=0 flags=0x3
+         serialSize=251659264 serialOff=0x0 extra=(1812035840,30188966) gen=1 (pos=0x76A)
+    [13] class=0 super=0 pkg=-1073741568 name='None'(0) num=1342220544 flags=0x50000000
+         serialSize=418 serialOff=0x40000 extra=(15,-1420230656) gen=5 (pos=0x78E)
+    [14] class=214215084 super=1 pkg=16777216 name='CheckpointTypePadding'(1) num=-1476394816 flags=0x0
+         serialSize=63587072 serialOff=0x0 extra=(458752,0) gen=844 (pos=0x7B7)
+    [15] class=214215084 super=1 pkg=16777216 name='Max'(2) num=-1241513792 flags=0x0
+         serialSize=63587328 serialOff=0x0 extra=(458756,0) gen=40 (pos=0x7DF)
+    [16] class=214215084 super=0 pkg=16777216 name='Min'(3) num=-1828716352 flags=0x0
+         serialSize=63587840 serialOff=0x0 extra=(983044,0) gen=44282 (pos=0x809)
+    [17] class=214215084 super=1 pkg=16777216 name='Range'(4) num=-1828716352 flags=0x0
+         serialSize=63588096 serialOff=0x0 extra=(983044,0) gen=3397 (pos=0x832)
+    [18] class=214215084 super=1 pkg=16777216 name='Vector'(5) num=-1509949248 flags=0x0
+         serialSize=63588352 serialOff=0x0 extra=(983044,0) gen=118 (pos=0x85B)
+    [19] class=214215084 super=1 pkg=16777216 name='Tag'(6) num=-1744830272 flags=0x0
+         serialSize=63588608 serialOff=0x0 extra=(458756,0) gen=923 (pos=0x884)
+  Export table ended at offset 0x884
+
+=== Region after export table (0x884) ===
+  Next 4 INT32s: -861559188, 257, -1073282816, 9961472
+  Hex: CCA5A66C 00000101 C0070100 00980000
+  Hex dump (first 256 bytes after export table):
+    0884: 6C A6 A5 CC 01 01 00 00 00 01 07 C0 00 00 98 00 
+    0894: 36 00 00 00 00 00 00 00 42 CA 03 00 00 00 00 04 
+    08A4: 00 07 00 00 00 00 00 59 0F 6C A6 A5 CC 01 01 00 
+    08B4: 00 00 01 A3 00 00 00 69 35 00 00 00 00 00 00 E0 
+    08C4: 00 00 00 04 00 00 00 03 00 00 00 04 00 00 00 01 
+    08D4: 00 00 00 00 00 00 00 00 00 00 00 00 6D 00 00 FF 
+    08E4: FF FF FF FF FF FF FF 00 00 00 00 00 36 36 6A D5 
+    08F4: 01 00 00 00 00 00 81 00 00 00 00 6A 02 00 00 00 
+    0904: 00 59 07 02 48 C4 03 46 C0 03 0B 00 00 00 00 15 
+    0914: 50 34 0C 00 00 00 00 5A 11 00 00 00 00 1E 0D 00 
+    0924: 00 00 00 15 6D 34 10 00 00 00 00 22 C5 03 00 00 
+    0934: 0E 00 00 00 00 01 2B 00 00 00 00 00 06 00 00 00 
+    0944: 00 56 06 6D 18 00 00 00 00 0F 00 00 00 00 15 51 
+    0954: 34 08 00 00 00 00 3A 05 00 00 00 00 00 20 DD C6 
+    0964: 00 00 E0 44 00 00 F6 45 45 01 00 00 00 00 24 00 
+    0974: 00 A0 40 09 00 00 00 00 56 06 7C 14 0B 00 00 00 
+
+  Scanning for section-like patterns:
+
+=== Scanning for pixel data start (256-byte steps, entropy > 7.0) ===
+  Pixel data starts at offset 0x10584 (66948) ΓÇö entropy 7.062
+  Gap from export table end: 64768 bytes
+
+=== Analyzing PackagePatch pixel data for lightmaps ===
+  Pixel data starts at 0x10584, total pixel region: 22957954 bytes
+  Pixel region: 22957954 bytes = ~32 slots of 696320
+
+  Sampling DXT1 at each 696320-byte slot (color delta metric):
+  Legend: delta = avg |c0-c1| per block (low = smooth gradient = lightmap)
+
+    Slot  0 @ 0x0010584: delta=0.720 sat=0.506 material
+    Slot  1 @ 0x00BA584: delta=0.637 sat=0.523 material
+    Slot  2 @ 0x0164584: delta=0.682 sat=0.540 material
+    Slot  3 @ 0x020E584: delta=0.159 sat=0.050 material
+    Slot  4 @ 0x02B8584: delta=0.773 sat=0.449 material
+    Slot  5 @ 0x0362584: delta=0.659 sat=0.536 material
+    Slot  6 @ 0x040C584: delta=0.743 sat=0.465 material
+    Slot  7 @ 0x04B6584: delta=0.729 sat=0.501 material
+    Slot  8 @ 0x0560584: delta=0.599 sat=0.440 material
+    Slot  9 @ 0x060A584: delta=0.556 sat=0.405 material
+    Slot 10 @ 0x06B4584: delta=0.621 sat=0.482 material
+    Slot 11 @ 0x075E584: delta=0.677 sat=0.478 material
+    Slot 12 @ 0x0808584: delta=0.673 sat=0.598 material
+    Slot 13 @ 0x08B2584: delta=0.945 sat=0.504 material
+    Slot 14 @ 0x095C584: delta=1.097 sat=0.509 material
+    Slot 15 @ 0x0A06584: delta=0.842 sat=0.749 material
+    Slot 16 @ 0x0AB0584: delta=0.602 sat=0.475 material
+    Slot 17 @ 0x0B5A584: delta=0.213 sat=0.026 material
+    Slot 18 @ 0x0C04584: delta=0.230 sat=0.019 material
+    Slot 19 @ 0x0CAE584: delta=0.269 sat=0.075 material
+    Slot 20 @ 0x0D58584: delta=0.678 sat=0.413 material
+    Slot 21 @ 0x0E02584: delta=0.620 sat=0.424 material
+    Slot 22 @ 0x0EAC584: delta=0.547 sat=0.438 material
+    Slot 23 @ 0x0F56584: delta=0.618 sat=0.415 material
+    Slot 24 @ 0x1000584: delta=0.599 sat=0.538 material
+    Slot 25 @ 0x10AA584: delta=0.866 sat=0.449 material
+    Slot 26 @ 0x1154584: delta=0.829 sat=0.406 material
+    Slot 27 @ 0x11FE584: delta=0.812 sat=0.435 material
+    Slot 28 @ 0x12A8584: delta=0.773 sat=0.400 material
+    Slot 29 @ 0x1352584: delta=0.758 sat=0.392 material
+    Slot 30 @ 0x13FC584: delta=0.724 sat=0.425 material
+    Slot 31 @ 0x14A6584: delta=0.603 sat=0.711 material
+
+=== FBspSurf Lightmap Field Analysis ===
+  Model export[20761] 'Model_1': serial 8608268 bytes at 0x823E9CB
+  Properties end at +33
+  UPrimitive+VengHeader: mdlCheck=4 mdlSV=7
+  Vectors: 590 (skipping 7080 bytes)
+  Points: 11652 (skipping 139824 bytes)
+  Nodes: 7125 (skipping 712500 bytes)
+  Surfs: 3386 ΓÇö dumping 20B tail of first 20 surfs:
+    [  0] mat=3347 act=6638 plane=(-1.00,-0.00,-0.00,17165.99) last4B=32.000 / 1107296256  hex: 00 00 80 BF 00 00 00 80 00 00 00 80 FC 1B 86 46 00 00 00 42
+    [  1] mat=3347 act=6638 plane=(-0.00,-0.00,-1.00,-8014.00) last4B=32.000 / 1107296256  hex: 00 00 00 80 00 00 00 80 FF FF 7F BF FF 6F FA C5 00 00 00 42
+    [  2] mat=3347 act=6638 plane=(1.00,-0.00,-0.00,-17639.99) last4B=32.000 / 1107296256  hex: FF FF 7F 3F 00 00 00 80 00 00 00 80 FB CF 89 C6 00 00 00 42
+    [  3] mat=3347 act=6638 plane=(-0.00,-0.00,1.00,7704.00) last4B=8.000 / 1090519040  hex: 00 00 00 80 00 00 00 80 FF FF 7F 3F FF BF F0 45 00 00 00 41
+    [  4] mat=3348 act=5802 plane=(-1.00,-0.00,-0.00,35887.99) last4B=32.000 / 1107296256  hex: FF FF 7F BF 00 00 00 80 00 00 00 80 FD 2F 0C 47 00 00 00 42
+    [  5] mat=3348 act=5802 plane=(-0.00,1.00,0.00,-31.74) last4B=8.000 / 1090519040  hex: 91 CF BA B6 FF FF 7F 3F FF FF 0F 37 5B EF FD C1 00 00 00 41
+    [  6] mat=3363 act=5802 plane=(-0.00,-0.00,-1.00,-8132.00) last4B=32.000 / 1107296256  hex: 00 00 00 80 00 00 00 80 FF FF 7F BF FF 1F FE C5 00 00 00 42
+    [  7] mat=3375 act=5802 plane=(-0.00,-0.00,1.00,7748.00) last4B=32.000 / 1107296256  hex: 00 00 00 80 00 00 00 80 FF FF 7F 3F FF 1F F2 45 00 00 00 42
+    [  8] mat=3347 act=5932 plane=(1.00,0.00,-0.00,-32991.98) last4B=32.000 / 1107296256  hex: FF FF 7F 3F 38 A5 AA 38 00 00 00 80 FB DF 00 C7 00 00 00 42
+    [  9] mat=3347 act=5932 plane=(-0.71,0.71,-0.00,23305.61) last4B=32.000 / 1107296256  hex: AD 03 35 BF 36 06 35 3F 00 00 00 80 39 13 B6 46 00 00 00 42
+    [ 10] mat=3347 act=5932 plane=(0.00,1.00,-0.00,223.90) last4B=16.000 / 1098907648  hex: 88 01 40 36 FF FF 7F 3F 00 00 00 80 95 E7 5F 43 00 00 80 41
+    [ 11] mat=3363 act=5932 plane=(-0.00,-0.00,-1.00,-8388.00) last4B=16.000 / 1098907648  hex: 00 00 00 80 00 00 00 80 FF FF 7F BF FF 0F 03 C6 00 00 80 41
+    [ 12] mat=3375 act=5932 plane=(-0.00,-0.00,1.00,8004.00) last4B=32.000 / 1107296256  hex: 00 00 00 80 00 00 00 80 FF FF 7F 3F FF 1F FA 45 00 00 00 42
+    [ 13] mat=3347 act=5896 plane=(-0.77,-0.64,-0.00,24624.52) last4B=32.000 / 1107296256  hex: 12 AB 44 BF 03 E2 23 BF 00 00 00 80 0B 61 C0 46 00 00 00 42
+    [ 14] mat=3347 act=5896 plane=(1.00,-0.00,-0.00,-32992.04) last4B=32.000 / 1107296256  hex: FF FF 7F 3F 7F AB 2A B8 00 00 00 80 0B E0 00 C7 00 00 00 42
+    [ 15] mat=3347 act=5896 plane=(-0.00,-1.00,-0.00,-799.92) last4B=32.000 / 1107296256  hex: 2D D4 52 B6 FF FF 7F BF 00 00 00 80 2F FB 47 C4 00 00 00 42
+    [ 16] mat=3363 act=5896 plane=(-0.00,-0.00,-1.00,-8388.00) last4B=16.000 / 1098907648  hex: 00 00 00 80 00 00 00 80 FF FF 7F BF FF 0F 03 C6 00 00 80 41
+    [ 17] mat=3375 act=5896 plane=(-0.00,-0.00,1.00,8004.00) last4B=32.000 / 1107296256  hex: 00 00 00 80 00 00 00 80 FF FF 7F 3F FF 1F FA 45 00 00 00 42
+    [ 18] mat=3347 act=7213 plane=(-0.00,1.00,-0.00,2872.00) last4B=32.000 / 1107296256  hex: 00 00 00 80 FF FF 7F 3F 00 00 00 80 FD 7F 33 45 00 00 00 42
+    [ 19] mat=3347 act=7213 plane=(-0.00,-1.00,-0.00,-3688.00) last4B=32.000 / 1107296256  hex: 00 00 00 80 FF FF 7F BF 00 00 00 80 FD 7F 66 C5 00 00 00 42
+  After surfs: +1049141
+  Verts: 857526 (skipping 6860208 bytes)
+  After verts: +7909352 (0x78AFE8), remaining 698916 bytes
+  Raw hex dump (first 512 bytes after Verts):
+    +78AFE8: 48 42 00 00 49 00 00 00 00 01 00 00 10 00 00 00  |HB..I...........|
+    +78AFF8: 00 00 00 00 00 00 00 00 00 FF FF FF FF FF FF FF  |................|
+    +78B008: FF 00 00 00 00 00 00 00 00 00 00 00 00 4B 3D 32  |.............K=2|
+    +78B018: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 FF  |................|
+    +78B028: FF FF FF FF FF FF FF 00 00 00 00 00 00 00 00 00  |................|
+    +78B038: 00 00 00 5E 3C 1C 00 00 00 00 00 00 00 00 00 00  |...^<...........|
+    +78B048: 00 00 00 00 00 FF FF FF FF FF FF FF FF 00 00 00  |................|
+    +78B058: 00 00 00 00 00 00 00 00 00 4D 40 8C 01 00 00 00  |.........M@.....|
+    +78B068: 00 00 00 00 00 00 00 00 00 00 00 FF FF FF FF FF  |................|
+    +78B078: FF FF FF 00 00 00 00 00 00 00 00 00 00 00 00 7A  |...............z|
+    +78B088: 36 36 00 00 00 00 00 00 00 00 00 00 00 00 00 00  |66..............|
+    +78B098: 00 FF FF FF FF FF FF FF FF 00 00 00 00 00 00 00  |................|
+    +78B0A8: 00 00 00 00 00 76 37 32 00 00 00 00 00 00 00 00  |.....v72........|
+    +78B0B8: 00 00 00 00 00 00 00 FF FF FF FF FF FF FF FF 00  |................|
+    +78B0C8: 00 00 00 00 00 00 00 00 00 00 00 44 36 C0 00 00  |...........D6...|
+    +78B0D8: 00 04 00 00 00 00 00 00 00 00 00 00 00 FF FF FF  |................|
+    +78B0E8: FF FF FF FF FF 00 00 00 00 00 00 00 00 00 00 00  |................|
+    +78B0F8: 00 7A 38 C8 01 00 00 00 00 00 00 00 00 00 00 00  |.z8.............|
+    +78B108: 00 00 00 FF FF FF FF FF FF FF FF 00 00 00 00 00  |................|
+    +78B118: 00 00 00 00 00 00 00 7A 3E 88 01 01 00 00 00 00  |.......z>.......|
+    +78B128: 00 00 00 00 00 00 00 00 00 FF FF FF FF FF FF FF  |................|
+    +78B138: FF 00 00 00 00 00 00 00 00 00 00 00 00 45 41 00  |.............EA.|
+    +78B148: 32 00 00 00 00 00 00 00 00 00 00 00 00 00 00 FF  |2...............|
+    +78B158: FF FF FF FF FF FF FF 00 00 00 00 00 00 00 00 00  |................|
+    +78B168: 00 00 00 79 34 00 1C 00 00 01 00 00 00 00 00 00  |...y4...........|
+    +78B178: 00 00 00 00 00 FF FF FF FF FF FF FF FF 00 00 00  |................|
+    +78B188: 00 00 00 00 00 00 00 00 00 49 40 00 2C 00 00 00  |.........I@.,...|
+    +78B198: 00 00 00 00 00 00 00 00 00 00 00 FF FF FF FF FF  |................|
+    +78B1A8: FF FF FF 00 00 00 00 00 00 00 00 00 00 00 00 5A  |...............Z|
+    +78B1B8: 3B 00 16 01 00 01 00 00 00 00 00 00 00 00 00 00  |;...............|
+    +78B1C8: 00 FF FF FF FF FF FF FF FF 00 00 00 00 00 00 00  |................|
+    +78B1D8: 00 00 00 00 00 00 00 2A 00 00 00 00 00 00 00 00  |.......*........|
+
+  Interpreting post-Verts data:
+    INT32 at +7909352 = 16968 (0x4248)
+    Sequential CI reads:
+      CI[0] at +7909352: value=4232 (size=2)
+      CI[1] at +7909354: value=0 (size=1)
+      CI[2] at +7909355: value=0 (size=1)
+      CI[3] at +7909356: value=9 (size=2)
+      CI[4] at +7909358: value=0 (size=1)
+      CI[5] at +7909359: value=0 (size=1)
+      CI[6] at +7909360: value=0 (size=1)
+      CI[7] at +7909361: value=1 (size=1)
+      CI[8] at +7909362: value=0 (size=1)
+      CI[9] at +7909363: value=0 (size=1)
+      CI[10] at +7909364: value=16 (size=1)
+      CI[11] at +7909365: value=0 (size=1)
+      CI[12] at +7909366: value=0 (size=1)
+      CI[13] at +7909367: value=0 (size=1)
+      CI[14] at +7909368: value=0 (size=1)
+      CI[15] at +7909369: value=0 (size=1)
+      CI[16] at +7909370: value=0 (size=1)
+      CI[17] at +7909371: value=0 (size=1)
+      CI[18] at +7909372: value=0 (size=1)
+      CI[19] at +7909373: value=0 (size=1)
+      CI[20] at +7909374: value=0 (size=1)
+      CI[21] at +7909375: value=0 (size=1)
+      CI[22] at +7909376: value=0 (size=1)
+      CI[23] at +7909377: value=1 (size=9)
+      CI[24] at +7909386: value=0 (size=1)
+      CI[25] at +7909387: value=0 (size=1)
+      CI[26] at +7909388: value=0 (size=1)
+      CI[27] at +7909389: value=0 (size=1)
+      CI[28] at +7909390: value=0 (size=1)
+      CI[29] at +7909391: value=0 (size=1)
+    Sequential INT32 reads:
+      INT32[0] at +7909352 = 16968 (0x00004248)
+      INT32[1] at +7909356 = 73 (0x00000049)
+      INT32[2] at +7909360 = 256 (0x00000100)
+      INT32[3] at +7909364 = 16 (0x00000010)
+      INT32[4] at +7909368 = 0 (0x00000000)
+      INT32[5] at +7909372 = 0 (0x00000000)
+      INT32[6] at +7909376 = -256 (0xFFFFFF00)
+      INT32[7] at +7909380 = -1 (0xFFFFFFFF)
+      INT32[8] at +7909384 = 255 (0x000000FF)
+      INT32[9] at +7909388 = 0 (0x00000000)
+      INT32[10] at +7909392 = 0 (0x00000000)
+      INT32[11] at +7909396 = 842877696 (0x323D4B00)
+      INT32[12] at +7909400 = 0 (0x00000000)
+      INT32[13] at +7909404 = 0 (0x00000000)
+      INT32[14] at +7909408 = 0 (0x00000000)
+      INT32[15] at +7909412 = -16777216 (0xFF000000)
+      INT32[16] at +7909416 = -1 (0xFFFFFFFF)
+      INT32[17] at +7909420 = 16777215 (0x00FFFFFF)
+      INT32[18] at +7909424 = 0 (0x00000000)
+      INT32[19] at +7909428 = 0 (0x00000000)
+
+  === SEQUENTIAL POST-VERTS PARSING ===
+  [1] NumSharedSides = 16968 at +7909352
+  [2] NumZones = 73 at +7909356
+  [3] Zones: trying stride 36B for 73 zones...
+    stride=36 ΓåÆ next CI=36, CI2=0 at +7911988
+    stride=40 ΓåÆ next CI=-32, CI2=-4473 at +7912280
+    stride=44 ΓåÆ next CI=1055, CI2=-1927 at +7912572
+    stride=48 ΓåÆ next CI=-2, CI2=54 at +7912864
+      ΓåÆ LeafHulls=54 ΓåÆ Leaves=70 at +7913082 Γ£ô VALID CHAIN
+    stride=52 ΓåÆ next CI=6, CI2=70 at +7913156
+      ΓåÆ LeafHulls=70 ΓåÆ Leaves=0 at +7913439
+    stride=56 ΓåÆ next CI=17, CI2=-4167 at +7913448
+    stride=60 ΓåÆ next CI=0, CI2=-800061570 at +7913740
+    stride=64 ΓåÆ next CI=70, CI2=10 at +7914032
+      ΓåÆ LeafHulls=10 ΓåÆ Leaves=0 at +7914075
+    stride=68 ΓåÆ next CI=-7, CI2=0 at +7914324
+    stride=72 ΓåÆ next CI=262019, CI2=-4466 at +7914616
+    stride=76 ΓåÆ next CI=1, CI2=-122875 at +7914908
+    stride=80 ΓåÆ next CI=24, CI2=1 at +7915200
+      ΓåÆ LeafHulls=1 ΓåÆ Leaves=0 at +7915206
+
+  Scanning for valid zone stride...
+    stride=48: Polys=-2 LH=54 Leaves=70 Lights=-2567 score=1
+
+  BEST stride: 48 ΓÇö parsing full chain...
+  After zones: +7912864
+  [4] Polys ref = -2
+  [5] LeafHulls = 54 entries (216 bytes)
+  [6] Leaves = 70 entries (840 bytes)
+  [7] Lights = -2567 entries at +7913926
+  After Lights: +7913926 (0x78C1C6), remaining 694342 bytes
+  [8] LightMap array: count = 3 at +7913926
+  *** FOUND LIGHTMAP ARRAY! count=3 (numSurfs=3386) ***
+  Raw hex of first 256 bytes:
+    +78C1C7: 36 44 40 00 FB 45 01 10 E4 0F C7 4F FD 93 43 00 
+    +78C1D7: 00 FB 45 E8 FF 0E C7 CE 01 36 44 00 10 00 46 01 
+    +78C1E7: 06 F8 0F C7 4F FD 93 43 00 00 FB 45 E8 FF 0E C7 
+    +78C1F7: CE 01 36 44 00 10 00 46 01 0A 60 10 C7 4E FD 93 
+    +78C207: 43 00 00 FB 45 E8 FF 0E C7 28 03 36 44 00 10 00 
+    +78C217: 46 01 00 90 0F C7 43 EF 8E 43 00 00 FB 45 F0 FF 
+    +78C227: 0E C7 00 00 94 43 00 10 00 46 01 0A 60 10 C7 AB 
+    +78C237: FE 8B 43 00 00 FB 45 21 E1 0F C7 00 00 94 43 FE 
+    +78C247: 0F 00 46 01 0A 60 10 C7 AB FE 8B 43 00 00 FB 45 
+    +78C257: F0 FF 0E C7 00 00 94 43 00 10 00 46 01 0A 60 10 
+    +78C267: C7 AB FE 8B 43 00 00 FB 45 E8 FF 0E C7 28 03 36 
+    +78C277: 44 00 10 00 46 01 0A 60 10 C7 74 FE 8B 43 FE 9F 
+    +78C287: ED 45 E8 FF 0E C7 28 03 36 44 00 10 00 46 01 0A 
+    +78C297: 60 10 C7 00 04 EE C3 FE 1F E8 45 E8 FF 0E C7 28 
+    +78C2A7: 03 36 44 70 10 00 46 01 FC D7 0E C7 40 15 00 C2 
+    +78C2B7: C0 1F E8 45 F4 1F 0C C7 00 0C C8 43 00 60 F1 45 
+
+  Trying FLightMapIndex strides:
+    stride=8: nextCI=1 at +7913951 ΓåÆ after LB=4
+    stride=28: nextCI=15 at +7914011 ΓåÆ after LB=-20
+    stride=32: nextCI=14 at +7914023 ΓåÆ after LB=-43
+    stride=36: nextCI=1056 at +7914035 ΓåÆ after LB=31
+    stride=44: nextCI=10 at +7914059 ΓåÆ after LB=15727621
+    stride=52: nextCI=1 at +7914083 ΓåÆ after LB=1056
+    stride=60: nextCI=70 at +7914107 ΓåÆ after LB=0
+
+  First 50 values as INT32/float:
+    [ 0] int=4211766    float=0.000000      
+    [ 1] int=268518907  float=0.000000      
+    [ 2] int=1338445796 float=6679414784.000000
+    [ 3] int=4428797    float=0.000000      
+    [ 4] int=-398066944 float=-3739745319551284818214912.000000
+    [ 5] int=-825815297 float=-1669824384.000000
+    [ 6] int=4470273    float=0.000000      
+    [ 7] int=21364752   float=0.000000      
+    [ 8] int=-955254778 float=-36856.023438 
+    [ 9] int=1133772111 float=295.978973     [scale]
+    [10] int=1174077440 float=8032.000000   
+    [11] int=-955318296 float=-36607.906250 
+    [12] int=1144390094 float=728.028198     [scale]
+    [13] int=1174409216 float=8196.000000   
+    [14] int=274729473  float=0.000000      
+    [15] int=-1812115769 float=-0.000000     
+    [16] int=-83886013  float=-664619306179346392162522297584844800.000000
+    [17] int=251652165  float=0.000000      
+    [18] int=906176711  float=0.000002      
+    [19] int=1048644    float=0.000000      
+    [20] int=-1879047866 float=-0.000000     
+    [21] int=-280770801 float=-60590223988762842651777040384.000000
+    [22] int=17294      float=0.000000      
+    [23] int=-1030661   float=-nan          
+    [24] int=50958      float=0.000000      
+    [25] int=268452756  float=0.000000      
+    [26] int=167855616  float=0.000000      
+    [27] int=-1413017504 float=-0.000000     
+    [28] int=4426750    float=0.000000      
+    [29] int=558234368  float=0.000000      
+    [30] int=13045729   float=0.000000      
+    [31] int=-29125632  float=-64991979778280437426316222552847941632.000000
+    [32] int=21364751   float=0.000000      
+    [33] int=-955228150 float=-36960.039062 
+    [34] int=1133248171 float=279.989594     [scale]
+    [35] int=1174077440 float=8032.000000   
+    [36] int=-955318288 float=-36607.937500 
+    [37] int=1133772800 float=296.000000     [scale]
+    [38] int=1174409216 float=8196.000000   
+    [39] int=274729473  float=0.000000      
+    [40] int=-1946244153 float=-0.000000     
+    [41] int=-83886013  float=-664619306179346392162522297584844800.000000
+    [42] int=251652165  float=0.000000      
+    [43] int=906176711  float=0.000002      
+    [44] int=1048644    float=0.000000      
+    [45] int=1611268422 float=39777225672098840576.000000
+    [46] int=-25901296  float=-81341305641230390528333318658484862976.000000
+    [47] int=-1610726517 float=-0.000000     
+    [48] int=-1554963   float=-nan          
+    [49] int=53004046   float=0.000000      
+
+  === BRUTE FORCE: scan for key CI values ===
+  Looking for CI = 3386 (numSurfs) or nearby...
+    CI=3385 at +7909739 (0x78B16B), ciSize=2
+      stride=4 ΓåÆ nextCI=4 at +7923281
+      stride=24 ΓåÆ nextCI=19 at +7990981
+      stride=28 ΓåÆ nextCI=1 at +8004521
+      stride=36 ΓåÆ nextCI=407 at +8031601
+      stride=48 ΓåÆ nextCI=5 at +8072221
+      stride=52 ΓåÆ nextCI=28 at +8085761
+      stride=64 ΓåÆ nextCI=63 at +8126381
+    CI=3377 at +7909966 (0x78B24E), ciSize=2
+      stride=4 ΓåÆ nextCI=1 at +7923476
+      stride=8 ΓåÆ nextCI=8 at +7936984
+      stride=20 ΓåÆ nextCI=1 at +7977508
+      stride=24 ΓåÆ nextCI=3525 at +7991016
+      stride=28 ΓåÆ nextCI=8 at +8004524
+      stride=48 ΓåÆ nextCI=170176 at +8072064
+      stride=52 ΓåÆ nextCI=3968 at +8085572
+      stride=60 ΓåÆ nextCI=40 at +8112588
+      stride=64 ΓåÆ nextCI=60 at +8126096
+    CI=3390 at +7911029 (0x78B675), ciSize=2
+      stride=56 ΓåÆ nextCI=25 at +8100871
+      stride=60 ΓåÆ nextCI=53 at +8114431
+      stride=64 ΓåÆ nextCI=3525 at +8127991
+    CI=3392 at +7987176 (0x79DFE8), ciSize=2
+      stride=4 ΓåÆ nextCI=5 at +8000746
+      stride=16 ΓåÆ nextCI=14 at +8041450
+      stride=20 ΓåÆ nextCI=16 at +8055018
+      stride=24 ΓåÆ nextCI=575648 at +8068586
+      stride=40 ΓåÆ nextCI=3467 at +8122858
+      stride=44 ΓåÆ nextCI=5312 at +8136426
+      stride=52 ΓåÆ nextCI=542293 at +8163562
+    CI=3392 at +8001756 (0x7A18DC), ciSize=2
+      stride=8 ΓåÆ nextCI=568320 at +8028894
+      stride=20 ΓåÆ nextCI=20 at +8069598
+      stride=28 ΓåÆ nextCI=26 at +8096734
+      stride=36 ΓåÆ nextCI=6471 at +8123870
+      stride=40 ΓåÆ nextCI=3400 at +8137438
+      stride=48 ΓåÆ nextCI=63 at +8164574
+      stride=52 ΓåÆ nextCI=36 at +8178142
+    CI=3392 at +8006856 (0x7A2CC8), ciSize=2
+      stride=4 ΓåÆ nextCI=9 at +8020426
+      stride=24 ΓåÆ nextCI=24 at +8088266
+      stride=32 ΓåÆ nextCI=3519 at +8115402
+      stride=36 ΓåÆ nextCI=3871 at +8128970
+      stride=40 ΓåÆ nextCI=4 at +8142538
+      stride=56 ΓåÆ nextCI=447395 at +8196810
+      stride=64 ΓåÆ nextCI=35 at +8223946
+    CI=3392 at +8010968 (0x7A3CD8), ciSize=2
+      stride=4 ΓåÆ nextCI=10 at +8024538
+      stride=8 ΓåÆ nextCI=13 at +8038106
+      stride=12 ΓåÆ nextCI=13 at +8051674
+      stride=20 ΓåÆ nextCI=22 at +8078810
+      stride=24 ΓåÆ nextCI=25 at +8092378
+      stride=32 ΓåÆ nextCI=60 at +8119514
+      stride=36 ΓåÆ nextCI=4242 at +8133082
+      stride=40 ΓåÆ nextCI=4095 at +8146650
+      stride=48 ΓåÆ nextCI=6 at +8173786
+      stride=56 ΓåÆ nextCI=2 at +8200922
+    CI=3392 at +8011016 (0x7A3D08), ciSize=2
+      stride=4 ΓåÆ nextCI=9 at +8024586
+      stride=8 ΓåÆ nextCI=13 at +8038154
+      stride=12 ΓåÆ nextCI=13 at +8051722
+      stride=20 ΓåÆ nextCI=20 at +8078858
+      stride=24 ΓåÆ nextCI=25 at +8092426
+      stride=32 ΓåÆ nextCI=62 at +8119562
+      stride=36 ΓåÆ nextCI=3718 at +8133130
+      stride=60 ΓåÆ nextCI=19 at +8214538
+      stride=64 ΓåÆ nextCI=58 at +8228106
+    CI=3392 at +8011112 (0x7A3D68), ciSize=2
+      stride=4 ΓåÆ nextCI=9 at +8024682
+      stride=8 ΓåÆ nextCI=12 at +8038250
+      stride=12 ΓåÆ nextCI=15 at +8051818
+      stride=24 ΓåÆ nextCI=25 at +8092522
+      stride=32 ΓåÆ nextCI=62 at +8119658
+      stride=36 ΓåÆ nextCI=3772 at +8133226
+      stride=40 ΓåÆ nextCI=2 at +8146794
+      stride=48 ΓåÆ nextCI=15 at +8173930
+      stride=56 ΓåÆ nextCI=1 at +8201066
+      stride=60 ΓåÆ nextCI=55 at +8214634
+    CI=3392 at +8016052 (0x7A50B4), ciSize=2
+      stride=20 ΓåÆ nextCI=23 at +8083894
+      stride=32 ΓåÆ nextCI=58 at +8124598
+      stride=36 ΓåÆ nextCI=4095 at +8138166
+      stride=40 ΓåÆ nextCI=4 at +8151734
+      stride=52 ΓåÆ nextCI=57 at +8192438
+    CI=3392 at +8029300 (0x7A8474), ciSize=2
+      stride=4 ΓåÆ nextCI=14 at +8042870
+      stride=12 ΓåÆ nextCI=20 at +8070006
+      stride=16 ΓåÆ nextCI=22 at +8083574
+      stride=28 ΓåÆ nextCI=3655 at +8124278
+      stride=32 ΓåÆ nextCI=55 at +8137846
+      stride=48 ΓåÆ nextCI=27 at +8192118
+      stride=52 ΓåÆ nextCI=8 at +8205686
+    CI=3392 at +8029348 (0x7A84A4), ciSize=2
+      stride=4 ΓåÆ nextCI=13 at +8042918
+      stride=12 ΓåÆ nextCI=20 at +8070054
+      stride=16 ΓåÆ nextCI=20 at +8083622
+      stride=28 ΓåÆ nextCI=3679 at +8124326
+      stride=32 ΓåÆ nextCI=55 at +8137894
+      stride=36 ΓåÆ nextCI=69 at +8151462
+      stride=40 ΓåÆ nextCI=4230 at +8165030
+      stride=44 ΓåÆ nextCI=1 at +8178598
+      stride=48 ΓåÆ nextCI=2 at +8192166
+      stride=56 ΓåÆ nextCI=4 at +8219302
+    CI=3392 at +8029400 (0x7A84D8), ciSize=2
+      stride=4 ΓåÆ nextCI=14 at +8042970
+      stride=12 ΓåÆ nextCI=20 at +8070106
+      stride=16 ΓåÆ nextCI=13 at +8083674
+      stride=28 ΓåÆ nextCI=56 at +8124378
+      stride=32 ΓåÆ nextCI=3532 at +8137946
+      stride=52 ΓåÆ nextCI=3810 at +8205786
+      stride=56 ΓåÆ nextCI=58 at +8219354
+    CI=3392 at +8029444 (0x7A8504), ciSize=2
+      stride=4 ΓåÆ nextCI=13 at +8043014
+      stride=12 ΓåÆ nextCI=20 at +8070150
+      stride=28 ΓåÆ nextCI=3518 at +8124422
+    CI=3392 at +8029496 (0x7A8538), ciSize=2
+      stride=4 ΓåÆ nextCI=13 at +8043066
+      stride=12 ΓåÆ nextCI=20 at +8070202
+      stride=28 ΓåÆ nextCI=58 at +8124474
+      stride=56 ΓåÆ nextCI=52 at +8219450
+      stride=64 ΓåÆ nextCI=468225 at +8246586
+    CI=3392 at +8029548 (0x7A856C), ciSize=2
+      stride=4 ΓåÆ nextCI=14 at +8043118
+      stride=12 ΓåÆ nextCI=20 at +8070254
+      stride=20 ΓåÆ nextCI=565951 at +8097390
+      stride=28 ΓåÆ nextCI=59 at +8124526
+      stride=32 ΓåÆ nextCI=56 at +8138094
+      stride=44 ΓåÆ nextCI=510 at +8178798
+      stride=52 ΓåÆ nextCI=19 at +8205934
+    CI=3392 at +8041448 (0x7AB3E8), ciSize=2
+      stride=4 ΓåÆ nextCI=16 at +8055018
+      stride=8 ΓåÆ nextCI=575648 at +8068586
+      stride=24 ΓåÆ nextCI=3467 at +8122858
+      stride=28 ΓåÆ nextCI=5312 at +8136426
+      stride=36 ΓåÆ nextCI=542293 at +8163562
+      stride=52 ΓåÆ nextCI=5 at +8217834
+      stride=64 ΓåÆ nextCI=26 at +8258538
+    CI=3392 at +8046152 (0x7AC648), ciSize=2
+      stride=4 ΓåÆ nextCI=31 at +8059722
+      stride=8 ΓåÆ nextCI=37 at +8073290
+      stride=24 ΓåÆ nextCI=7495 at +8127562
+      stride=48 ΓåÆ nextCI=15 at +8208970
+      stride=60 ΓåÆ nextCI=1 at +8249674
+      stride=64 ΓåÆ nextCI=63 at +8263242
+    CI=3392 at +8046208 (0x7AC680), ciSize=2
+      stride=12 ΓåÆ nextCI=24 at +8086914
+      stride=20 ΓåÆ nextCI=59 at +8114050
+      stride=24 ΓåÆ nextCI=3555 at +8127618
+      stride=40 ΓåÆ nextCI=4 at +8181890
+      stride=44 ΓåÆ nextCI=48 at +8195458
+    CI=3392 at +8046260 (0x7AC6B4), ciSize=2
+      stride=4 ΓåÆ nextCI=16 at +8059830
+      stride=12 ΓåÆ nextCI=24 at +8086966
+      stride=24 ΓåÆ nextCI=54 at +8127670
+      stride=40 ΓåÆ nextCI=4 at +8181942
+      stride=52 ΓåÆ nextCI=3 at +8222646
+      stride=60 ΓåÆ nextCI=15 at +8249782
+    CI=3392 at +8060588 (0x7AFEAC), ciSize=2
+      stride=4 ΓåÆ nextCI=21 at +8074158
+      stride=16 ΓåÆ nextCI=3658 at +8114862
+      stride=20 ΓåÆ nextCI=52 at +8128430
+      stride=24 ΓåÆ nextCI=5 at +8141998
+      stride=28 ΓåÆ nextCI=476876 at +8155566
+    CI=3392 at +8081644 (0x7B50EC), ciSize=2
+      stride=4 ΓåÆ nextCI=25 at +8095214
+      stride=12 ΓåÆ nextCI=55 at +8122350
+      stride=16 ΓåÆ nextCI=53 at +8135918
+      stride=20 ΓåÆ nextCI=3 at +8149486
+      stride=56 ΓåÆ nextCI=4847 at +8271598
+      stride=64 ΓåÆ nextCI=3729 at +8298734
+    CI=3392 at +8085256 (0x7B5F08), ciSize=2
+      stride=12 ΓåÆ nextCI=56 at +8125962
+      stride=28 ΓåÆ nextCI=3 at +8180234
+      stride=36 ΓåÆ nextCI=51 at +8207370
+      stride=52 ΓåÆ nextCI=1 at +8261642
+    CI=3392 at +8096236 (0x7B89EC), ciSize=2
+      stride=8 ΓåÆ nextCI=5140 at +8123374
+      stride=12 ΓåÆ nextCI=55 at +8136942
+      stride=20 ΓåÆ nextCI=1 at +8164078
+      stride=28 ΓåÆ nextCI=649 at +8191214
+      stride=44 ΓåÆ nextCI=9 at +8245486
+    CI=3392 at +8096284 (0x7B8A1C), ciSize=2
+      stride=8 ΓåÆ nextCI=4223 at +8123422
+      stride=12 ΓåÆ nextCI=55 at +8136990
+      stride=20 ΓåÆ nextCI=59 at +8164126
+      stride=24 ΓåÆ nextCI=55 at +8177694
+      stride=52 ΓåÆ nextCI=1 at +8272670
+      stride=64 ΓåÆ nextCI=6 at +8313374
+    CI=3392 at +8096736 (0x7B8BE0), ciSize=2
+      stride=8 ΓåÆ nextCI=54 at +8123874
+    CI=3387 at +8125898 (0x7BFDCA), ciSize=2
+      stride=16 ΓåÆ nextCI=4 at +8180092
+      stride=20 ΓåÆ nextCI=1 at +8193640
+      stride=24 ΓåÆ nextCI=6 at +8207188
+      stride=40 ΓåÆ nextCI=3486 at +8261380
+      stride=56 ΓåÆ nextCI=4 at +8315572
+      stride=64 ΓåÆ nextCI=29 at +8342668
+    CI=3387 at +8126176 (0x7BFEE0), ciSize=2
+      stride=12 ΓåÆ nextCI=4 at +8166822
+      stride=16 ΓåÆ nextCI=3556 at +8180370
+      stride=60 ΓåÆ nextCI=4 at +8329398
+      stride=64 ΓåÆ nextCI=8 at +8342946
+    CI=3387 at +8126219 (0x7BFF0B), ciSize=2
+      stride=16 ΓåÆ nextCI=417221 at +8180413
+      stride=28 ΓåÆ nextCI=3814 at +8221057
+      stride=40 ΓåÆ nextCI=43 at +8261701
+    CI=3387 at +8126277 (0x7BFF45), ciSize=2
+      stride=16 ΓåÆ nextCI=63 at +8180471
+      stride=56 ΓåÆ nextCI=3683 at +8315951
+      stride=64 ΓåÆ nextCI=8 at +8343047
+    CI=3387 at +8126318 (0x7BFF6E), ciSize=2
+      stride=4 ΓåÆ nextCI=58 at +8139868
+      stride=8 ΓåÆ nextCI=4 at +8153416
+      stride=20 ΓåÆ nextCI=17 at +8194060
+      stride=24 ΓåÆ nextCI=4445 at +8207608
+      stride=40 ΓåÆ nextCI=5 at +8261800
+    CI=3387 at +8126339 (0x7BFF83), ciSize=2
+      stride=8 ΓåÆ nextCI=2 at +8153437
+      stride=16 ΓåÆ nextCI=24 at +8180533
+      stride=36 ΓåÆ nextCI=38 at +8248273
+      stride=40 ΓåÆ nextCI=4225 at +8261821
+      stride=48 ΓåÆ nextCI=3 at +8288917
+    CI=3387 at +8126368 (0x7BFFA0), ciSize=2
+      stride=20 ΓåÆ nextCI=910786 at +8194110
+      stride=36 ΓåÆ nextCI=47 at +8248302
+      stride=40 ΓåÆ nextCI=3645 at +8261850
+      stride=56 ΓåÆ nextCI=63 at +8316042
+      stride=60 ΓåÆ nextCI=3 at +8329590
+    CI=3387 at +8126458 (0x7BFFFA), ciSize=2
+      stride=4 ΓåÆ nextCI=2 at +8140008
+      stride=32 ΓåÆ nextCI=59 at +8234844
+      stride=48 ΓåÆ nextCI=2 at +8289036
+      stride=60 ΓåÆ nextCI=63 at +8329680
+      stride=64 ΓåÆ nextCI=59 at +8343228
+    CI=3387 at +8126481 (0x7C0011), ciSize=2
+      stride=4 ΓåÆ nextCI=52 at +8140031
+      stride=48 ΓåÆ nextCI=164 at +8289059
+      stride=56 ΓåÆ nextCI=3754 at +8316155
+      stride=60 ΓåÆ nextCI=6080 at +8329703
+    CI=3387 at +8126504 (0x7C0028), ciSize=2
+      stride=12 ΓåÆ nextCI=63 at +8167150
+      stride=28 ΓåÆ nextCI=63 at +8221342
+    CI=3387 at +8126529 (0x7C0041), ciSize=2
+      stride=20 ΓåÆ nextCI=3392 at +8194271
+      stride=24 ΓåÆ nextCI=4095 at +8207819
+      stride=28 ΓåÆ nextCI=62 at +8221367
+      stride=32 ΓåÆ nextCI=3 at +8234915
+      stride=40 ΓåÆ nextCI=4 at +8262011
+      stride=60 ΓåÆ nextCI=63 at +8329751
+    CI=3387 at +8126583 (0x7C0077), ciSize=2
+      stride=16 ΓåÆ nextCI=3 at +8180777
+      stride=20 ΓåÆ nextCI=52 at +8194325
+      stride=40 ΓåÆ nextCI=4095 at +8262065
+      stride=48 ΓåÆ nextCI=3 at +8289161
+      stride=60 ΓåÆ nextCI=47 at +8329805
+    CI=3387 at +8126604 (0x7C008C), ciSize=2
+      stride=4 ΓåÆ nextCI=46 at +8140154
+      stride=8 ΓåÆ nextCI=3 at +8153702
+      stride=44 ΓåÆ nextCI=484489 at +8275634
+      stride=48 ΓåÆ nextCI=232 at +8289182
+      stride=52 ΓåÆ nextCI=291 at +8302730
+      stride=60 ΓåÆ nextCI=55 at +8329826
+    CI=3387 at +8126623 (0x7C009F), ciSize=2
+      stride=8 ΓåÆ nextCI=27 at +8153721
+      stride=28 ΓåÆ nextCI=59 at +8221461
+      stride=44 ΓåÆ nextCI=24 at +8275653
+      stride=52 ΓåÆ nextCI=63 at +8302749
+      stride=56 ΓåÆ nextCI=62 at +8316297
+    CI=3387 at +8126646 (0x7C00B6), ciSize=2
+      stride=4 ΓåÆ nextCI=69 at +8140196
+      stride=16 ΓåÆ nextCI=346779 at +8180840
+      stride=28 ΓåÆ nextCI=4384 at +8221484
+      stride=44 ΓåÆ nextCI=70 at +8275676
+    CI=3387 at +8126675 (0x7C00D3), ciSize=2
+      stride=12 ΓåÆ nextCI=19 at +8167321
+      stride=24 ΓåÆ nextCI=46 at +8207965
+      stride=28 ΓåÆ nextCI=3972 at +8221513
+      stride=40 ΓåÆ nextCI=4 at +8262157
+      stride=60 ΓåÆ nextCI=3438 at +8329897
+    CI=3387 at +8126704 (0x7C00F0), ciSize=2
+      stride=8 ΓåÆ nextCI=191 at +8153802
+      stride=20 ΓåÆ nextCI=8 at +8194446
+      stride=36 ΓåÆ nextCI=23 at +8248638
+      stride=44 ΓåÆ nextCI=52 at +8275734
+      stride=48 ΓåÆ nextCI=775918 at +8289282
+      stride=60 ΓåÆ nextCI=25 at +8329926
+      stride=64 ΓåÆ nextCI=54 at +8343474
+    CI=3387 at +8126731 (0x7C010B), ciSize=2
+      stride=12 ΓåÆ nextCI=14 at +8167377
+      stride=48 ΓåÆ nextCI=70 at +8289309
+      stride=64 ΓåÆ nextCI=1 at +8343501
+    CI=3387 at +8126773 (0x7C0135), ciSize=2
+      stride=4 ΓåÆ nextCI=1 at +8140323
+      stride=8 ΓåÆ nextCI=46 at +8153871
+      stride=20 ΓåÆ nextCI=4347 at +8194515
+    CI=3387 at +8126786 (0x7C0142), ciSize=2
+      stride=16 ΓåÆ nextCI=735 at +8180980
+      stride=28 ΓåÆ nextCI=133 at +8221624
+      stride=40 ΓåÆ nextCI=4 at +8262268
+      stride=44 ΓåÆ nextCI=7 at +8275816
+    CI=3387 at +8126898 (0x7C01B2), ciSize=2
+      stride=16 ΓåÆ nextCI=22 at +8181092
+      stride=20 ΓåÆ nextCI=2 at +8194640
+      stride=24 ΓåÆ nextCI=13 at +8208188
+      stride=48 ΓåÆ nextCI=2 at +8289476
+    CI=3387 at +8127036 (0x7C023C), ciSize=2
+      stride=44 ΓåÆ nextCI=37 at +8276066
+      stride=48 ΓåÆ nextCI=3399 at +8289614
+    CI=3387 at +8127073 (0x7C0261), ciSize=2
+      stride=12 ΓåÆ nextCI=44 at +8167719
+      stride=44 ΓåÆ nextCI=11 at +8276103
+    CI=3387 at +8127114 (0x7C028A), ciSize=2
+      stride=16 ΓåÆ nextCI=6478 at +8181308
+      stride=20 ΓåÆ nextCI=7 at +8194856
+    CI=3387 at +8127153 (0x7C02B1), ciSize=2
+      stride=8 ΓåÆ nextCI=1675 at +8154251
+      stride=20 ΓåÆ nextCI=1 at +8194895
+      stride=24 ΓåÆ nextCI=1 at +8208443
+      stride=48 ΓåÆ nextCI=44 at +8289731
+      stride=60 ΓåÆ nextCI=6 at +8330375
+    CI=3387 at +8127214 (0x7C02EE), ciSize=2
+      stride=4 ΓåÆ nextCI=7 at +8140764
+      stride=16 ΓåÆ nextCI=48 at +8181408
+      stride=20 ΓåÆ nextCI=14 at +8194956
+      stride=28 ΓåÆ nextCI=59 at +8222052
+      stride=32 ΓåÆ nextCI=602305 at +8235600
+      stride=44 ΓåÆ nextCI=57 at +8276244
+      stride=48 ΓåÆ nextCI=3502 at +8289792
+      stride=56 ΓåÆ nextCI=1 at +8316888
+    CI=3387 at +8127263 (0x7C031F), ciSize=2
+      stride=32 ΓåÆ nextCI=2 at +8235649
+      stride=44 ΓåÆ nextCI=3929 at +8276293
+      stride=48 ΓåÆ nextCI=53 at +8289841
+      stride=60 ΓåÆ nextCI=63 at +8330485
+    CI=3387 at +8127308 (0x7C034C), ciSize=2
+      stride=12 ΓåÆ nextCI=58 at +8167954
+      stride=24 ΓåÆ nextCI=58 at +8208598
+      stride=60 ΓåÆ nextCI=53 at +8330530
+    CI=3387 at +8127369 (0x7C0389), ciSize=2
+      stride=8 ΓåÆ nextCI=1 at +8154467
+      stride=12 ΓåÆ nextCI=2 at +8168015
+      stride=20 ΓåÆ nextCI=27 at +8195111
+      stride=24 ΓåÆ nextCI=3769 at +8208659
+      stride=36 ΓåÆ nextCI=1 at +8249303
+      stride=56 ΓåÆ nextCI=128 at +8317043
+    CI=3387 at +8127434 (0x7C03CA), ciSize=2
+      stride=32 ΓåÆ nextCI=3 at +8235820
+      stride=36 ΓåÆ nextCI=37 at +8249368
+      stride=40 ΓåÆ nextCI=14 at +8262916
+      stride=52 ΓåÆ nextCI=2 at +8303560
+      stride=56 ΓåÆ nextCI=18 at +8317108
+    CI=3387 at +8127495 (0x7C0407), ciSize=2
+      stride=8 ΓåÆ nextCI=54 at +8154593
+      stride=12 ΓåÆ nextCI=133 at +8168141
+      stride=16 ΓåÆ nextCI=13 at +8181689
+      stride=36 ΓåÆ nextCI=1 at +8249429
+      stride=40 ΓåÆ nextCI=6 at +8262977
+      stride=56 ΓåÆ nextCI=4 at +8317169
+      stride=64 ΓåÆ nextCI=7 at +8344265
+    CI=3387 at +8127544 (0x7C0438), ciSize=2
+      stride=44 ΓåÆ nextCI=3 at +8276574
+      stride=48 ΓåÆ nextCI=32 at +8290122
+      stride=56 ΓåÆ nextCI=51 at +8317218
+    CI=3387 at +8127591 (0x7C0467), ciSize=2
+      stride=8 ΓåÆ nextCI=59 at +8154689
+      stride=16 ΓåÆ nextCI=52 at +8181785
+      stride=20 ΓåÆ nextCI=31 at +8195333
+      stride=24 ΓåÆ nextCI=69 at +8208881
+      stride=36 ΓåÆ nextCI=4098 at +8249525
+      stride=40 ΓåÆ nextCI=3827 at +8263073
+      stride=52 ΓåÆ nextCI=51 at +8303717
+    CI=3387 at +8127636 (0x7C0494), ciSize=2
+      stride=36 ΓåÆ nextCI=2 at +8249570
+      stride=56 ΓåÆ nextCI=2 at +8317310
+    CI=3387 at +8127675 (0x7C04BB), ciSize=2
+      stride=20 ΓåÆ nextCI=3542 at +8195417
+      stride=44 ΓåÆ nextCI=58 at +8276705
+      stride=52 ΓåÆ nextCI=7 at +8303801
+      stride=64 ΓåÆ nextCI=133 at +8344445
+    CI=3387 at +8127742 (0x7C04FE), ciSize=2
+      stride=12 ΓåÆ nextCI=52 at +8168388
+      stride=32 ΓåÆ nextCI=439302 at +8236128
+      stride=52 ΓåÆ nextCI=63 at +8303868
+    CI=3387 at +8127805 (0x7C053D), ciSize=2
+      stride=4 ΓåÆ nextCI=8 at +8141355
+      stride=12 ΓåÆ nextCI=11 at +8168451
+      stride=56 ΓåÆ nextCI=12 at +8317479
+      stride=64 ΓåÆ nextCI=38 at +8344575
+    CI=3387 at +8127850 (0x7C056A), ciSize=2
+      stride=16 ΓåÆ nextCI=31 at +8182044
+      stride=36 ΓåÆ nextCI=46 at +8249784
+      stride=40 ΓåÆ nextCI=4 at +8263332
+      stride=48 ΓåÆ nextCI=625 at +8290428
+    CI=3387 at +8127887 (0x7C058F), ciSize=2
+      stride=32 ΓåÆ nextCI=8 at +8236273
+      stride=52 ΓåÆ nextCI=59 at +8304013
+      stride=64 ΓåÆ nextCI=12 at +8344657
+    CI=3387 at +8127984 (0x7C05F0), ciSize=2
+      stride=24 ΓåÆ nextCI=4 at +8209274
+      stride=32 ΓåÆ nextCI=36 at +8236370
+      stride=48 ΓåÆ nextCI=2 at +8290562
+      stride=56 ΓåÆ nextCI=30 at +8317658
+      stride=60 ΓåÆ nextCI=63 at +8331206
+      stride=64 ΓåÆ nextCI=55 at +8344754
+    CI=3387 at +8128009 (0x7C0609), ciSize=2
+      stride=12 ΓåÆ nextCI=58 at +8168655
+      stride=36 ΓåÆ nextCI=2 at +8249943
+      stride=40 ΓåÆ nextCI=11 at +8263491
+      stride=48 ΓåÆ nextCI=2 at +8290587
+      stride=56 ΓåÆ nextCI=4 at +8317683
+      stride=64 ΓåÆ nextCI=3821 at +8344779
+    CI=3387 at +8128024 (0x7C0618), ciSize=2
+      stride=8 ΓåÆ nextCI=2 at +8155122
+      stride=20 ΓåÆ nextCI=6 at +8195766
+      stride=44 ΓåÆ nextCI=60 at +8277054
+    CI=3387 at +8128039 (0x7C0627), ciSize=2
+      stride=4 ΓåÆ nextCI=197 at +8141589
+      stride=8 ΓåÆ nextCI=2 at +8155137
+      stride=16 ΓåÆ nextCI=572543 at +8182233
+      stride=20 ΓåÆ nextCI=1 at +8195781
+      stride=24 ΓåÆ nextCI=58 at +8209329
+      stride=32 ΓåÆ nextCI=3907 at +8236425
+      stride=56 ΓåÆ nextCI=1 at +8317713
+      stride=64 ΓåÆ nextCI=15 at +8344809
+    CI=3387 at +8128064 (0x7C0640), ciSize=2
+      stride=4 ΓåÆ nextCI=1 at +8141614
+      stride=8 ΓåÆ nextCI=56 at +8155162
+      stride=12 ΓåÆ nextCI=15 at +8168710
+      stride=32 ΓåÆ nextCI=53 at +8236450
+      stride=44 ΓåÆ nextCI=1410 at +8277094
+      stride=64 ΓåÆ nextCI=440 at +8344834
+    CI=3387 at +8128104 (0x7C0668), ciSize=2
+      stride=8 ΓåÆ nextCI=58 at +8155202
+      stride=40 ΓåÆ nextCI=3650 at +8263586
+      stride=52 ΓåÆ nextCI=4 at +8304230
+    CI=3387 at +8128133 (0x7C0685), ciSize=2
+      stride=4 ΓåÆ nextCI=27 at +8141683
+      stride=8 ΓåÆ nextCI=2252 at +8155231
+      stride=12 ΓåÆ nextCI=46 at +8168779
+      stride=24 ΓåÆ nextCI=4 at +8209423
+      stride=32 ΓåÆ nextCI=36 at +8236519
+      stride=64 ΓåÆ nextCI=62 at +8344903
+    CI=3387 at +8128200 (0x7C06C8), ciSize=2
+      stride=4 ΓåÆ nextCI=63 at +8141750
+      stride=16 ΓåÆ nextCI=55 at +8182394
+      stride=28 ΓåÆ nextCI=1 at +8223038
+      stride=36 ΓåÆ nextCI=63 at +8250134
+      stride=44 ΓåÆ nextCI=11 at +8277230
+    CI=3387 at +8128219 (0x7C06DB), ciSize=2
+      stride=12 ΓåÆ nextCI=4 at +8168865
+      stride=24 ΓåÆ nextCI=2861 at +8209509
+      stride=28 ΓåÆ nextCI=19 at +8223057
+      stride=48 ΓåÆ nextCI=10 at +8290797
+    CI=3387 at +8128232 (0x7C06E8), ciSize=2
+      stride=20 ΓåÆ nextCI=58 at +8195974
+      stride=32 ΓåÆ nextCI=31 at +8236618
+      stride=52 ΓåÆ nextCI=578704 at +8304358
+      stride=56 ΓåÆ nextCI=3180 at +8317906
+      stride=64 ΓåÆ nextCI=63 at +8345002
+    CI=3387 at +8128271 (0x7C070F), ciSize=2
+      stride=8 ΓåÆ nextCI=6875 at +8155369
+      stride=20 ΓåÆ nextCI=4095 at +8196013
+      stride=24 ΓåÆ nextCI=5 at +8209561
+      stride=44 ΓåÆ nextCI=63 at +8277301
+      stride=48 ΓåÆ nextCI=59 at +8290849
+      stride=52 ΓåÆ nextCI=2 at +8304397
+    CI=3387 at +8128324 (0x7C0744), ciSize=2
+      stride=4 ΓåÆ nextCI=59 at +8141874
+      stride=36 ΓåÆ nextCI=31 at +8250258
+      stride=40 ΓåÆ nextCI=63 at +8263806
+      stride=60 ΓåÆ nextCI=3 at +8331546
+    CI=3387 at +8128345 (0x7C0759), ciSize=2
+      stride=4 ΓåÆ nextCI=27 at +8141895
+      stride=8 ΓåÆ nextCI=4911 at +8155443
+      stride=28 ΓåÆ nextCI=11 at +8223183
+      stride=32 ΓåÆ nextCI=3 at +8236731
+      stride=56 ΓåÆ nextCI=23 at +8318019
+    CI=3387 at +8128364 (0x7C076C), ciSize=2
+      stride=24 ΓåÆ nextCI=693 at +8209654
+      stride=32 ΓåÆ nextCI=15 at +8236750
+    CI=3387 at +8128395 (0x7C078B), ciSize=2
+      stride=8 ΓåÆ nextCI=43 at +8155493
+      stride=36 ΓåÆ nextCI=69 at +8250329
+      stride=48 ΓåÆ nextCI=54 at +8290973
+    CI=3387 at +8128414 (0x7C079E), ciSize=2
+      stride=32 ΓåÆ nextCI=4095 at +8236800
+      stride=48 ΓåÆ nextCI=1 at +8290992
+      stride=56 ΓåÆ nextCI=48 at +8318088
+    CI=3387 at +8128429 (0x7C07AD), ciSize=2
+      stride=8 ΓåÆ nextCI=59 at +8155527
+      stride=16 ΓåÆ nextCI=11 at +8182623
+      stride=20 ΓåÆ nextCI=4 at +8196171
+      stride=48 ΓåÆ nextCI=1 at +8291007
+    CI=3387 at +8128478 (0x7C07DE), ciSize=2
+      stride=40 ΓåÆ nextCI=3 at +8263960
+      stride=44 ΓåÆ nextCI=58 at +8277508
+    CI=3387 at +8128549 (0x7C0825), ciSize=2
+      stride=8 ΓåÆ nextCI=61 at +8155647
+      stride=16 ΓåÆ nextCI=15 at +8182743
+      stride=20 ΓåÆ nextCI=40 at +8196291
+      stride=44 ΓåÆ nextCI=4 at +8277579
+    CI=7125 at +8132579 (0x7C17E3), ciSize=2
+      stride=4 ΓåÆ nextCI=2 at +8161081
+      stride=8 ΓåÆ nextCI=35 at +8189581
+      stride=12 ΓåÆ nextCI=63 at +8218081
+      stride=40 ΓåÆ nextCI=4 at +8417581
+    CI=7125 at +8132863 (0x7C18FF), ciSize=2
+      stride=4 ΓåÆ nextCI=55 at +8161365
+      stride=40 ΓåÆ nextCI=3316 at +8417865
+      stride=64 ΓåÆ nextCI=70 at +8588865
+    CI=3392 at +8135523 (0x7C2363), ciSize=2
+      stride=36 ΓåÆ nextCI=4095 at +8257637
+      stride=44 ΓåÆ nextCI=11 at +8284773
+      stride=48 ΓåÆ nextCI=3530 at +8298341
+      stride=64 ΓåÆ nextCI=4251 at +8352613
+    CI=3392 at +8135532 (0x7C236C), ciSize=2
+      stride=4 ΓåÆ nextCI=4 at +8149102
+      stride=8 ΓåÆ nextCI=4108 at +8162670
+      stride=12 ΓåÆ nextCI=15 at +8176238
+      stride=24 ΓåÆ nextCI=4 at +8216942
+      stride=28 ΓåÆ nextCI=60 at +8230510
+      stride=44 ΓåÆ nextCI=46 at +8284782
+    CI=3392 at +8135583 (0x7C239F), ciSize=2
+      stride=8 ΓåÆ nextCI=62 at +8162721
+      stride=32 ΓåÆ nextCI=580352 at +8244129
+      stride=36 ΓåÆ nextCI=3 at +8257697
+      stride=48 ΓåÆ nextCI=57 at +8298401
+    CI=3392 at +8135590 (0x7C23A6), ciSize=2
+      stride=36 ΓåÆ nextCI=4 at +8257704
+      stride=44 ΓåÆ nextCI=63 at +8284840
+    CI=3392 at +8135599 (0x7C23AF), ciSize=2
+      stride=4 ΓåÆ nextCI=8 at +8149169
+      stride=12 ΓåÆ nextCI=19 at +8176305
+      stride=16 ΓåÆ nextCI=610379 at +8189873
+      stride=36 ΓåÆ nextCI=59 at +8257713
+      stride=44 ΓåÆ nextCI=48 at +8284849
+    CI=3392 at +8135611 (0x7C23BB), ciSize=2
+      stride=4 ΓåÆ nextCI=13 at +8149181
+      stride=8 ΓåÆ nextCI=58 at +8162749
+      stride=12 ΓåÆ nextCI=7653 at +8176317
+      stride=20 ΓåÆ nextCI=1 at +8203453
+      stride=24 ΓåÆ nextCI=58 at +8217021
+      stride=32 ΓåÆ nextCI=22 at +8244157
+      stride=40 ΓåÆ nextCI=1 at +8271293
+      stride=52 ΓåÆ nextCI=2 at +8311997
+      stride=64 ΓåÆ nextCI=40 at +8352701
+    CI=3392 at +8135618 (0x7C23C2), ciSize=2
+      stride=28 ΓåÆ nextCI=437099 at +8230596
+      stride=36 ΓåÆ nextCI=2 at +8257732
+      stride=40 ΓåÆ nextCI=55 at +8271300
+    CI=3392 at +8135629 (0x7C23CD), ciSize=2
+      stride=28 ΓåÆ nextCI=63 at +8230607
+      stride=44 ΓåÆ nextCI=46 at +8284879
+      stride=48 ΓåÆ nextCI=31 at +8298447
+      stride=56 ΓåÆ nextCI=1 at +8325583
+      stride=64 ΓåÆ nextCI=7941 at +8352719
+    CI=3392 at +8135673 (0x7C23F9), ciSize=2
+      stride=12 ΓåÆ nextCI=8 at +8176379
+      stride=16 ΓåÆ nextCI=59 at +8189947
+      stride=24 ΓåÆ nextCI=4 at +8217083
+      stride=28 ΓåÆ nextCI=1 at +8230651
+      stride=44 ΓåÆ nextCI=46 at +8284923
+    CI=3392 at +8135696 (0x7C2410), ciSize=2
+      stride=4 ΓåÆ nextCI=11 at +8149266
+      stride=12 ΓåÆ nextCI=3652 at +8176402
+      stride=40 ΓåÆ nextCI=39 at +8271378
+      stride=44 ΓåÆ nextCI=3 at +8284946
+    CI=3392 at +8135709 (0x7C241D), ciSize=2
+      stride=20 ΓåÆ nextCI=7 at +8203551
+      stride=32 ΓåÆ nextCI=10 at +8244255
+      stride=36 ΓåÆ nextCI=69 at +8257823
+      stride=44 ΓåÆ nextCI=3505 at +8284959
+      stride=56 ΓåÆ nextCI=58 at +8325663
+      stride=60 ΓåÆ nextCI=4095 at +8339231
+    CI=3392 at +8135728 (0x7C2430), ciSize=2
+      stride=28 ΓåÆ nextCI=9 at +8230706
+      stride=36 ΓåÆ nextCI=3 at +8257842
+      stride=52 ΓåÆ nextCI=6804 at +8312114
+      stride=56 ΓåÆ nextCI=4095 at +8325682
+      stride=64 ΓåÆ nextCI=7672 at +8352818
+    CI=3392 at +8135739 (0x7C243B), ciSize=2
+      stride=8 ΓåÆ nextCI=262020 at +8162877
+      stride=20 ΓåÆ nextCI=5 at +8203581
+      stride=36 ΓåÆ nextCI=2 at +8257853
+      stride=40 ΓåÆ nextCI=58 at +8271421
+    CI=3392 at +8135752 (0x7C2448), ciSize=2
+      stride=4 ΓåÆ nextCI=7453 at +8149322
+      stride=24 ΓåÆ nextCI=63 at +8217162
+      stride=32 ΓåÆ nextCI=32 at +8244298
+      stride=44 ΓåÆ nextCI=58 at +8285002
+      stride=48 ΓåÆ nextCI=31 at +8298570
+      stride=60 ΓåÆ nextCI=3692 at +8339274
+    CI=3392 at +8135763 (0x7C2453), ciSize=2
+      stride=4 ΓåÆ nextCI=63 at +8149333
+      stride=8 ΓåÆ nextCI=16 at +8162901
+      stride=12 ΓåÆ nextCI=1161 at +8176469
+      stride=20 ΓåÆ nextCI=15 at +8203605
+      stride=40 ΓåÆ nextCI=6 at +8271445
+      stride=48 ΓåÆ nextCI=1 at +8298581
+      stride=52 ΓåÆ nextCI=31 at +8312149
+      stride=56 ΓåÆ nextCI=4 at +8325717
+    CI=3392 at +8135776 (0x7C2460), ciSize=2
+      stride=4 ΓåÆ nextCI=1 at +8149346
+      stride=16 ΓåÆ nextCI=2 at +8190050
+      stride=20 ΓåÆ nextCI=46 at +8203618
+      stride=56 ΓåÆ nextCI=54 at +8325730
+    CI=3392 at +8135787 (0x7C246B), ciSize=2
+      stride=4 ΓåÆ nextCI=3400 at +8149357
+      stride=12 ΓåÆ nextCI=431 at +8176493
+      stride=24 ΓåÆ nextCI=62 at +8217197
+      stride=36 ΓåÆ nextCI=53 at +8257901
+      stride=52 ΓåÆ nextCI=63 at +8312173
+    CI=3392 at +8135800 (0x7C2478), ciSize=2
+      stride=24 ΓåÆ nextCI=4 at +8217210
+      stride=40 ΓåÆ nextCI=3 at +8271482
+      stride=56 ΓåÆ nextCI=56 at +8325754
+      stride=60 ΓåÆ nextCI=54 at +8339322
+    CI=3392 at +8135811 (0x7C2483), ciSize=2
+      stride=4 ΓåÆ nextCI=10 at +8149381
+      stride=8 ΓåÆ nextCI=4 at +8162949
+      stride=12 ΓåÆ nextCI=1 at +8176517
+      stride=40 ΓåÆ nextCI=2 at +8271493
+      stride=60 ΓåÆ nextCI=23 at +8339333
+    CI=3392 at +8135824 (0x7C2490), ciSize=2
+      stride=16 ΓåÆ nextCI=53 at +8190098
+      stride=28 ΓåÆ nextCI=4045 at +8230802
+      stride=36 ΓåÆ nextCI=564351 at +8257938
+      stride=60 ΓåÆ nextCI=59 at +8339346
+    CI=3392 at +8135837 (0x7C249D), ciSize=2
+      stride=8 ΓåÆ nextCI=4 at +8162975
+      stride=12 ΓåÆ nextCI=1 at +8176543
+      stride=24 ΓåÆ nextCI=7 at +8217247
+      stride=32 ΓåÆ nextCI=5283 at +8244383
+      stride=40 ΓåÆ nextCI=4095 at +8271519
+      stride=56 ΓåÆ nextCI=59 at +8325791
+      stride=60 ΓåÆ nextCI=99466 at +8339359
+    CI=3392 at +8135856 (0x7C24B0), ciSize=2
+      stride=20 ΓåÆ nextCI=3521 at +8203698
+      stride=44 ΓåÆ nextCI=5 at +8285106
+      stride=52 ΓåÆ nextCI=58 at +8312242
+      stride=56 ΓåÆ nextCI=3794 at +8325810
+      stride=64 ΓåÆ nextCI=194 at +8352946
+    CI=3392 at +8135865 (0x7C24B9), ciSize=2
+      stride=12 ΓåÆ nextCI=794 at +8176571
+      stride=20 ΓåÆ nextCI=2 at +8203707
+      stride=48 ΓåÆ nextCI=1128 at +8298683
+      stride=60 ΓåÆ nextCI=1 at +8339387
+    CI=3392 at +8135882 (0x7C24CA), ciSize=2
+      stride=12 ΓåÆ nextCI=13 at +8176588
+      stride=28 ΓåÆ nextCI=31 at +8230860
+      stride=32 ΓåÆ nextCI=63 at +8244428
+      stride=40 ΓåÆ nextCI=524096 at +8271564
+      stride=64 ΓåÆ nextCI=1 at +8352972
+    CI=3392 at +8135889 (0x7C24D1), ciSize=2
+      stride=44 ΓåÆ nextCI=50 at +8285139
+      stride=52 ΓåÆ nextCI=13 at +8312275
+    CI=3392 at +8135898 (0x7C24DA), ciSize=2
+      stride=4 ΓåÆ nextCI=1 at +8149468
+      stride=12 ΓåÆ nextCI=30 at +8176604
+      stride=24 ΓåÆ nextCI=45 at +8217308
+      stride=32 ΓåÆ nextCI=2 at +8244444
+      stride=48 ΓåÆ nextCI=3 at +8298716
+      stride=52 ΓåÆ nextCI=4 at +8312284
+    CI=3392 at +8135917 (0x7C24ED), ciSize=2
+      stride=40 ΓåÆ nextCI=395 at +8271599
+      stride=44 ΓåÆ nextCI=4237 at +8285167
+      stride=48 ΓåÆ nextCI=58 at +8298735
+      stride=52 ΓåÆ nextCI=3 at +8312303
+    CI=3392 at +8135934 (0x7C24FE), ciSize=2
+      stride=12 ΓåÆ nextCI=12 at +8176640
+      stride=20 ΓåÆ nextCI=4095 at +8203776
+      stride=24 ΓåÆ nextCI=4436 at +8217344
+      stride=32 ΓåÆ nextCI=5283 at +8244480
+      stride=40 ΓåÆ nextCI=2 at +8271616
+      stride=52 ΓåÆ nextCI=3857 at +8312320
+      stride=56 ΓåÆ nextCI=2 at +8325888
+    CI=3392 at +8135958 (0x7C2516), ciSize=2
+      stride=12 ΓåÆ nextCI=1 at +8176664
+      stride=20 ΓåÆ nextCI=2 at +8203800
+      stride=48 ΓåÆ nextCI=8 at +8298776
+      stride=52 ΓåÆ nextCI=3 at +8312344
+    CI=3392 at +8135971 (0x7C2523), ciSize=2
+      stride=8 ΓåÆ nextCI=38 at +8163109
+      stride=12 ΓåÆ nextCI=2 at +8176677
+      stride=16 ΓåÆ nextCI=6 at +8190245
+      stride=28 ΓåÆ nextCI=3897 at +8230949
+      stride=32 ΓåÆ nextCI=63 at +8244517
+      stride=36 ΓåÆ nextCI=208 at +8258085
+      stride=56 ΓåÆ nextCI=3871 at +8325925
+    CI=3392 at +8136000 (0x7C2540), ciSize=2
+      stride=4 ΓåÆ nextCI=572511 at +8149570
+      stride=8 ΓåÆ nextCI=1 at +8163138
+      stride=16 ΓåÆ nextCI=3546 at +8190274
+      stride=24 ΓåÆ nextCI=42 at +8217410
+      stride=32 ΓåÆ nextCI=10 at +8244546
+      stride=40 ΓåÆ nextCI=569423 at +8271682
+      stride=48 ΓåÆ nextCI=2604 at +8298818
+      stride=60 ΓåÆ nextCI=4014 at +8339522
+    CI=3392 at +8136282 (0x7C265A), ciSize=2
+      stride=4 ΓåÆ nextCI=49 at +8149852
+      stride=12 ΓåÆ nextCI=13 at +8176988
+      stride=20 ΓåÆ nextCI=63 at +8204124
+      stride=24 ΓåÆ nextCI=7 at +8217692
+      stride=28 ΓåÆ nextCI=1161 at +8231260
+      stride=32 ΓåÆ nextCI=4 at +8244828
+      stride=44 ΓåÆ nextCI=197 at +8285532
+      stride=52 ΓåÆ nextCI=4095 at +8312668
+      stride=56 ΓåÆ nextCI=188 at +8326236
+      stride=60 ΓåÆ nextCI=49 at +8339804
+    CI=3392 at +8136297 (0x7C2669), ciSize=2
+      stride=4 ΓåÆ nextCI=9 at +8149867
+      stride=8 ΓåÆ nextCI=44 at +8163435
+      stride=12 ΓåÆ nextCI=5121 at +8177003
+      stride=20 ΓåÆ nextCI=3585 at +8204139
+      stride=28 ΓåÆ nextCI=32 at +8231275
+      stride=40 ΓåÆ nextCI=1857 at +8271979
+      stride=44 ΓåÆ nextCI=57 at +8285547
+      stride=56 ΓåÆ nextCI=56 at +8326251
+    CI=3392 at +8136312 (0x7C2678), ciSize=2
+      stride=4 ΓåÆ nextCI=24 at +8149882
+      stride=8 ΓåÆ nextCI=54 at +8163450
+      stride=16 ΓåÆ nextCI=492681 at +8190586
+      stride=20 ΓåÆ nextCI=20 at +8204154
+      stride=28 ΓåÆ nextCI=58 at +8231290
+      stride=56 ΓåÆ nextCI=4 at +8326266
+    CI=3392 at +8136342 (0x7C2696), ciSize=2
+      stride=16 ΓåÆ nextCI=63 at +8190616
+      stride=36 ΓåÆ nextCI=38 at +8258456
+      stride=56 ΓåÆ nextCI=53 at +8326296
+    CI=3392 at +8136363 (0x7C26AB), ciSize=2
+      stride=8 ΓåÆ nextCI=23 at +8163501
+      stride=12 ΓåÆ nextCI=60 at +8177069
+      stride=24 ΓåÆ nextCI=4 at +8217773
+      stride=28 ΓåÆ nextCI=9 at +8231341
+      stride=48 ΓåÆ nextCI=7 at +8299181
+    CI=3392 at +8136380 (0x7C26BC), ciSize=2
+      stride=36 ΓåÆ nextCI=429842 at +8258494
+      stride=64 ΓåÆ nextCI=11 at +8353470
+    CI=3392 at +8136403 (0x7C26D3), ciSize=2
+      stride=8 ΓåÆ nextCI=1410 at +8163541
+      stride=20 ΓåÆ nextCI=6147 at +8204245
+      stride=24 ΓåÆ nextCI=1 at +8217813
+      stride=40 ΓåÆ nextCI=1 at +8272085
+    CI=3392 at +8136412 (0x7C26DC), ciSize=2
+      stride=8 ΓåÆ nextCI=1161 at +8163550
+      stride=12 ΓåÆ nextCI=458832 at +8177118
+      stride=24 ΓåÆ nextCI=1 at +8217822
+    CI=3392 at +8136431 (0x7C26EF), ciSize=2
+      stride=4 ΓåÆ nextCI=307269 at +8150001
+      stride=24 ΓåÆ nextCI=7 at +8217841
+      stride=40 ΓåÆ nextCI=344 at +8272113
+      stride=44 ΓåÆ nextCI=46 at +8285681
+      stride=56 ΓåÆ nextCI=52 at +8326385
+    CI=3392 at +8136460 (0x7C270C), ciSize=2
+      stride=8 ΓåÆ nextCI=4162 at +8163598
+      stride=16 ΓåÆ nextCI=3 at +8190734
+      stride=28 ΓåÆ nextCI=54 at +8231438
+      stride=56 ΓåÆ nextCI=4 at +8326414
+      stride=64 ΓåÆ nextCI=1 at +8353550
+    CI=3392 at +8136475 (0x7C271B), ciSize=2
+      stride=4 ΓåÆ nextCI=1 at +8150045
+      stride=20 ΓåÆ nextCI=18 at +8204317
+      stride=52 ΓåÆ nextCI=5708 at +8312861
+    CI=3392 at +8136498 (0x7C2732), ciSize=2
+      stride=4 ΓåÆ nextCI=11 at +8150068
+      stride=24 ΓåÆ nextCI=63 at +8217908
+      stride=48 ΓåÆ nextCI=4 at +8299316
+      stride=64 ΓåÆ nextCI=11 at +8353588
+    CI=3386 at +8137986 (0x7C2D02), ciSize=2
+      stride=4 ΓåÆ nextCI=58 at +8151532
+      stride=8 ΓåÆ nextCI=3 at +8165076
+      stride=48 ΓåÆ nextCI=58 at +8300516
+      stride=56 ΓåÆ nextCI=1 at +8327604
+    CI=3392 at +8139077 (0x7C3145), ciSize=2
+      stride=8 ΓåÆ nextCI=59 at +8166215
+      stride=36 ΓåÆ nextCI=6 at +8261191
+      stride=48 ΓåÆ nextCI=4021 at +8301895
+      stride=56 ΓåÆ nextCI=4 at +8329031
+    CI=3392 at +8172237 (0x7CB2CD), ciSize=2
+      stride=20 ΓåÆ nextCI=712 at +8240079
+      stride=24 ΓåÆ nextCI=22 at +8253647
+      stride=32 ΓåÆ nextCI=4 at +8280783
+      stride=48 ΓåÆ nextCI=1 at +8335055
+      stride=52 ΓåÆ nextCI=1410 at +8348623
+      stride=56 ΓåÆ nextCI=11 at +8362191
+    CI=3392 at +8174783 (0x7CBCBF), ciSize=2
+      stride=4 ΓåÆ nextCI=581 at +8188353
+      stride=8 ΓåÆ nextCI=58 at +8201921
+      stride=12 ΓåÆ nextCI=63 at +8215489
+      stride=32 ΓåÆ nextCI=3 at +8283329
+      stride=52 ΓåÆ nextCI=5 at +8351169
+      stride=60 ΓåÆ nextCI=1 at +8378305
+    CI=3392 at +8175861 (0x7CC0F5), ciSize=2
+      stride=12 ΓåÆ nextCI=23 at +8216567
+      stride=36 ΓåÆ nextCI=60 at +8297975
+      stride=44 ΓåÆ nextCI=5952 at +8325111
+      stride=48 ΓåÆ nextCI=8 at +8338679
+      stride=60 ΓåÆ nextCI=41 at +8379383
+    CI=3392 at +8176547 (0x7CC3A3), ciSize=2
+      stride=24 ΓåÆ nextCI=6786 at +8257957
+      stride=56 ΓåÆ nextCI=33 at +8366501
+      stride=64 ΓåÆ nextCI=4 at +8393637
+    CI=3392 at +8177033 (0x7CC589), ciSize=2
+      stride=4 ΓåÆ nextCI=12 at +8190603
+      stride=28 ΓåÆ nextCI=4254 at +8272011
+      stride=32 ΓåÆ nextCI=1 at +8285579
+      stride=36 ΓåÆ nextCI=1 at +8299147
+      stride=40 ΓåÆ nextCI=3673 at +8312715
+      stride=48 ΓåÆ nextCI=55 at +8339851
+    CI=3392 at +8177568 (0x7CC7A0), ciSize=2
+      stride=8 ΓåÆ nextCI=1 at +8204706
+      stride=20 ΓåÆ nextCI=4 at +8245410
+      stride=36 ΓåÆ nextCI=25 at +8299682
+      stride=40 ΓåÆ nextCI=383 at +8313250
+      stride=44 ΓåÆ nextCI=3485 at +8326818
+      stride=48 ΓåÆ nextCI=1 at +8340386
+      stride=64 ΓåÆ nextCI=4095 at +8394658
+    CI=3392 at +8177816 (0x7CC898), ciSize=2
+      stride=36 ΓåÆ nextCI=3 at +8299930
+      stride=44 ΓåÆ nextCI=3688 at +8327066
+    CI=3392 at +8178086 (0x7CC9A6), ciSize=2
+      stride=8 ΓåÆ nextCI=10 at +8205224
+      stride=12 ΓåÆ nextCI=3963 at +8218792
+      stride=44 ΓåÆ nextCI=4128 at +8327336
+      stride=56 ΓåÆ nextCI=23 at +8368040
+    CI=3392 at +8178209 (0x7CCA21), ciSize=2
+      stride=8 ΓåÆ nextCI=63 at +8205347
+      stride=12 ΓåÆ nextCI=3529 at +8218915
+      stride=20 ΓåÆ nextCI=63 at +8246051
+      stride=24 ΓåÆ nextCI=70 at +8259619
+      stride=64 ΓåÆ nextCI=8 at +8395299
+    CI=3392 at +8178750 (0x7CCC3E), ciSize=2
+      stride=24 ΓåÆ nextCI=4 at +8260160
+      stride=28 ΓåÆ nextCI=4 at +8273728
+      stride=36 ΓåÆ nextCI=3 at +8300864
+      stride=44 ΓåÆ nextCI=6 at +8328000
+    CI=3392 at +8179020 (0x7CCD4C), ciSize=2
+      stride=28 ΓåÆ nextCI=4 at +8273998
+      stride=40 ΓåÆ nextCI=3698 at +8314702
+      stride=48 ΓåÆ nextCI=61 at +8341838
+      stride=64 ΓåÆ nextCI=8 at +8396110
+    CI=3392 at +8179165 (0x7CCDDD), ciSize=2
+      stride=60 ΓåÆ nextCI=56 at +8382687
+    CI=3392 at +8179288 (0x7CCE58), ciSize=2
+      stride=20 ΓåÆ nextCI=8183 at +8247130
+      stride=40 ΓåÆ nextCI=3 at +8314970
+      stride=44 ΓåÆ nextCI=52 at +8328538
+      stride=48 ΓåÆ nextCI=19 at +8342106
+    CI=3392 at +8179437 (0x7CCEED), ciSize=2
+      stride=4 ΓåÆ nextCI=1 at +8193007
+      stride=20 ΓåÆ nextCI=4 at +8247279
+      stride=24 ΓåÆ nextCI=1 at +8260847
+      stride=28 ΓåÆ nextCI=152 at +8274415
+      stride=44 ΓåÆ nextCI=55 at +8328687
+      stride=52 ΓåÆ nextCI=6 at +8355823
+      stride=60 ΓåÆ nextCI=28 at +8382959
+      stride=64 ΓåÆ nextCI=14 at +8396527
+    CI=3392 at +8179585 (0x7CCF81), ciSize=2
+      stride=4 ΓåÆ nextCI=1 at +8193155
+      stride=28 ΓåÆ nextCI=80 at +8274563
+      stride=52 ΓåÆ nextCI=6 at +8355971
+    CI=3392 at +8179977 (0x7CD109), ciSize=2
+      stride=20 ΓåÆ nextCI=4 at +8247819
+      stride=24 ΓåÆ nextCI=2 at +8261387
+      stride=44 ΓåÆ nextCI=526061 at +8329227
+      stride=60 ΓåÆ nextCI=63 at +8383499
+      stride=64 ΓåÆ nextCI=1 at +8397067
+    CI=3392 at +8180100 (0x7CD184), ciSize=2
+      stride=4 ΓåÆ nextCI=49 at +8193670
+      stride=20 ΓåÆ nextCI=4 at +8247942
+      stride=24 ΓåÆ nextCI=2 at +8261510
+      stride=36 ΓåÆ nextCI=5640 at +8302214
+      stride=52 ΓåÆ nextCI=1410 at +8356486
+      stride=56 ΓåÆ nextCI=11 at +8370054
+    CI=3392 at +8180223 (0x7CD1FF), ciSize=2
+      stride=4 ΓåÆ nextCI=58 at +8193793
+      stride=56 ΓåÆ nextCI=2 at +8370177
+    CI=3389 at +8184827 (0x7CE3FB), ciSize=2
+      stride=16 ΓåÆ nextCI=54 at +8239053
+      stride=20 ΓåÆ nextCI=1 at +8252609
+      stride=48 ΓåÆ nextCI=1 at +8347501
+      stride=56 ΓåÆ nextCI=5 at +8374613
+      stride=64 ΓåÆ nextCI=31 at +8401725
+    CI=3392 at +8187539 (0x7CEE93), ciSize=2
+      stride=4 ΓåÆ nextCI=8 at +8201109
+      stride=20 ΓåÆ nextCI=206437 at +8255381
+      stride=28 ΓåÆ nextCI=3730 at +8282517
+    CI=3392 at +8187735 (0x7CEF57), ciSize=2
+      stride=4 ΓåÆ nextCI=1 at +8201305
+      stride=8 ΓåÆ nextCI=3584 at +8214873
+      stride=12 ΓåÆ nextCI=36 at +8228441
+      stride=24 ΓåÆ nextCI=44296 at +8269145
+      stride=56 ΓåÆ nextCI=3545 at +8377689
+      stride=60 ΓåÆ nextCI=59 at +8391257
+    CI=3392 at +8187858 (0x7CEFD2), ciSize=2
+      stride=16 ΓåÆ nextCI=1 at +8242132
+      stride=20 ΓåÆ nextCI=58 at +8255700
+      stride=28 ΓåÆ nextCI=11 at +8282836
+      stride=36 ΓåÆ nextCI=12 at +8309972
+      stride=52 ΓåÆ nextCI=894 at +8364244
+      stride=56 ΓåÆ nextCI=11 at +8377812
+      stride=60 ΓåÆ nextCI=4095 at +8391380
+      stride=64 ΓåÆ nextCI=33 at +8404948
+    CI=3392 at +8187980 (0x7CF04C), ciSize=2
+      stride=28 ΓåÆ nextCI=11 at +8282958
+      stride=32 ΓåÆ nextCI=4 at +8296526
+      stride=36 ΓåÆ nextCI=12 at +8310094
+    CI=3392 at +8188106 (0x7CF0CA), ciSize=2
+      stride=16 ΓåÆ nextCI=6 at +8242380
+      stride=24 ΓåÆ nextCI=4180 at +8269516
+      stride=40 ΓåÆ nextCI=1 at +8323788
+    CI=3392 at +8188327 (0x7CF1A7), ciSize=2
+      stride=24 ΓåÆ nextCI=2 at +8269737
+      stride=32 ΓåÆ nextCI=4242 at +8296873
+      stride=48 ΓåÆ nextCI=58 at +8351145
+      stride=52 ΓåÆ nextCI=7 at +8364713
+      stride=60 ΓåÆ nextCI=1 at +8391849
+    CI=3392 at +8188454 (0x7CF226), ciSize=2
+      stride=4 ΓåÆ nextCI=1 at +8202024
+      stride=24 ΓåÆ nextCI=3725 at +8269864
+      stride=28 ΓåÆ nextCI=1 at +8283432
+      stride=32 ΓåÆ nextCI=6 at +8297000
+      stride=36 ΓåÆ nextCI=1 at +8310568
+      stride=40 ΓåÆ nextCI=2 at +8324136
+      stride=44 ΓåÆ nextCI=53 at +8337704
+      stride=48 ΓåÆ nextCI=22 at +8351272
+      stride=52 ΓåÆ nextCI=7 at +8364840
+      stride=60 ΓåÆ nextCI=53 at +8391976
+    CI=3392 at +8188696 (0x7CF318), ciSize=2
+      stride=20 ΓåÆ nextCI=484489 at +8256538
+    CI=3392 at +8188816 (0x7CF390), ciSize=2
+      stride=12 ΓåÆ nextCI=36 at +8229522
+      stride=24 ΓåÆ nextCI=133 at +8270226
+      stride=36 ΓåÆ nextCI=22 at +8310930
+      stride=60 ΓåÆ nextCI=1 at +8392338
+    CI=3392 at +8188937 (0x7CF409), ciSize=2
+      stride=32 ΓåÆ nextCI=3805 at +8297483
+      stride=36 ΓåÆ nextCI=10 at +8311051
+      stride=52 ΓåÆ nextCI=55 at +8365323
+    CI=3392 at +8189666 (0x7CF6E2), ciSize=2
+      stride=24 ΓåÆ nextCI=63 at +8271076
+    CI=3392 at +8189908 (0x7CF7D4), ciSize=2
+      stride=12 ΓåÆ nextCI=47 at +8230614
+      stride=32 ΓåÆ nextCI=1 at +8298454
+      stride=56 ΓåÆ nextCI=61 at +8379862
+    CI=3392 at +8190029 (0x7CF84D), ciSize=2
+      stride=24 ΓåÆ nextCI=3624 at +8271439
+      stride=32 ΓåÆ nextCI=133 at +8298575
+      stride=44 ΓåÆ nextCI=7 at +8339279
+      stride=48 ΓåÆ nextCI=4 at +8352847
+      stride=52 ΓåÆ nextCI=63 at +8366415
+      stride=64 ΓåÆ nextCI=1 at +8407119
+    CI=3392 at +8190272 (0x7CF940), ciSize=2
+      stride=8 ΓåÆ nextCI=42 at +8217410
+      stride=16 ΓåÆ nextCI=10 at +8244546
+      stride=24 ΓåÆ nextCI=569423 at +8271682
+      stride=32 ΓåÆ nextCI=2604 at +8298818
+      stride=44 ΓåÆ nextCI=4014 at +8339522
+      stride=52 ΓåÆ nextCI=55 at +8366658
+      stride=60 ΓåÆ nextCI=602 at +8393794
+    CI=3392 at +8190394 (0x7CF9BA), ciSize=2
+      stride=12 ΓåÆ nextCI=7 at +8231100
+      stride=32 ΓåÆ nextCI=22 at +8298940
+      stride=40 ΓåÆ nextCI=3812 at +8326076
+      stride=48 ΓåÆ nextCI=4 at +8353212
+    CI=3392 at +8190640 (0x7CFAB0), ciSize=2
+      stride=32 ΓåÆ nextCI=3 at +8299186
+      stride=40 ΓåÆ nextCI=5550 at +8326322
+      stride=48 ΓåÆ nextCI=2 at +8353458
+      stride=56 ΓåÆ nextCI=40 at +8380594
+      stride=60 ΓåÆ nextCI=4095 at +8394162
+    CI=3392 at +8190762 (0x7CFB2A), ciSize=2
+      stride=8 ΓåÆ nextCI=62 at +8217900
+      stride=20 ΓåÆ nextCI=51 at +8258604
+      stride=32 ΓåÆ nextCI=236 at +8299308
+      stride=40 ΓåÆ nextCI=53 at +8326444
+      stride=48 ΓåÆ nextCI=2 at +8353580
+      stride=64 ΓåÆ nextCI=524165 at +8407852
+    CI=3392 at +8190884 (0x7CFBA4), ciSize=2
+      stride=8 ΓåÆ nextCI=52 at +8218022
+      stride=36 ΓåÆ nextCI=1 at +8312998
+      stride=40 ΓåÆ nextCI=2 at +8326566
+      stride=52 ΓåÆ nextCI=16 at +8367270
+    CI=3392 at +8191129 (0x7CFC99), ciSize=2
+      stride=8 ΓåÆ nextCI=58 at +8218267
+      stride=12 ΓåÆ nextCI=1 at +8231835
+      stride=16 ΓåÆ nextCI=4435 at +8245403
+      stride=28 ΓåÆ nextCI=577727 at +8286107
+      stride=32 ΓåÆ nextCI=4095 at +8299675
+      stride=52 ΓåÆ nextCI=3727 at +8367515
+      stride=56 ΓåÆ nextCI=46 at +8381083
+    CI=3392 at +8191250 (0x7CFD12), ciSize=2
+      stride=8 ΓåÆ nextCI=50 at +8218388
+      stride=16 ΓåÆ nextCI=20 at +8245524
+      stride=32 ΓåÆ nextCI=234 at +8299796
+      stride=40 ΓåÆ nextCI=524096 at +8326932
+      stride=52 ΓåÆ nextCI=4 at +8367636
+    CI=3392 at +8191372 (0x7CFD8C), ciSize=2
+      stride=4 ΓåÆ nextCI=3 at +8204942
+    CI=3392 at +8191616 (0x7CFE80), ciSize=2
+      stride=8 ΓåÆ nextCI=4 at +8218754
+      stride=16 ΓåÆ nextCI=57 at +8245890
+      stride=20 ΓåÆ nextCI=58 at +8259458
+      stride=24 ΓåÆ nextCI=4877 at +8273026
+      stride=28 ΓåÆ nextCI=4 at +8286594
+      stride=32 ΓåÆ nextCI=5468 at +8300162
+      stride=36 ΓåÆ nextCI=11 at +8313730
+      stride=48 ΓåÆ nextCI=172 at +8354434
+      stride=64 ΓåÆ nextCI=2 at +8408706
+    CI=3392 at +8191765 (0x7CFF15), ciSize=2
+      stride=8 ΓåÆ nextCI=4 at +8218903
+      stride=16 ΓåÆ nextCI=2433 at +8246039
+      stride=20 ΓåÆ nextCI=63 at +8259607
+      stride=24 ΓåÆ nextCI=3697 at +8273175
+      stride=36 ΓåÆ nextCI=53 at +8313879
+    CI=3392 at +8191889 (0x7CFF91), ciSize=2
+      stride=24 ΓåÆ nextCI=55 at +8273299
+      stride=40 ΓåÆ nextCI=57 at +8327571
+      stride=44 ΓåÆ nextCI=51 at +8341139
+    CI=3392 at +8192012 (0x7D000C), ciSize=2
+      stride=12 ΓåÆ nextCI=59 at +8232718
+      stride=28 ΓåÆ nextCI=97 at +8286990
+      stride=32 ΓåÆ nextCI=2 at +8300558
+      stride=44 ΓåÆ nextCI=69 at +8341262
+      stride=52 ΓåÆ nextCI=3387 at +8368398
+      stride=60 ΓåÆ nextCI=392 at +8395534
+      stride=64 ΓåÆ nextCI=2531 at +8409102
+    CI=3392 at +8192159 (0x7D009F), ciSize=2
+      stride=32 ΓåÆ nextCI=3730 at +8300705
+      stride=40 ΓåÆ nextCI=3 at +8327841
+      stride=44 ΓåÆ nextCI=40 at +8341409
+      stride=52 ΓåÆ nextCI=3525 at +8368545
+      stride=60 ΓåÆ nextCI=52 at +8395681
+      stride=64 ΓåÆ nextCI=22 at +8409249
+    CI=3392 at +8192550 (0x7D0226), ciSize=2
+      stride=4 ΓåÆ nextCI=32 at +8206120
+      stride=8 ΓåÆ nextCI=196 at +8219688
+      stride=20 ΓåÆ nextCI=63 at +8260392
+      stride=36 ΓåÆ nextCI=134 at +8314664
+      stride=44 ΓåÆ nextCI=4264 at +8341800
+      stride=52 ΓåÆ nextCI=1 at +8368936
+      stride=60 ΓåÆ nextCI=3365 at +8396072
+    CI=3392 at +8192891 (0x7D037B), ciSize=2
+      stride=28 ΓåÆ nextCI=2 at +8287869
+      stride=32 ΓåÆ nextCI=133 at +8301437
+      stride=64 ΓåÆ nextCI=44 at +8409981
+    CI=3392 at +8193039 (0x7D040F), ciSize=2
+      stride=12 ΓåÆ nextCI=46 at +8233745
+      stride=24 ΓåÆ nextCI=2 at +8274449
+      stride=32 ΓåÆ nextCI=1 at +8301585
+      stride=40 ΓåÆ nextCI=61 at +8328721
+      stride=56 ΓåÆ nextCI=4095 at +8382993
+      stride=60 ΓåÆ nextCI=36 at +8396561
+    CI=3392 at +8193189 (0x7D04A5), ciSize=2
+      stride=40 ΓåÆ nextCI=63 at +8328871
+      stride=48 ΓåÆ nextCI=152 at +8356007
+      stride=52 ΓåÆ nextCI=57 at +8369575
+    CI=3392 at +8193338 (0x7D053A), ciSize=2
+      stride=52 ΓåÆ nextCI=36 at +8369724
+      stride=64 ΓåÆ nextCI=4095 at +8410428
+    CI=3392 at +8193483 (0x7D05CB), ciSize=2
+      stride=4 ΓåÆ nextCI=2870 at +8207053
+      stride=8 ΓåÆ nextCI=6 at +8220621
+      stride=20 ΓåÆ nextCI=56 at +8261325
+      stride=28 ΓåÆ nextCI=4095 at +8288461
+      stride=48 ΓåÆ nextCI=23 at +8356301
+      stride=56 ΓåÆ nextCI=56 at +8383437
+    CI=3392 at +8193632 (0x7D0660), ciSize=2
+      stride=8 ΓåÆ nextCI=4 at +8220770
+      stride=48 ΓåÆ nextCI=27 at +8356450
+      stride=64 ΓåÆ nextCI=4234 at +8410722
+    CI=3392 at +8193756 (0x7D06DC), ciSize=2
+      stride=36 ΓåÆ nextCI=8 at +8315870
+      stride=40 ΓåÆ nextCI=2 at +8329438
+      stride=56 ΓåÆ nextCI=31 at +8383710
+    CI=3392 at +8193901 (0x7D076D), ciSize=2
+      stride=12 ΓåÆ nextCI=46 at +8234607
+      stride=24 ΓåÆ nextCI=4 at +8275311
+      stride=28 ΓåÆ nextCI=5766 at +8288879
+      stride=32 ΓåÆ nextCI=59 at +8302447
+      stride=40 ΓåÆ nextCI=3962 at +8329583
+      stride=60 ΓåÆ nextCI=3428 at +8397423
+      stride=64 ΓåÆ nextCI=5 at +8410991
+    CI=3392 at +8194024 (0x7D07E8), ciSize=2
+      stride=24 ΓåÆ nextCI=4 at +8275434
+      stride=40 ΓåÆ nextCI=4522 at +8329706
+      stride=56 ΓåÆ nextCI=26 at +8383978
+      stride=64 ΓåÆ nextCI=36 at +8411114
+    CI=3392 at +8194148 (0x7D0864), ciSize=2
+      stride=4 ΓåÆ nextCI=4 at +8207718
+      stride=12 ΓåÆ nextCI=484489 at +8234854
+      stride=32 ΓåÆ nextCI=24 at +8302694
+      stride=36 ΓåÆ nextCI=4 at +8316262
+      stride=40 ΓåÆ nextCI=133 at +8329830
+      stride=64 ΓåÆ nextCI=58 at +8411238
+    CI=3392 at +8194271 (0x7D08DF), ciSize=2
+      stride=4 ΓåÆ nextCI=35 at +8207841
+      stride=12 ΓåÆ nextCI=59 at +8234977
+      stride=16 ΓåÆ nextCI=1410 at +8248545
+      stride=32 ΓåÆ nextCI=3 at +8302817
+      stride=44 ΓåÆ nextCI=3688 at +8343521
+      stride=48 ΓåÆ nextCI=3404 at +8357089
+    CI=3392 at +8194537 (0x7D09E9), ciSize=2
+      stride=20 ΓåÆ nextCI=1 at +8262379
+      stride=32 ΓåÆ nextCI=57 at +8303083
+      stride=44 ΓåÆ nextCI=1 at +8343787
+      stride=52 ΓåÆ nextCI=294 at +8370923
+    CI=3392 at +8194661 (0x7D0A65), ciSize=2
+      stride=8 ΓåÆ nextCI=4 at +8221799
+      stride=24 ΓåÆ nextCI=95 at +8276071
+    CI=3392 at +8194783 (0x7D0ADF), ciSize=2
+      stride=16 ΓåÆ nextCI=14 at +8249057
+      stride=40 ΓåÆ nextCI=2 at +8330465
+      stride=52 ΓåÆ nextCI=3387 at +8371169
+    CI=3392 at +8195029 (0x7D0BD5), ciSize=2
+      stride=4 ΓåÆ nextCI=4748 at +8208599
+      stride=16 ΓåÆ nextCI=1 at +8249303
+      stride=28 ΓåÆ nextCI=2 at +8290007
+      stride=44 ΓåÆ nextCI=40 at +8344279
+      stride=52 ΓåÆ nextCI=3538 at +8371415
+      stride=60 ΓåÆ nextCI=18 at +8398551
+      stride=64 ΓåÆ nextCI=3498 at +8412119
+    CI=3392 at +8195150 (0x7D0C4E), ciSize=2
+      stride=4 ΓåÆ nextCI=63 at +8208720
+      stride=8 ΓåÆ nextCI=47 at +8222288
+      stride=16 ΓåÆ nextCI=1 at +8249424
+      stride=24 ΓåÆ nextCI=1 at +8276560
+      stride=48 ΓåÆ nextCI=2 at +8357968
+      stride=52 ΓåÆ nextCI=3428 at +8371536
+    CI=3392 at +8195296 (0x7D0CE0), ciSize=2
+      stride=12 ΓåÆ nextCI=4 at +8236002
+      stride=16 ΓåÆ nextCI=2 at +8249570
+      stride=24 ΓåÆ nextCI=48 at +8276706
+      stride=44 ΓåÆ nextCI=63 at +8344546
+      stride=60 ΓåÆ nextCI=1 at +8398818
+      stride=64 ΓåÆ nextCI=4 at +8412386
+    CI=3392 at +8195421 (0x7D0D5D), ciSize=2
+      stride=4 ΓåÆ nextCI=63 at +8208991
+      stride=12 ΓåÆ nextCI=4494 at +8236127
+      stride=20 ΓåÆ nextCI=36 at +8263263
+      stride=24 ΓåÆ nextCI=50 at +8276831
+      stride=28 ΓåÆ nextCI=1 at +8290399
+      stride=36 ΓåÆ nextCI=2 at +8317535
+      stride=48 ΓåÆ nextCI=1 at +8358239
+    CI=3392 at +8195544 (0x7D0DD8), ciSize=2
+      stride=36 ΓåÆ nextCI=30 at +8317658
+      stride=52 ΓåÆ nextCI=11 at +8371930
+      stride=56 ΓåÆ nextCI=4346 at +8385498
+    CI=3392 at +8195787 (0x7D0ECB), ciSize=2
+      stride=4 ΓåÆ nextCI=63 at +8209357
+      stride=24 ΓåÆ nextCI=1 at +8277197
+      stride=60 ΓåÆ nextCI=1 at +8399309
+    CI=3392 at +8195934 (0x7D0F5E), ciSize=2
+      stride=20 ΓåÆ nextCI=46 at +8263776
+      stride=56 ΓåÆ nextCI=56 at +8385888
+    CI=3392 at +8196058 (0x7D0FDA), ciSize=2
+      stride=24 ΓåÆ nextCI=2 at +8277468
+      stride=44 ΓåÆ nextCI=60 at +8345308
+      stride=48 ΓåÆ nextCI=1 at +8358876
+      stride=60 ΓåÆ nextCI=1 at +8399580
+    CI=3392 at +8197378 (0x7D1502), ciSize=2
+      stride=4 ΓåÆ nextCI=331858 at +8210948
+      stride=8 ΓåÆ nextCI=63 at +8224516
+      stride=24 ΓåÆ nextCI=1 at +8278788
+      stride=44 ΓåÆ nextCI=3812 at +8346628
+    CI=3392 at +8197622 (0x7D15F6), ciSize=2
+      stride=4 ΓåÆ nextCI=51 at +8211192
+      stride=8 ΓåÆ nextCI=2 at +8224760
+      stride=36 ΓåÆ nextCI=58 at +8319736
+      stride=52 ΓåÆ nextCI=3387 at +8374008
+    CI=3392 at +8199586 (0x7D1DA2), ciSize=2
+      stride=4 ΓåÆ nextCI=47 at +8213156
+      stride=8 ΓåÆ nextCI=4095 at +8226724
+      stride=12 ΓåÆ nextCI=2425 at +8240292
+      stride=36 ΓåÆ nextCI=8 at +8321700
+      stride=44 ΓåÆ nextCI=2 at +8348836
+      stride=52 ΓåÆ nextCI=4095 at +8375972
+      stride=56 ΓåÆ nextCI=56 at +8389540
+    CI=3392 at +8199828 (0x7D1E94), ciSize=2
+      stride=12 ΓåÆ nextCI=63 at +8240534
+      stride=20 ΓåÆ nextCI=45 at +8267670
+      stride=24 ΓåÆ nextCI=55 at +8281238
+      stride=28 ΓåÆ nextCI=59 at +8294806
+      stride=32 ΓåÆ nextCI=4414 at +8308374
+      stride=40 ΓåÆ nextCI=3491 at +8335510
+      stride=44 ΓåÆ nextCI=3566 at +8349078
+      stride=48 ΓåÆ nextCI=4103 at +8362646
+    CI=3392 at +8199951 (0x7D1F0F), ciSize=2
+      stride=4 ΓåÆ nextCI=2 at +8213521
+      stride=20 ΓåÆ nextCI=56 at +8267793
+      stride=40 ΓåÆ nextCI=3363 at +8335633
+      stride=44 ΓåÆ nextCI=11 at +8349201
+      stride=64 ΓåÆ nextCI=1 at +8417041
+    CI=3392 at +8200098 (0x7D1FA2), ciSize=2
+      stride=12 ΓåÆ nextCI=4264 at +8240804
+      stride=24 ΓåÆ nextCI=58 at +8281508
+      stride=44 ΓåÆ nextCI=3875 at +8349348
+      stride=60 ΓåÆ nextCI=6 at +8403620
+    CI=3392 at +8200465 (0x7D2111), ciSize=2
+      stride=4 ΓåÆ nextCI=41 at +8214035
+      stride=12 ΓåÆ nextCI=54 at +8241171
+      stride=16 ΓåÆ nextCI=2 at +8254739
+      stride=36 ΓåÆ nextCI=569278 at +8322579
+      stride=52 ΓåÆ nextCI=4095 at +8376851
+      stride=56 ΓåÆ nextCI=59 at +8390419
+      stride=60 ΓåÆ nextCI=58 at +8403987
+    CI=3392 at +8200829 (0x7D227D), ciSize=2
+      stride=4 ΓåÆ nextCI=36 at +8214399
+      stride=12 ΓåÆ nextCI=4738 at +8241535
+      stride=44 ΓåÆ nextCI=3 at +8350079
+      stride=56 ΓåÆ nextCI=63 at +8390783
+    CI=3392 at +8200949 (0x7D22F5), ciSize=2
+      stride=4 ΓåÆ nextCI=3 at +8214519
+      stride=24 ΓåÆ nextCI=18 at +8282359
+      stride=48 ΓåÆ nextCI=44 at +8363767
+      stride=52 ΓåÆ nextCI=575255 at +8377335
+      stride=56 ΓåÆ nextCI=58 at +8390903
+    CI=3392 at +8201072 (0x7D2370), ciSize=2
+      stride=4 ΓåÆ nextCI=3 at +8214642
+      stride=32 ΓåÆ nextCI=59 at +8309618
+      stride=64 ΓåÆ nextCI=396825 at +8418162
+    CI=3392 at +8201194 (0x7D23EA), ciSize=2
+      stride=32 ΓåÆ nextCI=4318 at +8309740
+      stride=52 ΓåÆ nextCI=4 at +8377580
+      stride=64 ΓåÆ nextCI=11 at +8418284
+    CI=3379 at +8206206 (0x7D377E), ciSize=3
+      stride=8 ΓåÆ nextCI=13 at +8233241
+      stride=28 ΓåÆ nextCI=22 at +8300821
+      stride=36 ΓåÆ nextCI=6144 at +8327853
+      stride=40 ΓåÆ nextCI=5 at +8341369
+    CI=3392 at +8229677 (0x7D932D), ciSize=2
+      stride=4 ΓåÆ nextCI=4 at +8243247
+      stride=12 ΓåÆ nextCI=3659 at +8270383
+      stride=48 ΓåÆ nextCI=574207 at +8392495
+    CI=3377 at +8248904 (0x7DDE48), ciSize=2
+      stride=4 ΓåÆ nextCI=57 at +8262414
+      stride=8 ΓåÆ nextCI=46 at +8275922
+      stride=32 ΓåÆ nextCI=1 at +8356970
+      stride=36 ΓåÆ nextCI=4 at +8370478
+      stride=40 ΓåÆ nextCI=4095 at +8383986
+      stride=48 ΓåÆ nextCI=12 at +8411002
+      stride=60 ΓåÆ nextCI=6 at +8451526
+    CI=3392 at +8269308 (0x7E2DFC), ciSize=3
+      stride=4 ΓåÆ nextCI=59 at +8282879
+      stride=12 ΓåÆ nextCI=1410 at +8310015
+      stride=32 ΓåÆ nextCI=58 at +8377855
+      stride=52 ΓåÆ nextCI=4147 at +8445695
+    CI=3391 at +8269822 (0x7E2FFE), ciSize=2
+      stride=8 ΓåÆ nextCI=4 at +8296952
+      stride=52 ΓåÆ nextCI=46 at +8446156
+    CI=3395 at +8276708 (0x7E4AE4), ciSize=2
+      stride=4 ΓåÆ nextCI=60 at +8290290
+      stride=16 ΓåÆ nextCI=2 at +8331030
+      stride=28 ΓåÆ nextCI=31 at +8371770
+      stride=32 ΓåÆ nextCI=1 at +8385350
+      stride=36 ΓåÆ nextCI=524229 at +8398930
+    CI=3395 at +8286640 (0x7E71B0), ciSize=2
+      stride=48 ΓåÆ nextCI=4 at +8449602
+      stride=60 ΓåÆ nextCI=5 at +8490342
+    CI=3384 at +8287329 (0x7E7461), ciSize=2
+      stride=24 ΓåÆ nextCI=4039 at +8368547
+      stride=32 ΓåÆ nextCI=4095 at +8395619
+      stride=44 ΓåÆ nextCI=69 at +8436227
+      stride=48 ΓåÆ nextCI=63 at +8449763
+      stride=52 ΓåÆ nextCI=1 at +8463299
+      stride=56 ΓåÆ nextCI=1 at +8476835
+      stride=60 ΓåÆ nextCI=4 at +8490371
+      stride=64 ΓåÆ nextCI=3412 at +8503907
+    CI=3391 at +8304981 (0x7EB955), ciSize=2
+      stride=8 ΓåÆ nextCI=2 at +8332111
+      stride=16 ΓåÆ nextCI=2148 at +8359239
+      stride=40 ΓåÆ nextCI=3760 at +8440623
+      stride=48 ΓåÆ nextCI=52 at +8467751
+      stride=52 ΓåÆ nextCI=14 at +8481315
+    CI=3392 at +8331083 (0x7F1F4B), ciSize=3
+      stride=8 ΓåÆ nextCI=55 at +8358222
+      stride=24 ΓåÆ nextCI=53 at +8412494
+      stride=36 ΓåÆ nextCI=1 at +8453198
+      stride=40 ΓåÆ nextCI=1 at +8466766
+    CI=3391 at +8346689 (0x7F5C41), ciSize=3
+      stride=16 ΓåÆ nextCI=3498 at +8400948
+      stride=20 ΓåÆ nextCI=46 at +8414512
+      stride=24 ΓåÆ nextCI=46 at +8428076
+      stride=28 ΓåÆ nextCI=69 at +8441640
+      stride=32 ΓåÆ nextCI=572543 at +8455204
+      stride=64 ΓåÆ nextCI=63 at +8563716
+    CI=3386 at +8354635 (0x7F7B4B), ciSize=3
+      stride=4 ΓåÆ nextCI=21 at +8368182
+      stride=8 ΓåÆ nextCI=4095 at +8381726
+      stride=56 ΓåÆ nextCI=3691 at +8544254
+    CI=3387 at +8355727 (0x7F7F8F), ciSize=2
+      stride=16 ΓåÆ nextCI=4095 at +8409921
+      stride=32 ΓåÆ nextCI=297818 at +8464113
+      stride=36 ΓåÆ nextCI=2 at +8477661
+      stride=52 ΓåÆ nextCI=3526 at +8531853
+      stride=60 ΓåÆ nextCI=262021 at +8558949
+      stride=64 ΓåÆ nextCI=39 at +8572497
+    CI=3387 at +8355875 (0x7F8023), ciSize=2
+      stride=16 ΓåÆ nextCI=58 at +8410069
+      stride=20 ΓåÆ nextCI=63 at +8423617
+      stride=28 ΓåÆ nextCI=4 at +8450713
+      stride=52 ΓåÆ nextCI=2 at +8532001
+    CI=3387 at +8356023 (0x7F80B7), ciSize=2
+      stride=4 ΓåÆ nextCI=470378 at +8369573
+      stride=32 ΓåÆ nextCI=20 at +8464409
+      stride=36 ΓåÆ nextCI=9 at +8477957
+    CI=3387 at +8356244 (0x7F8194), ciSize=2
+      stride=20 ΓåÆ nextCI=58 at +8423986
+      stride=40 ΓåÆ nextCI=27063 at +8491726
+      stride=44 ΓåÆ nextCI=5 at +8505274
+      stride=48 ΓåÆ nextCI=3484 at +8518822
+      stride=56 ΓåÆ nextCI=8 at +8545918
+      stride=60 ΓåÆ nextCI=4 at +8559466
+      stride=64 ΓåÆ nextCI=63 at +8573014
+    CI=3387 at +8356392 (0x7F8228), ciSize=2
+      stride=4 ΓåÆ nextCI=45 at +8369942
+      stride=12 ΓåÆ nextCI=2 at +8397038
+      stride=20 ΓåÆ nextCI=5546 at +8424134
+      stride=28 ΓåÆ nextCI=28 at +8451230
+      stride=32 ΓåÆ nextCI=2 at +8464778
+      stride=40 ΓåÆ nextCI=4095 at +8491874
+      stride=48 ΓåÆ nextCI=57 at +8518970
+      stride=64 ΓåÆ nextCI=63 at +8573162
+    CI=3387 at +8356543 (0x7F82BF), ciSize=2
+      stride=4 ΓåÆ nextCI=59 at +8370093
+      stride=12 ΓåÆ nextCI=2 at +8397189
+      stride=24 ΓåÆ nextCI=2 at +8437833
+      stride=28 ΓåÆ nextCI=25 at +8451381
+      stride=36 ΓåÆ nextCI=54 at +8478477
+      stride=44 ΓåÆ nextCI=8 at +8505573
+      stride=60 ΓåÆ nextCI=3621 at +8559765
+    CI=3387 at +8356813 (0x7F83CD), ciSize=2
+      stride=24 ΓåÆ nextCI=3 at +8438103
+      stride=32 ΓåÆ nextCI=3910 at +8465199
+    CI=3387 at +8356985 (0x7F8479), ciSize=2
+      stride=16 ΓåÆ nextCI=31 at +8411179
+      stride=20 ΓåÆ nextCI=4736 at +8424727
+      stride=24 ΓåÆ nextCI=56 at +8438275
+      stride=32 ΓåÆ nextCI=57 at +8465371
+      stride=36 ΓåÆ nextCI=3487 at +8478919
+      stride=56 ΓåÆ nextCI=56 at +8546659
+    CI=3387 at +8357158 (0x7F8526), ciSize=2
+      stride=12 ΓåÆ nextCI=4 at +8397804
+      stride=16 ΓåÆ nextCI=36 at +8411352
+      stride=24 ΓåÆ nextCI=58 at +8438448
+      stride=28 ΓåÆ nextCI=645 at +8451996
+      stride=40 ΓåÆ nextCI=1 at +8492640
+      stride=64 ΓåÆ nextCI=2 at +8573928
+    CI=3387 at +8357307 (0x7F85BB), ciSize=2
+      stride=16 ΓåÆ nextCI=186094 at +8411501
+      stride=36 ΓåÆ nextCI=48 at +8479241
+      stride=48 ΓåÆ nextCI=1 at +8519885
+      stride=52 ΓåÆ nextCI=52 at +8533433
+      stride=56 ΓåÆ nextCI=3721 at +8546981
+    CI=3387 at +8357455 (0x7F864F), ciSize=2
+      stride=4 ΓåÆ nextCI=35 at +8371005
+      stride=24 ΓåÆ nextCI=69 at +8438745
+      stride=28 ΓåÆ nextCI=63 at +8452293
+      stride=32 ΓåÆ nextCI=4095 at +8465841
+    CI=3387 at +8357872 (0x7F87F0), ciSize=2
+      stride=28 ΓåÆ nextCI=4 at +8452710
+      stride=36 ΓåÆ nextCI=41 at +8479806
+      stride=48 ΓåÆ nextCI=58 at +8520450
+    CI=3387 at +8359544 (0x7F8E78), ciSize=2
+      stride=20 ΓåÆ nextCI=59 at +8427286
+      stride=36 ΓåÆ nextCI=58 at +8481478
+    CI=3387 at +8359665 (0x7F8EF1), ciSize=2
+      stride=20 ΓåÆ nextCI=5514 at +8427407
+      stride=40 ΓåÆ nextCI=46 at +8495147
+      stride=48 ΓåÆ nextCI=3 at +8522243
+      stride=60 ΓåÆ nextCI=21 at +8562887
+    CI=3387 at +8359837 (0x7F8F9D), ciSize=2
+      stride=4 ΓåÆ nextCI=5974 at +8373387
+      stride=8 ΓåÆ nextCI=3 at +8386935
+      stride=28 ΓåÆ nextCI=1 at +8454675
+      stride=32 ΓåÆ nextCI=1 at +8468223
+      stride=36 ΓåÆ nextCI=484489 at +8481771
+      stride=56 ΓåÆ nextCI=11 at +8549511
+      stride=64 ΓåÆ nextCI=5989 at +8576607
+    CI=3387 at +8359984 (0x7F9030), ciSize=2
+      stride=16 ΓåÆ nextCI=36 at +8414178
+      stride=24 ΓåÆ nextCI=4 at +8441274
+      stride=28 ΓåÆ nextCI=1 at +8454822
+      stride=32 ΓåÆ nextCI=3224 at +8468370
+      stride=48 ΓåÆ nextCI=2 at +8522562
+      stride=56 ΓåÆ nextCI=4095 at +8549658
+      stride=64 ΓåÆ nextCI=2 at +8576754
+    CI=3387 at +8360162 (0x7F90E2), ciSize=2
+      stride=8 ΓåÆ nextCI=49 at +8387260
+      stride=16 ΓåÆ nextCI=10 at +8414356
+      stride=36 ΓåÆ nextCI=70 at +8482096
+      stride=52 ΓåÆ nextCI=48 at +8536288
+      stride=56 ΓåÆ nextCI=24 at +8549836
+      stride=60 ΓåÆ nextCI=53 at +8563384
+    CI=3387 at +8360361 (0x7F91A9), ciSize=2
+      stride=4 ΓåÆ nextCI=40 at +8373911
+      stride=20 ΓåÆ nextCI=24 at +8428103
+      stride=24 ΓåÆ nextCI=53 at +8441651
+      stride=40 ΓåÆ nextCI=439302 at +8495843
+      stride=52 ΓåÆ nextCI=51 at +8536487
+      stride=60 ΓåÆ nextCI=7453 at +8563583
+    CI=3387 at +8360511 (0x7F923F), ciSize=2
+      stride=24 ΓåÆ nextCI=11 at +8441801
+      stride=36 ΓåÆ nextCI=4796 at +8482445
+      stride=52 ΓåÆ nextCI=58 at +8536637
+    CI=3387 at +8360683 (0x7F92EB), ciSize=2
+      stride=16 ΓåÆ nextCI=50 at +8414877
+      stride=40 ΓåÆ nextCI=6 at +8496165
+      stride=48 ΓåÆ nextCI=58 at +8523261
+    CI=3387 at +8360834 (0x7F9382), ciSize=2
+      stride=4 ΓåÆ nextCI=2 at +8374384
+      stride=16 ΓåÆ nextCI=258752 at +8415028
+      stride=32 ΓåÆ nextCI=3 at +8469220
+      stride=36 ΓåÆ nextCI=3511 at +8482768
+    CI=3387 at +8360957 (0x7F93FD), ciSize=2
+      stride=4 ΓåÆ nextCI=1 at +8374507
+      stride=24 ΓåÆ nextCI=4287 at +8442247
+    CI=3387 at +8361296 (0x7F9550), ciSize=2
+      stride=8 ΓåÆ nextCI=55 at +8388394
+      stride=24 ΓåÆ nextCI=58 at +8442586
+      stride=36 ΓåÆ nextCI=3664 at +8483230
+      stride=40 ΓåÆ nextCI=19 at +8496778
+      stride=48 ΓåÆ nextCI=60 at +8523874
+      stride=56 ΓåÆ nextCI=7 at +8550970
+      stride=64 ΓåÆ nextCI=1 at +8578066
+    CI=3387 at +8361420 (0x7F95CC), ciSize=2
+      stride=8 ΓåÆ nextCI=62 at +8388518
+      stride=16 ΓåÆ nextCI=4 at +8415614
+      stride=24 ΓåÆ nextCI=59 at +8442710
+      stride=28 ΓåÆ nextCI=66052 at +8456258
+      stride=44 ΓåÆ nextCI=21 at +8510450
+      stride=56 ΓåÆ nextCI=59 at +8551094
+      stride=60 ΓåÆ nextCI=10 at +8564642
+      stride=64 ΓåÆ nextCI=69 at +8578190
+    CI=3387 at +8361541 (0x7F9645), ciSize=2
+      stride=4 ΓåÆ nextCI=3523 at +8375091
+      stride=8 ΓåÆ nextCI=3625 at +8388639
+      stride=12 ΓåÆ nextCI=50 at +8402187
+      stride=16 ΓåÆ nextCI=4 at +8415735
+      stride=20 ΓåÆ nextCI=1 at +8429283
+      stride=24 ΓåÆ nextCI=59 at +8442831
+      stride=28 ΓåÆ nextCI=66052 at +8456379
+      stride=52 ΓåÆ nextCI=96 at +8537667
+    CI=3387 at +8361715 (0x7F96F3), ciSize=2
+      stride=4 ΓåÆ nextCI=4 at +8375265
+      stride=8 ΓåÆ nextCI=11 at +8388813
+      stride=24 ΓåÆ nextCI=2 at +8443005
+      stride=36 ΓåÆ nextCI=1 at +8483649
+      stride=40 ΓåÆ nextCI=52 at +8497197
+      stride=44 ΓåÆ nextCI=3424 at +8510745
+      stride=52 ΓåÆ nextCI=1 at +8537841
+    CI=3387 at +8361888 (0x7F97A0), ciSize=2
+      stride=16 ΓåÆ nextCI=1 at +8416082
+      stride=28 ΓåÆ nextCI=52 at +8456726
+      stride=60 ΓåÆ nextCI=10 at +8565110
+    CI=3387 at +8362037 (0x7F9835), ciSize=2
+      stride=4 ΓåÆ nextCI=54 at +8375587
+      stride=12 ΓåÆ nextCI=23 at +8402683
+      stride=16 ΓåÆ nextCI=2 at +8416231
+      stride=32 ΓåÆ nextCI=3 at +8470423
+      stride=36 ΓåÆ nextCI=48 at +8483971
+    CI=3387 at +8362699 (0x7F9ACB), ciSize=2
+      stride=4 ΓåÆ nextCI=4095 at +8376249
+      stride=32 ΓåÆ nextCI=63 at +8471085
+      stride=48 ΓåÆ nextCI=5 at +8525277
+      stride=52 ΓåÆ nextCI=120 at +8538825
+    CI=3387 at +8362871 (0x7F9B77), ciSize=2
+      stride=8 ΓåÆ nextCI=56 at +8389969
+      stride=24 ΓåÆ nextCI=2 at +8444161
+      stride=48 ΓåÆ nextCI=56 at +8525449
+      stride=60 ΓåÆ nextCI=55 at +8566093
+      stride=64 ΓåÆ nextCI=1 at +8579641
+    CI=3387 at +8362994 (0x7F9BF2), ciSize=2
+      stride=24 ΓåÆ nextCI=15 at +8444284
+      stride=32 ΓåÆ nextCI=63 at +8471380
+      stride=40 ΓåÆ nextCI=3730 at +8498476
+      stride=48 ΓåÆ nextCI=3568 at +8525572
+      stride=52 ΓåÆ nextCI=63 at +8539120
+      stride=56 ΓåÆ nextCI=63 at +8552668
+    CI=3387 at +8363115 (0x7F9C6B), ciSize=2
+      stride=28 ΓåÆ nextCI=12 at +8457953
+      stride=32 ΓåÆ nextCI=63 at +8471501
+      stride=48 ΓåÆ nextCI=3619 at +8525693
+      stride=56 ΓåÆ nextCI=63 at +8552789
+      stride=60 ΓåÆ nextCI=55 at +8566337
+      stride=64 ΓåÆ nextCI=4442 at +8579885
+    CI=3387 at +8363722 (0x7F9ECA), ciSize=2
+      stride=12 ΓåÆ nextCI=4095 at +8404368
+      stride=20 ΓåÆ nextCI=18 at +8431464
+      stride=32 ΓåÆ nextCI=55 at +8472108
+      stride=36 ΓåÆ nextCI=37 at +8485656
+      stride=44 ΓåÆ nextCI=52 at +8512752
+      stride=48 ΓåÆ nextCI=1 at +8526300
+      stride=60 ΓåÆ nextCI=59 at +8566944
+      stride=64 ΓåÆ nextCI=1 at +8580492
+    CI=3387 at +8363993 (0x7F9FD9), ciSize=2
+      stride=60 ΓåÆ nextCI=27 at +8567215
+    CI=3387 at +8364166 (0x7FA086), ciSize=2
+      stride=8 ΓåÆ nextCI=49 at +8391264
+      stride=12 ΓåÆ nextCI=65 at +8404812
+      stride=20 ΓåÆ nextCI=56 at +8431908
+      stride=52 ΓåÆ nextCI=7810 at +8540292
+      stride=64 ΓåÆ nextCI=5 at +8580936
+    CI=3387 at +8364291 (0x7FA103), ciSize=2
+      stride=8 ΓåÆ nextCI=58 at +8391389
+      stride=12 ΓåÆ nextCI=5 at +8404937
+      stride=24 ΓåÆ nextCI=3 at +8445581
+      stride=40 ΓåÆ nextCI=70 at +8499773
+      stride=52 ΓåÆ nextCI=6 at +8540417
+      stride=60 ΓåÆ nextCI=484489 at +8567513
+      stride=64 ΓåÆ nextCI=5 at +8581061
+    CI=3387 at +8364463 (0x7FA1AF), ciSize=2
+      stride=4 ΓåÆ nextCI=5 at +8378013
+      stride=20 ΓåÆ nextCI=48 at +8432205
+      stride=36 ΓåÆ nextCI=49 at +8486397
+      stride=56 ΓåÆ nextCI=63 at +8554137
+    CI=3387 at +8364687 (0x7FA28F), ciSize=2
+      stride=16 ΓåÆ nextCI=3735 at +8418881
+      stride=40 ΓåÆ nextCI=1 at +8500169
+      stride=60 ΓåÆ nextCI=38 at +8567909
+    CI=3387 at +8364810 (0x7FA30A), ciSize=2
+      stride=16 ΓåÆ nextCI=60 at +8419004
+      stride=28 ΓåÆ nextCI=58 at +8459648
+      stride=32 ΓåÆ nextCI=46 at +8473196
+      stride=40 ΓåÆ nextCI=255 at +8500292
+    CI=3387 at +8364955 (0x7FA39B), ciSize=2
+      stride=4 ΓåÆ nextCI=35 at +8378505
+      stride=16 ΓåÆ nextCI=63 at +8419149
+      stride=24 ΓåÆ nextCI=59 at +8446245
+      stride=40 ΓåÆ nextCI=63 at +8500437
+      stride=44 ΓåÆ nextCI=1161 at +8513985
+      stride=48 ΓåÆ nextCI=58 at +8527533
+      stride=60 ΓåÆ nextCI=610389 at +8568177
+    CI=3387 at +8365564 (0x7FA5FC), ciSize=2
+      stride=4 ΓåÆ nextCI=3 at +8379114
+      stride=8 ΓåÆ nextCI=33 at +8392662
+      stride=32 ΓåÆ nextCI=9 at +8473950
+    CI=3387 at +8365976 (0x7FA798), ciSize=2
+      stride=12 ΓåÆ nextCI=5092 at +8406622
+      stride=36 ΓåÆ nextCI=2 at +8487910
+      stride=44 ΓåÆ nextCI=6612 at +8515006
+      stride=48 ΓåÆ nextCI=11 at +8528554
+      stride=56 ΓåÆ nextCI=11 at +8555650
+      stride=60 ΓåÆ nextCI=3648 at +8569198
+    CI=3387 at +8366194 (0x7FA872), ciSize=2
+      stride=16 ΓåÆ nextCI=3757 at +8420388
+      stride=20 ΓåÆ nextCI=11 at +8433936
+      stride=32 ΓåÆ nextCI=3 at +8474580
+      stride=52 ΓåÆ nextCI=53 at +8542320
+      stride=56 ΓåÆ nextCI=3602 at +8555868
+      stride=64 ΓåÆ nextCI=2 at +8582964
+    CI=3387 at +8366709 (0x7FAA75), ciSize=2
+      stride=4 ΓåÆ nextCI=4364 at +8380259
+      stride=36 ΓåÆ nextCI=5 at +8488643
+      stride=56 ΓåÆ nextCI=56 at +8556383
+      stride=60 ΓåÆ nextCI=2 at +8569931
+    CI=3387 at +8366886 (0x7FAB26), ciSize=2
+      stride=4 ΓåÆ nextCI=3552 at +8380436
+      stride=20 ΓåÆ nextCI=164 at +8434628
+      stride=36 ΓåÆ nextCI=32 at +8488820
+      stride=48 ΓåÆ nextCI=63 at +8529464
+      stride=60 ΓåÆ nextCI=341 at +8570108
+    CI=3387 at +8367083 (0x7FABEB), ciSize=2
+    CI=3387 at +8367282 (0x7FACB2), ciSize=2
+      stride=8 ΓåÆ nextCI=23 at +8394380
+      stride=16 ΓåÆ nextCI=14 at +8421476
+      stride=24 ΓåÆ nextCI=3524 at +8448572
+      stride=56 ΓåÆ nextCI=1 at +8556956
+      stride=60 ΓåÆ nextCI=59 at +8570504
+    CI=3387 at +8367459 (0x7FAD63), ciSize=2
+      stride=12 ΓåÆ nextCI=29 at +8408105
+      stride=24 ΓåÆ nextCI=58 at +8448749
+      stride=28 ΓåÆ nextCI=6 at +8462297
+      stride=44 ΓåÆ nextCI=1 at +8516489
+    CI=3387 at +8367660 (0x7FAE2C), ciSize=2
+      stride=12 ΓåÆ nextCI=3538 at +8408306
+      stride=20 ΓåÆ nextCI=1 at +8435402
+      stride=40 ΓåÆ nextCI=3517 at +8503142
+    CI=3387 at +8367928 (0x7FAF38), ciSize=2
+      stride=4 ΓåÆ nextCI=4 at +8381478
+      stride=8 ΓåÆ nextCI=1 at +8395026
+      stride=12 ΓåÆ nextCI=5061 at +8408574
+      stride=40 ΓåÆ nextCI=63 at +8503410
+      stride=60 ΓåÆ nextCI=4445 at +8571150
+      stride=64 ΓåÆ nextCI=36 at +8584698
+    CI=3387 at +8368398 (0x7FB10E), ciSize=2
+      stride=32 ΓåÆ nextCI=3 at +8476784
+      stride=40 ΓåÆ nextCI=62 at +8503880
+      stride=52 ΓåÆ nextCI=57 at +8544524
+      stride=56 ΓåÆ nextCI=46 at +8558072
+    CI=3387 at +8368549 (0x7FB1A5), ciSize=2
+      stride=8 ΓåÆ nextCI=16 at +8395647
+      stride=40 ΓåÆ nextCI=1 at +8504031
+      stride=44 ΓåÆ nextCI=63 at +8517579
+    CI=3387 at +8368672 (0x7FB220), ciSize=2
+      stride=44 ΓåÆ nextCI=15 at +8517702
+    CI=3387 at +8368819 (0x7FB2B3), ciSize=2
+      stride=4 ΓåÆ nextCI=11 at +8382369
+      stride=44 ΓåÆ nextCI=3415 at +8517849
+      stride=48 ΓåÆ nextCI=84 at +8531397
+    CI=3387 at +8368968 (0x7FB348), ciSize=2
+      stride=8 ΓåÆ nextCI=1 at +8396066
+      stride=12 ΓåÆ nextCI=156 at +8409614
+      stride=48 ΓåÆ nextCI=1 at +8531546
+      stride=60 ΓåÆ nextCI=51 at +8572190
+    CI=3387 at +8369116 (0x7FB3DC), ciSize=2
+      stride=44 ΓåÆ nextCI=50 at +8518146
+      stride=48 ΓåÆ nextCI=133 at +8531694
+      stride=52 ΓåÆ nextCI=889 at +8545242
+      stride=56 ΓåÆ nextCI=5 at +8558790
+      stride=60 ΓåÆ nextCI=4 at +8572338
+      stride=64 ΓåÆ nextCI=4 at +8585886
+    CI=3387 at +8369262 (0x7FB46E), ciSize=2
+      stride=44 ΓåÆ nextCI=58 at +8518292
+    CI=3387 at +8369411 (0x7FB503), ciSize=2
+      stride=56 ΓåÆ nextCI=3754 at +8559085
+    CI=3387 at +8369535 (0x7FB57F), ciSize=2
+      stride=4 ΓåÆ nextCI=4 at +8383085
+      stride=8 ΓåÆ nextCI=1 at +8396633
+      stride=16 ΓåÆ nextCI=104 at +8423729
+      stride=24 ΓåÆ nextCI=1 at +8450825
+      stride=44 ΓåÆ nextCI=1 at +8518565
+      stride=60 ΓåÆ nextCI=4 at +8572757
+    CI=3387 at +8369658 (0x7FB5FA), ciSize=2
+      stride=4 ΓåÆ nextCI=4 at +8383208
+      stride=8 ΓåÆ nextCI=1 at +8396756
+      stride=16 ΓåÆ nextCI=52 at +8423852
+      stride=24 ΓåÆ nextCI=50 at +8450948
+      stride=28 ΓåÆ nextCI=6 at +8464496
+      stride=32 ΓåÆ nextCI=2 at +8478044
+      stride=44 ΓåÆ nextCI=4 at +8518688
+      stride=56 ΓåÆ nextCI=4 at +8559332
+    CI=3387 at +8369902 (0x7FB6EE), ciSize=2
+      stride=4 ΓåÆ nextCI=4 at +8383452
+      stride=24 ΓåÆ nextCI=2657 at +8451192
+      stride=32 ΓåÆ nextCI=10 at +8478288
+      stride=36 ΓåÆ nextCI=34 at +8491836
+      stride=44 ΓåÆ nextCI=2 at +8518932
+    CI=3387 at +8370486 (0x7FB936), ciSize=2
+      stride=4 ΓåÆ nextCI=2 at +8384036
+      stride=24 ΓåÆ nextCI=3 at +8451776
+      stride=28 ΓåÆ nextCI=4 at +8465324
+      stride=44 ΓåÆ nextCI=3 at +8519516
+      stride=52 ΓåÆ nextCI=3890 at +8546612
+    CI=3387 at +8371169 (0x7FBBE1), ciSize=2
+      stride=16 ΓåÆ nextCI=59 at +8425363
+      stride=28 ΓåÆ nextCI=40 at +8466007
+      stride=36 ΓåÆ nextCI=1 at +8493103
+      stride=48 ΓåÆ nextCI=58 at +8533747
+    CI=3387 at +8372369 (0x7FC091), ciSize=2
+      stride=4 ΓåÆ nextCI=58 at +8385919
+      stride=8 ΓåÆ nextCI=1 at +8399467
+      stride=16 ΓåÆ nextCI=60 at +8426563
+      stride=20 ΓåÆ nextCI=11 at +8440111
+      stride=32 ΓåÆ nextCI=9 at +8480755
+      stride=52 ΓåÆ nextCI=2 at +8548495
+      stride=64 ΓåÆ nextCI=5 at +8589139
+    CI=3387 at +8372489 (0x7FC109), ciSize=2
+      stride=4 ΓåÆ nextCI=39 at +8386039
+      stride=8 ΓåÆ nextCI=52 at +8399587
+      stride=24 ΓåÆ nextCI=37 at +8453779
+      stride=40 ΓåÆ nextCI=8 at +8507971
+      stride=48 ΓåÆ nextCI=4095 at +8535067
+    CI=3387 at +8373033 (0x7FC329), ciSize=2
+      stride=32 ΓåÆ nextCI=55 at +8481419
+      stride=56 ΓåÆ nextCI=1 at +8562707
+      stride=60 ΓåÆ nextCI=5 at +8576255
+      stride=64 ΓåÆ nextCI=5 at +8589803
+    CI=3387 at +8373206 (0x7FC3D6), ciSize=2
+      stride=4 ΓåÆ nextCI=9 at +8386756
+      stride=20 ΓåÆ nextCI=18 at +8440948
+      stride=24 ΓåÆ nextCI=2 at +8454496
+      stride=40 ΓåÆ nextCI=59 at +8508688
+      stride=60 ΓåÆ nextCI=3832 at +8576428
+      stride=64 ΓåÆ nextCI=573119 at +8589976
+    CI=3387 at +8373326 (0x7FC44E), ciSize=2
+      stride=20 ΓåÆ nextCI=36 at +8441068
+      stride=36 ΓåÆ nextCI=59 at +8495260
+      stride=44 ΓåÆ nextCI=63 at +8522356
+      stride=64 ΓåÆ nextCI=5 at +8590096
+    CI=3387 at +8373449 (0x7FC4C9), ciSize=2
+      stride=32 ΓåÆ nextCI=3623 at +8481835
+      stride=36 ΓåÆ nextCI=3767 at +8495383
+      stride=52 ΓåÆ nextCI=49 at +8549575
+    CI=3387 at +8373668 (0x7FC5A4), ciSize=2
+      stride=8 ΓåÆ nextCI=1 at +8400766
+      stride=20 ΓåÆ nextCI=61 at +8441410
+      stride=28 ΓåÆ nextCI=46 at +8468506
+      stride=32 ΓåÆ nextCI=484489 at +8482054
+      stride=52 ΓåÆ nextCI=2 at +8549794
+      stride=60 ΓåÆ nextCI=69 at +8576890
+    CI=3387 at +8373792 (0x7FC620), ciSize=2
+      stride=44 ΓåÆ nextCI=4 at +8522822
+      stride=48 ΓåÆ nextCI=51 at +8536370
+    CI=3387 at +8374008 (0x7FC6F8), ciSize=2
+      stride=12 ΓåÆ nextCI=22 at +8414654
+      stride=20 ΓåÆ nextCI=63 at +8441750
+      stride=48 ΓåÆ nextCI=252 at +8536586
+    CI=3387 at +8374518 (0x7FC8F6), ciSize=2
+      stride=8 ΓåÆ nextCI=4 at +8401616
+      stride=16 ΓåÆ nextCI=5 at +8428712
+      stride=20 ΓåÆ nextCI=63 at +8442260
+      stride=28 ΓåÆ nextCI=51 at +8469356
+      stride=32 ΓåÆ nextCI=2 at +8482904
+      stride=36 ΓåÆ nextCI=36 at +8496452
+      stride=44 ΓåÆ nextCI=908 at +8523548
+      stride=48 ΓåÆ nextCI=11 at +8537096
+      stride=56 ΓåÆ nextCI=296130 at +8564192
+      stride=60 ΓåÆ nextCI=69 at +8577740
+    CI=3387 at +8374693 (0x7FC9A5), ciSize=2
+      stride=36 ΓåÆ nextCI=3751 at +8496627
+      stride=60 ΓåÆ nextCI=69 at +8577915
+    CI=3387 at +8374922 (0x7FCA8A), ciSize=2
+      stride=4 ΓåÆ nextCI=3376 at +8388472
+      stride=8 ΓåÆ nextCI=48 at +8402020
+      stride=40 ΓåÆ nextCI=7 at +8510404
+      stride=44 ΓåÆ nextCI=30 at +8523952
+      stride=56 ΓåÆ nextCI=56 at +8564596
+    CI=3387 at +8375117 (0x7FCB4D), ciSize=2
+      stride=36 ΓåÆ nextCI=19 at +8497051
+      stride=44 ΓåÆ nextCI=54 at +8524147
+      stride=52 ΓåÆ nextCI=5 at +8551243
+      stride=64 ΓåÆ nextCI=4096 at +8591887
+    CI=3387 at +8377391 (0x7FD42F), ciSize=2
+      stride=16 ΓåÆ nextCI=36 at +8431585
+      stride=28 ΓåÆ nextCI=3533 at +8472229
+      stride=32 ΓåÆ nextCI=12 at +8485777
+      stride=44 ΓåÆ nextCI=2 at +8526421
+      stride=52 ΓåÆ nextCI=2 at +8553517
+      stride=56 ΓåÆ nextCI=3453 at +8567065
+    CI=3387 at +8377566 (0x7FD4DE), ciSize=2
+      stride=4 ΓåÆ nextCI=46 at +8391116
+      stride=48 ΓåÆ nextCI=1410 at +8540144
+    CI=3387 at +8378179 (0x7FD743), ciSize=2
+      stride=20 ΓåÆ nextCI=42 at +8445921
+      stride=56 ΓåÆ nextCI=27 at +8567853
+    CI=3387 at +8378301 (0x7FD7BD), ciSize=2
+      stride=16 ΓåÆ nextCI=270 at +8432495
+      stride=40 ΓåÆ nextCI=69 at +8513783
+      stride=60 ΓåÆ nextCI=37 at +8581523
+      stride=64 ΓåÆ nextCI=10 at +8595071
+    CI=3387 at +8378622 (0x7FD8FE), ciSize=2
+      stride=48 ΓåÆ nextCI=56 at +8541200
+    CI=3391 at +8379323 (0x7FDBBB), ciSize=2
+      stride=12 ΓåÆ nextCI=471105 at +8420017
+      stride=16 ΓåÆ nextCI=8 at +8433581
+      stride=24 ΓåÆ nextCI=6 at +8460709
+      stride=36 ΓåÆ nextCI=3800 at +8501401
+      stride=44 ΓåÆ nextCI=54 at +8528529
+      stride=56 ΓåÆ nextCI=5 at +8569221
+      stride=64 ΓåÆ nextCI=5 at +8596349
+    CI=3387 at +8379819 (0x7FDDAB), ciSize=2
+      stride=8 ΓåÆ nextCI=43 at +8406917
+      stride=12 ΓåÆ nextCI=2 at +8420465
+      stride=16 ΓåÆ nextCI=566015 at +8434013
+      stride=44 ΓåÆ nextCI=23 at +8528849
+      stride=56 ΓåÆ nextCI=3549 at +8569493
+      stride=60 ΓåÆ nextCI=1 at +8583041
+      stride=64 ΓåÆ nextCI=3 at +8596589
+    CI=3388 at +8422588 (0x8084BC), ciSize=2
+      stride=12 ΓåÆ nextCI=63 at +8463246
+      stride=48 ΓåÆ nextCI=2 at +8585214
+      stride=52 ΓåÆ nextCI=1 at +8598766
+    CI=3377 at +8424065 (0x808A81), ciSize=3
+      stride=12 ΓåÆ nextCI=37 at +8464592
+      stride=52 ΓåÆ nextCI=3327 at +8599672
+    CI=6772 at +8436813 (0x80BC4D), ciSize=2
+      stride=8 ΓåÆ nextCI=3746 at +8490991
+    CI=6772 at +8437178 (0x80BDBA), ciSize=2
+      stride=12 ΓåÆ nextCI=1 at +8518444
+      stride=20 ΓåÆ nextCI=4652 at +8572620
+    CI=3391 at +8446498 (0x80E222), ciSize=2
+      stride=8 ΓåÆ nextCI=8 at +8473628
+      stride=28 ΓåÆ nextCI=7 at +8541448
+      stride=36 ΓåÆ nextCI=4146 at +8568576
+      stride=40 ΓåÆ nextCI=70 at +8582140
+    CI=3380 at +8456613 (0x8109A5), ciSize=3
+      stride=4 ΓåÆ nextCI=58 at +8470136
+      stride=8 ΓåÆ nextCI=54 at +8483656
+      stride=40 ΓåÆ nextCI=1 at +8591816
+      stride=44 ΓåÆ nextCI=3 at +8605336
+    CI=3380 at +8456760 (0x810A38), ciSize=3
+      stride=8 ΓåÆ nextCI=54 at +8483803
+      stride=20 ΓåÆ nextCI=278909 at +8524363
+      stride=28 ΓåÆ nextCI=4 at +8551403
+      stride=32 ΓåÆ nextCI=2 at +8564923
+      stride=40 ΓåÆ nextCI=572672 at +8591963
+      stride=44 ΓåÆ nextCI=294850 at +8605483
+    CI=6772 at +8467909 (0x8135C5), ciSize=2
+      stride=8 ΓåÆ nextCI=392 at +8522087
+      stride=12 ΓåÆ nextCI=58 at +8549175
+    CI=3391 at +8504471 (0x81C497), ciSize=3
+      stride=4 ΓåÆ nextCI=2192 at +8518038
+      stride=12 ΓåÆ nextCI=12 at +8545166
+      stride=24 ΓåÆ nextCI=38 at +8585858
+      stride=28 ΓåÆ nextCI=6655 at +8599422
+    CI=3394 at +8505516 (0x81C8AC), ciSize=2
+      stride=4 ΓåÆ nextCI=54 at +8519094
+      stride=16 ΓåÆ nextCI=484489 at +8559822
+      stride=20 ΓåÆ nextCI=529861 at +8573398
+      stride=24 ΓåÆ nextCI=524164 at +8586974
+    CI=3394 at +8505639 (0x81C927), ciSize=2
+      stride=4 ΓåÆ nextCI=7 at +8519217
+    CI=3377 at +8528736 (0x822360), ciSize=2
+    CI=3392 at +8532833 (0x823361), ciSize=2
+    CI=3383 at +8533183 (0x8234BF), ciSize=2
+    CI=3394 at +8533537 (0x823621), ciSize=2
+      stride=4 ΓåÆ nextCI=108 at +8547115
+      stride=12 ΓåÆ nextCI=57 at +8574267
+    CI=3392 at +8564617 (0x82AF89), ciSize=2
+      stride=8 ΓåÆ nextCI=574207 at +8591755
+
+  === CHAIN SCANNER: find CI-counted array chains ===
+  Best chain: 20 arrays starting at +7909399 (0x78B017)
+    +7909399: count=50, stride=32 (1600 bytes total)
+    +7911000: count=8, stride=1 (8 bytes total)
+    +7911009: count=1, stride=12 (12 bytes total)
+    +7911030: count=52, stride=4 (208 bytes total)
+    +7911239: count=1, stride=12 (12 bytes total)
+    +7911258: count=53, stride=8 (424 bytes total)
+    +7911683: count=32, stride=8 (256 bytes total)
+    +7911941: count=58, stride=20 (1160 bytes total)
+    +7913102: count=4373, stride=8 (34984 bytes total)
+    +7948088: count=17, stride=4 (68 bytes total)
+    +7948157: count=70, stride=4 (280 bytes total)
+    +7948439: count=2399, stride=8 (19192 bytes total)
+    +7967633: count=1, stride=24 (24 bytes total)
+    +7967658: count=1, stride=24 (24 bytes total)
+    +7967683: count=1, stride=4 (4 bytes total)
+    +7967688: count=8144, stride=2 (16288 bytes total)
+    +7983978: count=1, stride=2 (2 bytes total)
+    +7983981: count=118, stride=8 (944 bytes total)
+    +7984927: count=15, stride=2 (30 bytes total)
+    +7984958: count=1, stride=16 (16 bytes total)
+
+=== Catalog.bdc Analysis ===
+  Catalog.bdc size: 516961 bytes
+  First 256 bytes (entry format):
+    +0000: 00 D0 12 1A 53 89 FA 25 41 00 00 00 00 49 03 28  |....S..%A....I.(|
+    +0010: 58 2D 9E 28 DF 25 41 11 42 00 75 00 6C 00 6B 00  |X-.(.%A.B.u.l.k.|
+    +0020: 43 00 68 00 75 00 6E 00 6B 00 30 00 5F 00 30 00  |C.h.u.n.k.0._.0.|
+    +0030: 2E 00 62 00 6C 00 6B 00 00 00 17 15 48 00 61 00  |..b.l.k.....H.a.|
+    +0040: 72 00 76 00 65 00 73 00 74 00 53 00 6C 00 75 00  |r.v.e.s.t.S.l.u.|
+    +0050: 67 00 46 00 69 00 73 00 68 00 5F 00 44 00 69 00  |g.F.i.s.h._.D.i.|
+    +0060: 66 00 66 00 00 00 10 48 00 61 00 72 00 76 00 65  |f.f....H.a.r.v.e|
+    +0070: 00 73 00 74 00 53 00 6C 00 75 00 67 00 66 00 69  |.s.t.S.l.u.g.f.i|
+    +0080: 00 73 00 68 00 00 00 00 00 00 00 00 80 00 00 00  |.s.h............|
+    +0090: A0 0A 00 00 A0 0A 00 01 00 00 00 15 48 00 61 00  |............H.a.|
+    +00A0: 72 00 76 00 65 00 73 00 74 00 53 00 6C 00 75 00  |r.v.e.s.t.S.l.u.|
+    +00B0: 67 00 46 00 69 00 73 00 68 00 5F 00 4E 00 6F 00  |g.F.i.s.h._.N.o.|
+    +00C0: 72 00 6D 00 00 00 10 48 00 61 00 72 00 76 00 65  |r.m....H.a.r.v.e|
+    +00D0: 00 73 00 74 00 53 00 6C 00 75 00 67 00 66 00 69  |.s.t.S.l.u.g.f.i|
+    +00E0: 00 73 00 68 00 00 00 00 00 00 00 00 80 0B 00 00  |.s.h............|
+    +00F0: A0 0A 00 00 A0 0A 00 02 00 00 00 15 53 00 74 00  |............S.t.|
+
+=== Catalog Lookup for Lightmap Textures ===
+  Looking up 14 textures in catalog
+  Texture49: meta hex @0x38B6F: 00 00 00 00 00 80 16 00 00 A0 0A 00 00 A0 0A 00 20 07 00 00 12 45 00 6D 00 70 00 74 00 79 00 5F 
+  Texture49: chunk='BulkChunk1_38.blk' meta=[0, 1474560, 696320, 696320, 1824]
+  Texture46: meta hex @0x4C8A7: 00 00 00 00 00 80 16 00 00 A0 0A 00 00 A0 0A 00 87 07 00 00 13 64 00 65 00 73 00 6B 00 5F 00 63 
+  Texture46: chunk='BulkChunk1_68.blk' meta=[0, 1474560, 696320, 696320, 1927]
+  Texture47: meta hex @0x6B82D: 00 00 00 00 00 80 00 00 00 A0 0A 00 00 A0 0A 00 F0 07 00 00 12 6C 00 69 00 67 00 68 00 74 00 5F 
+  Texture47: chunk='BulkChunk1_117.blk' meta=[0, 32768, 696320, 696320, 2032]
+  Texture50: chunk='BulkChunk1_21.blk' meta=[0, 8650752, 696320, 696320, 2422]
+  Texture48: chunk='BulkChunk1_112.blk' meta=[0, 32768, 696320, 696320, 2614]
+  Texture54: chunk='BulkChunk1_78.blk' meta=[0, 753664, 696320, 696320, 2750]
+  Texture44: chunk='BulkChunk1_97.blk' meta=[0, 3571712, 696320, 696320, 2868]
+  Texture43: chunk='BulkChunk1_123.blk' meta=[0, 32768, 696320, 696320, 2878]
+  Texture55: chunk='BulkChunk1_22.blk' meta=[0, 2850816, 696320, 696320, 2871]
+  Texture45: chunk='BulkChunk1_87.blk' meta=[0, 6389760, 696320, 696320, 3267]
+  Texture42: chunk='BulkChunk1_19.blk' meta=[0, 2850816, 696320, 696320, 4827]
+  Texture51: chunk='BulkChunk1_55.blk' meta=[0, 753664, 696320, 696320, 4830]
+  Texture52: chunk='BulkChunk1_115.blk' meta=[0, 4456448, 696320, 696320, 6632]
+  Texture53: chunk='BulkChunk1_47.blk' meta=[0, 6389760, 696320, 696320, 9664]
+  Found 14 catalog entries
+
+  === Multi-variant lightmap extraction ===
+    Texture49: chunk=BulkChunk1_38.blk off=0x168000 firstNZ=+0x2C8
+      A(raw,mip0)   delta=0.106 sat=0.281
+      B(+0xD0,mip0) delta=0.040 sat=0.250
+      C(firstNZ+0x2C8,mip0) delta=0.038 sat=0.375
+      D(raw,4mips)  delta=0.106 sat=0.281
+      E(512x512)    delta=0.069 sat=0.562
+      hex[0..63]: 0000000000000000 0000000000000000 0000000000000000 0000000000000000 0000000000000000 0000000000000000 0000000000000000 0000000000000000 
+    Texture46: chunk=BulkChunk1_68.blk off=0x168000 firstNZ=+0x88
+      A(raw,mip0)   delta=0.394 sat=0.681
+      B(+0xD0,mip0) delta=0.096 sat=0.561
+      C(firstNZ+0x88,mip0) delta=0.087 sat=0.828
+      D(raw,4mips)  delta=0.394 sat=0.681
+      E(512x512)    delta=0.567 sat=0.875
+      hex[0..63]: 0000000000000000 0000000000000000 0000000000000000 0000000000000000 0000000000000000 0000000000000000 0000000000000000 0000000000000000 
+    Texture47: chunk=BulkChunk1_117.blk off=0x8000 firstNZ=+0x18
+      A(raw,mip0)   delta=0.197 sat=0.530
+      B(+0xD0,mip0) delta=0.033 sat=0.469
+      C(firstNZ+0x18,mip0) delta=0.087 sat=0.577
+      D(raw,4mips)  delta=0.197 sat=0.530
+      E(512x512)    delta=0.026 sat=0.312
+      hex[0..63]: 0000000000000000 0000000000000000 0000000000000000 020000002DB5D555 030001000A2B2DBD 050003000B2FBDF5 06000400020A2BAD 080006002BAFFDF5 
+    Texture50: chunk=BulkChunk1_21.blk off=0x840000 firstNZ=+0x0
+      A(raw,mip0)   delta=0.053 sat=0.422
+      B(+0xD0,mip0) delta=0.036 sat=0.641
+      D(raw,4mips)  delta=0.053 sat=0.422
+      E(512x512)    delta=0.194 sat=1.000
+      hex[0..63]: 09900780AFAB2B2D 0A980990D5F52D0B 0BA00998F5FFAF2A 0CA80AA055F5FFAF 0CB00AA0FDBFAB2A 0CB00BB055F5AF0A 0CB80BB0F5AF0A00 0DC00CB85555F5BF 
+    Texture48: chunk=BulkChunk1_112.blk off=0x8000 firstNZ=+0x9
+      A(raw,mip0)   delta=0.000 sat=0.000
+      B(+0xD0,mip0) delta=0.035 sat=0.406
+      C(firstNZ+0x9,mip0) delta=0.234 sat=0.191
+      D(raw,4mips)  delta=0.000 sat=0.000
+      E(512x512)    delta=0.000 sat=0.000
+      hex[0..63]: 0000000000000000 00D800D800000000 00E000D8D5555555 00E000D8FFFFFDF5 00E000D8FFFFFFFF 00D800E0AAAAAAAA 00D800E0AAAAAAAA 00E000D8AAAAAAAA 
+    Texture54: chunk=BulkChunk1_78.blk off=0xB8000 firstNZ=+0x0
+      A(raw,mip0)   delta=0.197 sat=0.406
+      B(+0xD0,mip0) delta=0.029 sat=0.643
+      D(raw,4mips)  delta=0.197 sat=0.406
+      E(512x512)    delta=0.584 sat=1.000
+      hex[0..63]: A022000009090909 202BE02203030302 6033202BBFAFAB2A 60334033AF2A0A00 803B6033BDAFAB2A A03B803B55F5ADAB C043803BFDBFBFAB C043803BAA2A0A00 
+    Texture44: chunk=BulkChunk1_97.blk off=0x368000 firstNZ=+0x438
+      A(raw,mip0)   delta=0.111 sat=0.457
+      B(+0xD0,mip0) delta=0.040 sat=0.219
+      C(firstNZ+0x438,mip0) delta=0.032 sat=0.359
+      D(raw,4mips)  delta=0.111 sat=0.457
+      E(512x512)    delta=0.000 sat=0.000
+      hex[0..63]: 0000000000000000 0000000000000000 0000000000000000 0000000000000000 0000000000000000 0000000000000000 0000000000000000 0000000000000000 
+    Texture43: chunk=BulkChunk1_123.blk off=0x8000 firstNZ=+0xD0
+      A(raw,mip0)   delta=0.093 sat=0.156
+      B(+0xD0,mip0) delta=0.069 sat=0.531
+      D(raw,4mips)  delta=0.093 sat=0.156
+      E(512x512)    delta=0.000 sat=0.000
+      hex[0..63]: 0000000000000000 0000000000000000 0000000000000000 0000000000000000 0000000000000000 0000000000000000 0000000000000000 0000000000000000 
+    Texture55: chunk=BulkChunk1_22.blk off=0x2B8000 firstNZ=+0x0
+      A(raw,mip0)   delta=0.003 sat=0.094
+      B(+0xD0,mip0) delta=0.015 sat=0.234
+      D(raw,4mips)  delta=0.003 sat=0.094
+      E(512x512)    delta=0.013 sat=0.375
+      hex[0..63]: 201A001A022AADB5 6022201AFFFDFDD5 8022201AAFBFFFFF 8022201AAAAAAAAB 8022401A00022AAA A02280222AABB5D5 C02A601AAAAAAAAA C02AA022AAABAFBF 
+    Texture45: chunk=BulkChunk1_87.blk off=0x618000 firstNZ=+0xD0
+      A(raw,mip0)   delta=0.062 sat=0.281
+      B(+0xD0,mip0) delta=0.038 sat=0.344
+      D(raw,4mips)  delta=0.062 sat=0.281
+      E(512x512)    delta=0.008 sat=0.312
+      hex[0..63]: 0000000000000000 0000000000000000 0000000000000000 0000000000000000 0000000000000000 0000000000000000 0000000000000000 0000000000000000 
+    Texture42: chunk=BulkChunk1_19.blk off=0x2B8000 firstNZ=+0x1
+      A(raw,mip0)   delta=0.064 sat=0.181
+      B(+0xD0,mip0) delta=0.096 sat=0.433
+      C(firstNZ+0x1,mip0) delta=0.117 sat=0.163
+      D(raw,4mips)  delta=0.064 sat=0.181
+      E(512x512)    delta=0.105 sat=0.250
+      hex[0..63]: 0040000075654555 008000000A025555 00980008AA800105 008000105E7A7878 14000900B5AD2D2D 18000100EA820004 1D00000055575E58 A004400355FFAA00 
+    Texture51: chunk=BulkChunk1_55.blk off=0xB8000 firstNZ=+0x8
+      A(raw,mip0)   delta=0.000 sat=0.000
+      B(+0xD0,mip0) delta=0.020 sat=0.281
+      C(firstNZ+0x8,mip0) delta=0.004 sat=0.109
+      D(raw,4mips)  delta=0.000 sat=0.000
+      E(512x512)    delta=0.000 sat=0.000
+      hex[0..63]: 0000000000000000 090008000A0A0B0B 0A0009000A0A0A0A 0B000A000A0A0A0A 0C000B000B0B0B0B 0D000C000B0B2B2B 0E000D002B2B2B2B 0F000E002B2DADAD 
+    Texture52: chunk=BulkChunk1_115.blk off=0x440000 firstNZ=+0x41
+      A(raw,mip0)   delta=0.187 sat=0.469
+      B(+0xD0,mip0) delta=0.030 sat=0.531
+      C(firstNZ+0x41,mip0) delta=0.452 sat=0.443
+      D(raw,4mips)  delta=0.187 sat=0.469
+      E(512x512)    delta=0.433 sat=0.875
+      hex[0..63]: 0000000000000000 0000000000000000 0000000000000000 0000000000000000 0000000000000000 0000000000000000 0000000000000000 0000000000000000 
+    Texture53: chunk=BulkChunk1_47.blk off=0x618000 firstNZ=+0x2E8
+      A(raw,mip0)   delta=0.000 sat=0.000
+      B(+0xD0,mip0) delta=0.000 sat=0.000
+      C(firstNZ+0x2E8,mip0) delta=0.009 sat=0.203
+      D(raw,4mips)  delta=0.000 sat=0.000
+      E(512x512)    delta=0.000 sat=0.000
+      hex[0..63]: 0000000000000000 0000000000000000 0000000000000000 0000000000000000 0000000000000000 0000000000000000 0000000000000000 0000000000000000 

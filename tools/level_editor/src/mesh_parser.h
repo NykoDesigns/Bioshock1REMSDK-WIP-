@@ -9,6 +9,7 @@ struct MeshVertex {
     float x, y, z;    // position
     float nx, ny, nz; // normal
     float u, v;       // texture coordinates
+    float tx, ty, tz, tw; // tangent (xyz = direction, w = handedness ±1)
 };
 
 struct MeshTriangle {
@@ -23,8 +24,10 @@ struct ParsedMesh {
     Vec3 boundsMin = {0,0,0};
     Vec3 boundsMax = {0,0,0};
     bool valid = false;
+    bool isWater = false;      // BSP: water surface (rendered with transparency + animation)
     uint8_t zoneMask[16] = {}; // BSP: union of zone visibility masks for all nodes in this chunk
     uint8_t zoneIndex = 0;     // BSP: zone this chunk belongs to (byte at +96)
+    float lightMapScale = 0.0f;  // BSP: lightmap texel density (from FBspSurf 20B tail)
 };
 
 // Parse a StaticMesh export's serial data into vertices + triangles.

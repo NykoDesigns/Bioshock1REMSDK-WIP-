@@ -2,340 +2,366 @@
 ║              BS1SDK CRASH REPORT v3.0                      ║
 ╚══════════════════════════════════════════════════════════════╝
 
-Time:       2026-05-18 00:30:22.671
-Uptime:     0.2 seconds (since SDK init)
-Thread:     32688 (0x7FB0)
-Process:    14872
-Context:    init:property_layout
+Time:       2026-05-22 01:17:14.885
+Uptime:     31.0 seconds (since SDK init)
+Thread:     35444 (0x8A74)
+Process:    9288
+Context:    runtime:normal
 
 === EXCEPTION ===
 Code:       0xC0000005 (ACCESS_VIOLATION)
-Address:    0x60EEF892  [BS1SDK.dll+0x0005F892]
-Operation:  Attempted READ at 0x0080003F
+Address:    0x7593CA4E  [KERNEL32.DLL+0x0001CA4E]
+Operation:  Attempted READ at 0x0000801D
+            *** NEAR-NULL dereference (likely null pointer + offset 0x801D) ***
 
-=== MEMORY AROUND AV TARGET (0x0080003F ± 64 bytes) ===
-    007FFFF0: ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ??
-    00800000: ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ??
-    00800010: ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ??
-    00800020: ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ??
-    00800030: ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ??
-    00800040: ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ??
-    00800050: ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ??
-    00800060: ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ??
-    00800070: ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ??
+=== NULL POINTER ANALYSIS (target offset 0x801D) ===
 
 === CRASH MODULE ===
-Module:     D:\SteamLibrary\steamapps\common\BioShock Remastered\Build\Final\BS1SDK.dll
-Base:       0x60E90000
-Size:       0x00386000 (3608 KB)
-Offset:     0x0005F892
+Module:     C:\WINDOWS\System32\KERNEL32.DLL
+Base:       0x75920000
+Size:       0x000F0000 (960 KB)
+Offset:     0x0001CA4E
 PDB:        NOT FOUND (place .pdb next to DLL for symbols)
 
 === REGISTERS ===
-EAX=111E04EC  EBX=014CECC8  ECX=00800017  EDX=00000000
-ESI=5EE9FA6C  EDI=0000001A  EBP=5EE9F8A4  ESP=5EE9F834
-EIP=60EEF892  EFLAGS=00010206
+EAX=00008020  EBX=00000200  ECX=5D88B290  EDX=0000801D
+ESI=00001000  EDI=5D88B290  EBP=5D88B21C  ESP=5D88B1EC
+EIP=7593CA4E  EFLAGS=00010246
 
 === REGISTER POINTER ANALYSIS ===
-  EAX = 0x111E04EC  -> BioshockHD.exe+0x13904EC  -> [0x0F3E6F80]  -> [0x040FF530]  -> [0x00000000]
-         hex: 80 6F 3E 0F 17 7A 00 00 A3 90 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
-  EBX = 0x014CECC8  -> [0x60E9AB60]  -> [0x6AEC8B55]  -> [0x0F1FF883]
-         hex: 60 AB E9 60 E0 88 17 63 00 00 00 00 00 00 E9 60 00 00 00 00 00 00 00 00 6D 41 A8 0E 00 0B 00 89 
-  ECX = 0x00800017
-  EDX = 0x00000000  (NULL)
-  ESI = 0x5EE9FA6C  -> [0x63171400]  -> [0x51A6E988]  -> [0x66274800]
-         hex: 00 14 17 63 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0F 00 00 00 81 73 D8 5A FE FF FF FF 
-  EDI = 0x0000001A
-  EBP = 0x5EE9F8A4  -> [0x5EE9FDB4]  -> [0x5EE9FE2C]  -> [0x5EE9FE94]
-         hex: B4 FD E9 5E D1 92 EA 60 6C FA E9 5E C1 EE BD 59 00 70 67 01 00 00 E5 0F 3C DB 15 61 F8 DA 15 61 
+  EAX = 0x00008020
+  EBX = 0x00000200
+  ECX = 0x5D88B290  -> [0x4207CA28]  -> [0x60467448]  -> [0x601A8D00]
+         hex: 28 CA 07 42 00 00 00 00 C8 48 50 60 B0 B2 88 5D AC B2 88 5D 37 F3 41 60 C8 48 50 60 18 B3 88 5D 
+  EDX = 0x0000801D
+  ESI = 0x00001000
+  EDI = 0x5D88B290  -> [0x4207CA28]  -> [0x60467448]  -> [0x601A8D00]
+         hex: 28 CA 07 42 00 00 00 00 C8 48 50 60 B0 B2 88 5D AC B2 88 5D 37 F3 41 60 C8 48 50 60 18 B3 88 5D 
+  EBP = 0x5D88B21C  -> [0x5D88B270]  -> [0x5D88B494]  -> [0x5D88BBD8]
+         hex: 70 B2 88 5D FE B7 2A 60 1D 80 00 00 04 00 00 00 CA A0 33 5C A8 9E A3 1A F0 B6 88 5D E4 BB 88 5D 
 
 === CODE BYTES (EIP-0x40 .. EIP+0x40) ===
-  60EEF852:  C2  04  00  B9  05  00  00  00  CD  29  CC  CC  CC  CC  55  8B   .........)....U.
-  60EEF862:  EC  6A  FF  68  D5  5E  14  61  64  A1  00  00  00  00  50  83   .j.h.^.ad.....P.
-  60EEF872:  EC  58  A1  40  2C  1E  61  33  C5  89  45  F0  56  57  50  8D   .X.@,.a3..E.VWP.
-  60EEF882:  45  F4  64  A3  00  00  00  00  A1  4C  68  1E  61  8B  75  08   E.d......Lh.a.u.
-  60EEF892: [8B] 51  28  8B  79  2C  89  75  A0  85  C0  0F  84  16  01  00   .Q(.y,.u........
-  60EEF8A2:  00  85  D2  0F  88  0E  01  00  00  3B  50  04  7C  3D  0F  57   .........;P.|=.W
-  60EEF8B2:  C0  0F  11  06  C7  46  10  0E  00  00  00  C7  46  14  0F  00   .....F......F...
-  60EEF8C2:  00  00  F3  0F  7E  05  8C  35  16  61  66  0F  D6  06  8B  0D   ....~..5.af.....
+  7593CA0E:  CC  CC  FF  25  2C  1A  9A  75  CC  CC  CC  CC  CC  CC  CC  CC   ...%,..u........
+  7593CA1E:  CC  CC  6A  10  68  78  3F  9B  75  E8  B0  E4  00  00  8B  35   ..j.hx?.u......5
+  7593CA2E:  88  07  9D  75  8B  45  0C  85  C0  74  3A  8B  55  08  85  D2   ...u.E...t:.U...
+  7593CA3E:  74  47  48  03  C2  89  45  E4  3B  C2  72  3D  83  65  FC  00   tGH...E.;.r=.e..
+  7593CA4E: [8A] 02  8D  46  FF  F7  D0  8B  C8  23  CA  89  4D  E0  8B  55   ...F.....#..M..U
+  7593CA5E:  E4  23  D0  89  55  E4  3B  CA  0F  85  39  FE  00  00  C7  45   .#..U.;...9....E
+  7593CA6E:  FC  FE  FF  FF  FF  33  C0  8B  4D  F0  64  89  0D  00  00  00   .....3..M.d.....
+  7593CA7E:  00  59  5F  5E  5B  C9  C2  08  00  33  C0  40  EB  E9  CC  CC   .Y_^[....3.@....
 
 --- DbgHelp Stack Trace ---
   # 0  ntdll.dll+0x0006D7C1  RtlGetAppContainerNamedObjectPath+0x231
 
 === RAW STACK (2048 bytes from ESP) ===
-  5EE9FF5C: FFFFFFFF 77D24977 00000000 00000000  ....wI.w........
-  5EE9FF6C: 610F9401 014CECC8 00000000 00000000  ...a..L.........
-  5EE9FF7C: 00000000 00000000 00000000 00000000  ................
-  5EE9FF8C: 00000000 00000000 00000000 00000000  ................
-  5EE9FF9C: 00000000 00000000 00000000 00000000  ................
-  5EE9FFAC: 00000000 00000000 00000000 00000000  ................
-  5EE9FFBC: 00000000 00000000 00000000 00000000  ................
-  5EE9FFCC: 00000000 00000000 00000000 00000000  ................
-  5EE9FFDC: 00000000 00000000 00000000 00000000  ................
-  5EE9FFEC: 00000000 00000000 00000000 00000000  ................
+  5D88FDE0: FFFFFFFF 76FF4973 00000000 00000000  ....sI.v........
+  5D88FDF0: 1058CBB0 5FFA75A0 00000000 00000000  ..X..u._........
+  5D88FE00: 00000000 00000000 00000000 00000000  ................
+  5D88FE10: 00000000 00000000 00000000 00000000  ................
+  5D88FE20: 00000000 00000000 00000000 00000000  ................
+  5D88FE30: 00000000 00000000 00000000 00000000  ................
+  5D88FE40: 00000000 00000000 00000000 00000000  ................
+  5D88FE50: 00000000 00000000 00000000 00000000  ................
+  5D88FE60: 00000000 00000000 00000000 00000000  ................
+  5D88FE70: 00000000 00000000 00000000 00000000  ................
+  5D88FE80: 00000000 00000000 00000000 00000000  ................
+  5D88FE90: 00000000 00000000 00000000 00000000  ................
+  5D88FEA0: 00000000 00000000 00000000 00000000  ................
+  5D88FEB0: 00000000 00000000 00000000 00000000  ................
+  5D88FEC0: 00000000 00000000 00000000 00000000  ................
+  5D88FED0: 00000000 00000000 00000000 00000000  ................
+  5D88FEE0: 00000000 00000000 00000000 00000000  ................
+  5D88FEF0: 00000000 00000000 00000000 00000000  ................
+  5D88FF00: 00000000 00000000 00000000 00000000  ................
+  5D88FF10: 00000000 00000000 00000000 00000000  ................
+  5D88FF20: 00000000 00000000 00000000 00000000  ................
+  5D88FF30: 00000000 00000000 00000000 00000000  ................
+  5D88FF40: 00000000 00000000 00000000 00000000  ................
+  5D88FF50: 00000000 00000000 00000000 00000000  ................
+  5D88FF60: 00000000 00000000 00000000 00000000  ................
+  5D88FF70: 00000000 00000000 00000000 00000000  ................
+  5D88FF80: 00000000 00000000 00000000 00000000  ................
+  5D88FF90: 00000000 00000000 00000000 00000000  ................
+  5D88FFA0: 00000000 00000000 00000000 00000000  ................
+  5D88FFB0: 00000000 00000000 00000000 00000000  ................
+  5D88FFC0: 00000000 00000000 00000000 00000000  ................
+  5D88FFD0: 00000000 00000000 00000000 00000000  ................
+  5D88FFE0: 00000000 00000000 00000000 00000000  ................
+  5D88FFF0: 00000000 00000000 00000000 00000000  ................
 
 === RETURN ADDRESS SCAN (all modules) ===
-  ESP+0004: 0x77D24977  [ntdll.dll+0x000B4977]
-  ESP+0010: 0x610F9401  [BS1SDK.dll+0x00269401]
+  ESP+0004: 0x76FF4973  [ntdll.dll+0x000B4973]
+  ESP+0010: 0x1058CBB0  [BioshockHD.exe+0x0070CBB0]
 
 === BREADCRUMBS (last 128, newest first) ===
   (none recorded)
 
 === THREADS ===
-  TID= 7372  Priority= 8
-  TID=35024  Priority= 8
-  TID=21756  Priority= 8
-  TID=11048  Priority= 8
-  TID=15080  Priority= 8
-  TID= 4108  Priority= 8
-  TID=37032  Priority= 8
-  TID=26904  Priority= 8
-  TID=28456  Priority=21
-  TID= 5104  Priority=10
-  TID=20952  Priority=10
-  TID=17576  Priority= 8
-  TID=27384  Priority= 8
-  TID=34012  Priority=10
-  TID=36612  Priority= 8
-  TID=23604  Priority= 8
-  TID= 9800  Priority= 1
-  TID=30480  Priority= 1
-  TID=39308  Priority= 1
-  TID=39392  Priority= 1
-  TID=35176  Priority= 1
-  TID=37592  Priority= 1
-  TID=38692  Priority= 1
-  TID=37332  Priority= 1
-  TID=35572  Priority= 1
-  TID=36248  Priority= 1
-  TID=12660  Priority= 1
-  TID=38412  Priority= 1
-  TID=19876  Priority= 1
-  TID=23520  Priority= 1
-  TID=39988  Priority= 1
-  TID=15008  Priority= 1
-  TID=39664  Priority= 9
-  TID=35928  Priority= 9
-  TID=36748  Priority= 1
-  TID= 3400  Priority= 1
-  TID=29112  Priority= 1
-  TID=19344  Priority= 1
-  TID=14984  Priority= 1
-  TID=37904  Priority= 1
-  TID=34216  Priority= 1
-  TID=32668  Priority= 1
-  TID=39088  Priority= 1
-  TID=30484  Priority= 1
-  TID=34372  Priority= 1
-  TID= 3720  Priority= 1
-  TID=38956  Priority= 1
-  TID= 9200  Priority= 1
-  TID=23840  Priority= 1
-  TID=40268  Priority= 1
-  TID= 8252  Priority=15
-  TID=28708  Priority=15
-  TID= 7620  Priority=10
-  TID=29820  Priority= 9
-  TID=40028  Priority= 8
-  TID=38828  Priority= 1
-  TID=40708  Priority= 1
-  TID=32948  Priority= 1
-  TID=14420  Priority= 1
-  TID=36992  Priority= 1
-  TID=38392  Priority= 1
-  TID=13904  Priority= 1
-  TID=30712  Priority= 1
-  TID=24620  Priority= 1
-  TID=34212  Priority= 1
-  TID=30536  Priority= 1
-  TID= 6320  Priority= 1
-  TID=38880  Priority= 1
-  TID= 9992  Priority= 1
-  TID=35364  Priority= 1
-  TID=27408  Priority= 1
-  TID= 2144  Priority= 8
-  TID=19476  Priority= 8
-  TID=32392  Priority=22
-  TID= 8336  Priority= 9
-  TID=38944  Priority= 9
-  TID=32688  Priority= 8 <<<< CRASH
+  TID=36264  Priority= 8
+  TID=41624  Priority= 8
+  TID=21004  Priority= 8
+  TID=36084  Priority= 8
+  TID=38084  Priority= 8
+  TID=57320  Priority= 8
+  TID=35384  Priority= 8
+  TID=58872  Priority= 8
+  TID=24208  Priority=21
+  TID=12732  Priority=10
+  TID= 7688  Priority=10
+  TID=55684  Priority= 8
+  TID=38172  Priority= 8
+  TID=22504  Priority=10
+  TID=55760  Priority= 8
+  TID=38576  Priority= 8
+  TID=27556  Priority= 1
+  TID=41140  Priority= 1
+  TID=37416  Priority= 1
+  TID=59188  Priority= 1
+  TID=39536  Priority= 1
+  TID=57152  Priority= 1
+  TID=39924  Priority= 1
+  TID=40792  Priority= 1
+  TID=57952  Priority= 1
+  TID=38948  Priority= 1
+  TID=46160  Priority= 1
+  TID=59836  Priority= 1
+  TID=18400  Priority= 1
+  TID=35464  Priority= 1
+  TID=13396  Priority= 1
+  TID=55356  Priority= 1
+  TID=55600  Priority= 9
+  TID=58968  Priority= 9
+  TID=58584  Priority= 1
+  TID=60072  Priority= 1
+  TID=39316  Priority= 1
+  TID= 4236  Priority= 1
+  TID= 9020  Priority= 1
+  TID=41512  Priority= 1
+  TID=57640  Priority= 1
+  TID=36332  Priority= 1
+  TID=56920  Priority= 1
+  TID=59080  Priority= 1
+  TID=59064  Priority= 1
+  TID=59732  Priority= 1
+  TID=17876  Priority= 1
+  TID=21520  Priority= 1
+  TID=36148  Priority= 1
+  TID=27560  Priority= 1
+  TID=59136  Priority=15
+  TID=37872  Priority=15
+  TID=54380  Priority= 8
+  TID=59632  Priority= 1
+  TID=42888  Priority= 1
+  TID=28344  Priority= 1
+  TID=15928  Priority= 1
+  TID=38552  Priority= 1
+  TID=57820  Priority= 1
+  TID=30652  Priority= 1
+  TID=25160  Priority= 1
+  TID=16012  Priority= 1
+  TID= 3016  Priority= 1
+  TID=44540  Priority= 1
+  TID=42312  Priority= 1
+  TID=43628  Priority= 1
+  TID=54444  Priority= 1
+  TID=39144  Priority= 1
+  TID= 7232  Priority= 1
+  TID=55860  Priority= 8
+  TID= 8736  Priority= 8
+  TID=27484  Priority=22
+  TID=35444  Priority= 9 <<<< CRASH
+  TID=38404  Priority= 8
+  TID=59264  Priority= 9
+  TID=54980  Priority= 8
+  TID=51836  Priority= 8
+  TID=19956  Priority= 9
+  TID=39728  Priority= 9
+  TID=24808  Priority= 9
+  TID=55268  Priority= 9
+  TID=38980  Priority= 9
+  TID=42100  Priority= 9
+  TID=34520  Priority= 8
+  TID=39356  Priority= 8
 
 === LOADED MODULES ===
-  0x0FE50000 - 0x114C7000   23004 KB  BioshockHD.exe
-  0x77C70000 - 0x77E2F000    1788 KB  ntdll.dll
-  0x76120000 - 0x76210000     960 KB  KERNEL32.DLL
-  0x76B80000 - 0x76E4D000    2868 KB  KERNELBASE.dll
-  0x775E0000 - 0x777B6000    1880 KB  USER32.dll
-  0x76020000 - 0x7603B000     108 KB  win32u.dll
-  0x773C0000 - 0x773E2000     136 KB  GDI32.dll
-  0x622D0000 - 0x624B0000    1920 KB  dbghelp.dll
-  0x6D4E0000 - 0x6D65A000    1512 KB  d3d9.dll
-  0x754D0000 - 0x755BC000     944 KB  gdi32full.dll
-  0x77A60000 - 0x77B27000     796 KB  msvcrt.dll
-  0x5C070000 - 0x5C261000    1988 KB  d3d11.dll
-  0x77B30000 - 0x77BB3000     524 KB  sechost.dll
-  0x76A60000 - 0x76B70000    1088 KB  ucrtbase.dll
-  0x76E50000 - 0x76ED5000     532 KB  msvcp_win.dll
-  0x75CA0000 - 0x75D55000     724 KB  COMDLG32.dll
-  0x777C0000 - 0x77A53000    2636 KB  combase.dll
-  0x76040000 - 0x760FC000     752 KB  RPCRT4.dll
-  0x70A80000 - 0x70AA6000     152 KB  dwmapi.dll
-  0x75D60000 - 0x75E31000     836 KB  shcore.dll
-  0x76220000 - 0x762BF000     636 KB  OLEAUT32.dll
-  0x74F90000 - 0x74F98000      32 KB  VERSION.dll
-  0x75FC0000 - 0x76012000     328 KB  SHLWAPI.dll
-  0x76370000 - 0x76A56000    7064 KB  Windows.Storage.dll
-  0x5C790000 - 0x5C899000    1060 KB  dxgi.dll
-  0x755C0000 - 0x75642000     520 KB  advapi32.dll
-  0x69020000 - 0x69075000     340 KB  powrprof.dll
-  0x70860000 - 0x70898000     224 KB  dxcore.dll
-  0x75650000 - 0x75C93000    6412 KB  SHELL32.dll
-  0x750C0000 - 0x75129000     420 KB  WS2_32.dll
-  0x62CC0000 - 0x62D51000     580 KB  COMCTL32.dll
-  0x77C30000 - 0x77C55000     148 KB  IMM32.dll
-  0x50CF0000 - 0x50D48000     352 KB  bink2w32.dll
-  0x75370000 - 0x754C3000    1356 KB  ole32.dll
-  0x50CB0000 - 0x50CED000     244 KB  steam_api.dll
-  0x50CA0000 - 0x50CA8000      32 KB  WSOCK32.dll
-  0x61430000 - 0x6149D000     436 KB  MSVCP140.dll
-  0x50C80000 - 0x50C9C000     112 KB  amd_ags_x86.dll
-  0x70A70000 - 0x70A76000      24 KB  MSIMG32.dll
-  0x61410000 - 0x61425000      84 KB  VCRUNTIME140.dll
-  0x5AD10000 - 0x5AD48000     224 KB  DINPUT8.dll
-  0x5B3D0000 - 0x5B446000     472 KB  DSOUND.dll
-  0x50C50000 - 0x50C77000     156 KB  WINMM.dll
-  0x50C20000 - 0x50C46000     152 KB  XINPUT1_3.dll
-  0x50AA0000 - 0x50C1A000    1512 KB  fmodex.dll
-  0x50890000 - 0x50A97000    2076 KB  D3DCOMPILER_43.dll
-  0x5B680000 - 0x5B6A5000     148 KB  winmmbase.dll
-  0x5B330000 - 0x5B3CA000     616 KB  ResampleDmo.DLL
-  0x51FD0000 - 0x51FEA000     104 KB  MSACM32.dll
-  0x54280000 - 0x542B0000     192 KB  dbgcore.DLL
-  0x69170000 - 0x69179000      36 KB  msdmo.dll
-  0x70350000 - 0x7035E000      56 KB  UMPDC.dll
-  0x68FE0000 - 0x69013000     204 KB  winmm.dll
-  0x50720000 - 0x5088E000    1464 KB  gameoverlayrenderer.dll
-  0x76100000 - 0x76106000      24 KB  PSAPI.DLL
-  0x730B0000 - 0x730EE000     248 KB  CFGMGR32.dll
-  0x59970000 - 0x59AE2000    1480 KB  inputhost.dll
-  0x59890000 - 0x5996D000     884 KB  CoreMessaging.dll
-  0x70650000 - 0x706D0000     512 KB  uxtheme.dll
-  0x77460000 - 0x77569000    1060 KB  CRYPT32.dll
-  0x773A0000 - 0x773BB000     108 KB  imagehlp.dll
-  0x70230000 - 0x70255000     148 KB  IPHLPAPI.DLL
-  0x706E0000 - 0x70734000     336 KB  MSWSOCK.dll
-  0x72010000 - 0x7202C000     112 KB  bcrypt.dll
-  0x05F20000 - 0x06371000    4420 KB  SETUPAPI.dll
-  0x72030000 - 0x7203A000      40 KB  CRYPTBASE.DLL
-  0x75130000 - 0x751A7000     476 KB  bcryptPrimitives.dll
-  0x74F10000 - 0x74F25000      84 KB  kernel.appcore.dll
-  0x504A0000 - 0x504C1000     132 KB  CSERHelper.dll
-  0x751C0000 - 0x752D7000    1116 KB  MSCTF.dll
-  0x619E0000 - 0x61AE2000    1032 KB  textinputframework.dll
-  0x52200000 - 0x52492000    2632 KB  CoreUIComponents.dll
-  0x71F10000 - 0x72009000     996 KB  wintypes.dll
-  0x62D60000 - 0x62DBB000     364 KB  Oleacc.dll
-  0x74730000 - 0x7473E000      56 KB  msasn1.dll
-  0x703A0000 - 0x703CB000     172 KB  cryptnet.dll
-  0x720A0000 - 0x720FB000     364 KB  wldp.dll
-  0x6D310000 - 0x6D439000    1188 KB  drvstore.dll
-  0x70370000 - 0x70394000     144 KB  devobj.dll
-  0x77BC0000 - 0x77C27000     412 KB  wintrust.dll
-  0x72080000 - 0x72094000      80 KB  CRYPTSP.dll
-  0x72040000 - 0x72072000     200 KB  rsaenh.dll
-  0x65300000 - 0x6534F000     316 KB  directxdatabasehelper.dll
-  0x5AD80000 - 0x5AE96000    1112 KB  nvspcap.dll
-  0x73100000 - 0x7311D000     116 KB  profapi.dll
-  0x64180000 - 0x641A9000     164 KB  ntmarta.dll
-  0x36D00000 - 0x36E40000    1280 KB  nvppe.dll
-  0x50490000 - 0x50496000      24 KB  RICHED32.DLL
-  0x61BF0000 - 0x61C74000     528 KB  RICHED20.dll
-  0x61BC0000 - 0x61BEC000     176 KB  msls31.dll
-  0x61BA0000 - 0x61BB7000      92 KB  USP10.dll
-  0x625A0000 - 0x627C9000    2212 KB  comctl32.DLL
-  0x61AF0000 - 0x61B95000     660 KB  TextShaping.dll
-  0x5F6B0000 - 0x5F6BB000      44 KB  HID.DLL
-  0x524A0000 - 0x524B6000      88 KB  xinput1_4.dll
-  0x752E0000 - 0x75366000     536 KB  clbcatq.dll
-  0x541F0000 - 0x5426E000     504 KB  MMDevApi.dll
-  0x521B0000 - 0x521ED000     244 KB  wdmaud.drv
-  0x52190000 - 0x521AC000     112 KB  wdmaud2.drv
-  0x52180000 - 0x52189000      36 KB  AVRT.dll
-  0x52000000 - 0x5216E000    1464 KB  AUDIOSES.DLL
-  0x51FF0000 - 0x51FFB000      44 KB  msacm32.drv
-  0x51FC0000 - 0x51FC8000      32 KB  midimap.dll
-  0x17E70000 - 0x17E80000      64 KB  resourcepolicyclient.dll
-  0x627D0000 - 0x62CB5000    5012 KB  nvapi.dll
-  0x6D440000 - 0x6D4DC000     624 KB  nvldumd.dll
-  0x69470000 - 0x6D303000   64076 KB  nvgpucomp32.dll
-  0x69080000 - 0x6916D000     948 KB  NvMemMapStorage.dll
-  0x48EA0000 - 0x4C32A000   53800 KB  nvwgf2um.dll
-  0x52940000 - 0x52ACA000    1576 KB  dcomp.dll
-  0x52920000 - 0x52932000      72 KB  Microsoft.Internal.WarpPal.dll
-  0x527C0000 - 0x528D1000    1092 KB  Windows.UI.dll
-  0x70260000 - 0x7034C000     944 KB  DNSAPI.dll
-  0x751B0000 - 0x751B7000      28 KB  NSI.dll
-  0x70180000 - 0x701E2000     392 KB  fwpuclnt.dll
-  0x70A60000 - 0x70A68000      32 KB  rasadhlp.dll
-  0x60E90000 - 0x61216000    3608 KB  BS1SDK.dll
-  0x7A140000 - 0x7A535000    4052 KB  D3DCOMPILER_47.dll
-  0x78CB0000 - 0x7A134000   21008 KB  steamclient.dll
-  0x70850000 - 0x7085A000      40 KB  Secur32.dll
-  0x50680000 - 0x50720000     640 KB  tier0_s.dll
-  0x505E0000 - 0x50678000     608 KB  vstdlib_s.dll
-  0x74F30000 - 0x74F5B000     172 KB  SSPICLI.DLL
-  0x504D0000 - 0x505D9000    1060 KB  steam.dll
+  0x0FE80000 - 0x114F7000   23004 KB  BioshockHD.exe
+  0x76F40000 - 0x770FF000    1788 KB  ntdll.dll
+  0x75920000 - 0x75A10000     960 KB  KERNEL32.DLL
+  0x743F0000 - 0x746BD000    2868 KB  KERNELBASE.dll
+  0x75740000 - 0x75916000    1880 KB  USER32.dll
+  0x75F30000 - 0x75F4B000     108 KB  win32u.dll
+  0x75D40000 - 0x75D62000     136 KB  GDI32.dll
+  0x60E70000 - 0x61050000    1920 KB  dbghelp.dll
+  0x6C560000 - 0x6C6DA000    1512 KB  d3d9.dll
+  0x75F50000 - 0x7603C000     944 KB  gdi32full.dll
+  0x76840000 - 0x76907000     796 KB  msvcrt.dll
+  0x76AF0000 - 0x76C00000    1088 KB  ucrtbase.dll
+  0x76940000 - 0x769C5000     532 KB  msvcp_win.dll
+  0x615F0000 - 0x617E1000    1988 KB  d3d11.dll
+  0x75250000 - 0x752D3000     524 KB  sechost.dll
+  0x74ED0000 - 0x75163000    2636 KB  combase.dll
+  0x75BA0000 - 0x75C55000     724 KB  COMDLG32.dll
+  0x75A20000 - 0x75ADC000     752 KB  RPCRT4.dll
+  0x760C0000 - 0x7615F000     636 KB  OLEAUT32.dll
+  0x75C60000 - 0x75D31000     836 KB  shcore.dll
+  0x74390000 - 0x743E2000     328 KB  SHLWAPI.dll
+  0x614E0000 - 0x615E9000    1060 KB  dxgi.dll
+  0x747E0000 - 0x74EC6000    7064 KB  Windows.Storage.dll
+  0x6C6E0000 - 0x6C706000     152 KB  dwmapi.dll
+  0x75AE0000 - 0x75B62000     520 KB  advapi32.dll
+  0x742F0000 - 0x742F8000      32 KB  VERSION.dll
+  0x761F0000 - 0x76833000    6412 KB  SHELL32.dll
+  0x682C0000 - 0x68315000     340 KB  powrprof.dll
+  0x75170000 - 0x751D9000     420 KB  WS2_32.dll
+  0x61E90000 - 0x61F21000     580 KB  COMCTL32.dll
+  0x6C520000 - 0x6C558000     224 KB  dxcore.dll
+  0x75B70000 - 0x75B95000     148 KB  IMM32.dll
+  0x75D70000 - 0x75EC3000    1356 KB  ole32.dll
+  0x58670000 - 0x586C8000     352 KB  bink2w32.dll
+  0x60120000 - 0x6018D000     436 KB  MSVCP140.dll
+  0x5B350000 - 0x5B38D000     244 KB  steam_api.dll
+  0x5B340000 - 0x5B348000      32 KB  WSOCK32.dll
+  0x6F440000 - 0x6F455000      84 KB  VCRUNTIME140.dll
+  0x71270000 - 0x71276000      24 KB  MSIMG32.dll
+  0x5B2D0000 - 0x5B2EC000     112 KB  amd_ags_x86.dll
+  0x59850000 - 0x59877000     156 KB  WINMM.dll
+  0x61140000 - 0x61178000     224 KB  DINPUT8.dll
+  0x5B210000 - 0x5B286000     472 KB  DSOUND.dll
+  0x58640000 - 0x58666000     152 KB  XINPUT1_3.dll
+  0x584C0000 - 0x5863A000    1512 KB  fmodex.dll
+  0x5B2F0000 - 0x5B315000     148 KB  winmmbase.dll
+  0x5B170000 - 0x5B20A000     616 KB  ResampleDmo.DLL
+  0x59830000 - 0x5984A000     104 KB  MSACM32.dll
+  0x5B160000 - 0x5B169000      36 KB  msdmo.dll
+  0x582B0000 - 0x584B7000    2076 KB  D3DCOMPILER_43.dll
+  0x58270000 - 0x582A0000     192 KB  dbgcore.DLL
+  0x6FAE0000 - 0x6FAEE000      56 KB  UMPDC.dll
+  0x68320000 - 0x68353000     204 KB  winmm.dll
+  0x58100000 - 0x5826E000    1464 KB  gameoverlayrenderer.dll
+  0x761E0000 - 0x761E6000      24 KB  PSAPI.DLL
+  0x72380000 - 0x723BE000     248 KB  CFGMGR32.dll
+  0x61270000 - 0x613E2000    1480 KB  inputhost.dll
+  0x61190000 - 0x6126D000     884 KB  CoreMessaging.dll
+  0x712E0000 - 0x71360000     512 KB  uxtheme.dll
+  0x76E20000 - 0x76F29000    1060 KB  CRYPT32.dll
+  0x76910000 - 0x7692B000     108 KB  imagehlp.dll
+  0x752E0000 - 0x75731000    4420 KB  SETUPAPI.dll
+  0x704F0000 - 0x70515000     148 KB  IPHLPAPI.DLL
+  0x711E0000 - 0x711FC000     112 KB  bcrypt.dll
+  0x6F9B0000 - 0x6FA04000     336 KB  MSWSOCK.dll
+  0x71200000 - 0x7120A000      40 KB  CRYPTBASE.DLL
+  0x76040000 - 0x760B7000     476 KB  bcryptPrimitives.dll
+  0x741E0000 - 0x741F5000      84 KB  kernel.appcore.dll
+  0x580D0000 - 0x580F1000     132 KB  CSERHelper.dll
+  0x60720000 - 0x607C5000     660 KB  TextShaping.dll
+  0x769D0000 - 0x76AE7000    1116 KB  MSCTF.dll
+  0x60610000 - 0x60712000    1032 KB  textinputframework.dll
+  0x61F30000 - 0x61F8B000     364 KB  Oleacc.dll
+  0x76D90000 - 0x76E16000     536 KB  clbcatq.dll
+  0x56220000 - 0x564B2000    2632 KB  CoreUIComponents.dll
+  0x6F6E0000 - 0x6F7D9000     996 KB  wintypes.dll
+  0x73A00000 - 0x73A0E000      56 KB  msasn1.dll
+  0x6C450000 - 0x6C47B000     172 KB  cryptnet.dll
+  0x71370000 - 0x713CB000     364 KB  wldp.dll
+  0x6C320000 - 0x6C449000    1188 KB  drvstore.dll
+  0x6C2F0000 - 0x6C314000     144 KB  devobj.dll
+  0x751E0000 - 0x75247000     412 KB  wintrust.dll
+  0x71250000 - 0x71264000      80 KB  CRYPTSP.dll
+  0x71210000 - 0x71242000     200 KB  rsaenh.dll
+  0x645E0000 - 0x6462F000     316 KB  directxdatabasehelper.dll
+  0x5DF30000 - 0x5E046000    1112 KB  nvspcap.dll
+  0x723D0000 - 0x723ED000     116 KB  profapi.dll
+  0x64240000 - 0x64269000     164 KB  ntmarta.dll
+  0x5DDF0000 - 0x5DF30000    1280 KB  nvppe.dll
+  0x5B150000 - 0x5B156000      24 KB  RICHED32.DLL
+  0x607D0000 - 0x60854000     528 KB  RICHED20.dll
+  0x6F460000 - 0x6F477000      92 KB  USP10.dll
+  0x6F480000 - 0x6F4AC000     176 KB  msls31.dll
+  0x6F4B0000 - 0x6F6D9000    2212 KB  comctl32.DLL
+  0x61180000 - 0x6118B000      44 KB  HID.DLL
+  0x580B0000 - 0x580C6000      88 KB  xinput1_4.dll
+  0x56730000 - 0x567AE000     504 KB  MMDevApi.dll
+  0x58070000 - 0x580AD000     244 KB  wdmaud.drv
+  0x56710000 - 0x5672C000     112 KB  wdmaud2.drv
+  0x56700000 - 0x56709000      36 KB  AVRT.dll
+  0x56580000 - 0x566EE000    1464 KB  AUDIOSES.DLL
+  0x56210000 - 0x5621B000      44 KB  msacm32.drv
+  0x56200000 - 0x56208000      32 KB  midimap.dll
+  0x561E0000 - 0x561F0000      64 KB  resourcepolicyclient.dll
+  0x619A0000 - 0x61E85000    5012 KB  nvapi.dll
+  0x6C480000 - 0x6C51C000     624 KB  nvldumd.dll
+  0x68450000 - 0x6C2E3000   64076 KB  nvgpucomp32.dll
+  0x68360000 - 0x6844D000     948 KB  NvMemMapStorage.dll
+  0x52D50000 - 0x561DA000   53800 KB  nvwgf2um.dll
+  0x52BC0000 - 0x52D4A000    1576 KB  dcomp.dll
+  0x52BA0000 - 0x52BB2000      72 KB  Microsoft.Internal.WarpPal.dll
+  0x596A0000 - 0x597B1000    1092 KB  Windows.UI.dll
+  0x6F8C0000 - 0x6F9AC000     944 KB  DNSAPI.dll
+  0x57EE0000 - 0x57EE7000      28 KB  NSI.dll
+  0x60190000 - 0x60520000    3648 KB  BS1SDK.dll
+  0x63760000 - 0x63B55000    4052 KB  D3DCOMPILER_47.dll
+  0x6F7E0000 - 0x6F842000     392 KB  fwpuclnt.dll
+  0x6F850000 - 0x6F858000      32 KB  rasadhlp.dll
+  0x56A10000 - 0x57E95000   21012 KB  steamclient.dll
+  0x56970000 - 0x56A08000     608 KB  vstdlib_s.dll
+  0x568D0000 - 0x56970000     640 KB  tier0_s.dll
+  0x712D0000 - 0x712DA000      40 KB  Secur32.dll
+  0x74200000 - 0x7422B000     172 KB  SSPICLI.DLL
+  0x567C0000 - 0x568C9000    1060 KB  steam.dll
 
 === MEMORY ===
-Physical:   27904 MB used / 65298 MB total (42% load)
-Virtual:    2145 MB used / 4095 MB total
-Working:    1393 MB  (peak 1394 MB)
-Private:    1288 MB
+Physical:   34982 MB used / 65298 MB total (53% load)
+Virtual:    3272 MB used / 4095 MB total
+Working:    2434 MB  (peak 2567 MB)
+Private:    2303 MB
 
 === ALL THREAD STACKS ===
-  --- TID 7372 (priority=8) ---
-  EIP=0x1038E3E4 ESP=0x010FF2B0 EBP=0x010FF30C
-    # 0  BioshockHD.exe+0x0053E3E4
-    # 1  BioshockHD.exe+0x004D01F6
-    # 2  BioshockHD.exe+0x00874351
-    # 3  BioshockHD.exe+0x00873641
-    # 4  BioshockHD.exe+0x00860429
-    # 5  BioshockHD.exe+0x00874EC8
-    # 6  BioshockHD.exe+0x0094DF2E
-    # 7  KERNEL32.DLL+0x00015D49  BaseThreadInitThunk+0x19
-    # 8  ntdll.dll+0x0006D83B  RtlInitializeExceptionChain+0x6B
-    # 9  ntdll.dll+0x0006D7C1  RtlGetAppContainerNamedObjectPath+0x231
+  --- TID 36264 (priority=8) ---
+  EIP=0x76FB91FC ESP=0x00F3F73C EBP=0x00F3F7A8
+    # 0  ntdll.dll+0x000791FC  ZwWaitForSingleObject+0xC
+    # 1  KERNELBASE.dll+0x00158302  WaitForSingleObject+0x12
+    # 2  BioshockHD.exe+0x0070BEBF
+    # 3  BioshockHD.exe+0x004C3755
+    # 4  BioshockHD.exe+0x004D0D04
+    # 5  BioshockHD.exe+0x00874351
+    # 6  BioshockHD.exe+0x00873641
+    # 7  BioshockHD.exe+0x00860429
+    # 8  BioshockHD.exe+0x00874EC8
+    # 9  BioshockHD.exe+0x0094DF2E
+    #10  KERNEL32.DLL+0x00015D49  BaseThreadInitThunk+0x19
+    #11  ntdll.dll+0x0006D83B  RtlInitializeExceptionChain+0x6B
+    #12  ntdll.dll+0x0006D7C1  RtlGetAppContainerNamedObjectPath+0x231
 
-  --- TID 35024 (priority=8) ---
-  EIP=0x77CEB03C ESP=0x018FF890 EBP=0x018FFA50
+  --- TID 41624 (priority=8) ---
+  EIP=0x76FBB03C ESP=0x0175F670 EBP=0x0175F830
     # 0  ntdll.dll+0x0007B03C  NtWaitForWorkViaWorkerFactory+0xC
     # 1  KERNEL32.DLL+0x00015D49  BaseThreadInitThunk+0x19
     # 2  ntdll.dll+0x0006D83B  RtlInitializeExceptionChain+0x6B
     # 3  ntdll.dll+0x0006D7C1  RtlGetAppContainerNamedObjectPath+0x231
 
-  --- TID 21756 (priority=8) ---
-  EIP=0x77CEB03C ESP=0x01C3F900 EBP=0x01C3FAC0
+  --- TID 21004 (priority=8) ---
+  EIP=0x76FBB03C ESP=0x01A9F850 EBP=0x01A9FA10
     # 0  ntdll.dll+0x0007B03C  NtWaitForWorkViaWorkerFactory+0xC
     # 1  KERNEL32.DLL+0x00015D49  BaseThreadInitThunk+0x19
     # 2  ntdll.dll+0x0006D83B  RtlInitializeExceptionChain+0x6B
     # 3  ntdll.dll+0x0006D7C1  RtlGetAppContainerNamedObjectPath+0x231
 
-  --- TID 11048 (priority=8) ---
-  EIP=0x77CEB03C ESP=0x01F7F824 EBP=0x01F7F9E4
+  --- TID 36084 (priority=8) ---
+  EIP=0x76FBB03C ESP=0x01DDF908 EBP=0x01DDFAC8
     # 0  ntdll.dll+0x0007B03C  NtWaitForWorkViaWorkerFactory+0xC
     # 1  KERNEL32.DLL+0x00015D49  BaseThreadInitThunk+0x19
     # 2  ntdll.dll+0x0006D83B  RtlInitializeExceptionChain+0x6B
     # 3  ntdll.dll+0x0006D7C1  RtlGetAppContainerNamedObjectPath+0x231
 
-  --- TID 15080 (priority=8) ---
-  EIP=0x77CEB03C ESP=0x03F5FCDC EBP=0x03F5FE9C
+  --- TID 38084 (priority=8) ---
+  EIP=0x76FBB03C ESP=0x03F1FBBC EBP=0x03F1FD7C
     # 0  ntdll.dll+0x0007B03C  NtWaitForWorkViaWorkerFactory+0xC
     # 1  KERNEL32.DLL+0x00015D49  BaseThreadInitThunk+0x19
     # 2  ntdll.dll+0x0006D83B  RtlInitializeExceptionChain+0x6B
     # 3  ntdll.dll+0x0006D7C1  RtlGetAppContainerNamedObjectPath+0x231
 
-  --- TID 4108 (priority=8) ---
-  EIP=0x77CE978C ESP=0x05F1F8E4 EBP=0x05F1FA70
+  --- TID 57320 (priority=8) ---
+  EIP=0x76FB978C ESP=0x05E9F928 EBP=0x05E9FAB4
     # 0  ntdll.dll+0x0007978C  ZwWaitForMultipleObjects+0xC
     # 1  CoreMessaging.dll+0x0006AB0A  ServiceMain+0x5209A
     # 2  CoreMessaging.dll+0x00027172  ServiceMain+0xE702
@@ -355,16 +381,15 @@ Private:    1288 MB
     #16  ntdll.dll+0x0006D83B  RtlInitializeExceptionChain+0x6B
     #17  ntdll.dll+0x0006D7C1  RtlGetAppContainerNamedObjectPath+0x231
 
-  --- TID 37032 (priority=8) ---
-  EIP=0x77CE978C ESP=0x43E1F9F0 EBP=0x43E1FB7C
-    # 0  ntdll.dll+0x0007978C  ZwWaitForMultipleObjects+0xC
-    # 1  CRYPT32.dll+0x0004F986  CertAddEncodedCRLToStore+0x726
-    # 2  KERNEL32.DLL+0x00015D49  BaseThreadInitThunk+0x19
-    # 3  ntdll.dll+0x0006D83B  RtlInitializeExceptionChain+0x6B
-    # 4  ntdll.dll+0x0006D7C1  RtlGetAppContainerNamedObjectPath+0x231
+  --- TID 35384 (priority=8) ---
+  EIP=0x76FBB03C ESP=0x087FF898 EBP=0x087FFA58
+    # 0  ntdll.dll+0x0007B03C  NtWaitForWorkViaWorkerFactory+0xC
+    # 1  KERNEL32.DLL+0x00015D49  BaseThreadInitThunk+0x19
+    # 2  ntdll.dll+0x0006D83B  RtlInitializeExceptionChain+0x6B
+    # 3  ntdll.dll+0x0006D7C1  RtlGetAppContainerNamedObjectPath+0x231
 
-  --- TID 26904 (priority=8) ---
-  EIP=0x77CE91FC ESP=0x4795FA10 EBP=0x4795FA7C
+  --- TID 58872 (priority=8) ---
+  EIP=0x76FB91FC ESP=0x44F7FEA0 EBP=0x44F7FF0C
     # 0  ntdll.dll+0x000791FC  ZwWaitForSingleObject+0xC
     # 1  KERNELBASE.dll+0x00158302  WaitForSingleObject+0x12
     # 2  BioshockHD.exe+0x0058B007
@@ -373,8 +398,8 @@ Private:    1288 MB
     # 5  ntdll.dll+0x0006D83B  RtlInitializeExceptionChain+0x6B
     # 6  ntdll.dll+0x0006D7C1  RtlGetAppContainerNamedObjectPath+0x231
 
-  --- TID 28456 (priority=21) ---
-  EIP=0x77CE91FC ESP=0x47C5F840 EBP=0x47C5F8AC
+  --- TID 24208 (priority=21) ---
+  EIP=0x76FB91FC ESP=0x4527FDA8 EBP=0x4527FE14
     # 0  ntdll.dll+0x000791FC  ZwWaitForSingleObject+0xC
     # 1  KERNELBASE.dll+0x00158302  WaitForSingleObject+0x12
     # 2  fmodex.dll+0x0008F040  FMOD_MyEars_GetError+0x11600
@@ -386,8 +411,8 @@ Private:    1288 MB
     # 8  ntdll.dll+0x0006D83B  RtlInitializeExceptionChain+0x6B
     # 9  ntdll.dll+0x0006D7C1  RtlGetAppContainerNamedObjectPath+0x231
 
-  --- TID 5104 (priority=10) ---
-  EIP=0x77CE91FC ESP=0x47F9FC98 EBP=0x47F9FD04
+  --- TID 12732 (priority=10) ---
+  EIP=0x76FB91FC ESP=0x4557FDB4 EBP=0x4557FE20
     # 0  ntdll.dll+0x000791FC  ZwWaitForSingleObject+0xC
     # 1  KERNELBASE.dll+0x00158302  WaitForSingleObject+0x12
     # 2  fmodex.dll+0x000939C1  FMOD_MyEars_GetError+0x15F81
@@ -399,8 +424,8 @@ Private:    1288 MB
     # 8  ntdll.dll+0x0006D83B  RtlInitializeExceptionChain+0x6B
     # 9  ntdll.dll+0x0006D7C1  RtlGetAppContainerNamedObjectPath+0x231
 
-  --- TID 20952 (priority=10) ---
-  EIP=0x77CE951C ESP=0x482DF6FC EBP=0x482DF718
+  --- TID 7688 (priority=10) ---
+  EIP=0x76FB951C ESP=0x4587FAB4 EBP=0x4587FAD4
     # 0  ntdll.dll+0x0007951C  NtDelayExecution+0xC
     # 1  KERNELBASE.dll+0x00163090  SleepEx+0x50
     # 2  KERNELBASE.dll+0x0016302F  Sleep+0xF
@@ -412,8 +437,8 @@ Private:    1288 MB
     # 8  ntdll.dll+0x0006D83B  RtlInitializeExceptionChain+0x6B
     # 9  ntdll.dll+0x0006D7C1  RtlGetAppContainerNamedObjectPath+0x231
 
-  --- TID 17576 (priority=8) ---
-  EIP=0x77CE91FC ESP=0x4861FD38 EBP=0x4861FDA4
+  --- TID 55684 (priority=8) ---
+  EIP=0x76FB91FC ESP=0x45B7F93C EBP=0x45B7F9A8
     # 0  ntdll.dll+0x000791FC  ZwWaitForSingleObject+0xC
     # 1  KERNELBASE.dll+0x00158302  WaitForSingleObject+0x12
     # 2  BioshockHD.exe+0x006047BB
@@ -421,8 +446,8 @@ Private:    1288 MB
     # 4  ntdll.dll+0x0006D83B  RtlInitializeExceptionChain+0x6B
     # 5  ntdll.dll+0x0006D7C1  RtlGetAppContainerNamedObjectPath+0x231
 
-  --- TID 27384 (priority=8) ---
-  EIP=0x77CE91FC ESP=0x48B5F8C4 EBP=0x48B5F930
+  --- TID 38172 (priority=8) ---
+  EIP=0x76FB91FC ESP=0x4607FD78 EBP=0x4607FDE4
     # 0  ntdll.dll+0x000791FC  ZwWaitForSingleObject+0xC
     # 1  KERNELBASE.dll+0x00158302  WaitForSingleObject+0x12
     # 2  BioshockHD.exe+0x006047BB
@@ -430,26 +455,26 @@ Private:    1288 MB
     # 4  ntdll.dll+0x0006D83B  RtlInitializeExceptionChain+0x6B
     # 5  ntdll.dll+0x0006D7C1  RtlGetAppContainerNamedObjectPath+0x231
 
-  --- TID 34012 (priority=10) ---
-  EIP=0x76025F4C ESP=0x48E9F724 EBP=0x48E9F744
+  --- TID 22504 (priority=10) ---
+  EIP=0x75F35F4C ESP=0x4637FF10 EBP=0x4637FF30
     # 0  win32u.dll+0x00005F4C  NtUserMsgWaitForMultipleObjectsEx+0xC
     # 1  DINPUT8.dll+0x00011AD1  GetdfDIJoystick+0x65A1
     # 2  KERNEL32.DLL+0x00015D49  BaseThreadInitThunk+0x19
     # 3  ntdll.dll+0x0006D83B  RtlInitializeExceptionChain+0x6B
     # 4  ntdll.dll+0x0006D7C1  RtlGetAppContainerNamedObjectPath+0x231
 
-  --- TID 36612 (priority=8) ---
-  EIP=0x77CE91FC ESP=0x454FF9D8 EBP=0x454FFA44
+  --- TID 55760 (priority=8) ---
+  EIP=0x76FB91FC ESP=0x4667FBA0 EBP=0x4667FC0C
     # 0  ntdll.dll+0x000791FC  ZwWaitForSingleObject+0xC
     # 1  KERNELBASE.dll+0x00158302  WaitForSingleObject+0x12
-    # 2  nvwgf2um.dll+0x0080FE50  NVDEV_Thunk+0x222F0
+    # 2  nvwgf2um.dll+0x0080FF45  NVDEV_Thunk+0x223E5
     # 3  nvwgf2um.dll+0x00C80A77  NVDEV_Thunk+0x492F17
     # 4  KERNEL32.DLL+0x00015D49  BaseThreadInitThunk+0x19
     # 5  ntdll.dll+0x0006D83B  RtlInitializeExceptionChain+0x6B
     # 6  ntdll.dll+0x0006D7C1  RtlGetAppContainerNamedObjectPath+0x231
 
-  --- TID 23604 (priority=8) ---
-  EIP=0x77CE91FC ESP=0x458BFD18 EBP=0x458BFD84
+  --- TID 38576 (priority=8) ---
+  EIP=0x76FB91FC ESP=0x46A3F780 EBP=0x46A3F7EC
     # 0  ntdll.dll+0x000791FC  ZwWaitForSingleObject+0xC
     # 1  KERNELBASE.dll+0x00158302  WaitForSingleObject+0x12
     # 2  nvwgf2um.dll+0x0086AAD5  NVDEV_Thunk+0x7CF75
@@ -459,8 +484,8 @@ Private:    1288 MB
     # 6  ntdll.dll+0x0006D83B  RtlInitializeExceptionChain+0x6B
     # 7  ntdll.dll+0x0006D7C1  RtlGetAppContainerNamedObjectPath+0x231
 
-  --- TID 9800 (priority=1) ---
-  EIP=0x77CE91FC ESP=0x4590FB70 EBP=0x4590FBDC
+  --- TID 27556 (priority=1) ---
+  EIP=0x76FB91FC ESP=0x37CFFB80 EBP=0x37CFFBEC
     # 0  ntdll.dll+0x000791FC  ZwWaitForSingleObject+0xC
     # 1  KERNELBASE.dll+0x00158302  WaitForSingleObject+0x12
     # 2  nvwgf2um.dll+0x007ED7E1  OpenAdapter12+0x120B11
@@ -470,63 +495,63 @@ Private:    1288 MB
     # 6  ntdll.dll+0x0006D83B  RtlInitializeExceptionChain+0x6B
     # 7  ntdll.dll+0x0006D7C1  RtlGetAppContainerNamedObjectPath+0x231
 
-  --- TID 30480 (priority=1) ---
-  EIP=0x77CEB630 ESP=0x45A6F8B8 EBP=0x00000000
+  --- TID 41140 (priority=1) ---
+  EIP=0x76FBB630 ESP=0x46ACFC30 EBP=0x00000000
     # 0  ntdll.dll+0x0007B630  RtlUserThreadStart+0x0
 
-  --- TID 39308 (priority=1) ---
-  EIP=0x77CEB630 ESP=0x45ABF9DC EBP=0x00000000
+  --- TID 37416 (priority=1) ---
+  EIP=0x76FBB630 ESP=0x46C2FE0C EBP=0x00000000
     # 0  ntdll.dll+0x0007B630  RtlUserThreadStart+0x0
 
-  --- TID 39392 (priority=1) ---
-  EIP=0x77CEB630 ESP=0x45B0FDB0 EBP=0x00000000
+  --- TID 59188 (priority=1) ---
+  EIP=0x76FBB630 ESP=0x46E0F9C4 EBP=0x00000000
     # 0  ntdll.dll+0x0007B630  RtlUserThreadStart+0x0
 
-  --- TID 35176 (priority=1) ---
-  EIP=0x77CEB630 ESP=0x45B5FF88 EBP=0x00000000
+  --- TID 39536 (priority=1) ---
+  EIP=0x76FBB630 ESP=0x46C7FBD4 EBP=0x00000000
     # 0  ntdll.dll+0x0007B630  RtlUserThreadStart+0x0
 
-  --- TID 37592 (priority=1) ---
-  EIP=0x77CEB630 ESP=0x45BAF91C EBP=0x00000000
+  --- TID 57152 (priority=1) ---
+  EIP=0x76FBB630 ESP=0x46CCF860 EBP=0x00000000
     # 0  ntdll.dll+0x0007B630  RtlUserThreadStart+0x0
 
-  --- TID 38692 (priority=1) ---
-  EIP=0x77CEB630 ESP=0x45BFFD2C EBP=0x00000000
+  --- TID 39924 (priority=1) ---
+  EIP=0x76FBB630 ESP=0x46D1F80C EBP=0x00000000
     # 0  ntdll.dll+0x0007B630  RtlUserThreadStart+0x0
 
-  --- TID 37332 (priority=1) ---
-  EIP=0x77CEB630 ESP=0x45C4FF48 EBP=0x00000000
+  --- TID 40792 (priority=1) ---
+  EIP=0x76FBB630 ESP=0x46D6FF80 EBP=0x00000000
     # 0  ntdll.dll+0x0007B630  RtlUserThreadStart+0x0
 
-  --- TID 35572 (priority=1) ---
-  EIP=0x77CEB630 ESP=0x45E2F8A4 EBP=0x00000000
+  --- TID 57952 (priority=1) ---
+  EIP=0x76FBB630 ESP=0x46DBFA2C EBP=0x00000000
     # 0  ntdll.dll+0x0007B630  RtlUserThreadStart+0x0
 
-  --- TID 36248 (priority=1) ---
-  EIP=0x77CEB630 ESP=0x45E7FE64 EBP=0x00000000
+  --- TID 38948 (priority=1) ---
+  EIP=0x76FBB630 ESP=0x46E5FAF0 EBP=0x00000000
     # 0  ntdll.dll+0x0007B630  RtlUserThreadStart+0x0
 
-  --- TID 12660 (priority=1) ---
-  EIP=0x77CEB630 ESP=0x45C9FE74 EBP=0x00000000
+  --- TID 46160 (priority=1) ---
+  EIP=0x76FBB630 ESP=0x46EAFC80 EBP=0x00000000
     # 0  ntdll.dll+0x0007B630  RtlUserThreadStart+0x0
 
-  --- TID 38412 (priority=1) ---
-  EIP=0x77CEB630 ESP=0x45CEFAC4 EBP=0x00000000
+  --- TID 59836 (priority=1) ---
+  EIP=0x76FBB630 ESP=0x46EFFD24 EBP=0x00000000
     # 0  ntdll.dll+0x0007B630  RtlUserThreadStart+0x0
 
-  --- TID 19876 (priority=1) ---
-  EIP=0x77CEB630 ESP=0x45D3FBB4 EBP=0x00000000
+  --- TID 18400 (priority=1) ---
+  EIP=0x76FBB630 ESP=0x46F4FD68 EBP=0x00000000
     # 0  ntdll.dll+0x0007B630  RtlUserThreadStart+0x0
 
-  --- TID 23520 (priority=1) ---
-  EIP=0x77CEB630 ESP=0x45D8F8A4 EBP=0x00000000
+  --- TID 35464 (priority=1) ---
+  EIP=0x76FBB630 ESP=0x46F9FF6C EBP=0x00000000
     # 0  ntdll.dll+0x0007B630  RtlUserThreadStart+0x0
 
   (truncated after 30 threads)
 
 === ENGINE PATCHES ===
   Installed patches: 1
-  [0] NullDeref_763F9B: addr=0x105B3F9B installed=YES triggered=no (0 hits)
+  [0] NullDeref_763F9B: addr=0x105E3F9B installed=YES triggered=no (0 hits)
       Null-check EBX before mov eax,[ebx+0x234] on worker thread
 
 ╔══════════════════════════════════════════════════════════════╗

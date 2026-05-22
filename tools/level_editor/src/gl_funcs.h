@@ -37,6 +37,9 @@ extern void (APIENTRY *glUniform1i)(GLint, GLint);
 extern void (APIENTRY *glUniform1f)(GLint, GLfloat);
 extern void (APIENTRY *glUniform2f)(GLint, GLfloat, GLfloat);
 extern void (APIENTRY *glUniform3f)(GLint, GLfloat, GLfloat, GLfloat);
+extern void (APIENTRY *glUniform4f)(GLint, GLfloat, GLfloat, GLfloat, GLfloat);
+extern void (APIENTRY *glUniform3fv)(GLint, GLsizei, const GLfloat*);
+extern void (APIENTRY *glUniform4fv)(GLint, GLsizei, const GLfloat*);
 extern void (APIENTRY *glUniformMatrix4fv)(GLint, GLsizei, GLboolean, const GLfloat*);
 extern void (APIENTRY *glGetShaderiv)(GLuint, GLenum, GLint*);
 extern void (APIENTRY *glGetShaderInfoLog)(GLuint, GLsizei, GLsizei*, GLchar*);
@@ -44,6 +47,21 @@ extern void (APIENTRY *glGetProgramiv)(GLuint, GLenum, GLint*);
 extern void (APIENTRY *glGetProgramInfoLog)(GLuint, GLsizei, GLsizei*, GLchar*);
 extern void (APIENTRY *glGenerateMipmap)(GLenum);
 extern void (APIENTRY *glActiveTexture)(GLenum);
+
+// Framebuffer (shadow mapping + bloom)
+extern void (APIENTRY *glGenFramebuffers)(GLsizei, GLuint*);
+extern void (APIENTRY *glDeleteFramebuffers)(GLsizei, const GLuint*);
+extern void (APIENTRY *glBindFramebuffer)(GLenum, GLuint);
+extern void (APIENTRY *glFramebufferTexture2D)(GLenum, GLenum, GLenum, GLuint, GLint);
+extern GLenum (APIENTRY *glCheckFramebufferStatus)(GLenum);
+extern void (APIENTRY *glDrawBuffers)(GLsizei, const GLenum*);
+
+// Renderbuffer
+extern void (APIENTRY *glGenRenderbuffers)(GLsizei, GLuint*);
+extern void (APIENTRY *glDeleteRenderbuffers)(GLsizei, const GLuint*);
+extern void (APIENTRY *glBindRenderbuffer)(GLenum, GLuint);
+extern void (APIENTRY *glRenderbufferStorage)(GLenum, GLenum, GLsizei, GLsizei);
+extern void (APIENTRY *glFramebufferRenderbuffer)(GLenum, GLenum, GLenum, GLuint);
 
 // Additional constants
 #ifndef GL_ARRAY_BUFFER
@@ -70,6 +88,59 @@ extern void (APIENTRY *glActiveTexture)(GLenum);
 
 #ifndef GL_TEXTURE0
 #define GL_TEXTURE0 0x84C0
+#endif
+#ifndef GL_TEXTURE1
+#define GL_TEXTURE1 0x84C1
+#endif
+#ifndef GL_TEXTURE2
+#define GL_TEXTURE2 0x84C2
+#endif
+#ifndef GL_TEXTURE3
+#define GL_TEXTURE3 0x84C3
+#endif
+#ifndef GL_TEXTURE_MAX_ANISOTROPY_EXT
+#define GL_TEXTURE_MAX_ANISOTROPY_EXT 0x84FE
+#endif
+#ifndef GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT
+#define GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT 0x84FF
+#endif
+
+// Framebuffer constants
+#ifndef GL_FRAMEBUFFER
+#define GL_FRAMEBUFFER 0x8D40
+#endif
+#ifndef GL_DEPTH_ATTACHMENT
+#define GL_DEPTH_ATTACHMENT 0x8D00
+#endif
+#ifndef GL_DEPTH_COMPONENT24
+#define GL_DEPTH_COMPONENT24 0x81A6
+#endif
+#ifndef GL_DEPTH_COMPONENT
+#define GL_DEPTH_COMPONENT 0x1902
+#endif
+#ifndef GL_CLAMP_TO_BORDER
+#define GL_CLAMP_TO_BORDER 0x812D
+#endif
+#ifndef GL_TEXTURE_BORDER_COLOR
+#define GL_TEXTURE_BORDER_COLOR 0x1004
+#endif
+#ifndef GL_TEXTURE_COMPARE_MODE
+#define GL_TEXTURE_COMPARE_MODE 0x884C
+#endif
+#ifndef GL_NONE
+#define GL_NONE 0
+#endif
+#ifndef GL_RENDERBUFFER
+#define GL_RENDERBUFFER 0x8D41
+#endif
+#ifndef GL_COLOR_ATTACHMENT0
+#define GL_COLOR_ATTACHMENT0 0x8CE0
+#endif
+#ifndef GL_RGBA16F
+#define GL_RGBA16F 0x881A
+#endif
+#ifndef GL_CLAMP_TO_EDGE
+#define GL_CLAMP_TO_EDGE 0x812F
 #endif
 
 bool LoadGLFunctions();

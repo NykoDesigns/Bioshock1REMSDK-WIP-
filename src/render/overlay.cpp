@@ -7,6 +7,7 @@
 #include "../sdk/sdk_generator.h"
 #include "../debug/coop_debug.h"
 #include "../debug/disasm_dump.h"
+#include "../debug/nearby_scanner.h"
 #include "../network/coop_true.h"
 #include "../network/coop_world_sync.h"
 #include "../network/coop_p2.h"
@@ -976,6 +977,9 @@ void Overlay::RenderConsole()
             LogInfo("  actors [class]          - List actors (optionally filter by class)");
             LogInfo("  worldinfo               - Show level info + actor count");
             LogInfo("  nearby <radius> [class] - Find actors within radius");
+            LogInfo("  scan [radius]           - Export nearby actors to JSON (for level editor)");
+            LogInfo("  scanfull                - FULL scan: all actors/meshes/materials/textures");
+            LogInfo("  scanradius <value>      - Set scan radius (default 3000)");
             LogInfo("  tickrate                - Show current engine tick rate");
             LogYellow("=== Spawning / Movement ===");
             LogInfo("  spawn <class>           - Spawn actor at your position");
@@ -1764,6 +1768,44 @@ void Overlay::RenderConsole()
                                  a->GetObjClassName().c_str(), a->GetName().c_str(), dist);
                     LogInfo(buf);
                 }
+            }
+        }
+        // ─── scan [radius] — export nearby actors to JSON ───
+        else if (tokens[0] == "scan") {
+            if (tokens.size() >= 2) {
+                float r = std::strtof(tokens[1].c_str(), nullptr);
+                if (r > 0) SetScanRadius(r);
+            }
+            int count = ExecuteNearbyScan();
+            if (count >= 0) {
+                char buf[256];
+                std::snprintf(buf, sizeof(buf), "Exported %d actors (radius %.0f) -> BS1SDK_dumps/runtime_nearby_actors.json",
+                             count, GetScanRadius());
+                LogGreen(buf);
+            } else {
+                LogRed("Scan failed — world not ready or can't get player position");
+            }
+        }
+        // ─── scanfull — comprehensive GObjects scan ───
+        else if (tokens[0] == "scanfull") {
+            LogYellow("Running full scan (all GObjects: actors, meshes, materials, textures)...");
+            int count = ExecuteFullScan();
+            if (count >= 0) {
+                char buf[256];
+                std::snprintf(buf, sizeof(buf), "Full scan: %d objects exported -> BS1SDK_dumps/runtime_full_scan.json", count);
+                LogGreen(buf);
+            } else {
+                LogRed("Full scan failed — engine globals not ready");
+            }
+        }
+        // ─── scanradius <value> ───
+        else if (tokens[0] == "scanradius" && tokens.size() >= 2) {
+            float r = std::strtof(tokens[1].c_str(), nullptr);
+            if (r > 0) {
+                SetScanRadius(r);
+                char buf[128];
+                std::snprintf(buf, sizeof(buf), "Scan radius set to %.0f", GetScanRadius());
+                LogInfo(buf);
             }
         }
         // ─── tickrate ───

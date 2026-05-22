@@ -1,0 +1,1714 @@
+﻿Lightmap Probe v0.3 - BSM Texture BulkData Header Parser
+
+BSM: 214215598 bytes
+PackagePatch: 23024902 bytes
+
+Names: 29295, Exports: 49140, Imports: 1381
+Parsed 29295 names
+Parsed 49140 exports
+
+=== Texture exports (Texture_4x, Texture_5x) ===
+  Export[4086] 'Texture_49' serial=3193 offset=0x261CC8F
+  Export[4335] 'Texture_46' serial=3193 offset=0x2A09C3F
+  Export[4439] 'Texture_47' serial=3193 offset=0x2A3B414
+  Export[5002] 'Texture_50' serial=3193 offset=0x3851057
+  Export[5163] 'Texture_48' serial=3193 offset=0x3913CF7
+  Export[5417] 'Texture_54' serial=3193 offset=0x3D06A61
+  Export[5481] 'Texture_44' serial=3193 offset=0x3D16190
+  Export[5529] 'Texture_43' serial=3193 offset=0x3E12B37
+  Export[5574] 'Texture_55' serial=3193 offset=0x3F63557
+  Export[5988] 'Texture_45' serial=3193 offset=0x441DA15
+  Export[8007] 'Texture_42' serial=3193 offset=0x57D5DC1
+  Export[8010] 'Texture_51' serial=3193 offset=0x57D6C53
+  Export[10984] 'Texture_52' serial=3193 offset=0x6D8FC26
+  Export[13804] 'Texture_53' serial=3193 offset=0x7FE3641
+Found 14 lightmap texture exports
+
+=== Parsing texture serial data for BulkData headers ===
+
+--- Texture_49 (export 4086, serial 3193 bytes at 0x261CC8F) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1
+  Native data: 3027 bytes remaining
+  First 128 bytes of native data:
+    +0000: 04 00 00 00 01 00 00 00 00 A0 0A 00 00 00 00 00 
+    +0010: 09 04 00 00 00 02 00 00 00 5B CD 61 02 00 00 00 
+    +0020: 00 40 80 40 00 00 00 04 00 00 00 04 00 00 0A 0A 
+    +0030: 04 00 00 00 02 00 00 00 7A CD 61 02 00 00 00 00 
+    +0040: 40 80 10 00 00 00 02 00 00 00 02 00 00 09 09 04 
+    +0050: 00 00 00 02 00 00 00 99 CD 61 02 00 00 00 00 40 
+    +0060: 80 04 00 00 00 01 00 00 00 01 00 00 08 08 04 00 
+    +0070: 00 00 02 00 00 00 B8 CD 61 02 00 00 00 00 40 80 
+
+  Trying FByteBulkData interpretations:
+  First INT32 = 4 (potential mip count)
+
+  Scanning for DXT1 mip sizes in native data:
+    Offset +19: found 131072 (DXT1 512x512 mip size)
+      Context: 00 01 00 00 00 00 A0 0A 00 00 00 00 00 09 04 00 00 00 02 00 00 00 5B CD 61 02 00 00 00 00 40 80 40 00 00 00 
+      As BulkHeader(i-8): flags=0x0 count=264448 sizeOnDisk=131072 offset32=-849674240 offset64=2619080376320
+      As BulkHeader(i-4): flags=0x40900 elementCount=131072 sizeOnDisk=-849674240 offset=609
+    Offset +50: found 131072 (DXT1 512x512 mip size)
+      Context: 80 40 00 00 00 04 00 00 00 04 00 00 0A 0A 04 00 00 00 02 00 00 00 7A CD 61 02 00 00 00 00 40 80 10 00 00 00 
+      As BulkHeader(i-8): flags=0x400 count=264714 sizeOnDisk=131072 offset32=-847642624 offset64=2619082407936
+      As BulkHeader(i-4): flags=0x40A0A elementCount=131072 sizeOnDisk=-847642624 offset=609
+    Offset +68: found 131072 (DXT1 512x512 mip size)
+      Context: 02 00 00 00 7A CD 61 02 00 00 00 00 40 80 10 00 00 00 02 00 00 00 02 00 00 09 09 04 00 00 00 02 00 00 00 99 
+      As BulkHeader(i-8): flags=0x0 count=1081408 sizeOnDisk=131072 offset32=131072 offset64=290773546546888704
+      As BulkHeader(i-4): flags=0x108040 elementCount=131072 sizeOnDisk=131072 offset=67700992
+    Offset +72: found 131072 (DXT1 512x512 mip size)
+      Context: 7A CD 61 02 00 00 00 00 40 80 10 00 00 00 02 00 00 00 02 00 00 09 09 04 00 00 00 02 00 00 00 99 CD 61 02 00 
+      As BulkHeader(i-8): flags=0x108040 count=131072 sizeOnDisk=131072 offset32=67700992 offset64=144115188143556864
+      As BulkHeader(i-4): flags=0x20000 elementCount=131072 sizeOnDisk=67700992 offset=33554432
+    Offset +81: found 131072 (DXT1 512x512 mip size)
+      Context: 80 10 00 00 00 02 00 00 00 02 00 00 09 09 04 00 00 00 02 00 00 00 99 CD 61 02 00 00 00 00 40 80 04 00 00 00 
+      As BulkHeader(i-8): flags=0x200 count=264457 sizeOnDisk=131072 offset32=-845611008 offset64=2619084439552
+      As BulkHeader(i-4): flags=0x40909 elementCount=131072 sizeOnDisk=-845611008 offset=609
+    Offset +112: found 131072 (DXT1 512x512 mip size)
+      Context: 80 04 00 00 00 01 00 00 00 01 00 00 08 08 04 00 00 00 02 00 00 00 B8 CD 61 02 00 00 00 00 40 80 01 00 00 80 
+      As BulkHeader(i-8): flags=0x100 count=264200 sizeOnDisk=131072 offset32=-843579392 offset64=2619086471168
+      As BulkHeader(i-4): flags=0x40808 elementCount=131072 sizeOnDisk=-843579392 offset=609
+    Offset +130: found 32768 (DXT1 256x256 mip size)
+      Context: 02 00 00 00 B8 CD 61 02 00 00 00 00 40 80 01 00 00 80 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 00 D8 
+      As BulkHeader(i-8): flags=0x0 count=98368 sizeOnDisk=32768 offset32=32768 offset64=290208397570113536
+      As BulkHeader(i-4): flags=0x18040 elementCount=32768 sizeOnDisk=32768 offset=67569408
+    Offset +134: found 32768 (DXT1 256x256 mip size)
+      Context: B8 CD 61 02 00 00 00 00 40 80 01 00 00 80 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 00 D8 D5 61 02 00 
+      As BulkHeader(i-8): flags=0x18040 count=32768 sizeOnDisk=32768 offset32=67569408 offset64=144115188143425280
+      As BulkHeader(i-4): flags=0x8000 elementCount=32768 sizeOnDisk=67569408 offset=33554432
+    Offset +143: found 131072 (DXT1 512x512 mip size)
+      Context: 80 01 00 00 80 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 00 D8 D5 61 02 00 00 00 00 40 20 00 00 40 20 
+      As BulkHeader(i-8): flags=0x80 count=263943 sizeOnDisk=131072 offset32=-707264512 offset64=2619222786048
+      As BulkHeader(i-4): flags=0x40707 elementCount=131072 sizeOnDisk=-707264512 offset=609
+    Offset +164: found 524288 (DXT1 1024x1024 mip size)
+      Context: 00 D8 D5 61 02 00 00 00 00 40 20 00 00 40 20 00 00 00 08 00 00 00 02 00 00 00 00 00 00 00 00 00 00 00 00 00 
+      As BulkHeader(i-8): flags=0x204000 count=2113536 sizeOnDisk=524288 offset32=131072 offset64=131072
+      As BulkHeader(i-4): flags=0x204000 elementCount=524288 sizeOnDisk=131072 offset=0
+    Offset +165: found 2048 (DXT1 64x64 mip size)
+      Context: D8 D5 61 02 00 00 00 00 40 20 00 00 40 20 00 00 00 08 00 00 00 02 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+      As BulkHeader(i-8): flags=0x2040 count=8256 sizeOnDisk=2048 offset32=512 offset64=512
+      As BulkHeader(i-4): flags=0x2040 elementCount=2048 sizeOnDisk=512 offset=0
+    Offset +168: found 131072 (DXT1 512x512 mip size)
+      Context: 02 00 00 00 00 40 20 00 00 40 20 00 00 00 08 00 00 00 02 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+      As BulkHeader(i-8): flags=0x204000 count=524288 sizeOnDisk=131072 offset32=0 offset64=0
+      As BulkHeader(i-4): flags=0x80000 elementCount=131072 sizeOnDisk=0 offset=0
+    Offset +194: found 8192 (DXT1 128x128 mip size)
+      Context: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 20 00 00 00 D5 55 55 55 00 04 00 00 35 25 2D AD 80 05 60 
+      As BulkHeader(i-8): flags=0x0 count=0 sizeOnDisk=8192 offset32=1431688448 offset64=1126266410751232
+      As BulkHeader(i-4): flags=0x0 elementCount=8192 sizeOnDisk=1431688448 offset=262229
+    Offset +244: found 32768 (DXT1 256x256 mip size)
+      Context: 00 00 00 55 55 55 57 20 00 00 00 55 55 55 57 00 00 80 00 00 00 00 60 00 00 20 00 00 00 00 01 21 22 06 08 D5 
+      As BulkHeader(i-8): flags=0x55000000 count=5723477 sizeOnDisk=32768 offset32=6291456 offset64=35184378380288
+      As BulkHeader(i-4): flags=0x575555 elementCount=32768 sizeOnDisk=6291456 offset=8192
+    Offset +252: found 8192 (DXT1 128x128 mip size)
+      Context: 00 00 00 55 55 55 57 00 00 80 00 00 00 00 60 00 00 20 00 00 00 00 01 21 22 06 08 D5 55 FF 82 21 00 00 00 55 
+      As BulkHeader(i-8): flags=0x8000 count=6291456 sizeOnDisk=8192 offset32=553713664 offset64=-3096218000164847616
+      As BulkHeader(i-4): flags=0x600000 elementCount=8192 sizeOnDisk=553713664 offset=-720894430
+    Offset +298: found 8192 (DXT1 128x128 mip size)
+      Context: D5 81 11 21 00 55 F5 17 D5 00 00 00 20 02 01 02 00 20 00 00 00 55 F5 55 7A 20 00 00 00 55 55 57 5D 00 00 00 
+      As BulkHeader(i-8): flags=0xD5 count=33620512 sizeOnDisk=8192 offset32=1442141440 offset64=35709800240384
+      As BulkHeader(i-4): flags=0x2010220 elementCount=8192 sizeOnDisk=1442141440 offset=8314
+    Offset +322: found 8192 (DXT1 128x128 mip size)
+      Context: 7A 20 00 00 00 55 55 57 5D 00 00 00 00 00 00 00 00 20 00 00 00 55 D5 D5 55 12 78 61 00 55 55 0D 0B 0A 28 A0 
+      As BulkHeader(i-8): flags=0x5D count=0 sizeOnDisk=8192 offset32=-707439360 offset64=7023383778753336576
+      As BulkHeader(i-4): flags=0x0 elementCount=8192 sizeOnDisk=-707439360 offset=1635258965
+    Offset +578: found 8192 (DXT1 128x128 mip size)
+      Context: 82 40 01 00 00 74 74 54 57 00 00 00 00 00 00 00 00 20 00 00 00 55 D5 D5 55 01 08 00 00 55 55 55 D5 E0 02 00 
+      As BulkHeader(i-8): flags=0x57 count=0 sizeOnDisk=8192 offset32=-707439360 offset64=2253267985061120
+      As BulkHeader(i-4): flags=0x0 elementCount=8192 sizeOnDisk=-707439360 offset=524629
+    Offset +739: found 2048 (DXT1 64x64 mip size)
+      Context: CD 58 62 08 5D 55 D1 5D CD 50 61 00 7F 55 5C 55 00 08 00 00 5F 55 55 55 20 00 00 00 57 55 55 55 20 00 00 00 
+      As BulkHeader(i-8): flags=0x6150CD count=1432114559 sizeOnDisk=2048 offset32=1431655775 offset64=138870609247
+      As BulkHeader(i-4): flags=0x555C557F elementCount=2048 sizeOnDisk=1431655775 offset=32
+    Offset +843: found 8192 (DXT1 128x128 mip size)
+      Context: 06 02 41 00 41 69 65 95 4E 30 00 08 55 7D 4B 60 00 20 00 00 55 55 55 95 00 20 00 00 55 55 55 62 20 00 00 00 
+      As BulkHeader(i-8): flags=0x800304E count=1615560021 sizeOnDisk=8192 offset32=-1789569707 offset64=35186877486421
+      As BulkHeader(i-4): flags=0x604B7D55 elementCount=8192 sizeOnDisk=-1789569707 offset=8192
+    Offset +851: found 8192 (DXT1 128x128 mip size)
+      Context: 4E 30 00 08 55 7D 4B 60 00 20 00 00 55 55 55 95 00 20 00 00 55 55 55 62 20 00 00 00 D7 55 D5 55 20 00 00 00 
+      As BulkHeader(i-8): flags=0x2000 count=-1789569707 sizeOnDisk=8192 offset32=1649759573 offset64=139088713045
+      As BulkHeader(i-4): flags=0x95555555 elementCount=8192 sizeOnDisk=1649759573 offset=32
+    Offset +986: found 8192 (DXT1 128x128 mip size)
+      Context: 55 00 00 A0 18 40 80 00 00 20 08 40 1B 0A 05 00 00 20 00 00 00 55 D5 55 55 20 00 00 00 FF D5 75 55 60 B9 00 
+      As BulkHeader(i-8): flags=0x40082000 count=330267 sizeOnDisk=8192 offset32=1440044288 offset64=35550884353280
+      As BulkHeader(i-4): flags=0x50A1B elementCount=8192 sizeOnDisk=1440044288 offset=8277
+    Offset +1490: found 32768 (DXT1 256x256 mip size)
+      Context: 83 E0 00 00 00 55 55 55 54 00 00 00 00 00 00 00 00 80 00 00 00 15 55 55 55 A1 00 00 00 78 55 55 55 00 78 00 
+      As BulkHeader(i-8): flags=0x54 count=0 sizeOnDisk=32768 offset32=1431639296 offset64=177387875931392
+      As BulkHeader(i-4): flags=0x0 elementCount=32768 sizeOnDisk=1431639296 offset=41301
+    Offset +2106: found 8192 (DXT1 128x128 mip size)
+      Context: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 20 00 00 00 D5 D5 55 55 64 10 20 00 55 55 0D 8D 25 00 20 
+      As BulkHeader(i-8): flags=0x0 count=0 sizeOnDisk=8192 offset32=1440077056 offset64=2310456926516139264
+      As BulkHeader(i-4): flags=0x0 elementCount=8192 sizeOnDisk=1440077056 offset=537945173
+    Offset +2223: found 131072 (DXT1 512x512 mip size)
+      Context: 75 75 B5 15 40 00 00 00 40 00 00 00 06 06 04 00 00 00 02 00 00 00 F8 D7 61 02 00 00 00 00 40 08 00 10 40 08 
+      As BulkHeader(i-8): flags=0x40 count=263686 sizeOnDisk=131072 offset32=-671612928 offset64=2619258437632
+      As BulkHeader(i-4): flags=0x40606 elementCount=131072 sizeOnDisk=-671612928 offset=609
+    Offset +2754: found 8192 (DXT1 128x128 mip size)
+      Context: 55 41 08 62 05 B6 00 00 00 81 08 F0 00 0D 0A 00 00 20 00 00 00 20 00 00 00 05 05 04 00 00 00 02 00 00 00 98 
+      As BulkHeader(i-8): flags=0xF0088100 count=658688 sizeOnDisk=8192 offset32=8192 offset64=289643248593412096
+      As BulkHeader(i-4): flags=0xA0D00 elementCount=8192 sizeOnDisk=8192 offset=67437824
+    Offset +2758: found 8192 (DXT1 128x128 mip size)
+      Context: 05 B6 00 00 00 81 08 F0 00 0D 0A 00 00 20 00 00 00 20 00 00 00 05 05 04 00 00 00 02 00 00 00 98 D8 61 02 00 
+      As BulkHeader(i-8): flags=0xA0D00 count=8192 sizeOnDisk=8192 offset32=67437824 offset64=144115188143293696
+      As BulkHeader(i-4): flags=0x2000 elementCount=8192 sizeOnDisk=67437824 offset=33554432
+    Offset +2767: found 131072 (DXT1 512x512 mip size)
+      Context: 0D 0A 00 00 20 00 00 00 20 00 00 00 05 05 04 00 00 00 02 00 00 00 98 D8 61 02 00 00 00 00 40 02 20 02 40 02 
+      As BulkHeader(i-8): flags=0x20 count=263429 sizeOnDisk=131072 offset32=-661127168 offset64=2619268923392
+      As BulkHeader(i-4): flags=0x40505 elementCount=131072 sizeOnDisk=-661127168 offset=609
+    Offset +2927: found 131072 (DXT1 512x512 mip size)
+      Context: 15 5F 5A 55 10 00 00 00 10 00 00 00 04 04 04 00 00 00 02 00 00 00 D7 D8 61 02 00 00 00 00 20 C2 20 61 20 C2 
+      As BulkHeader(i-8): flags=0x10 count=263172 sizeOnDisk=131072 offset32=-656998400 offset64=2619273052160
+      As BulkHeader(i-4): flags=0x40404 elementCount=131072 sizeOnDisk=-656998400 offset=609
+    Offset +2980: found 524288 (DXT1 1024x1024 mip size)
+      Context: 01 00 FB FB 0D A5 81 08 A1 28 20 81 82 02 08 00 00 00 08 00 00 00 03 03 04 00 00 00 02 00 00 00 FE D8 61 02 
+      As BulkHeader(i-8): flags=0x812028A1 count=524930 sizeOnDisk=524288 offset32=50528256 offset64=17230397440
+      As BulkHeader(i-4): flags=0x80282 elementCount=524288 sizeOnDisk=50528256 offset=4
+    Offset +2981: found 2048 (DXT1 64x64 mip size)
+      Context: 00 FB FB 0D A5 81 08 A1 28 20 81 82 02 08 00 00 00 08 00 00 00 03 03 04 00 00 00 02 00 00 00 FE D8 61 02 00 
+      As BulkHeader(i-8): flags=0x82812028 count=2050 sizeOnDisk=2048 offset32=67306240 offset64=144115188143162112
+      As BulkHeader(i-4): flags=0x802 elementCount=2048 sizeOnDisk=67306240 offset=33554432
+    Offset +2990: found 131072 (DXT1 512x512 mip size)
+      Context: 20 81 82 02 08 00 00 00 08 00 00 00 03 03 04 00 00 00 02 00 00 00 FE D8 61 02 00 00 00 00 08 A2 18 61 08 A2 
+      As BulkHeader(i-8): flags=0x8 count=262915 sizeOnDisk=131072 offset32=-654442496 offset64=2619275608064
+      As BulkHeader(i-4): flags=0x40303 elementCount=131072 sizeOnDisk=-654442496 offset=609
+
+--- Texture_46 (export 4335, serial 3193 bytes at 0x2A09C3F) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1
+  Native data: 3027 bytes remaining
+  First 128 bytes of native data:
+    +0000: 04 00 00 00 01 00 00 00 00 A0 0A 00 00 00 00 00 
+    +0010: 09 04 00 00 00 02 00 00 00 0B 9D A0 02 00 00 00 
+    +0020: 00 40 80 40 00 00 00 04 00 00 00 04 00 00 0A 0A 
+    +0030: 04 00 00 00 02 00 00 00 2A 9D A0 02 00 00 00 00 
+    +0040: 40 80 10 29 00 00 02 00 00 00 02 00 00 09 09 04 
+    +0050: 00 00 00 02 00 00 00 49 9D A0 02 00 00 00 00 40 
+    +0060: 80 04 CF 00 00 01 00 00 00 01 00 00 08 08 04 00 
+    +0070: 00 00 02 00 00 00 68 9D A0 02 00 00 00 00 40 80 
+
+  Trying FByteBulkData interpretations:
+  First INT32 = 4 (potential mip count)
+
+  Scanning for DXT1 mip sizes in native data:
+    Offset +19: found 131072 (DXT1 512x512 mip size)
+      Context: 00 01 00 00 00 00 A0 0A 00 00 00 00 00 09 04 00 00 00 02 00 00 00 0B 9D A0 02 00 00 00 00 40 80 40 00 00 00 
+      As BulkHeader(i-8): flags=0x0 count=264448 sizeOnDisk=131072 offset32=-1660223488 offset64=2888852766720
+      As BulkHeader(i-4): flags=0x40900 elementCount=131072 sizeOnDisk=-1660223488 offset=672
+    Offset +50: found 131072 (DXT1 512x512 mip size)
+      Context: 80 40 00 00 00 04 00 00 00 04 00 00 0A 0A 04 00 00 00 02 00 00 00 2A 9D A0 02 00 00 00 00 40 80 10 29 00 00 
+      As BulkHeader(i-8): flags=0x400 count=264714 sizeOnDisk=131072 offset32=-1658191872 offset64=2888854798336
+      As BulkHeader(i-4): flags=0x40A0A elementCount=131072 sizeOnDisk=-1658191872 offset=672
+    Offset +68: found 131072 (DXT1 512x512 mip size)
+      Context: 02 00 00 00 2A 9D A0 02 00 00 00 00 40 80 10 29 00 00 02 00 00 00 02 00 00 09 09 04 00 00 00 02 00 00 00 49 
+      As BulkHeader(i-8): flags=0x0 count=688947264 sizeOnDisk=131072 offset32=131072 offset64=290773546546888704
+      As BulkHeader(i-4): flags=0x29108040 elementCount=131072 sizeOnDisk=131072 offset=67700992
+    Offset +72: found 131072 (DXT1 512x512 mip size)
+      Context: 2A 9D A0 02 00 00 00 00 40 80 10 29 00 00 02 00 00 00 02 00 00 09 09 04 00 00 00 02 00 00 00 49 9D A0 02 00 
+      As BulkHeader(i-8): flags=0x29108040 count=131072 sizeOnDisk=131072 offset32=67700992 offset64=144115188143556864
+      As BulkHeader(i-4): flags=0x20000 elementCount=131072 sizeOnDisk=67700992 offset=33554432
+    Offset +81: found 131072 (DXT1 512x512 mip size)
+      Context: 80 10 29 00 00 02 00 00 00 02 00 00 09 09 04 00 00 00 02 00 00 00 49 9D A0 02 00 00 00 00 40 80 04 CF 00 00 
+      As BulkHeader(i-8): flags=0x200 count=264457 sizeOnDisk=131072 offset32=-1656160256 offset64=2888856829952
+      As BulkHeader(i-4): flags=0x40909 elementCount=131072 sizeOnDisk=-1656160256 offset=672
+    Offset +112: found 131072 (DXT1 512x512 mip size)
+      Context: 80 04 CF 00 00 01 00 00 00 01 00 00 08 08 04 00 00 00 02 00 00 00 68 9D A0 02 00 00 00 00 40 80 01 90 00 80 
+      As BulkHeader(i-8): flags=0x100 count=264200 sizeOnDisk=131072 offset32=-1654128640 offset64=2888858861568
+      As BulkHeader(i-4): flags=0x40808 elementCount=131072 sizeOnDisk=-1654128640 offset=672
+    Offset +130: found 32768 (DXT1 256x256 mip size)
+      Context: 02 00 00 00 68 9D A0 02 00 00 00 00 40 80 01 90 00 80 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 00 88 
+      As BulkHeader(i-8): flags=0x0 count=-1878949824 sizeOnDisk=32768 offset32=32768 offset64=290208397570113536
+      As BulkHeader(i-4): flags=0x90018040 elementCount=32768 sizeOnDisk=32768 offset=67569408
+    Offset +134: found 32768 (DXT1 256x256 mip size)
+      Context: 68 9D A0 02 00 00 00 00 40 80 01 90 00 80 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 00 88 A5 A0 02 00 
+      As BulkHeader(i-8): flags=0x90018040 count=32768 sizeOnDisk=32768 offset32=67569408 offset64=144115188143425280
+      As BulkHeader(i-4): flags=0x8000 elementCount=32768 sizeOnDisk=67569408 offset=33554432
+    Offset +143: found 131072 (DXT1 512x512 mip size)
+      Context: 80 01 90 00 80 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 00 88 A5 A0 02 00 00 00 00 40 20 02 11 40 20 
+      As BulkHeader(i-8): flags=0x80 count=263943 sizeOnDisk=131072 offset32=-1517813760 offset64=2888995176448
+      As BulkHeader(i-4): flags=0x40707 elementCount=131072 sizeOnDisk=-1517813760 offset=672
+    Offset +658: found 32768 (DXT1 256x256 mip size)
+      Context: 55 6E 70 20 08 57 5C 54 55 80 08 00 78 00 26 00 00 80 00 00 00 35 35 55 55 C0 88 20 08 55 F3 53 55 C0 00 00 
+      As BulkHeader(i-8): flags=0x88055 count=2490488 sizeOnDisk=32768 offset32=1429550336 offset64=2344335078780646656
+      As BulkHeader(i-4): flags=0x260078 elementCount=32768 sizeOnDisk=1429550336 offset=545833045
+    Offset +2223: found 131072 (DXT1 512x512 mip size)
+      Context: 35 B5 D5 55 40 00 00 00 40 00 00 00 06 06 04 00 00 00 02 00 00 00 A8 A7 A0 02 00 00 00 00 40 08 CC 10 40 08 
+      As BulkHeader(i-8): flags=0x40 count=263686 sizeOnDisk=131072 offset32=-1482162176 offset64=2889030828032
+      As BulkHeader(i-4): flags=0x40606 elementCount=131072 sizeOnDisk=-1482162176 offset=672
+    Offset +2758: found 8192 (DXT1 128x128 mip size)
+      Context: 00 73 5D 55 D5 20 58 20 00 D5 15 15 DD 20 00 00 00 20 00 00 00 05 05 04 00 00 00 02 00 00 00 48 A8 A0 02 00 
+      As BulkHeader(i-8): flags=0x1515D500 count=8413 sizeOnDisk=8192 offset32=67437824 offset64=144115188143293696
+      As BulkHeader(i-4): flags=0x20DD elementCount=8192 sizeOnDisk=67437824 offset=33554432
+    Offset +2767: found 131072 (DXT1 512x512 mip size)
+      Context: D5 15 15 DD 20 00 00 00 20 00 00 00 05 05 04 00 00 00 02 00 00 00 48 A8 A0 02 00 00 00 00 40 02 23 13 40 02 
+      As BulkHeader(i-8): flags=0x20 count=263429 sizeOnDisk=131072 offset32=-1471676416 offset64=2889041313792
+      As BulkHeader(i-4): flags=0x40505 elementCount=131072 sizeOnDisk=-1471676416 offset=672
+    Offset +2927: found 131072 (DXT1 512x512 mip size)
+      Context: 9D 3D 97 97 10 00 00 00 10 00 00 00 04 04 04 00 00 00 02 00 00 00 87 A8 A0 02 00 00 00 00 20 63 0A 83 20 63 
+      As BulkHeader(i-8): flags=0x10 count=263172 sizeOnDisk=131072 offset32=-1467547648 offset64=2889045442560
+      As BulkHeader(i-4): flags=0x40404 elementCount=131072 sizeOnDisk=-1467547648 offset=672
+    Offset +2980: found 524288 (DXT1 1024x1024 mip size)
+      Context: 60 0B A9 A9 03 00 21 21 62 08 FB 7D 57 52 08 00 00 00 08 00 00 00 03 03 04 00 00 00 02 00 00 00 AE A8 A0 02 
+      As BulkHeader(i-8): flags=0x7DFB0862 count=545367 sizeOnDisk=524288 offset32=50528256 offset64=17230397440
+      As BulkHeader(i-4): flags=0x85257 elementCount=524288 sizeOnDisk=50528256 offset=4
+    Offset +2981: found 2048 (DXT1 64x64 mip size)
+      Context: 0B A9 A9 03 00 21 21 62 08 FB 7D 57 52 08 00 00 00 08 00 00 00 03 03 04 00 00 00 02 00 00 00 AE A8 A0 02 00 
+      As BulkHeader(i-8): flags=0x577DFB08 count=2130 sizeOnDisk=2048 offset32=67306240 offset64=144115188143162112
+      As BulkHeader(i-4): flags=0x852 elementCount=2048 sizeOnDisk=67306240 offset=33554432
+    Offset +2990: found 131072 (DXT1 512x512 mip size)
+      Context: FB 7D 57 52 08 00 00 00 08 00 00 00 03 03 04 00 00 00 02 00 00 00 AE A8 A0 02 00 00 00 00 08 82 10 02 08 82 
+      As BulkHeader(i-8): flags=0x8 count=262915 sizeOnDisk=131072 offset32=-1464991744 offset64=2889047998464
+      As BulkHeader(i-4): flags=0x40303 elementCount=131072 sizeOnDisk=-1464991744 offset=672
+
+--- Texture_47 (export 4439, serial 3193 bytes at 0x2A3B414) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1
+  Native data: 3027 bytes remaining
+  First 128 bytes of native data:
+    +0000: 04 00 00 00 01 00 00 00 00 A0 0A 00 00 00 00 00 
+    +0010: 09 04 00 00 00 02 00 00 00 E0 B4 A3 02 00 00 00 
+    +0020: 00 40 80 40 00 00 00 04 00 00 00 04 00 00 0A 0A 
+    +0030: 04 00 00 00 02 00 00 00 FF B4 A3 02 00 00 00 00 
+    +0040: 40 80 10 00 00 00 02 00 00 00 02 00 00 09 09 04 
+    +0050: 00 00 00 02 00 00 00 1E B5 A3 02 00 00 00 00 40 
+    +0060: 80 04 00 00 00 01 00 00 00 01 00 00 08 08 04 00 
+    +0070: 00 00 02 00 00 00 3D B5 A3 02 00 00 00 00 40 80 
+
+  Trying FByteBulkData interpretations:
+  First INT32 = 4 (potential mip count)
+
+  Scanning for DXT1 mip sizes in native data:
+    Offset +19: found 131072 (DXT1 512x512 mip size)
+      Context: 00 01 00 00 00 00 A0 0A 00 00 00 00 00 09 04 00 00 00 02 00 00 00 E0 B4 A3 02 00 00 00 00 40 80 40 00 00 00 
+      As BulkHeader(i-8): flags=0x0 count=264448 sizeOnDisk=131072 offset32=-1260388352 offset64=2902137503744
+      As BulkHeader(i-4): flags=0x40900 elementCount=131072 sizeOnDisk=-1260388352 offset=675
+    Offset +50: found 131072 (DXT1 512x512 mip size)
+      Context: 80 40 00 00 00 04 00 00 00 04 00 00 0A 0A 04 00 00 00 02 00 00 00 FF B4 A3 02 00 00 00 00 40 80 10 00 00 00 
+      As BulkHeader(i-8): flags=0x400 count=264714 sizeOnDisk=131072 offset32=-1258356736 offset64=2902139535360
+      As BulkHeader(i-4): flags=0x40A0A elementCount=131072 sizeOnDisk=-1258356736 offset=675
+    Offset +68: found 131072 (DXT1 512x512 mip size)
+      Context: 02 00 00 00 FF B4 A3 02 00 00 00 00 40 80 10 00 00 00 02 00 00 00 02 00 00 09 09 04 00 00 00 02 00 00 00 1E 
+      As BulkHeader(i-8): flags=0x0 count=1081408 sizeOnDisk=131072 offset32=131072 offset64=290773546546888704
+      As BulkHeader(i-4): flags=0x108040 elementCount=131072 sizeOnDisk=131072 offset=67700992
+    Offset +72: found 131072 (DXT1 512x512 mip size)
+      Context: FF B4 A3 02 00 00 00 00 40 80 10 00 00 00 02 00 00 00 02 00 00 09 09 04 00 00 00 02 00 00 00 1E B5 A3 02 00 
+      As BulkHeader(i-8): flags=0x108040 count=131072 sizeOnDisk=131072 offset32=67700992 offset64=144115188143556864
+      As BulkHeader(i-4): flags=0x20000 elementCount=131072 sizeOnDisk=67700992 offset=33554432
+    Offset +81: found 131072 (DXT1 512x512 mip size)
+      Context: 80 10 00 00 00 02 00 00 00 02 00 00 09 09 04 00 00 00 02 00 00 00 1E B5 A3 02 00 00 00 00 40 80 04 00 00 00 
+      As BulkHeader(i-8): flags=0x200 count=264457 sizeOnDisk=131072 offset32=-1256325120 offset64=2902141566976
+      As BulkHeader(i-4): flags=0x40909 elementCount=131072 sizeOnDisk=-1256325120 offset=675
+    Offset +112: found 131072 (DXT1 512x512 mip size)
+      Context: 80 04 00 00 00 01 00 00 00 01 00 00 08 08 04 00 00 00 02 00 00 00 3D B5 A3 02 00 00 00 00 40 80 01 05 00 80 
+      As BulkHeader(i-8): flags=0x100 count=264200 sizeOnDisk=131072 offset32=-1254293504 offset64=2902143598592
+      As BulkHeader(i-4): flags=0x40808 elementCount=131072 sizeOnDisk=-1254293504 offset=675
+    Offset +130: found 32768 (DXT1 256x256 mip size)
+      Context: 02 00 00 00 3D B5 A3 02 00 00 00 00 40 80 01 05 00 80 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 00 5D 
+      As BulkHeader(i-8): flags=0x0 count=83984448 sizeOnDisk=32768 offset32=32768 offset64=290208397570113536
+      As BulkHeader(i-4): flags=0x5018040 elementCount=32768 sizeOnDisk=32768 offset=67569408
+    Offset +134: found 32768 (DXT1 256x256 mip size)
+      Context: 3D B5 A3 02 00 00 00 00 40 80 01 05 00 80 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 00 5D BD A3 02 00 
+      As BulkHeader(i-8): flags=0x5018040 count=32768 sizeOnDisk=32768 offset32=67569408 offset64=144115188143425280
+      As BulkHeader(i-4): flags=0x8000 elementCount=32768 sizeOnDisk=67569408 offset=33554432
+    Offset +143: found 131072 (DXT1 512x512 mip size)
+      Context: 80 01 05 00 80 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 00 5D BD A3 02 00 00 00 00 40 20 00 C0 40 20 
+      As BulkHeader(i-8): flags=0x80 count=263943 sizeOnDisk=131072 offset32=-1117978624 offset64=2902279913472
+      As BulkHeader(i-4): flags=0x40707 elementCount=131072 sizeOnDisk=-1117978624 offset=675
+    Offset +683: found 2048 (DXT1 64x64 mip size)
+      Context: 00 00 00 00 00 00 00 00 43 01 00 00 55 55 5C 5C 00 08 00 00 35 55 55 55 40 18 20 05 00 A0 58 78 E2 3B 02 00 
+      As BulkHeader(i-8): flags=0x143 count=1549555029 sizeOnDisk=2048 offset32=1431655733 offset64=369321834033009973
+      As BulkHeader(i-4): flags=0x5C5C5555 elementCount=2048 sizeOnDisk=1431655733 offset=85989440
+    Offset +1558: found 32768 (DXT1 256x256 mip size)
+      Context: 00 55 55 55 49 0F 20 00 00 55 75 85 E5 00 00 21 00 80 00 00 80 61 08 CA 01 07 00 00 C0 80 05 00 00 22 FF 55 
+      As BulkHeader(i-8): flags=0x85755500 count=553648357 sizeOnDisk=32768 offset32=-905420416 offset64=7704265908608
+      As BulkHeader(i-4): flags=0x210000E5 elementCount=32768 sizeOnDisk=-905420416 offset=1793
+    Offset +2223: found 131072 (DXT1 512x512 mip size)
+      Context: 60 40 40 6A 40 00 00 00 40 00 00 00 06 06 04 00 00 00 02 00 00 00 7D BF A3 02 00 00 00 00 40 08 20 B0 40 08 
+      As BulkHeader(i-8): flags=0x40 count=263686 sizeOnDisk=131072 offset32=-1082327040 offset64=2902315565056
+      As BulkHeader(i-4): flags=0x40606 elementCount=131072 sizeOnDisk=-1082327040 offset=675
+    Offset +2570: found 32768 (DXT1 256x256 mip size)
+      Context: 55 6B 01 81 08 55 55 55 85 62 08 61 04 00 97 BF 00 80 00 00 00 55 55 97 17 00 B2 20 18 33 2B FD 55 23 C8 60 
+      As BulkHeader(i-8): flags=0x61086285 count=-1080623100 sizeOnDisk=32768 offset32=-1756015360 offset64=2355945656391390464
+      As BulkHeader(i-4): flags=0xBF970004 elementCount=32768 sizeOnDisk=-1756015360 offset=548536343
+    Offset +2758: found 8192 (DXT1 128x128 mip size)
+      Context: 07 BA 5C 55 55 20 07 A5 01 7B 40 C0 C0 20 00 00 00 20 00 00 00 05 05 04 00 00 00 02 00 00 00 1D C0 A3 02 00 
+      As BulkHeader(i-8): flags=0xC0407B01 count=8384 sizeOnDisk=8192 offset32=67437824 offset64=144115188143293696
+      As BulkHeader(i-4): flags=0x20C0 elementCount=8192 sizeOnDisk=67437824 offset=33554432
+    Offset +2767: found 131072 (DXT1 512x512 mip size)
+      Context: 7B 40 C0 C0 20 00 00 00 20 00 00 00 05 05 04 00 00 00 02 00 00 00 1D C0 A3 02 00 00 00 00 40 02 61 59 40 02 
+      As BulkHeader(i-8): flags=0x20 count=263429 sizeOnDisk=131072 offset32=-1071841280 offset64=2902326050816
+      As BulkHeader(i-4): flags=0x40505 elementCount=131072 sizeOnDisk=-1071841280 offset=675
+    Offset +2927: found 131072 (DXT1 512x512 mip size)
+      Context: 00 00 BE D5 10 00 00 00 10 00 00 00 04 04 04 00 00 00 02 00 00 00 5C C0 A3 02 00 00 00 00 20 61 40 63 20 61 
+      As BulkHeader(i-8): flags=0x10 count=263172 sizeOnDisk=131072 offset32=-1067712512 offset64=2902330179584
+      As BulkHeader(i-4): flags=0x40404 elementCount=131072 sizeOnDisk=-1067712512 offset=675
+    Offset +2980: found 524288 (DXT1 1024x1024 mip size)
+      Context: A1 08 B5 05 55 55 62 10 C2 0C 0A 00 00 58 08 00 00 00 08 00 00 00 03 03 04 00 00 00 02 00 00 00 83 C0 A3 02 
+      As BulkHeader(i-8): flags=0xA0CC2 count=546816 sizeOnDisk=524288 offset32=50528256 offset64=17230397440
+      As BulkHeader(i-4): flags=0x85800 elementCount=524288 sizeOnDisk=50528256 offset=4
+    Offset +2981: found 2048 (DXT1 64x64 mip size)
+      Context: 08 B5 05 55 55 62 10 C2 0C 0A 00 00 58 08 00 00 00 08 00 00 00 03 03 04 00 00 00 02 00 00 00 83 C0 A3 02 00 
+      As BulkHeader(i-8): flags=0xA0C count=2136 sizeOnDisk=2048 offset32=67306240 offset64=144115188143162112
+      As BulkHeader(i-4): flags=0x858 elementCount=2048 sizeOnDisk=67306240 offset=33554432
+    Offset +2990: found 131072 (DXT1 512x512 mip size)
+      Context: 0A 00 00 58 08 00 00 00 08 00 00 00 03 03 04 00 00 00 02 00 00 00 83 C0 A3 02 00 00 00 00 08 82 10 63 08 82 
+      As BulkHeader(i-8): flags=0x8 count=262915 sizeOnDisk=131072 offset32=-1065156608 offset64=2902332735488
+      As BulkHeader(i-4): flags=0x40303 elementCount=131072 sizeOnDisk=-1065156608 offset=675
+
+--- Texture_50 (export 5002, serial 3193 bytes at 0x3851057) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1
+  Native data: 3027 bytes remaining
+  First 128 bytes of native data:
+    +0000: 04 00 00 00 01 00 00 00 00 A0 0A 00 00 00 00 00 
+    +0010: 09 04 00 00 00 02 00 00 00 23 11 85 03 00 00 00 
+    +0020: 00 40 80 40 09 00 00 04 00 00 00 04 00 00 0A 0A 
+    +0030: 04 00 00 00 02 00 00 00 42 11 85 03 00 00 00 00 
+    +0040: 40 80 10 0A 00 00 02 00 00 00 02 00 00 09 09 04 
+    +0050: 00 00 00 02 00 00 00 61 11 85 03 00 00 00 00 40 
+    +0060: 80 04 0D 00 00 01 00 00 00 01 00 00 08 08 04 00 
+    +0070: 00 00 02 00 00 00 80 11 85 03 00 00 00 00 40 80 
+
+  Trying FByteBulkData interpretations:
+  First INT32 = 4 (potential mip count)
+
+  Scanning for DXT1 mip sizes in native data:
+    Offset +19: found 131072 (DXT1 512x512 mip size)
+      Context: 00 01 00 00 00 00 A0 0A 00 00 00 00 00 09 04 00 00 00 02 00 00 00 23 11 85 03 00 00 00 00 40 80 40 09 00 00 
+      As BulkHeader(i-8): flags=0x0 count=264448 sizeOnDisk=131072 offset32=287506432 offset64=3870053040128
+      As BulkHeader(i-4): flags=0x40900 elementCount=131072 sizeOnDisk=287506432 offset=901
+    Offset +50: found 131072 (DXT1 512x512 mip size)
+      Context: 80 40 09 00 00 04 00 00 00 04 00 00 0A 0A 04 00 00 00 02 00 00 00 42 11 85 03 00 00 00 00 40 80 10 0A 00 00 
+      As BulkHeader(i-8): flags=0x400 count=264714 sizeOnDisk=131072 offset32=289538048 offset64=3870055071744
+      As BulkHeader(i-4): flags=0x40A0A elementCount=131072 sizeOnDisk=289538048 offset=901
+    Offset +68: found 131072 (DXT1 512x512 mip size)
+      Context: 02 00 00 00 42 11 85 03 00 00 00 00 40 80 10 0A 00 00 02 00 00 00 02 00 00 09 09 04 00 00 00 02 00 00 00 61 
+      As BulkHeader(i-8): flags=0x0 count=168853568 sizeOnDisk=131072 offset32=131072 offset64=290773546546888704
+      As BulkHeader(i-4): flags=0xA108040 elementCount=131072 sizeOnDisk=131072 offset=67700992
+    Offset +72: found 131072 (DXT1 512x512 mip size)
+      Context: 42 11 85 03 00 00 00 00 40 80 10 0A 00 00 02 00 00 00 02 00 00 09 09 04 00 00 00 02 00 00 00 61 11 85 03 00 
+      As BulkHeader(i-8): flags=0xA108040 count=131072 sizeOnDisk=131072 offset32=67700992 offset64=144115188143556864
+      As BulkHeader(i-4): flags=0x20000 elementCount=131072 sizeOnDisk=67700992 offset=33554432
+    Offset +81: found 131072 (DXT1 512x512 mip size)
+      Context: 80 10 0A 00 00 02 00 00 00 02 00 00 09 09 04 00 00 00 02 00 00 00 61 11 85 03 00 00 00 00 40 80 04 0D 00 00 
+      As BulkHeader(i-8): flags=0x200 count=264457 sizeOnDisk=131072 offset32=291569664 offset64=3870057103360
+      As BulkHeader(i-4): flags=0x40909 elementCount=131072 sizeOnDisk=291569664 offset=901
+    Offset +112: found 131072 (DXT1 512x512 mip size)
+      Context: 80 04 0D 00 00 01 00 00 00 01 00 00 08 08 04 00 00 00 02 00 00 00 80 11 85 03 00 00 00 00 40 80 01 13 00 80 
+      As BulkHeader(i-8): flags=0x100 count=264200 sizeOnDisk=131072 offset32=293601280 offset64=3870059134976
+      As BulkHeader(i-4): flags=0x40808 elementCount=131072 sizeOnDisk=293601280 offset=901
+    Offset +130: found 32768 (DXT1 256x256 mip size)
+      Context: 02 00 00 00 80 11 85 03 00 00 00 00 40 80 01 13 00 80 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 00 A0 
+      As BulkHeader(i-8): flags=0x0 count=318865472 sizeOnDisk=32768 offset32=32768 offset64=290208397570113536
+      As BulkHeader(i-4): flags=0x13018040 elementCount=32768 sizeOnDisk=32768 offset=67569408
+    Offset +134: found 32768 (DXT1 256x256 mip size)
+      Context: 80 11 85 03 00 00 00 00 40 80 01 13 00 80 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 00 A0 19 85 03 00 
+      As BulkHeader(i-8): flags=0x13018040 count=32768 sizeOnDisk=32768 offset32=67569408 offset64=144115188143425280
+      As BulkHeader(i-4): flags=0x8000 elementCount=32768 sizeOnDisk=67569408 offset=33554432
+    Offset +143: found 131072 (DXT1 512x512 mip size)
+      Context: 80 01 13 00 80 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 00 A0 19 85 03 00 00 00 00 40 20 18 D0 40 20 
+      As BulkHeader(i-8): flags=0x80 count=263943 sizeOnDisk=131072 offset32=429916160 offset64=3870195449856
+      As BulkHeader(i-4): flags=0x40707 elementCount=131072 sizeOnDisk=429916160 offset=901
+    Offset +450: found 524288 (DXT1 1024x1024 mip size)
+      Context: FF 11 04 00 01 5F 5E 78 70 00 00 00 00 00 00 00 00 00 08 00 00 55 55 D5 95 00 00 00 00 00 00 00 00 21 00 00 
+      As BulkHeader(i-8): flags=0x70 count=0 sizeOnDisk=524288 offset32=-715827968 offset64=643529266432
+      As BulkHeader(i-4): flags=0x0 elementCount=524288 sizeOnDisk=-715827968 offset=149
+    Offset +451: found 2048 (DXT1 64x64 mip size)
+      Context: 11 04 00 01 5F 5E 78 70 00 00 00 00 00 00 00 00 00 08 00 00 55 55 D5 95 00 00 00 00 00 00 00 00 21 00 00 00 
+      As BulkHeader(i-8): flags=0x0 count=0 sizeOnDisk=2048 offset32=-1781181099 offset64=2513786197
+      As BulkHeader(i-4): flags=0x0 elementCount=2048 sizeOnDisk=-1781181099 offset=0
+    Offset +770: found 8192 (DXT1 128x128 mip size)
+      Context: 35 00 B0 00 10 7A 78 78 78 00 00 00 00 00 00 00 00 20 00 00 00 D7 75 55 75 23 05 00 00 2F 35 B5 F5 42 03 00 
+      As BulkHeader(i-8): flags=0x78 count=0 sizeOnDisk=8192 offset32=1433786112 offset64=1446361735485184
+      As BulkHeader(i-4): flags=0x0 elementCount=8192 sizeOnDisk=1433786112 offset=336757
+    Offset +1083: found 2048 (DXT1 64x64 mip size)
+      Context: 40 00 00 00 55 55 55 15 C0 01 00 00 55 55 7D 42 00 08 00 00 55 55 55 B5 02 50 00 00 55 55 B5 25 A6 00 00 00 
+      As BulkHeader(i-8): flags=0x1C0 count=1115510101 sizeOnDisk=2048 offset32=-1252698795 offset64=87972562425173
+      As BulkHeader(i-4): flags=0x427D5555 elementCount=2048 sizeOnDisk=-1252698795 offset=20482
+    Offset +1354: found 524288 (DXT1 1024x1024 mip size)
+      Context: 00 0B 28 20 00 55 55 70 50 00 00 00 00 00 00 00 00 00 08 00 00 55 55 55 95 00 70 00 08 55 55 83 8D 00 30 00 
+      As BulkHeader(i-8): flags=0x50 count=0 sizeOnDisk=524288 offset32=1431655680 offset64=31525838773376256
+      As BulkHeader(i-4): flags=0x0 elementCount=524288 sizeOnDisk=1431655680 offset=7340181
+    Offset +1355: found 2048 (DXT1 64x64 mip size)
+      Context: 0B 28 20 00 55 55 70 50 00 00 00 00 00 00 00 00 00 08 00 00 55 55 55 95 00 70 00 08 55 55 83 8D 00 30 00 00 
+      As BulkHeader(i-8): flags=0x0 count=0 sizeOnDisk=2048 offset32=-1789569707 offset64=576583900111131989
+      As BulkHeader(i-4): flags=0x0 elementCount=2048 sizeOnDisk=-1789569707 offset=134246400
+    Offset +2034: found 8192 (DXT1 128x128 mip size)
+      Context: 5E 20 00 00 00 56 57 57 5D 00 00 00 00 00 00 00 00 20 00 00 00 5D F5 55 55 E1 1D 00 10 35 B5 55 D5 60 40 65 
+      As BulkHeader(i-8): flags=0x5D count=0 sizeOnDisk=8192 offset32=1442143488 offset64=8410530955222272
+      As BulkHeader(i-4): flags=0x0 elementCount=8192 sizeOnDisk=1442143488 offset=1958229
+    Offset +2125: found 2048 (DXT1 64x64 mip size)
+      Context: 00 00 00 FF 55 55 80 4A 00 00 0D 0D AD 55 C0 62 00 08 00 00 AA 55 00 6A 00 08 80 80 AA 55 60 48 00 00 E8 60 
+      As BulkHeader(i-8): flags=0xD0D0000 count=1656772013 sizeOnDisk=2048 offset32=1778406826 offset64=-9187334441964382806
+      As BulkHeader(i-4): flags=0x62C055AD elementCount=2048 sizeOnDisk=1778406826 offset=-2139092992
+    Offset +2223: found 131072 (DXT1 512x512 mip size)
+      Context: 56 55 55 55 40 00 00 00 40 00 00 00 06 06 04 00 00 00 02 00 00 00 C0 1B 85 03 00 00 00 00 40 08 19 90 40 08 
+      As BulkHeader(i-8): flags=0x40 count=263686 sizeOnDisk=131072 offset32=465567744 offset64=3870231101440
+      As BulkHeader(i-4): flags=0x40606 elementCount=131072 sizeOnDisk=465567744 offset=901
+    Offset +2475: found 32768 (DXT1 256x256 mip size)
+      Context: 00 E0 40 08 0B FD 55 55 19 30 00 08 C2 7F 55 55 00 80 00 00 15 15 15 D5 00 C8 00 88 40 80 A8 EB 61 A8 83 10 
+      As BulkHeader(i-8): flags=0x8003019 count=1431666626 sizeOnDisk=32768 offset32=-720038635 offset64=-8646691378650868459
+      As BulkHeader(i-4): flags=0x55557FC2 elementCount=32768 sizeOnDisk=-720038635 offset=-2013214720
+    Offset +2722: found 8192 (DXT1 128x128 mip size)
+      Context: 55 C0 28 60 1D 56 FE A8 00 60 30 A0 1C B5 2F 0A 00 20 00 00 00 F6 57 5D 5F E1 22 00 00 15 D5 D5 55 63 44 00 
+      As BulkHeader(i-8): flags=0xA0306000 count=170898716 sizeOnDisk=8192 offset32=1566045696 offset64=9817948912350720
+      As BulkHeader(i-4): flags=0xA2FB51C elementCount=8192 sizeOnDisk=1566045696 offset=2285919
+    Offset +2758: found 8192 (DXT1 128x128 mip size)
+      Context: 08 58 5F 5D 55 63 10 00 00 D5 F3 50 55 20 00 00 00 20 00 00 00 05 05 04 00 00 00 02 00 00 00 60 1C 85 03 00 
+      As BulkHeader(i-8): flags=0x50F3D500 count=8277 sizeOnDisk=8192 offset32=67437824 offset64=144115188143293696
+      As BulkHeader(i-4): flags=0x2055 elementCount=8192 sizeOnDisk=67437824 offset=33554432
+    Offset +2767: found 131072 (DXT1 512x512 mip size)
+      Context: D5 F3 50 55 20 00 00 00 20 00 00 00 05 05 04 00 00 00 02 00 00 00 60 1C 85 03 00 00 00 00 40 02 59 80 40 02 
+      As BulkHeader(i-8): flags=0x20 count=263429 sizeOnDisk=131072 offset32=476053504 offset64=3870241587200
+      As BulkHeader(i-4): flags=0x40505 elementCount=131072 sizeOnDisk=476053504 offset=901
+    Offset +2927: found 131072 (DXT1 512x512 mip size)
+      Context: 96 02 02 00 10 00 00 00 10 00 00 00 04 04 04 00 00 00 02 00 00 00 9F 1C 85 03 00 00 00 00 20 8F 80 41 20 8F 
+      As BulkHeader(i-8): flags=0x10 count=263172 sizeOnDisk=131072 offset32=480182272 offset64=3870245715968
+      As BulkHeader(i-4): flags=0x40404 elementCount=131072 sizeOnDisk=480182272 offset=901
+    Offset +2980: found 524288 (DXT1 1024x1024 mip size)
+      Context: E0 0A 08 00 5B DD 21 71 E1 08 87 F6 55 55 08 00 00 00 08 00 00 00 03 03 04 00 00 00 02 00 00 00 C6 1C 85 03 
+      As BulkHeader(i-8): flags=0xF68708E1 count=546133 sizeOnDisk=524288 offset32=50528256 offset64=17230397440
+      As BulkHeader(i-4): flags=0x85555 elementCount=524288 sizeOnDisk=50528256 offset=4
+    Offset +2981: found 2048 (DXT1 64x64 mip size)
+      Context: 0A 08 00 5B DD 21 71 E1 08 87 F6 55 55 08 00 00 00 08 00 00 00 03 03 04 00 00 00 02 00 00 00 C6 1C 85 03 00 
+      As BulkHeader(i-8): flags=0x55F68708 count=2133 sizeOnDisk=2048 offset32=67306240 offset64=144115188143162112
+      As BulkHeader(i-4): flags=0x855 elementCount=2048 sizeOnDisk=67306240 offset=33554432
+    Offset +2990: found 131072 (DXT1 512x512 mip size)
+      Context: 87 F6 55 55 08 00 00 00 08 00 00 00 03 03 04 00 00 00 02 00 00 00 C6 1C 85 03 00 00 00 00 08 23 28 C0 08 23 
+      As BulkHeader(i-8): flags=0x8 count=262915 sizeOnDisk=131072 offset32=482738176 offset64=3870248271872
+      As BulkHeader(i-4): flags=0x40303 elementCount=131072 sizeOnDisk=482738176 offset=901
+
+--- Texture_48 (export 5163, serial 3193 bytes at 0x3913CF7) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1
+  Native data: 3027 bytes remaining
+  First 128 bytes of native data:
+    +0000: 04 00 00 00 01 00 00 00 00 A0 0A 00 00 00 00 00 
+    +0010: 09 04 00 00 00 02 00 00 00 C3 3D 91 03 00 00 00 
+    +0020: 00 40 80 40 00 00 00 04 00 00 00 04 00 00 0A 0A 
+    +0030: 04 00 00 00 02 00 00 00 E2 3D 91 03 00 00 00 00 
+    +0040: 40 80 10 00 00 00 02 00 00 00 02 00 00 09 09 04 
+    +0050: 00 00 00 02 00 00 00 01 3E 91 03 00 00 00 00 40 
+    +0060: 80 04 00 00 00 01 00 00 00 01 00 00 08 08 04 00 
+    +0070: 00 00 02 00 00 00 20 3E 91 03 00 00 00 00 40 80 
+
+  Trying FByteBulkData interpretations:
+  First INT32 = 4 (potential mip count)
+
+  Scanning for DXT1 mip sizes in native data:
+    Offset +19: found 131072 (DXT1 512x512 mip size)
+      Context: 00 01 00 00 00 00 A0 0A 00 00 00 00 00 09 04 00 00 00 02 00 00 00 C3 3D 91 03 00 00 00 00 40 80 40 00 00 00 
+      As BulkHeader(i-8): flags=0x0 count=264448 sizeOnDisk=131072 offset32=1036189696 offset64=3922341330944
+      As BulkHeader(i-4): flags=0x40900 elementCount=131072 sizeOnDisk=1036189696 offset=913
+    Offset +50: found 131072 (DXT1 512x512 mip size)
+      Context: 80 40 00 00 00 04 00 00 00 04 00 00 0A 0A 04 00 00 00 02 00 00 00 E2 3D 91 03 00 00 00 00 40 80 10 00 00 00 
+      As BulkHeader(i-8): flags=0x400 count=264714 sizeOnDisk=131072 offset32=1038221312 offset64=3922343362560
+      As BulkHeader(i-4): flags=0x40A0A elementCount=131072 sizeOnDisk=1038221312 offset=913
+    Offset +68: found 131072 (DXT1 512x512 mip size)
+      Context: 02 00 00 00 E2 3D 91 03 00 00 00 00 40 80 10 00 00 00 02 00 00 00 02 00 00 09 09 04 00 00 00 02 00 00 00 01 
+      As BulkHeader(i-8): flags=0x0 count=1081408 sizeOnDisk=131072 offset32=131072 offset64=290773546546888704
+      As BulkHeader(i-4): flags=0x108040 elementCount=131072 sizeOnDisk=131072 offset=67700992
+    Offset +72: found 131072 (DXT1 512x512 mip size)
+      Context: E2 3D 91 03 00 00 00 00 40 80 10 00 00 00 02 00 00 00 02 00 00 09 09 04 00 00 00 02 00 00 00 01 3E 91 03 00 
+      As BulkHeader(i-8): flags=0x108040 count=131072 sizeOnDisk=131072 offset32=67700992 offset64=144115188143556864
+      As BulkHeader(i-4): flags=0x20000 elementCount=131072 sizeOnDisk=67700992 offset=33554432
+    Offset +81: found 131072 (DXT1 512x512 mip size)
+      Context: 80 10 00 00 00 02 00 00 00 02 00 00 09 09 04 00 00 00 02 00 00 00 01 3E 91 03 00 00 00 00 40 80 04 00 00 00 
+      As BulkHeader(i-8): flags=0x200 count=264457 sizeOnDisk=131072 offset32=1040252928 offset64=3922345394176
+      As BulkHeader(i-4): flags=0x40909 elementCount=131072 sizeOnDisk=1040252928 offset=913
+    Offset +112: found 131072 (DXT1 512x512 mip size)
+      Context: 80 04 00 00 00 01 00 00 00 01 00 00 08 08 04 00 00 00 02 00 00 00 20 3E 91 03 00 00 00 00 40 80 01 00 00 80 
+      As BulkHeader(i-8): flags=0x100 count=264200 sizeOnDisk=131072 offset32=1042284544 offset64=3922347425792
+      As BulkHeader(i-4): flags=0x40808 elementCount=131072 sizeOnDisk=1042284544 offset=913
+    Offset +130: found 32768 (DXT1 256x256 mip size)
+      Context: 02 00 00 00 20 3E 91 03 00 00 00 00 40 80 01 00 00 80 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 00 40 
+      As BulkHeader(i-8): flags=0x0 count=98368 sizeOnDisk=32768 offset32=32768 offset64=290208397570113536
+      As BulkHeader(i-4): flags=0x18040 elementCount=32768 sizeOnDisk=32768 offset=67569408
+    Offset +134: found 32768 (DXT1 256x256 mip size)
+      Context: 20 3E 91 03 00 00 00 00 40 80 01 00 00 80 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 00 40 46 91 03 00 
+      As BulkHeader(i-8): flags=0x18040 count=32768 sizeOnDisk=32768 offset32=67569408 offset64=144115188143425280
+      As BulkHeader(i-4): flags=0x8000 elementCount=32768 sizeOnDisk=67569408 offset=33554432
+    Offset +143: found 131072 (DXT1 512x512 mip size)
+      Context: 80 01 00 00 80 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 00 40 46 91 03 00 00 00 00 40 20 00 D8 40 20 
+      As BulkHeader(i-8): flags=0x80 count=263943 sizeOnDisk=131072 offset32=1178599424 offset64=3922483740672
+      As BulkHeader(i-4): flags=0x40707 elementCount=131072 sizeOnDisk=1178599424 offset=913
+    Offset +386: found 8192 (DXT1 128x128 mip size)
+      Context: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 20 00 00 00 55 D5 D5 55 00 00 06 03 58 00 00 00 66 08 00 
+      As BulkHeader(i-8): flags=0x0 count=0 sizeOnDisk=8192 offset32=-707439360 offset64=432345932887315712
+      As BulkHeader(i-4): flags=0x0 elementCount=8192 sizeOnDisk=-707439360 offset=100663381
+    Offset +514: found 8192 (DXT1 128x128 mip size)
+      Context: C2 20 00 00 00 55 5F 7D 54 00 00 00 00 00 00 00 00 20 00 00 00 55 55 D5 55 00 00 20 00 00 00 00 14 60 04 00 
+      As BulkHeader(i-8): flags=0x54 count=0 sizeOnDisk=8192 offset32=-715827968 offset64=2305843377865053440
+      As BulkHeader(i-4): flags=0x0 elementCount=8192 sizeOnDisk=-715827968 offset=536870997
+    Offset +524: found 8192 (DXT1 128x128 mip size)
+      Context: 00 00 00 00 00 00 00 20 00 00 00 55 55 D5 55 00 00 20 00 00 00 00 14 60 04 00 00 55 55 AB 09 C7 70 01 01 B5 
+      As BulkHeader(i-8): flags=0x55000000 count=5625173 sizeOnDisk=8192 offset32=1611923456 offset64=6124895512015667200
+      As BulkHeader(i-4): flags=0x55D555 elementCount=8192 sizeOnDisk=1611923456 offset=1426063364
+    Offset +673: found 32768 (DXT1 256x256 mip size)
+      Context: 5C 5C E0 08 00 00 8B 57 55 55 01 08 A6 01 48 00 00 80 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+      As BulkHeader(i-8): flags=0x8015555 count=4719014 sizeOnDisk=32768 offset32=0 offset64=0
+      As BulkHeader(i-4): flags=0x4801A6 elementCount=32768 sizeOnDisk=0 offset=0
+    Offset +899: found 32768 (DXT1 256x256 mip size)
+      Context: 00 A8 00 00 80 80 FF 55 00 90 21 08 D7 37 D5 55 00 80 00 00 5E 60 7F 55 20 00 07 00 00 80 00 06 66 01 20 00 
+      As BulkHeader(i-8): flags=0x8219000 count=1440036823 sizeOnDisk=32768 offset32=1434411102 offset64=1970463710339166
+      As BulkHeader(i-4): flags=0x55D537D7 elementCount=32768 sizeOnDisk=1434411102 offset=458784
+    Offset +1011: found 8192 (DXT1 128x128 mip size)
+      Context: E5 5C 26 00 8D AD D5 5E 98 00 22 00 63 72 55 55 00 20 00 00 55 53 5D 55 01 02 20 00 45 85 55 55 06 10 20 00 
+      As BulkHeader(i-8): flags=0x220098 count=1431663203 sizeOnDisk=8192 offset32=1432179541 offset64=9009404005143381
+      As BulkHeader(i-4): flags=0x55557263 elementCount=8192 sizeOnDisk=1432179541 offset=2097665
+    Offset +1265: found 131072 (DXT1 512x512 mip size)
+      Context: E5 E5 00 A0 00 00 E2 72 73 7B 00 00 00 00 00 00 00 00 02 00 00 00 95 95 95 D5 43 08 20 00 86 F4 54 D7 E1 18 
+      As BulkHeader(i-8): flags=0x7B73 count=0 sizeOnDisk=131072 offset32=-1785397248 offset64=595554414179450880
+      As BulkHeader(i-4): flags=0x0 elementCount=131072 sizeOnDisk=-1785397248 offset=138663317
+    Offset +1803: found 32768 (DXT1 256x256 mip size)
+      Context: 00 D8 00 38 02 82 6B EB 00 B8 00 00 00 37 B5 AB 00 80 00 00 5C 5C 5C 5E 00 00 00 00 00 00 00 00 00 00 00 00 
+      As BulkHeader(i-8): flags=0xB800 count=-1414187264 sizeOnDisk=32768 offset32=1583111260 offset64=1583111260
+      As BulkHeader(i-4): flags=0xABB53700 elementCount=32768 sizeOnDisk=1583111260 offset=0
+    Offset +1906: found 524288 (DXT1 1024x1024 mip size)
+      Context: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 08 00 00 15 15 55 D5 00 78 00 08 82 EF 55 55 00 50 00 
+      As BulkHeader(i-8): flags=0x0 count=0 sizeOnDisk=524288 offset32=1427444992 offset64=33777913460757760
+      As BulkHeader(i-4): flags=0x0 elementCount=524288 sizeOnDisk=1427444992 offset=7864533
+    Offset +1907: found 2048 (DXT1 64x64 mip size)
+      Context: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 08 00 00 15 15 55 D5 00 78 00 08 82 EF 55 55 00 50 00 00 
+      As BulkHeader(i-8): flags=0x0 count=0 sizeOnDisk=2048 offset32=-715844331 offset64=576592697277879573
+      As BulkHeader(i-4): flags=0x0 elementCount=2048 sizeOnDisk=-715844331 offset=134248448
+    Offset +2223: found 131072 (DXT1 512x512 mip size)
+      Context: 0D 02 80 80 40 00 00 00 40 00 00 00 06 06 04 00 00 00 02 00 00 00 60 48 91 03 00 00 00 00 40 08 00 D8 40 08 
+      As BulkHeader(i-8): flags=0x40 count=263686 sizeOnDisk=131072 offset32=1214251008 offset64=3922519392256
+      As BulkHeader(i-4): flags=0x40606 elementCount=131072 sizeOnDisk=1214251008 offset=913
+    Offset +2283: found 2048 (DXT1 64x64 mip size)
+      Context: 14 00 01 00 57 5E 78 78 20 00 00 00 55 55 57 5F 00 08 00 00 35 15 55 55 0C 02 20 00 35 35 D5 55 66 10 60 00 
+      As BulkHeader(i-8): flags=0x20 count=1599558997 sizeOnDisk=2048 offset32=1431639349 offset64=9009451249243445
+      As BulkHeader(i-4): flags=0x5F575555 elementCount=2048 sizeOnDisk=1431639349 offset=2097676
+    Offset +2675: found 32768 (DXT1 256x256 mip size)
+      Context: 00 00 00 00 00 00 00 00 00 C0 00 08 05 A5 F5 55 00 80 00 00 60 6B 5F 55 40 08 00 00 55 55 55 70 00 00 00 00 
+      As BulkHeader(i-8): flags=0x800C000 count=1442161925 sizeOnDisk=32768 offset32=1432316768 offset64=9072403245920
+      As BulkHeader(i-4): flags=0x55F5A505 elementCount=32768 sizeOnDisk=1432316768 offset=2112
+    Offset +2754: found 8192 (DXT1 128x128 mip size)
+      Context: 55 10 18 01 00 58 70 50 55 20 08 60 04 36 96 36 00 20 00 00 00 20 00 00 00 05 05 04 00 00 00 02 00 00 00 00 
+      As BulkHeader(i-8): flags=0x60082055 count=915813892 sizeOnDisk=8192 offset32=8192 offset64=289643248593412096
+      As BulkHeader(i-4): flags=0x36963604 elementCount=8192 sizeOnDisk=8192 offset=67437824
+    Offset +2758: found 8192 (DXT1 128x128 mip size)
+      Context: 00 58 70 50 55 20 08 60 04 36 96 36 00 20 00 00 00 20 00 00 00 05 05 04 00 00 00 02 00 00 00 00 49 91 03 00 
+      As BulkHeader(i-8): flags=0x36963604 count=8192 sizeOnDisk=8192 offset32=67437824 offset64=144115188143293696
+      As BulkHeader(i-4): flags=0x2000 elementCount=8192 sizeOnDisk=67437824 offset=33554432
+    Offset +2767: found 131072 (DXT1 512x512 mip size)
+      Context: 36 96 36 00 20 00 00 00 20 00 00 00 05 05 04 00 00 00 02 00 00 00 00 49 91 03 00 00 00 00 40 02 00 C8 40 02 
+      As BulkHeader(i-8): flags=0x20 count=263429 sizeOnDisk=131072 offset32=1224736768 offset64=3922529878016
+      As BulkHeader(i-4): flags=0x40505 elementCount=131072 sizeOnDisk=1224736768 offset=913
+    Offset +2927: found 131072 (DXT1 512x512 mip size)
+      Context: 00 00 F9 A3 10 00 00 00 10 00 00 00 04 04 04 00 00 00 02 00 00 00 3F 49 91 03 00 00 00 00 20 82 98 45 20 82 
+      As BulkHeader(i-8): flags=0x10 count=263172 sizeOnDisk=131072 offset32=1228865536 offset64=3922534006784
+      As BulkHeader(i-4): flags=0x40404 elementCount=131072 sizeOnDisk=1228865536 offset=913
+    Offset +2980: found 524288 (DXT1 1024x1024 mip size)
+      Context: 00 00 50 55 55 55 68 61 80 08 7D 49 7D 7D 08 00 00 00 08 00 00 00 03 03 04 00 00 00 02 00 00 00 66 49 91 03 
+      As BulkHeader(i-8): flags=0x497D0880 count=556413 sizeOnDisk=524288 offset32=50528256 offset64=17230397440
+      As BulkHeader(i-4): flags=0x87D7D elementCount=524288 sizeOnDisk=50528256 offset=4
+    Offset +2981: found 2048 (DXT1 64x64 mip size)
+      Context: 00 50 55 55 55 68 61 80 08 7D 49 7D 7D 08 00 00 00 08 00 00 00 03 03 04 00 00 00 02 00 00 00 66 49 91 03 00 
+      As BulkHeader(i-8): flags=0x7D497D08 count=2173 sizeOnDisk=2048 offset32=67306240 offset64=144115188143162112
+      As BulkHeader(i-4): flags=0x87D elementCount=2048 sizeOnDisk=67306240 offset=33554432
+    Offset +2990: found 131072 (DXT1 512x512 mip size)
+      Context: 7D 49 7D 7D 08 00 00 00 08 00 00 00 03 03 04 00 00 00 02 00 00 00 66 49 91 03 00 00 00 00 08 A4 60 42 08 A4 
+      As BulkHeader(i-8): flags=0x8 count=262915 sizeOnDisk=131072 offset32=1231421440 offset64=3922536562688
+      As BulkHeader(i-4): flags=0x40303 elementCount=131072 sizeOnDisk=1231421440 offset=913
+
+--- Texture_54 (export 5417, serial 3193 bytes at 0x3D06A61) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1
+  Native data: 3027 bytes remaining
+  First 128 bytes of native data:
+    +0000: 04 00 00 00 01 00 00 00 00 A0 0A 00 00 00 00 00 
+    +0010: 09 04 00 00 00 02 00 00 00 2D 6B D0 03 00 00 00 
+    +0020: 00 40 80 40 A0 00 00 04 00 00 00 04 00 00 0A 0A 
+    +0030: 04 00 00 00 02 00 00 00 4C 6B D0 03 00 00 00 00 
+    +0040: 40 80 10 40 00 00 02 00 00 00 02 00 00 09 09 04 
+    +0050: 00 00 00 02 00 00 00 6B 6B D0 03 00 00 00 00 40 
+    +0060: 80 04 80 00 00 01 00 00 00 01 00 00 08 08 04 00 
+    +0070: 00 00 02 00 00 00 8A 6B D0 03 00 00 00 00 40 80 
+
+  Trying FByteBulkData interpretations:
+  First INT32 = 4 (potential mip count)
+
+  Scanning for DXT1 mip sizes in native data:
+    Offset +19: found 131072 (DXT1 512x512 mip size)
+      Context: 00 01 00 00 00 00 A0 0A 00 00 00 00 00 09 04 00 00 00 02 00 00 00 2D 6B D0 03 00 00 00 00 40 80 40 A0 00 00 
+      As BulkHeader(i-8): flags=0x0 count=264448 sizeOnDisk=131072 offset32=1798111232 offset64=4193686192128
+      As BulkHeader(i-4): flags=0x40900 elementCount=131072 sizeOnDisk=1798111232 offset=976
+    Offset +50: found 131072 (DXT1 512x512 mip size)
+      Context: 80 40 A0 00 00 04 00 00 00 04 00 00 0A 0A 04 00 00 00 02 00 00 00 4C 6B D0 03 00 00 00 00 40 80 10 40 00 00 
+      As BulkHeader(i-8): flags=0x400 count=264714 sizeOnDisk=131072 offset32=1800142848 offset64=4193688223744
+      As BulkHeader(i-4): flags=0x40A0A elementCount=131072 sizeOnDisk=1800142848 offset=976
+    Offset +68: found 131072 (DXT1 512x512 mip size)
+      Context: 02 00 00 00 4C 6B D0 03 00 00 00 00 40 80 10 40 00 00 02 00 00 00 02 00 00 09 09 04 00 00 00 02 00 00 00 6B 
+      As BulkHeader(i-8): flags=0x0 count=1074823232 sizeOnDisk=131072 offset32=131072 offset64=290773546546888704
+      As BulkHeader(i-4): flags=0x40108040 elementCount=131072 sizeOnDisk=131072 offset=67700992
+    Offset +72: found 131072 (DXT1 512x512 mip size)
+      Context: 4C 6B D0 03 00 00 00 00 40 80 10 40 00 00 02 00 00 00 02 00 00 09 09 04 00 00 00 02 00 00 00 6B 6B D0 03 00 
+      As BulkHeader(i-8): flags=0x40108040 count=131072 sizeOnDisk=131072 offset32=67700992 offset64=144115188143556864
+      As BulkHeader(i-4): flags=0x20000 elementCount=131072 sizeOnDisk=67700992 offset=33554432
+    Offset +81: found 131072 (DXT1 512x512 mip size)
+      Context: 80 10 40 00 00 02 00 00 00 02 00 00 09 09 04 00 00 00 02 00 00 00 6B 6B D0 03 00 00 00 00 40 80 04 80 00 00 
+      As BulkHeader(i-8): flags=0x200 count=264457 sizeOnDisk=131072 offset32=1802174464 offset64=4193690255360
+      As BulkHeader(i-4): flags=0x40909 elementCount=131072 sizeOnDisk=1802174464 offset=976
+    Offset +112: found 131072 (DXT1 512x512 mip size)
+      Context: 80 04 80 00 00 01 00 00 00 01 00 00 08 08 04 00 00 00 02 00 00 00 8A 6B D0 03 00 00 00 00 40 80 01 20 00 80 
+      As BulkHeader(i-8): flags=0x100 count=264200 sizeOnDisk=131072 offset32=1804206080 offset64=4193692286976
+      As BulkHeader(i-4): flags=0x40808 elementCount=131072 sizeOnDisk=1804206080 offset=976
+    Offset +130: found 32768 (DXT1 256x256 mip size)
+      Context: 02 00 00 00 8A 6B D0 03 00 00 00 00 40 80 01 20 00 80 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 00 AA 
+      As BulkHeader(i-8): flags=0x0 count=536969280 sizeOnDisk=32768 offset32=32768 offset64=290208397570113536
+      As BulkHeader(i-4): flags=0x20018040 elementCount=32768 sizeOnDisk=32768 offset=67569408
+    Offset +134: found 32768 (DXT1 256x256 mip size)
+      Context: 8A 6B D0 03 00 00 00 00 40 80 01 20 00 80 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 00 AA 73 D0 03 00 
+      As BulkHeader(i-8): flags=0x20018040 count=32768 sizeOnDisk=32768 offset32=67569408 offset64=144115188143425280
+      As BulkHeader(i-4): flags=0x8000 elementCount=32768 sizeOnDisk=67569408 offset=33554432
+    Offset +143: found 131072 (DXT1 512x512 mip size)
+      Context: 80 01 20 00 80 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 00 AA 73 D0 03 00 00 00 00 40 20 41 75 40 20 
+      As BulkHeader(i-8): flags=0x80 count=263943 sizeOnDisk=131072 offset32=1940520960 offset64=4193828601856
+      As BulkHeader(i-4): flags=0x40707 elementCount=131072 sizeOnDisk=1940520960 offset=976
+    Offset +211: found 8192 (DXT1 128x128 mip size)
+      Context: 28 00 10 00 D7 B7 B6 2E 09 00 00 00 78 78 5E 56 00 20 00 00 25 B5 D5 55 00 48 00 00 82 6A 5F 55 00 02 00 00 
+      As BulkHeader(i-8): flags=0x9 count=1449031800 sizeOnDisk=8192 offset32=1440068901 offset64=79166277268773
+      As BulkHeader(i-4): flags=0x565E7878 elementCount=8192 sizeOnDisk=1440068901 offset=18432
+    Offset +346: found 8192 (DXT1 128x128 mip size)
+      Context: 55 42 00 00 00 54 57 55 55 00 00 00 00 00 00 00 00 20 00 00 00 D5 D5 55 55 80 00 00 00 35 55 55 55 A0 01 00 
+      As BulkHeader(i-8): flags=0x55 count=0 sizeOnDisk=8192 offset32=1440077056 offset64=141104000652544
+      As BulkHeader(i-4): flags=0x0 elementCount=8192 sizeOnDisk=1440077056 offset=32853
+    Offset +729: found 131072 (DXT1 512x512 mip size)
+      Context: 55 55 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 02 00 00 00 55 55 55 15 0F 00 01 00 BB D5 D5 37 12 00 
+      As BulkHeader(i-8): flags=0x0 count=0 sizeOnDisk=131072 offset32=1431633920 offset64=4245580898697216
+      As BulkHeader(i-4): flags=0x0 elementCount=131072 sizeOnDisk=1431633920 offset=988501
+    Offset +776: found 131072 (DXT1 512x512 mip size)
+      Context: FE A8 80 0D 00 04 00 7A 6A 60 C0 00 00 01 00 00 00 00 02 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+      As BulkHeader(i-8): flags=0xC0606A count=256 sizeOnDisk=131072 offset32=0 offset64=0
+      As BulkHeader(i-4): flags=0x100 elementCount=131072 sizeOnDisk=0 offset=0
+    Offset +1050: found 8192 (DXT1 128x128 mip size)
+      Context: 57 01 00 00 00 55 55 55 57 00 00 00 00 00 00 00 00 20 00 00 00 55 7D 95 95 00 00 00 00 00 00 00 00 00 00 00 
+      As BulkHeader(i-8): flags=0x57 count=0 sizeOnDisk=8192 offset32=-1786948352 offset64=642458146048
+      As BulkHeader(i-4): flags=0x0 elementCount=8192 sizeOnDisk=-1786948352 offset=149
+    Offset +1074: found 8192 (DXT1 128x128 mip size)
+      Context: 95 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 20 00 00 00 55 55 55 7D 20 00 00 00 55 55 5F D5 20 00 00 
+      As BulkHeader(i-8): flags=0x0 count=0 sizeOnDisk=8192 offset32=1431655680 offset64=35722674656512
+      As BulkHeader(i-4): flags=0x0 elementCount=8192 sizeOnDisk=1431655680 offset=8317
+    Offset +1194: found 8192 (DXT1 128x128 mip size)
+      Context: 7A 00 18 00 00 55 D5 15 D5 00 00 00 00 00 00 00 00 20 00 00 00 D5 D5 55 55 C0 01 00 00 55 55 B5 2D 80 02 60 
+      As BulkHeader(i-8): flags=0xD5 count=0 sizeOnDisk=8192 offset32=1440077056 offset64=492947721540864
+      As BulkHeader(i-4): flags=0x0 elementCount=8192 sizeOnDisk=1440077056 offset=114773
+    Offset +1450: found 8192 (DXT1 128x128 mip size)
+      Context: 20 62 02 00 00 A5 D5 15 D5 00 00 00 00 00 00 00 00 20 00 00 00 55 D5 55 55 60 08 08 01 80 80 FC B4 FA 12 01 
+      As BulkHeader(i-8): flags=0xD5 count=0 sizeOnDisk=8192 offset32=1440044288 offset64=578818471745639680
+      As BulkHeader(i-4): flags=0x0 elementCount=8192 sizeOnDisk=1440044288 offset=134766677
+    Offset +1539: found 8192 (DXT1 128x128 mip size)
+      Context: 01 C8 0B 20 60 E0 78 5C 79 08 41 00 60 60 60 7A 00 20 00 00 25 55 55 55 EB 04 20 00 55 75 EB 83 22 01 16 00 
+      As BulkHeader(i-8): flags=0x410879 count=2053136480 sizeOnDisk=8192 offset32=1431655717 offset64=9012608050222373
+      As BulkHeader(i-4): flags=0x7A606060 elementCount=8192 sizeOnDisk=1431655717 offset=2098411
+    Offset +1666: found 32768 (DXT1 256x256 mip size)
+      Context: 55 20 00 00 60 09 00 00 00 20 00 05 00 37 00 00 00 80 00 00 00 55 55 55 5E 03 00 68 03 98 00 00 00 13 00 01 
+      As BulkHeader(i-8): flags=0x5002000 count=14080 sizeOnDisk=32768 offset32=1431655680 offset64=7493993483637970176
+      As BulkHeader(i-4): flags=0x3700 elementCount=32768 sizeOnDisk=1431655680 offset=1744831326
+    Offset +2223: found 131072 (DXT1 512x512 mip size)
+      Context: D7 17 55 55 40 00 00 00 40 00 00 00 06 06 04 00 00 00 02 00 00 00 CA 75 D0 03 00 00 00 00 40 08 A1 A6 40 08 
+      As BulkHeader(i-8): flags=0x40 count=263686 sizeOnDisk=131072 offset32=1976172544 offset64=4193864253440
+      As BulkHeader(i-4): flags=0x40606 elementCount=131072 sizeOnDisk=1976172544 offset=976
+    Offset +2562: found 8192 (DXT1 128x128 mip size)
+      Context: 00 04 68 04 00 5F 7A 70 50 40 00 08 00 02 09 8B 00 20 00 00 00 55 55 D5 70 CF 12 21 00 25 BD 55 55 CE 24 20 
+      As BulkHeader(i-8): flags=0x8004050 count=-1962343936 sizeOnDisk=8192 offset32=-715827968 offset64=2383195236354839808
+      As BulkHeader(i-4): flags=0x8B090200 elementCount=8192 sizeOnDisk=-715827968 offset=554880880
+    Offset +2758: found 8192 (DXT1 128x128 mip size)
+      Context: 00 80 80 0B 09 60 00 10 00 0D 0F 02 02 20 00 00 00 20 00 00 00 05 05 04 00 00 00 02 00 00 00 6A 76 D0 03 00 
+      As BulkHeader(i-8): flags=0x20F0D00 count=8194 sizeOnDisk=8192 offset32=67437824 offset64=144115188143293696
+      As BulkHeader(i-4): flags=0x2002 elementCount=8192 sizeOnDisk=67437824 offset=33554432
+    Offset +2767: found 131072 (DXT1 512x512 mip size)
+      Context: 0D 0F 02 02 20 00 00 00 20 00 00 00 05 05 04 00 00 00 02 00 00 00 6A 76 D0 03 00 00 00 00 40 02 40 AF 40 02 
+      As BulkHeader(i-8): flags=0x20 count=263429 sizeOnDisk=131072 offset32=1986658304 offset64=4193874739200
+      As BulkHeader(i-4): flags=0x40505 elementCount=131072 sizeOnDisk=1986658304 offset=976
+    Offset +2927: found 131072 (DXT1 512x512 mip size)
+      Context: 18 18 38 23 10 00 00 00 10 00 00 00 04 04 04 00 00 00 02 00 00 00 A9 76 D0 03 00 00 00 00 20 61 96 01 20 61 
+      As BulkHeader(i-8): flags=0x10 count=263172 sizeOnDisk=131072 offset32=1990787072 offset64=4193878867968
+      As BulkHeader(i-4): flags=0x40404 elementCount=131072 sizeOnDisk=1990787072 offset=976
+    Offset +2980: found 524288 (DXT1 1024x1024 mip size)
+      Context: 60 01 D5 FD C9 CD 05 18 41 03 00 A2 A5 25 08 00 00 00 08 00 00 00 03 03 04 00 00 00 02 00 00 00 D0 76 D0 03 
+      As BulkHeader(i-8): flags=0xA2000341 count=533925 sizeOnDisk=524288 offset32=50528256 offset64=17230397440
+      As BulkHeader(i-4): flags=0x825A5 elementCount=524288 sizeOnDisk=50528256 offset=4
+    Offset +2981: found 2048 (DXT1 64x64 mip size)
+      Context: 01 D5 FD C9 CD 05 18 41 03 00 A2 A5 25 08 00 00 00 08 00 00 00 03 03 04 00 00 00 02 00 00 00 D0 76 D0 03 00 
+      As BulkHeader(i-8): flags=0xA5A20003 count=2085 sizeOnDisk=2048 offset32=67306240 offset64=144115188143162112
+      As BulkHeader(i-4): flags=0x825 elementCount=2048 sizeOnDisk=67306240 offset=33554432
+    Offset +2990: found 131072 (DXT1 512x512 mip size)
+      Context: 00 A2 A5 25 08 00 00 00 08 00 00 00 03 03 04 00 00 00 02 00 00 00 D0 76 D0 03 00 00 00 00 08 80 6D A4 08 80 
+      As BulkHeader(i-8): flags=0x8 count=262915 sizeOnDisk=131072 offset32=1993342976 offset64=4193881423872
+      As BulkHeader(i-4): flags=0x40303 elementCount=131072 sizeOnDisk=1993342976 offset=976
+
+--- Texture_44 (export 5481, serial 3193 bytes at 0x3D16190) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1
+  Native data: 3027 bytes remaining
+  First 128 bytes of native data:
+    +0000: 04 00 00 00 01 00 00 00 00 A0 0A 00 00 00 00 00 
+    +0010: 09 04 00 00 00 02 00 00 00 5C 62 D1 03 00 00 00 
+    +0020: 00 40 80 40 00 00 00 04 00 00 00 04 00 00 0A 0A 
+    +0030: 04 00 00 00 02 00 00 00 7B 62 D1 03 00 00 00 00 
+    +0040: 40 80 10 00 00 00 02 00 00 00 02 00 00 09 09 04 
+    +0050: 00 00 00 02 00 00 00 9A 62 D1 03 00 00 00 00 40 
+    +0060: 80 04 00 00 00 01 00 00 00 01 00 00 08 08 04 00 
+    +0070: 00 00 02 00 00 00 B9 62 D1 03 00 00 00 00 40 80 
+
+  Trying FByteBulkData interpretations:
+  First INT32 = 4 (potential mip count)
+
+  Scanning for DXT1 mip sizes in native data:
+    Offset +19: found 131072 (DXT1 512x512 mip size)
+      Context: 00 01 00 00 00 00 A0 0A 00 00 00 00 00 09 04 00 00 00 02 00 00 00 5C 62 D1 03 00 00 00 00 40 80 40 00 00 00 
+      As BulkHeader(i-8): flags=0x0 count=264448 sizeOnDisk=131072 offset32=1650196480 offset64=4197833244672
+      As BulkHeader(i-4): flags=0x40900 elementCount=131072 sizeOnDisk=1650196480 offset=977
+    Offset +50: found 131072 (DXT1 512x512 mip size)
+      Context: 80 40 00 00 00 04 00 00 00 04 00 00 0A 0A 04 00 00 00 02 00 00 00 7B 62 D1 03 00 00 00 00 40 80 10 00 00 00 
+      As BulkHeader(i-8): flags=0x400 count=264714 sizeOnDisk=131072 offset32=1652228096 offset64=4197835276288
+      As BulkHeader(i-4): flags=0x40A0A elementCount=131072 sizeOnDisk=1652228096 offset=977
+    Offset +68: found 131072 (DXT1 512x512 mip size)
+      Context: 02 00 00 00 7B 62 D1 03 00 00 00 00 40 80 10 00 00 00 02 00 00 00 02 00 00 09 09 04 00 00 00 02 00 00 00 9A 
+      As BulkHeader(i-8): flags=0x0 count=1081408 sizeOnDisk=131072 offset32=131072 offset64=290773546546888704
+      As BulkHeader(i-4): flags=0x108040 elementCount=131072 sizeOnDisk=131072 offset=67700992
+    Offset +72: found 131072 (DXT1 512x512 mip size)
+      Context: 7B 62 D1 03 00 00 00 00 40 80 10 00 00 00 02 00 00 00 02 00 00 09 09 04 00 00 00 02 00 00 00 9A 62 D1 03 00 
+      As BulkHeader(i-8): flags=0x108040 count=131072 sizeOnDisk=131072 offset32=67700992 offset64=144115188143556864
+      As BulkHeader(i-4): flags=0x20000 elementCount=131072 sizeOnDisk=67700992 offset=33554432
+    Offset +81: found 131072 (DXT1 512x512 mip size)
+      Context: 80 10 00 00 00 02 00 00 00 02 00 00 09 09 04 00 00 00 02 00 00 00 9A 62 D1 03 00 00 00 00 40 80 04 00 00 00 
+      As BulkHeader(i-8): flags=0x200 count=264457 sizeOnDisk=131072 offset32=1654259712 offset64=4197837307904
+      As BulkHeader(i-4): flags=0x40909 elementCount=131072 sizeOnDisk=1654259712 offset=977
+    Offset +112: found 131072 (DXT1 512x512 mip size)
+      Context: 80 04 00 00 00 01 00 00 00 01 00 00 08 08 04 00 00 00 02 00 00 00 B9 62 D1 03 00 00 00 00 40 80 01 00 00 80 
+      As BulkHeader(i-8): flags=0x100 count=264200 sizeOnDisk=131072 offset32=1656291328 offset64=4197839339520
+      As BulkHeader(i-4): flags=0x40808 elementCount=131072 sizeOnDisk=1656291328 offset=977
+    Offset +130: found 32768 (DXT1 256x256 mip size)
+      Context: 02 00 00 00 B9 62 D1 03 00 00 00 00 40 80 01 00 00 80 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 00 D9 
+      As BulkHeader(i-8): flags=0x0 count=98368 sizeOnDisk=32768 offset32=32768 offset64=290208397570113536
+      As BulkHeader(i-4): flags=0x18040 elementCount=32768 sizeOnDisk=32768 offset=67569408
+    Offset +134: found 32768 (DXT1 256x256 mip size)
+      Context: B9 62 D1 03 00 00 00 00 40 80 01 00 00 80 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 00 D9 6A D1 03 00 
+      As BulkHeader(i-8): flags=0x18040 count=32768 sizeOnDisk=32768 offset32=67569408 offset64=144115188143425280
+      As BulkHeader(i-4): flags=0x8000 elementCount=32768 sizeOnDisk=67569408 offset=33554432
+    Offset +143: found 131072 (DXT1 512x512 mip size)
+      Context: 80 01 00 00 80 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 00 D9 6A D1 03 00 00 00 00 40 20 40 00 40 20 
+      As BulkHeader(i-8): flags=0x80 count=263943 sizeOnDisk=131072 offset32=1792606208 offset64=4197975654400
+      As BulkHeader(i-4): flags=0x40707 elementCount=131072 sizeOnDisk=1792606208 offset=977
+    Offset +299: found 2048 (DXT1 64x64 mip size)
+      Context: 44 58 63 08 A9 5D 7D 41 60 00 00 00 25 E5 55 55 00 08 00 00 7D 55 55 55 00 00 00 00 00 00 00 00 A0 02 20 00 
+      As BulkHeader(i-8): flags=0x60 count=1431692581 sizeOnDisk=2048 offset32=1431655805 offset64=1431655805
+      As BulkHeader(i-4): flags=0x5555E525 elementCount=2048 sizeOnDisk=1431655805 offset=0
+    Offset +426: found 8192 (DXT1 128x128 mip size)
+      Context: 55 E0 01 20 00 D5 15 D5 D5 00 00 00 00 00 00 00 00 20 00 00 00 55 55 75 D5 A0 00 00 00 55 55 55 C2 20 02 20 
+      As BulkHeader(i-8): flags=0xD5 count=0 sizeOnDisk=8192 offset32=1968526592 offset64=176838657004800
+      As BulkHeader(i-4): flags=0x0 elementCount=8192 sizeOnDisk=1968526592 offset=41173
+    Offset +1731: found 2048 (DXT1 64x64 mip size)
+      Context: 20 01 00 00 55 55 B5 25 60 01 00 00 55 55 5E 70 00 08 00 00 15 55 55 55 00 00 81 29 56 00 00 00 84 21 00 00 
+      As BulkHeader(i-8): flags=0x160 count=1885230421 sizeOnDisk=2048 offset32=1431655701 offset64=2990671628982375701
+      As BulkHeader(i-4): flags=0x705E5555 elementCount=2048 sizeOnDisk=1431655701 offset=696320000
+    Offset +1898: found 8192 (DXT1 128x128 mip size)
+      Context: 70 20 00 00 00 55 55 55 5F 00 00 00 00 00 00 00 00 20 00 00 00 55 55 55 5D E7 01 20 00 55 D5 B5 0D A5 02 E0 
+      As BulkHeader(i-8): flags=0x5F count=0 sizeOnDisk=8192 offset32=1431655680 offset64=2306378872240035072
+      As BulkHeader(i-4): flags=0x0 elementCount=8192 sizeOnDisk=1431655680 offset=536995677
+    Offset +2150: found 131072 (DXT1 512x512 mip size)
+      Context: 00 55 DB D8 5C 45 10 00 00 55 84 56 55 00 00 01 00 00 02 00 00 00 00 00 00 00 00 00 00 61 00 00 00 AD 55 55 
+      As BulkHeader(i-8): flags=0x56845500 count=16777301 sizeOnDisk=131072 offset32=0 offset64=0
+      As BulkHeader(i-4): flags=0x1000055 elementCount=131072 sizeOnDisk=0 offset=0
+    Offset +2223: found 131072 (DXT1 512x512 mip size)
+      Context: 5E 58 58 57 40 00 00 00 40 00 00 00 06 06 04 00 00 00 02 00 00 00 F9 6C D1 03 00 00 00 00 40 08 20 00 40 08 
+      As BulkHeader(i-8): flags=0x40 count=263686 sizeOnDisk=131072 offset32=1828257792 offset64=4198011305984
+      As BulkHeader(i-4): flags=0x40606 elementCount=131072 sizeOnDisk=1828257792 offset=977
+    Offset +2758: found 8192 (DXT1 128x128 mip size)
+      Context: 00 60 60 55 55 B2 20 C0 10 55 55 C9 C9 20 00 00 00 20 00 00 00 05 05 04 00 00 00 02 00 00 00 99 6D D1 03 00 
+      As BulkHeader(i-8): flags=0xC9555510 count=8393 sizeOnDisk=8192 offset32=67437824 offset64=144115188143293696
+      As BulkHeader(i-4): flags=0x20C9 elementCount=8192 sizeOnDisk=67437824 offset=33554432
+    Offset +2767: found 131072 (DXT1 512x512 mip size)
+      Context: 55 55 C9 C9 20 00 00 00 20 00 00 00 05 05 04 00 00 00 02 00 00 00 99 6D D1 03 00 00 00 00 40 02 E0 00 40 02 
+      As BulkHeader(i-8): flags=0x20 count=263429 sizeOnDisk=131072 offset32=1838743552 offset64=4198021791744
+      As BulkHeader(i-4): flags=0x40505 elementCount=131072 sizeOnDisk=1838743552 offset=977
+    Offset +2927: found 131072 (DXT1 512x512 mip size)
+      Context: 95 F7 FE 25 10 00 00 00 10 00 00 00 04 04 04 00 00 00 02 00 00 00 D8 6D D1 03 00 00 00 00 20 43 12 61 20 43 
+      As BulkHeader(i-8): flags=0x10 count=263172 sizeOnDisk=131072 offset32=1842872320 offset64=4198025920512
+      As BulkHeader(i-4): flags=0x40404 elementCount=131072 sizeOnDisk=1842872320 offset=977
+    Offset +2980: found 524288 (DXT1 1024x1024 mip size)
+      Context: C2 08 55 27 77 6D 24 12 60 08 35 3A FD FD 08 00 00 00 08 00 00 00 03 03 04 00 00 00 02 00 00 00 FF 6D D1 03 
+      As BulkHeader(i-8): flags=0x3A350860 count=589309 sizeOnDisk=524288 offset32=50528256 offset64=17230397440
+      As BulkHeader(i-4): flags=0x8FDFD elementCount=524288 sizeOnDisk=50528256 offset=4
+    Offset +2981: found 2048 (DXT1 64x64 mip size)
+      Context: 08 55 27 77 6D 24 12 60 08 35 3A FD FD 08 00 00 00 08 00 00 00 03 03 04 00 00 00 02 00 00 00 FF 6D D1 03 00 
+      As BulkHeader(i-8): flags=0xFD3A3508 count=2301 sizeOnDisk=2048 offset32=67306240 offset64=144115188143162112
+      As BulkHeader(i-4): flags=0x8FD elementCount=2048 sizeOnDisk=67306240 offset=33554432
+    Offset +2990: found 131072 (DXT1 512x512 mip size)
+      Context: 35 3A FD FD 08 00 00 00 08 00 00 00 03 03 04 00 00 00 02 00 00 00 FF 6D D1 03 00 00 00 00 08 62 11 61 08 62 
+      As BulkHeader(i-8): flags=0x8 count=262915 sizeOnDisk=131072 offset32=1845428224 offset64=4198028476416
+      As BulkHeader(i-4): flags=0x40303 elementCount=131072 sizeOnDisk=1845428224 offset=977
+
+--- Texture_43 (export 5529, serial 3193 bytes at 0x3E12B37) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1
+  Native data: 3027 bytes remaining
+  First 128 bytes of native data:
+    +0000: 04 00 00 00 01 00 00 00 00 A0 0A 00 00 00 00 00 
+    +0010: 09 04 00 00 00 02 00 00 00 03 2C E1 03 00 00 00 
+    +0020: 00 40 80 40 00 00 00 04 00 00 00 04 00 00 0A 0A 
+    +0030: 04 00 00 00 02 00 00 00 22 2C E1 03 00 00 00 00 
+    +0040: 40 80 10 00 00 00 02 00 00 00 02 00 00 09 09 04 
+    +0050: 00 00 00 02 00 00 00 41 2C E1 03 00 00 00 00 40 
+    +0060: 80 04 01 00 00 01 00 00 00 01 00 00 08 08 04 00 
+    +0070: 00 00 02 00 00 00 60 2C E1 03 00 00 00 00 40 80 
+
+  Trying FByteBulkData interpretations:
+  First INT32 = 4 (potential mip count)
+
+  Scanning for DXT1 mip sizes in native data:
+    Offset +19: found 131072 (DXT1 512x512 mip size)
+      Context: 00 01 00 00 00 00 A0 0A 00 00 00 00 00 09 04 00 00 00 02 00 00 00 03 2C E1 03 00 00 00 00 40 80 40 00 00 00 
+      As BulkHeader(i-8): flags=0x0 count=264448 sizeOnDisk=131072 offset32=738394112 offset64=4265640919040
+      As BulkHeader(i-4): flags=0x40900 elementCount=131072 sizeOnDisk=738394112 offset=993
+    Offset +50: found 131072 (DXT1 512x512 mip size)
+      Context: 80 40 00 00 00 04 00 00 00 04 00 00 0A 0A 04 00 00 00 02 00 00 00 22 2C E1 03 00 00 00 00 40 80 10 00 00 00 
+      As BulkHeader(i-8): flags=0x400 count=264714 sizeOnDisk=131072 offset32=740425728 offset64=4265642950656
+      As BulkHeader(i-4): flags=0x40A0A elementCount=131072 sizeOnDisk=740425728 offset=993
+    Offset +68: found 131072 (DXT1 512x512 mip size)
+      Context: 02 00 00 00 22 2C E1 03 00 00 00 00 40 80 10 00 00 00 02 00 00 00 02 00 00 09 09 04 00 00 00 02 00 00 00 41 
+      As BulkHeader(i-8): flags=0x0 count=1081408 sizeOnDisk=131072 offset32=131072 offset64=290773546546888704
+      As BulkHeader(i-4): flags=0x108040 elementCount=131072 sizeOnDisk=131072 offset=67700992
+    Offset +72: found 131072 (DXT1 512x512 mip size)
+      Context: 22 2C E1 03 00 00 00 00 40 80 10 00 00 00 02 00 00 00 02 00 00 09 09 04 00 00 00 02 00 00 00 41 2C E1 03 00 
+      As BulkHeader(i-8): flags=0x108040 count=131072 sizeOnDisk=131072 offset32=67700992 offset64=144115188143556864
+      As BulkHeader(i-4): flags=0x20000 elementCount=131072 sizeOnDisk=67700992 offset=33554432
+    Offset +81: found 131072 (DXT1 512x512 mip size)
+      Context: 80 10 00 00 00 02 00 00 00 02 00 00 09 09 04 00 00 00 02 00 00 00 41 2C E1 03 00 00 00 00 40 80 04 01 00 00 
+      As BulkHeader(i-8): flags=0x200 count=264457 sizeOnDisk=131072 offset32=742457344 offset64=4265644982272
+      As BulkHeader(i-4): flags=0x40909 elementCount=131072 sizeOnDisk=742457344 offset=993
+    Offset +112: found 131072 (DXT1 512x512 mip size)
+      Context: 80 04 01 00 00 01 00 00 00 01 00 00 08 08 04 00 00 00 02 00 00 00 60 2C E1 03 00 00 00 00 40 80 01 01 00 80 
+      As BulkHeader(i-8): flags=0x100 count=264200 sizeOnDisk=131072 offset32=744488960 offset64=4265647013888
+      As BulkHeader(i-4): flags=0x40808 elementCount=131072 sizeOnDisk=744488960 offset=993
+    Offset +130: found 32768 (DXT1 256x256 mip size)
+      Context: 02 00 00 00 60 2C E1 03 00 00 00 00 40 80 01 01 00 80 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 00 80 
+      As BulkHeader(i-8): flags=0x0 count=16875584 sizeOnDisk=32768 offset32=32768 offset64=290208397570113536
+      As BulkHeader(i-4): flags=0x1018040 elementCount=32768 sizeOnDisk=32768 offset=67569408
+    Offset +134: found 32768 (DXT1 256x256 mip size)
+      Context: 60 2C E1 03 00 00 00 00 40 80 01 01 00 80 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 00 80 34 E1 03 00 
+      As BulkHeader(i-8): flags=0x1018040 count=32768 sizeOnDisk=32768 offset32=67569408 offset64=144115188143425280
+      As BulkHeader(i-4): flags=0x8000 elementCount=32768 sizeOnDisk=67569408 offset=33554432
+    Offset +143: found 131072 (DXT1 512x512 mip size)
+      Context: 80 01 01 00 80 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 00 80 34 E1 03 00 00 00 00 40 20 00 00 40 20 
+      As BulkHeader(i-8): flags=0x80 count=263943 sizeOnDisk=131072 offset32=880803840 offset64=4265783328768
+      As BulkHeader(i-4): flags=0x40707 elementCount=131072 sizeOnDisk=880803840 offset=993
+    Offset +994: found 8192 (DXT1 128x128 mip size)
+      Context: 00 13 10 00 00 8E 57 55 55 00 00 00 00 00 00 00 00 20 00 00 00 75 D5 D5 D5 23 00 00 00 55 55 55 0D A1 05 01 
+      As BulkHeader(i-8): flags=0x55 count=0 sizeOnDisk=8192 offset32=-707431168 offset64=39401322542336
+      As BulkHeader(i-4): flags=0x0 elementCount=8192 sizeOnDisk=-707431168 offset=9173
+    Offset +1683: found 2048 (DXT1 64x64 mip size)
+      Context: 20 00 00 00 DD 7D 56 56 01 00 00 00 5E 55 75 80 00 08 00 00 5D 55 55 55 00 01 01 00 8D 55 55 95 40 00 00 00 
+      As BulkHeader(i-8): flags=0x1 count=-2139794082 sizeOnDisk=2048 offset32=1431655773 offset64=282575919994205
+      As BulkHeader(i-4): flags=0x8075555E elementCount=2048 sizeOnDisk=1431655773 offset=65792
+    Offset +2223: found 131072 (DXT1 512x512 mip size)
+      Context: 73 7A D5 55 40 00 00 00 40 00 00 00 06 06 04 00 00 00 02 00 00 00 A0 36 E1 03 00 00 00 00 40 08 42 02 40 08 
+      As BulkHeader(i-8): flags=0x40 count=263686 sizeOnDisk=131072 offset32=916455424 offset64=4265818980352
+      As BulkHeader(i-4): flags=0x40606 elementCount=131072 sizeOnDisk=916455424 offset=993
+    Offset +2758: found 8192 (DXT1 128x128 mip size)
+      Context: 08 50 00 00 00 42 12 62 08 D5 08 75 55 20 00 00 00 20 00 00 00 05 05 04 00 00 00 02 00 00 00 40 37 E1 03 00 
+      As BulkHeader(i-8): flags=0x7508D508 count=8277 sizeOnDisk=8192 offset32=67437824 offset64=144115188143293696
+      As BulkHeader(i-4): flags=0x2055 elementCount=8192 sizeOnDisk=67437824 offset=33554432
+    Offset +2767: found 131072 (DXT1 512x512 mip size)
+      Context: D5 08 75 55 20 00 00 00 20 00 00 00 05 05 04 00 00 00 02 00 00 00 40 37 E1 03 00 00 00 00 40 02 80 08 40 02 
+      As BulkHeader(i-8): flags=0x20 count=263429 sizeOnDisk=131072 offset32=926941184 offset64=4265829466112
+      As BulkHeader(i-4): flags=0x40505 elementCount=131072 sizeOnDisk=926941184 offset=993
+    Offset +2927: found 131072 (DXT1 512x512 mip size)
+      Context: 04 04 08 00 10 00 00 00 10 00 00 00 04 04 04 00 00 00 02 00 00 00 7F 37 E1 03 00 00 00 00 20 23 03 81 20 23 
+      As BulkHeader(i-8): flags=0x10 count=263172 sizeOnDisk=131072 offset32=931069952 offset64=4265833594880
+      As BulkHeader(i-4): flags=0x40404 elementCount=131072 sizeOnDisk=931069952 offset=993
+    Offset +2980: found 524288 (DXT1 1024x1024 mip size)
+      Context: 22 08 5F FA 7F 78 81 08 67 08 28 2A 92 A0 08 00 00 00 08 00 00 00 03 03 04 00 00 00 02 00 00 00 A6 37 E1 03 
+      As BulkHeader(i-8): flags=0x2A280867 count=565394 sizeOnDisk=524288 offset32=50528256 offset64=17230397440
+      As BulkHeader(i-4): flags=0x8A092 elementCount=524288 sizeOnDisk=50528256 offset=4
+    Offset +2981: found 2048 (DXT1 64x64 mip size)
+      Context: 08 5F FA 7F 78 81 08 67 08 28 2A 92 A0 08 00 00 00 08 00 00 00 03 03 04 00 00 00 02 00 00 00 A6 37 E1 03 00 
+      As BulkHeader(i-8): flags=0x922A2808 count=2208 sizeOnDisk=2048 offset32=67306240 offset64=144115188143162112
+      As BulkHeader(i-4): flags=0x8A0 elementCount=2048 sizeOnDisk=67306240 offset=33554432
+    Offset +2990: found 131072 (DXT1 512x512 mip size)
+      Context: 28 2A 92 A0 08 00 00 00 08 00 00 00 03 03 04 00 00 00 02 00 00 00 A6 37 E1 03 00 00 00 00 08 04 0A 82 08 04 
+      As BulkHeader(i-8): flags=0x8 count=262915 sizeOnDisk=131072 offset32=933625856 offset64=4265836150784
+      As BulkHeader(i-4): flags=0x40303 elementCount=131072 sizeOnDisk=933625856 offset=993
+
+--- Texture_55 (export 5574, serial 3193 bytes at 0x3F63557) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1
+  Native data: 3027 bytes remaining
+  First 128 bytes of native data:
+    +0000: 04 00 00 00 01 00 00 00 00 A0 0A 00 00 00 00 00 
+    +0010: 09 04 00 00 00 02 00 00 00 23 36 F6 03 00 00 00 
+    +0020: 00 40 80 40 20 00 00 04 00 00 00 04 00 00 0A 0A 
+    +0030: 04 00 00 00 02 00 00 00 42 36 F6 03 00 00 00 00 
+    +0040: 40 80 10 40 00 00 02 00 00 00 02 00 00 09 09 04 
+    +0050: 00 00 00 02 00 00 00 61 36 F6 03 00 00 00 00 40 
+    +0060: 80 04 40 00 00 01 00 00 00 01 00 00 08 08 04 00 
+    +0070: 00 00 02 00 00 00 80 36 F6 03 00 00 00 00 40 80 
+
+  Trying FByteBulkData interpretations:
+  First INT32 = 4 (potential mip count)
+
+  Scanning for DXT1 mip sizes in native data:
+    Offset +19: found 131072 (DXT1 512x512 mip size)
+      Context: 00 01 00 00 00 00 A0 0A 00 00 00 00 00 09 04 00 00 00 02 00 00 00 23 36 F6 03 00 00 00 00 40 80 40 20 00 00 
+      As BulkHeader(i-8): flags=0x0 count=264448 sizeOnDisk=131072 offset32=908263424 offset64=4356005101568
+      As BulkHeader(i-4): flags=0x40900 elementCount=131072 sizeOnDisk=908263424 offset=1014
+    Offset +50: found 131072 (DXT1 512x512 mip size)
+      Context: 80 40 20 00 00 04 00 00 00 04 00 00 0A 0A 04 00 00 00 02 00 00 00 42 36 F6 03 00 00 00 00 40 80 10 40 00 00 
+      As BulkHeader(i-8): flags=0x400 count=264714 sizeOnDisk=131072 offset32=910295040 offset64=4356007133184
+      As BulkHeader(i-4): flags=0x40A0A elementCount=131072 sizeOnDisk=910295040 offset=1014
+    Offset +68: found 131072 (DXT1 512x512 mip size)
+      Context: 02 00 00 00 42 36 F6 03 00 00 00 00 40 80 10 40 00 00 02 00 00 00 02 00 00 09 09 04 00 00 00 02 00 00 00 61 
+      As BulkHeader(i-8): flags=0x0 count=1074823232 sizeOnDisk=131072 offset32=131072 offset64=290773546546888704
+      As BulkHeader(i-4): flags=0x40108040 elementCount=131072 sizeOnDisk=131072 offset=67700992
+    Offset +72: found 131072 (DXT1 512x512 mip size)
+      Context: 42 36 F6 03 00 00 00 00 40 80 10 40 00 00 02 00 00 00 02 00 00 09 09 04 00 00 00 02 00 00 00 61 36 F6 03 00 
+      As BulkHeader(i-8): flags=0x40108040 count=131072 sizeOnDisk=131072 offset32=67700992 offset64=144115188143556864
+      As BulkHeader(i-4): flags=0x20000 elementCount=131072 sizeOnDisk=67700992 offset=33554432
+    Offset +81: found 131072 (DXT1 512x512 mip size)
+      Context: 80 10 40 00 00 02 00 00 00 02 00 00 09 09 04 00 00 00 02 00 00 00 61 36 F6 03 00 00 00 00 40 80 04 40 00 00 
+      As BulkHeader(i-8): flags=0x200 count=264457 sizeOnDisk=131072 offset32=912326656 offset64=4356009164800
+      As BulkHeader(i-4): flags=0x40909 elementCount=131072 sizeOnDisk=912326656 offset=1014
+    Offset +112: found 131072 (DXT1 512x512 mip size)
+      Context: 80 04 40 00 00 01 00 00 00 01 00 00 08 08 04 00 00 00 02 00 00 00 80 36 F6 03 00 00 00 00 40 80 01 80 00 80 
+      As BulkHeader(i-8): flags=0x100 count=264200 sizeOnDisk=131072 offset32=914358272 offset64=4356011196416
+      As BulkHeader(i-4): flags=0x40808 elementCount=131072 sizeOnDisk=914358272 offset=1014
+    Offset +130: found 32768 (DXT1 256x256 mip size)
+      Context: 02 00 00 00 80 36 F6 03 00 00 00 00 40 80 01 80 00 80 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 00 A0 
+      As BulkHeader(i-8): flags=0x0 count=-2147385280 sizeOnDisk=32768 offset32=32768 offset64=290208397570113536
+      As BulkHeader(i-4): flags=0x80018040 elementCount=32768 sizeOnDisk=32768 offset=67569408
+    Offset +134: found 32768 (DXT1 256x256 mip size)
+      Context: 80 36 F6 03 00 00 00 00 40 80 01 80 00 80 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 00 A0 3E F6 03 00 
+      As BulkHeader(i-8): flags=0x80018040 count=32768 sizeOnDisk=32768 offset32=67569408 offset64=144115188143425280
+      As BulkHeader(i-4): flags=0x8000 elementCount=32768 sizeOnDisk=67569408 offset=33554432
+    Offset +143: found 131072 (DXT1 512x512 mip size)
+      Context: 80 01 80 00 80 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 00 A0 3E F6 03 00 00 00 00 40 20 C0 2A 40 20 
+      As BulkHeader(i-8): flags=0x80 count=263943 sizeOnDisk=131072 offset32=1050673152 offset64=4356147511296
+      As BulkHeader(i-4): flags=0x40707 elementCount=131072 sizeOnDisk=1050673152 offset=1014
+    Offset +722: found 8192 (DXT1 128x128 mip size)
+      Context: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 20 00 00 00 5D 55 55 55 20 00 00 00 55 D5 D5 55 20 05 20 
+      As BulkHeader(i-8): flags=0x0 count=0 sizeOnDisk=8192 offset32=1431657728 offset64=35550875966720
+      As BulkHeader(i-4): flags=0x0 elementCount=8192 sizeOnDisk=1431657728 offset=8277
+    Offset +1290: found 524288 (DXT1 1024x1024 mip size)
+      Context: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 08 00 00 15 55 55 55 00 38 00 00 02 FD 55 55 01 10 0F 
+      As BulkHeader(i-8): flags=0x0 count=0 sizeOnDisk=524288 offset32=1431639296 offset64=15762965199656192
+      As BulkHeader(i-4): flags=0x0 elementCount=524288 sizeOnDisk=1431639296 offset=3670101
+    Offset +1291: found 2048 (DXT1 64x64 mip size)
+      Context: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 08 00 00 15 55 55 55 00 38 00 00 02 FD 55 55 01 10 0F 00 
+      As BulkHeader(i-8): flags=0x0 count=0 sizeOnDisk=2048 offset32=1431655701 offset64=61574082811157
+      As BulkHeader(i-4): flags=0x0 elementCount=2048 sizeOnDisk=1431655701 offset=14336
+    Offset +1451: found 8192 (DXT1 128x128 mip size)
+      Context: 0D 00 01 00 05 05 A5 55 00 00 00 00 00 00 00 00 00 20 00 00 15 95 55 95 00 28 00 08 78 56 57 5F 00 00 00 00 
+      As BulkHeader(i-8): flags=0x0 count=0 sizeOnDisk=8192 offset32=-1789553387 offset64=576504735273948437
+      As BulkHeader(i-4): flags=0x0 elementCount=8192 sizeOnDisk=-1789553387 offset=134227968
+    Offset +2223: found 131072 (DXT1 512x512 mip size)
+      Context: 55 55 CD 65 40 00 00 00 40 00 00 00 06 06 04 00 00 00 02 00 00 00 C0 40 F6 03 00 00 00 00 40 08 00 3B 40 08 
+      As BulkHeader(i-8): flags=0x40 count=263686 sizeOnDisk=131072 offset32=1086324736 offset64=4356183162880
+      As BulkHeader(i-4): flags=0x40606 elementCount=131072 sizeOnDisk=1086324736 offset=1014
+    Offset +2322: found 8192 (DXT1 128x128 mip size)
+      Context: 80 20 00 00 00 5F 55 55 55 00 00 00 00 00 00 00 00 20 00 00 00 5F 55 55 55 A0 06 20 00 09 09 09 AD 80 06 A0 
+      As BulkHeader(i-8): flags=0x55 count=0 sizeOnDisk=8192 offset32=1431658240 offset64=2307708147438280448
+      As BulkHeader(i-4): flags=0x0 elementCount=8192 sizeOnDisk=1431658240 offset=537305173
+    Offset +2610: found 32768 (DXT1 256x256 mip size)
+      Context: 55 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 80 00 00 00 95 55 55 55 02 00 00 00 F5 25 55 95 00 00 00 
+      As BulkHeader(i-8): flags=0x0 count=0 sizeOnDisk=32768 offset32=1431672064 offset64=2565527147776
+      As BulkHeader(i-4): flags=0x0 elementCount=32768 sizeOnDisk=1431672064 offset=597
+    Offset +2754: found 8192 (DXT1 128x128 mip size)
+      Context: 00 00 00 00 00 00 00 00 00 20 00 21 40 40 80 00 00 20 00 00 00 20 00 00 00 05 05 04 00 00 00 02 00 00 00 60 
+      As BulkHeader(i-8): flags=0x21002000 count=8405056 sizeOnDisk=8192 offset32=8192 offset64=289643248593412096
+      As BulkHeader(i-4): flags=0x804040 elementCount=8192 sizeOnDisk=8192 offset=67437824
+    Offset +2758: found 8192 (DXT1 128x128 mip size)
+      Context: 00 00 00 00 00 20 00 21 40 40 80 00 00 20 00 00 00 20 00 00 00 05 05 04 00 00 00 02 00 00 00 60 41 F6 03 00 
+      As BulkHeader(i-8): flags=0x804040 count=8192 sizeOnDisk=8192 offset32=67437824 offset64=144115188143293696
+      As BulkHeader(i-4): flags=0x2000 elementCount=8192 sizeOnDisk=67437824 offset=33554432
+    Offset +2767: found 131072 (DXT1 512x512 mip size)
+      Context: 40 80 00 00 20 00 00 00 20 00 00 00 05 05 04 00 00 00 02 00 00 00 60 41 F6 03 00 00 00 00 40 02 40 3A 40 02 
+      As BulkHeader(i-8): flags=0x20 count=263429 sizeOnDisk=131072 offset32=1096810496 offset64=4356193648640
+      As BulkHeader(i-4): flags=0x40505 elementCount=131072 sizeOnDisk=1096810496 offset=1014
+    Offset +2927: found 131072 (DXT1 512x512 mip size)
+      Context: 00 80 40 00 10 00 00 00 10 00 00 00 04 04 04 00 00 00 02 00 00 00 9F 41 F6 03 00 00 00 00 20 E0 0B 21 20 E0 
+      As BulkHeader(i-8): flags=0x10 count=263172 sizeOnDisk=131072 offset32=1100939264 offset64=4356197777408
+      As BulkHeader(i-4): flags=0x40404 elementCount=131072 sizeOnDisk=1100939264 offset=1014
+    Offset +2980: found 524288 (DXT1 1024x1024 mip size)
+      Context: 00 00 2B 55 55 55 02 08 00 00 15 55 D5 D5 08 00 00 00 08 00 00 00 03 03 04 00 00 00 02 00 00 00 C6 41 F6 03 
+      As BulkHeader(i-8): flags=0x55150000 count=579029 sizeOnDisk=524288 offset32=50528256 offset64=17230397440
+      As BulkHeader(i-4): flags=0x8D5D5 elementCount=524288 sizeOnDisk=50528256 offset=4
+    Offset +2981: found 2048 (DXT1 64x64 mip size)
+      Context: 00 2B 55 55 55 02 08 00 00 15 55 D5 D5 08 00 00 00 08 00 00 00 03 03 04 00 00 00 02 00 00 00 C6 41 F6 03 00 
+      As BulkHeader(i-8): flags=0xD5551500 count=2261 sizeOnDisk=2048 offset32=67306240 offset64=144115188143162112
+      As BulkHeader(i-4): flags=0x8D5 elementCount=2048 sizeOnDisk=67306240 offset=33554432
+    Offset +2990: found 131072 (DXT1 512x512 mip size)
+      Context: 15 55 D5 D5 08 00 00 00 08 00 00 00 03 03 04 00 00 00 02 00 00 00 C6 41 F6 03 00 00 00 00 08 E1 13 20 08 E1 
+      As BulkHeader(i-8): flags=0x8 count=262915 sizeOnDisk=131072 offset32=1103495168 offset64=4356200333312
+      As BulkHeader(i-4): flags=0x40303 elementCount=131072 sizeOnDisk=1103495168 offset=1014
+
+--- Texture_45 (export 5988, serial 3193 bytes at 0x441DA15) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1
+  Native data: 3027 bytes remaining
+  First 128 bytes of native data:
+    +0000: 04 00 00 00 01 00 00 00 00 A0 0A 00 00 00 00 00 
+    +0010: 09 04 00 00 00 02 00 00 00 E1 DA 41 04 00 00 00 
+    +0020: 00 40 80 40 00 00 00 04 00 00 00 04 00 00 0A 0A 
+    +0030: 04 00 00 00 02 00 00 00 00 DB 41 04 00 00 00 00 
+    +0040: 40 80 10 00 00 00 02 00 00 00 02 00 00 09 09 04 
+    +0050: 00 00 00 02 00 00 00 1F DB 41 04 00 00 00 00 40 
+    +0060: 80 04 00 00 00 01 00 00 00 01 00 00 08 08 04 00 
+    +0070: 00 00 02 00 00 00 3E DB 41 04 00 00 00 00 40 80 
+
+  Trying FByteBulkData interpretations:
+  First INT32 = 4 (potential mip count)
+
+  Scanning for DXT1 mip sizes in native data:
+    Offset +19: found 131072 (DXT1 512x512 mip size)
+      Context: 00 01 00 00 00 00 A0 0A 00 00 00 00 00 09 04 00 00 00 02 00 00 00 E1 DA 41 04 00 00 00 00 40 80 40 00 00 00 
+      As BulkHeader(i-8): flags=0x0 count=264448 sizeOnDisk=131072 offset32=-622788608 offset64=4680891564032
+      As BulkHeader(i-4): flags=0x40900 elementCount=131072 sizeOnDisk=-622788608 offset=1089
+    Offset +50: found 131072 (DXT1 512x512 mip size)
+      Context: 80 40 00 00 00 04 00 00 00 04 00 00 0A 0A 04 00 00 00 02 00 00 00 00 DB 41 04 00 00 00 00 40 80 10 00 00 00 
+      As BulkHeader(i-8): flags=0x400 count=264714 sizeOnDisk=131072 offset32=-620756992 offset64=4680893595648
+      As BulkHeader(i-4): flags=0x40A0A elementCount=131072 sizeOnDisk=-620756992 offset=1089
+    Offset +68: found 131072 (DXT1 512x512 mip size)
+      Context: 02 00 00 00 00 DB 41 04 00 00 00 00 40 80 10 00 00 00 02 00 00 00 02 00 00 09 09 04 00 00 00 02 00 00 00 1F 
+      As BulkHeader(i-8): flags=0x0 count=1081408 sizeOnDisk=131072 offset32=131072 offset64=290773546546888704
+      As BulkHeader(i-4): flags=0x108040 elementCount=131072 sizeOnDisk=131072 offset=67700992
+    Offset +72: found 131072 (DXT1 512x512 mip size)
+      Context: 00 DB 41 04 00 00 00 00 40 80 10 00 00 00 02 00 00 00 02 00 00 09 09 04 00 00 00 02 00 00 00 1F DB 41 04 00 
+      As BulkHeader(i-8): flags=0x108040 count=131072 sizeOnDisk=131072 offset32=67700992 offset64=144115188143556864
+      As BulkHeader(i-4): flags=0x20000 elementCount=131072 sizeOnDisk=67700992 offset=33554432
+    Offset +81: found 131072 (DXT1 512x512 mip size)
+      Context: 80 10 00 00 00 02 00 00 00 02 00 00 09 09 04 00 00 00 02 00 00 00 1F DB 41 04 00 00 00 00 40 80 04 00 00 00 
+      As BulkHeader(i-8): flags=0x200 count=264457 sizeOnDisk=131072 offset32=-618725376 offset64=4680895627264
+      As BulkHeader(i-4): flags=0x40909 elementCount=131072 sizeOnDisk=-618725376 offset=1089
+    Offset +112: found 131072 (DXT1 512x512 mip size)
+      Context: 80 04 00 00 00 01 00 00 00 01 00 00 08 08 04 00 00 00 02 00 00 00 3E DB 41 04 00 00 00 00 40 80 01 00 00 80 
+      As BulkHeader(i-8): flags=0x100 count=264200 sizeOnDisk=131072 offset32=-616693760 offset64=4680897658880
+      As BulkHeader(i-4): flags=0x40808 elementCount=131072 sizeOnDisk=-616693760 offset=1089
+    Offset +130: found 32768 (DXT1 256x256 mip size)
+      Context: 02 00 00 00 3E DB 41 04 00 00 00 00 40 80 01 00 00 80 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 00 5E 
+      As BulkHeader(i-8): flags=0x0 count=98368 sizeOnDisk=32768 offset32=32768 offset64=290208397570113536
+      As BulkHeader(i-4): flags=0x18040 elementCount=32768 sizeOnDisk=32768 offset=67569408
+    Offset +134: found 32768 (DXT1 256x256 mip size)
+      Context: 3E DB 41 04 00 00 00 00 40 80 01 00 00 80 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 00 5E E3 41 04 00 
+      As BulkHeader(i-8): flags=0x18040 count=32768 sizeOnDisk=32768 offset32=67569408 offset64=144115188143425280
+      As BulkHeader(i-4): flags=0x8000 elementCount=32768 sizeOnDisk=67569408 offset=33554432
+    Offset +143: found 131072 (DXT1 512x512 mip size)
+      Context: 80 01 00 00 80 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 00 5E E3 41 04 00 00 00 00 40 20 C0 2C 40 20 
+      As BulkHeader(i-8): flags=0x80 count=263943 sizeOnDisk=131072 offset32=-480378880 offset64=4681033973760
+      As BulkHeader(i-4): flags=0x40707 elementCount=131072 sizeOnDisk=-480378880 offset=1089
+    Offset +274: found 8192 (DXT1 128x128 mip size)
+      Context: 5C 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 20 00 00 00 55 55 D5 55 E3 11 20 00 15 D5 15 D5 00 44 20 
+      As BulkHeader(i-8): flags=0x0 count=0 sizeOnDisk=8192 offset32=-715827968 offset64=2310878041608639744
+      As BulkHeader(i-4): flags=0x0 elementCount=8192 sizeOnDisk=-715827968 offset=538043221
+    Offset +530: found 8192 (DXT1 128x128 mip size)
+      Context: 5C 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 20 00 00 00 55 55 55 D5 40 06 60 00 63 7B F5 E5 41 03 1E 
+      As BulkHeader(i-8): flags=0x0 count=0 sizeOnDisk=8192 offset32=1431655680 offset64=6919289162505213184
+      As BulkHeader(i-4): flags=0x0 elementCount=8192 sizeOnDisk=1431655680 offset=1611022549
+    Offset +1516: found 131072 (DXT1 512x512 mip size)
+      Context: 00 00 00 55 55 15 D5 00 02 00 00 55 55 0A FF 00 00 00 02 00 00 55 AA E0 02 00 01 01 01 02 83 A0 02 C0 01 E0 
+      As BulkHeader(i-8): flags=0x55000002 count=16714325 sizeOnDisk=131072 offset32=-525708032 offset64=72339081373832448
+      As BulkHeader(i-4): flags=0xFF0A55 elementCount=131072 sizeOnDisk=-525708032 offset=16842754
+    Offset +1626: found 8192 (DXT1 128x128 mip size)
+      Context: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 20 00 00 00 5D 7D 95 15 80 00 00 00 55 55 FF 2A C0 00 00 
+      As BulkHeader(i-8): flags=0x0 count=0 sizeOnDisk=8192 offset32=-1786946304 offset64=140830190689536
+      As BulkHeader(i-4): flags=0x0 elementCount=8192 sizeOnDisk=-1786946304 offset=32789
+    Offset +1754: found 8192 (DXT1 128x128 mip size)
+      Context: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 20 00 00 00 5D 7D 55 55 20 00 00 00 F5 55 55 55 20 00 00 
+      As BulkHeader(i-8): flags=0x0 count=0 sizeOnDisk=8192 offset32=1434279168 offset64=35550878588160
+      As BulkHeader(i-4): flags=0x0 elementCount=8192 sizeOnDisk=1434279168 offset=8277
+    Offset +1786: found 8192 (DXT1 128x128 mip size)
+      Context: 55 20 00 00 00 FA 55 55 55 00 00 20 00 A6 00 00 00 20 00 00 00 57 F5 55 55 20 00 00 00 7D 55 55 55 00 00 00 
+      As BulkHeader(i-8): flags=0x20000055 count=42496 sizeOnDisk=8192 offset32=1442141952 offset64=35550886450944
+      As BulkHeader(i-4): flags=0xA600 elementCount=8192 sizeOnDisk=1442141952 offset=8277
+    Offset +1825: found 32768 (DXT1 256x256 mip size)
+      Context: 00 00 00 00 00 00 00 00 00 00 00 00 01 00 00 00 00 80 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+      As BulkHeader(i-8): flags=0x0 count=1 sizeOnDisk=32768 offset32=0 offset64=0
+      As BulkHeader(i-4): flags=0x1 elementCount=32768 sizeOnDisk=0 offset=0
+    Offset +2223: found 131072 (DXT1 512x512 mip size)
+      Context: 5D F7 07 B5 40 00 00 00 40 00 00 00 06 06 04 00 00 00 02 00 00 00 7E E5 41 04 00 00 00 00 40 08 60 45 40 08 
+      As BulkHeader(i-8): flags=0x40 count=263686 sizeOnDisk=131072 offset32=-444727296 offset64=4681069625344
+      As BulkHeader(i-4): flags=0x40606 elementCount=131072 sizeOnDisk=-444727296 offset=1089
+    Offset +2513: found 131072 (DXT1 512x512 mip size)
+      Context: 55 55 16 00 00 00 5E 5A 58 5E 00 00 00 00 00 00 00 00 02 00 00 00 09 55 55 55 20 00 02 00 95 00 00 00 40 02 
+      As BulkHeader(i-8): flags=0x5E58 count=0 sizeOnDisk=131072 offset32=1426653184 offset64=9101024241975296
+      As BulkHeader(i-4): flags=0x0 elementCount=131072 sizeOnDisk=1426653184 offset=2118997
+    Offset +2650: found 8192 (DXT1 128x128 mip size)
+      Context: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 20 00 00 00 D5 75 55 55 20 00 00 00 AB 55 55 55 20 00 00 
+      As BulkHeader(i-8): flags=0x0 count=0 sizeOnDisk=8192 offset32=1433785600 offset64=35550878094592
+      As BulkHeader(i-4): flags=0x0 elementCount=8192 sizeOnDisk=1433785600 offset=8277
+    Offset +2758: found 8192 (DXT1 128x128 mip size)
+      Context: 00 55 55 59 D3 81 00 00 00 D5 D5 5F DC 20 00 00 00 20 00 00 00 05 05 04 00 00 00 02 00 00 00 1E E6 41 04 00 
+      As BulkHeader(i-8): flags=0x5FD5D500 count=8412 sizeOnDisk=8192 offset32=67437824 offset64=144115188143293696
+      As BulkHeader(i-4): flags=0x20DC elementCount=8192 sizeOnDisk=67437824 offset=33554432
+    Offset +2767: found 131072 (DXT1 512x512 mip size)
+      Context: D5 D5 5F DC 20 00 00 00 20 00 00 00 05 05 04 00 00 00 02 00 00 00 1E E6 41 04 00 00 00 00 40 02 00 2E 40 02 
+      As BulkHeader(i-8): flags=0x20 count=263429 sizeOnDisk=131072 offset32=-434241536 offset64=4681080111104
+      As BulkHeader(i-4): flags=0x40505 elementCount=131072 sizeOnDisk=-434241536 offset=1089
+    Offset +2927: found 131072 (DXT1 512x512 mip size)
+      Context: 55 55 55 7E 10 00 00 00 10 00 00 00 04 04 04 00 00 00 02 00 00 00 5D E6 41 04 00 00 00 00 20 30 13 C2 20 30 
+      As BulkHeader(i-8): flags=0x10 count=263172 sizeOnDisk=131072 offset32=-430112768 offset64=4681084239872
+      As BulkHeader(i-4): flags=0x40404 elementCount=131072 sizeOnDisk=-430112768 offset=1089
+    Offset +2980: found 524288 (DXT1 1024x1024 mip size)
+      Context: 00 00 D4 57 55 D5 80 01 20 00 5A 73 55 55 08 00 00 00 08 00 00 00 03 03 04 00 00 00 02 00 00 00 84 E6 41 04 
+      As BulkHeader(i-8): flags=0x735A0020 count=546133 sizeOnDisk=524288 offset32=50528256 offset64=17230397440
+      As BulkHeader(i-4): flags=0x85555 elementCount=524288 sizeOnDisk=50528256 offset=4
+    Offset +2981: found 2048 (DXT1 64x64 mip size)
+      Context: 00 D4 57 55 D5 80 01 20 00 5A 73 55 55 08 00 00 00 08 00 00 00 03 03 04 00 00 00 02 00 00 00 84 E6 41 04 00 
+      As BulkHeader(i-8): flags=0x55735A00 count=2133 sizeOnDisk=2048 offset32=67306240 offset64=144115188143162112
+      As BulkHeader(i-4): flags=0x855 elementCount=2048 sizeOnDisk=67306240 offset=33554432
+    Offset +2990: found 131072 (DXT1 512x512 mip size)
+      Context: 5A 73 55 55 08 00 00 00 08 00 00 00 03 03 04 00 00 00 02 00 00 00 84 E6 41 04 00 00 00 00 08 05 0B 01 08 05 
+      As BulkHeader(i-8): flags=0x8 count=262915 sizeOnDisk=131072 offset32=-427556864 offset64=4681086795776
+      As BulkHeader(i-4): flags=0x40303 elementCount=131072 sizeOnDisk=-427556864 offset=1089
+
+--- Texture_42 (export 8007, serial 3193 bytes at 0x57D5DC1) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1
+  Native data: 3027 bytes remaining
+  First 128 bytes of native data:
+    +0000: 04 00 00 00 01 00 00 00 00 A0 0A 00 00 00 00 00 
+    +0010: 09 04 00 00 00 02 00 00 00 8D 5E 7D 05 00 00 00 
+    +0020: 00 40 80 40 00 00 00 04 00 00 00 04 00 00 0A 0A 
+    +0030: 04 00 00 00 02 00 00 00 AC 5E 7D 05 00 00 00 00 
+    +0040: 40 80 10 00 00 00 02 00 00 00 02 00 00 09 09 04 
+    +0050: 00 00 00 02 00 00 00 CB 5E 7D 05 00 00 00 00 40 
+    +0060: 80 04 00 00 00 01 00 00 00 01 00 00 08 08 04 00 
+    +0070: 00 00 02 00 00 00 EA 5E 7D 05 00 00 00 00 40 80 
+
+  Trying FByteBulkData interpretations:
+  First INT32 = 4 (potential mip count)
+
+  Scanning for DXT1 mip sizes in native data:
+    Offset +19: found 131072 (DXT1 512x512 mip size)
+      Context: 00 01 00 00 00 00 A0 0A 00 00 00 00 00 09 04 00 00 00 02 00 00 00 8D 5E 7D 05 00 00 00 00 40 80 40 00 00 00 
+      As BulkHeader(i-8): flags=0x0 count=264448 sizeOnDisk=131072 offset32=1586298880 offset64=6036015349760
+      As BulkHeader(i-4): flags=0x40900 elementCount=131072 sizeOnDisk=1586298880 offset=1405
+    Offset +50: found 131072 (DXT1 512x512 mip size)
+      Context: 80 40 00 00 00 04 00 00 00 04 00 00 0A 0A 04 00 00 00 02 00 00 00 AC 5E 7D 05 00 00 00 00 40 80 10 00 00 00 
+      As BulkHeader(i-8): flags=0x400 count=264714 sizeOnDisk=131072 offset32=1588330496 offset64=6036017381376
+      As BulkHeader(i-4): flags=0x40A0A elementCount=131072 sizeOnDisk=1588330496 offset=1405
+    Offset +68: found 131072 (DXT1 512x512 mip size)
+      Context: 02 00 00 00 AC 5E 7D 05 00 00 00 00 40 80 10 00 00 00 02 00 00 00 02 00 00 09 09 04 00 00 00 02 00 00 00 CB 
+      As BulkHeader(i-8): flags=0x0 count=1081408 sizeOnDisk=131072 offset32=131072 offset64=290773546546888704
+      As BulkHeader(i-4): flags=0x108040 elementCount=131072 sizeOnDisk=131072 offset=67700992
+    Offset +72: found 131072 (DXT1 512x512 mip size)
+      Context: AC 5E 7D 05 00 00 00 00 40 80 10 00 00 00 02 00 00 00 02 00 00 09 09 04 00 00 00 02 00 00 00 CB 5E 7D 05 00 
+      As BulkHeader(i-8): flags=0x108040 count=131072 sizeOnDisk=131072 offset32=67700992 offset64=144115188143556864
+      As BulkHeader(i-4): flags=0x20000 elementCount=131072 sizeOnDisk=67700992 offset=33554432
+    Offset +81: found 131072 (DXT1 512x512 mip size)
+      Context: 80 10 00 00 00 02 00 00 00 02 00 00 09 09 04 00 00 00 02 00 00 00 CB 5E 7D 05 00 00 00 00 40 80 04 00 00 00 
+      As BulkHeader(i-8): flags=0x200 count=264457 sizeOnDisk=131072 offset32=1590362112 offset64=6036019412992
+      As BulkHeader(i-4): flags=0x40909 elementCount=131072 sizeOnDisk=1590362112 offset=1405
+    Offset +112: found 131072 (DXT1 512x512 mip size)
+      Context: 80 04 00 00 00 01 00 00 00 01 00 00 08 08 04 00 00 00 02 00 00 00 EA 5E 7D 05 00 00 00 00 40 80 01 E9 00 80 
+      As BulkHeader(i-8): flags=0x100 count=264200 sizeOnDisk=131072 offset32=1592393728 offset64=6036021444608
+      As BulkHeader(i-4): flags=0x40808 elementCount=131072 sizeOnDisk=1592393728 offset=1405
+    Offset +130: found 32768 (DXT1 256x256 mip size)
+      Context: 02 00 00 00 EA 5E 7D 05 00 00 00 00 40 80 01 E9 00 80 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 00 0A 
+      As BulkHeader(i-8): flags=0x0 count=-385777600 sizeOnDisk=32768 offset32=32768 offset64=290208397570113536
+      As BulkHeader(i-4): flags=0xE9018040 elementCount=32768 sizeOnDisk=32768 offset=67569408
+    Offset +134: found 32768 (DXT1 256x256 mip size)
+      Context: EA 5E 7D 05 00 00 00 00 40 80 01 E9 00 80 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 00 0A 67 7D 05 00 
+      As BulkHeader(i-8): flags=0xE9018040 count=32768 sizeOnDisk=32768 offset32=67569408 offset64=144115188143425280
+      As BulkHeader(i-4): flags=0x8000 elementCount=32768 sizeOnDisk=67569408 offset=33554432
+    Offset +143: found 131072 (DXT1 512x512 mip size)
+      Context: 80 01 E9 00 80 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 00 0A 67 7D 05 00 00 00 00 40 20 A4 19 40 20 
+      As BulkHeader(i-8): flags=0x80 count=263943 sizeOnDisk=131072 offset32=1728708608 offset64=6036157759488
+      As BulkHeader(i-4): flags=0x40707 elementCount=131072 sizeOnDisk=1728708608 offset=1405
+    Offset +2223: found 131072 (DXT1 512x512 mip size)
+      Context: 54 56 55 55 40 00 00 00 40 00 00 00 06 06 04 00 00 00 02 00 00 00 2A 69 7D 05 00 00 00 00 40 08 63 08 40 08 
+      As BulkHeader(i-8): flags=0x40 count=263686 sizeOnDisk=131072 offset32=1764360192 offset64=6036193411072
+      As BulkHeader(i-4): flags=0x40606 elementCount=131072 sizeOnDisk=1764360192 offset=1405
+    Offset +2758: found 8192 (DXT1 128x128 mip size)
+      Context: 00 E9 02 A0 A0 24 09 20 08 F7 7D 61 55 20 00 00 00 20 00 00 00 05 05 04 00 00 00 02 00 00 00 CA 69 7D 05 00 
+      As BulkHeader(i-8): flags=0x617DF708 count=8277 sizeOnDisk=8192 offset32=67437824 offset64=144115188143293696
+      As BulkHeader(i-4): flags=0x2055 elementCount=8192 sizeOnDisk=67437824 offset=33554432
+    Offset +2767: found 131072 (DXT1 512x512 mip size)
+      Context: F7 7D 61 55 20 00 00 00 20 00 00 00 05 05 04 00 00 00 02 00 00 00 CA 69 7D 05 00 00 00 00 40 02 41 08 40 02 
+      As BulkHeader(i-8): flags=0x20 count=263429 sizeOnDisk=131072 offset32=1774845952 offset64=6036203896832
+      As BulkHeader(i-4): flags=0x40505 elementCount=131072 sizeOnDisk=1774845952 offset=1405
+    Offset +2927: found 131072 (DXT1 512x512 mip size)
+      Context: BD 21 FD 77 10 00 00 00 10 00 00 00 04 04 04 00 00 00 02 00 00 00 09 6A 7D 05 00 00 00 00 20 25 12 61 20 25 
+      As BulkHeader(i-8): flags=0x10 count=263172 sizeOnDisk=131072 offset32=1778974720 offset64=6036208025600
+      As BulkHeader(i-4): flags=0x40404 elementCount=131072 sizeOnDisk=1778974720 offset=1405
+    Offset +2980: found 524288 (DXT1 1024x1024 mip size)
+      Context: 08 09 02 D8 77 0F E1 08 AA 08 00 2F 25 0A 08 00 00 00 08 00 00 00 03 03 04 00 00 00 02 00 00 00 30 6A 7D 05 
+      As BulkHeader(i-8): flags=0x2F0008AA count=526885 sizeOnDisk=524288 offset32=50528256 offset64=17230397440
+      As BulkHeader(i-4): flags=0x80A25 elementCount=524288 sizeOnDisk=50528256 offset=4
+    Offset +2981: found 2048 (DXT1 64x64 mip size)
+      Context: 09 02 D8 77 0F E1 08 AA 08 00 2F 25 0A 08 00 00 00 08 00 00 00 03 03 04 00 00 00 02 00 00 00 30 6A 7D 05 00 
+      As BulkHeader(i-8): flags=0x252F0008 count=2058 sizeOnDisk=2048 offset32=67306240 offset64=144115188143162112
+      As BulkHeader(i-4): flags=0x80A elementCount=2048 sizeOnDisk=67306240 offset=33554432
+    Offset +2990: found 131072 (DXT1 512x512 mip size)
+      Context: 00 2F 25 0A 08 00 00 00 08 00 00 00 03 03 04 00 00 00 02 00 00 00 30 6A 7D 05 00 00 00 00 08 C7 08 C2 08 C7 
+      As BulkHeader(i-8): flags=0x8 count=262915 sizeOnDisk=131072 offset32=1781530624 offset64=6036210581504
+      As BulkHeader(i-4): flags=0x40303 elementCount=131072 sizeOnDisk=1781530624 offset=1405
+
+--- Texture_51 (export 8010, serial 3193 bytes at 0x57D6C53) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1
+  Native data: 3027 bytes remaining
+  First 128 bytes of native data:
+    +0000: 04 00 00 00 01 00 00 00 00 A0 0A 00 00 00 00 00 
+    +0010: 09 04 00 00 00 02 00 00 00 1F 6D 7D 05 00 00 00 
+    +0020: 00 40 80 40 00 00 00 04 00 00 00 04 00 00 0A 0A 
+    +0030: 04 00 00 00 02 00 00 00 3E 6D 7D 05 00 00 00 00 
+    +0040: 40 80 10 08 00 00 02 00 00 00 02 00 00 09 09 04 
+    +0050: 00 00 00 02 00 00 00 5D 6D 7D 05 00 00 00 00 40 
+    +0060: 80 04 0A 00 00 01 00 00 00 01 00 00 08 08 04 00 
+    +0070: 00 00 02 00 00 00 7C 6D 7D 05 00 00 00 00 40 80 
+
+  Trying FByteBulkData interpretations:
+  First INT32 = 4 (potential mip count)
+
+  Scanning for DXT1 mip sizes in native data:
+    Offset +19: found 131072 (DXT1 512x512 mip size)
+      Context: 00 01 00 00 00 00 A0 0A 00 00 00 00 00 09 04 00 00 00 02 00 00 00 1F 6D 7D 05 00 00 00 00 40 80 40 00 00 00 
+      As BulkHeader(i-8): flags=0x0 count=264448 sizeOnDisk=131072 offset32=1830748160 offset64=6036259799040
+      As BulkHeader(i-4): flags=0x40900 elementCount=131072 sizeOnDisk=1830748160 offset=1405
+    Offset +50: found 131072 (DXT1 512x512 mip size)
+      Context: 80 40 00 00 00 04 00 00 00 04 00 00 0A 0A 04 00 00 00 02 00 00 00 3E 6D 7D 05 00 00 00 00 40 80 10 08 00 00 
+      As BulkHeader(i-8): flags=0x400 count=264714 sizeOnDisk=131072 offset32=1832779776 offset64=6036261830656
+      As BulkHeader(i-4): flags=0x40A0A elementCount=131072 sizeOnDisk=1832779776 offset=1405
+    Offset +68: found 131072 (DXT1 512x512 mip size)
+      Context: 02 00 00 00 3E 6D 7D 05 00 00 00 00 40 80 10 08 00 00 02 00 00 00 02 00 00 09 09 04 00 00 00 02 00 00 00 5D 
+      As BulkHeader(i-8): flags=0x0 count=135299136 sizeOnDisk=131072 offset32=131072 offset64=290773546546888704
+      As BulkHeader(i-4): flags=0x8108040 elementCount=131072 sizeOnDisk=131072 offset=67700992
+    Offset +72: found 131072 (DXT1 512x512 mip size)
+      Context: 3E 6D 7D 05 00 00 00 00 40 80 10 08 00 00 02 00 00 00 02 00 00 09 09 04 00 00 00 02 00 00 00 5D 6D 7D 05 00 
+      As BulkHeader(i-8): flags=0x8108040 count=131072 sizeOnDisk=131072 offset32=67700992 offset64=144115188143556864
+      As BulkHeader(i-4): flags=0x20000 elementCount=131072 sizeOnDisk=67700992 offset=33554432
+    Offset +81: found 131072 (DXT1 512x512 mip size)
+      Context: 80 10 08 00 00 02 00 00 00 02 00 00 09 09 04 00 00 00 02 00 00 00 5D 6D 7D 05 00 00 00 00 40 80 04 0A 00 00 
+      As BulkHeader(i-8): flags=0x200 count=264457 sizeOnDisk=131072 offset32=1834811392 offset64=6036263862272
+      As BulkHeader(i-4): flags=0x40909 elementCount=131072 sizeOnDisk=1834811392 offset=1405
+    Offset +112: found 131072 (DXT1 512x512 mip size)
+      Context: 80 04 0A 00 00 01 00 00 00 01 00 00 08 08 04 00 00 00 02 00 00 00 7C 6D 7D 05 00 00 00 00 40 80 01 0D 00 80 
+      As BulkHeader(i-8): flags=0x100 count=264200 sizeOnDisk=131072 offset32=1836843008 offset64=6036265893888
+      As BulkHeader(i-4): flags=0x40808 elementCount=131072 sizeOnDisk=1836843008 offset=1405
+    Offset +130: found 32768 (DXT1 256x256 mip size)
+      Context: 02 00 00 00 7C 6D 7D 05 00 00 00 00 40 80 01 0D 00 80 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 00 9C 
+      As BulkHeader(i-8): flags=0x0 count=218202176 sizeOnDisk=32768 offset32=32768 offset64=290208397570113536
+      As BulkHeader(i-4): flags=0xD018040 elementCount=32768 sizeOnDisk=32768 offset=67569408
+    Offset +134: found 32768 (DXT1 256x256 mip size)
+      Context: 7C 6D 7D 05 00 00 00 00 40 80 01 0D 00 80 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 00 9C 75 7D 05 00 
+      As BulkHeader(i-8): flags=0xD018040 count=32768 sizeOnDisk=32768 offset32=67569408 offset64=144115188143425280
+      As BulkHeader(i-4): flags=0x8000 elementCount=32768 sizeOnDisk=67569408 offset=33554432
+    Offset +143: found 131072 (DXT1 512x512 mip size)
+      Context: 80 01 0D 00 80 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 00 9C 75 7D 05 00 00 00 00 40 20 13 00 40 20 
+      As BulkHeader(i-8): flags=0x80 count=263943 sizeOnDisk=131072 offset32=1973157888 offset64=6036402208768
+      As BulkHeader(i-4): flags=0x40707 elementCount=131072 sizeOnDisk=1973157888 offset=1405
+    Offset +353: found 131072 (DXT1 512x512 mip size)
+      Context: 55 A0 02 00 00 00 55 55 55 5C 00 00 00 00 00 00 00 00 02 00 00 00 B5 55 55 55 04 00 00 00 EB 55 55 55 41 00 
+      As BulkHeader(i-8): flags=0x5C55 count=0 sizeOnDisk=131072 offset32=1437925376 offset64=1219724905349120
+      As BulkHeader(i-4): flags=0x0 elementCount=131072 sizeOnDisk=1437925376 offset=283989
+    Offset +417: found 131072 (DXT1 512x512 mip size)
+      Context: AF D5 A0 06 E0 01 60 60 EA 7F 00 00 60 00 02 00 00 00 02 00 00 00 35 55 55 55 06 00 00 00 02 BD 55 55 00 00 
+      As BulkHeader(i-8): flags=0x7FEA count=131168 sizeOnDisk=131072 offset32=1429536768 offset64=1782674850381824
+      As BulkHeader(i-4): flags=0x20060 elementCount=131072 sizeOnDisk=1429536768 offset=415061
+    Offset +802: found 8192 (DXT1 128x128 mip size)
+      Context: 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 20 00 00 00 7D 55 55 55 20 00 00 00 7D 55 55 55 00 00 00 
+      As BulkHeader(i-8): flags=0x0 count=0 sizeOnDisk=8192 offset32=1431665920 offset64=35550875974912
+      As BulkHeader(i-4): flags=0x0 elementCount=8192 sizeOnDisk=1431665920 offset=8277
+    Offset +994: found 8192 (DXT1 128x128 mip size)
+      Context: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 20 00 00 00 7D D5 55 55 E0 01 00 00 25 D5 55 55 A0 02 40 
+      As BulkHeader(i-8): flags=0x0 count=0 sizeOnDisk=8192 offset32=1440054528 offset64=528132093607168
+      As BulkHeader(i-4): flags=0x0 elementCount=8192 sizeOnDisk=1440054528 offset=122965
+    Offset +1202: found 8192 (DXT1 128x128 mip size)
+      Context: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 20 00 00 00 55 55 57 57 20 00 00 00 55 55 57 57 00 00 00 
+      As BulkHeader(i-8): flags=0x0 count=0 sizeOnDisk=8192 offset32=1465210112 offset64=35559499453696
+      As BulkHeader(i-4): flags=0x0 elementCount=8192 sizeOnDisk=1465210112 offset=8279
+    Offset +1682: found 8192 (DXT1 128x128 mip size)
+      Context: 00 24 01 00 00 5B 55 59 53 00 00 00 00 00 00 00 00 20 00 00 00 55 55 55 57 00 00 00 00 00 00 00 00 20 00 00 
+      As BulkHeader(i-8): flags=0x53 count=0 sizeOnDisk=8192 offset32=1431655680 offset64=375093810432
+      As BulkHeader(i-4): flags=0x0 elementCount=8192 sizeOnDisk=1431655680 offset=87
+    Offset +1698: found 8192 (DXT1 128x128 mip size)
+      Context: 00 20 00 00 00 55 55 55 57 00 00 00 00 00 00 00 00 20 00 00 00 57 55 55 55 00 00 00 00 00 00 00 00 40 15 60 
+      As BulkHeader(i-8): flags=0x57 count=0 sizeOnDisk=8192 offset32=1431656192 offset64=366503876352
+      As BulkHeader(i-4): flags=0x0 elementCount=8192 sizeOnDisk=1431656192 offset=85
+    Offset +1771: found 2048 (DXT1 64x64 mip size)
+      Context: 23 05 80 00 E0 70 60 C0 40 00 00 00 54 55 55 55 00 08 00 00 55 55 D5 95 00 40 00 00 55 55 57 50 00 03 00 00 
+      As BulkHeader(i-8): flags=0x40 count=1431655764 sizeOnDisk=2048 offset32=-1781181099 offset64=70371257963861
+      As BulkHeader(i-4): flags=0x55555554 elementCount=2048 sizeOnDisk=-1781181099 offset=16384
+    Offset +1834: found 8192 (DXT1 128x128 mip size)
+      Context: 54 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 20 00 00 00 55 55 55 D5 40 0A 00 00 53 5F 55 55 00 00 00 
+      As BulkHeader(i-8): flags=0x0 count=0 sizeOnDisk=8192 offset32=1431655680 offset64=2886034770973952
+      As BulkHeader(i-4): flags=0x0 elementCount=8192 sizeOnDisk=1431655680 offset=671957
+    Offset +1899: found 2048 (DXT1 64x64 mip size)
+      Context: A0 04 00 00 80 80 FF 55 60 00 00 00 54 54 57 55 00 08 00 00 95 95 95 95 00 80 00 08 5A 72 62 62 A0 0B 20 00 
+      As BulkHeader(i-8): flags=0x60 count=1431786580 sizeOnDisk=2048 offset32=-1785358955 offset64=576601492301387157
+      As BulkHeader(i-4): flags=0x55575454 elementCount=2048 sizeOnDisk=-1785358955 offset=134250496
+    Offset +2026: found 524288 (DXT1 1024x1024 mip size)
+      Context: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 08 00 00 95 55 55 55 00 58 00 00 60 5F 55 55 60 01 00 
+      As BulkHeader(i-8): flags=0x0 count=0 sizeOnDisk=524288 offset32=1431672064 offset64=24770164454429952
+      As BulkHeader(i-4): flags=0x0 elementCount=524288 sizeOnDisk=1431672064 offset=5767253
+    Offset +2027: found 2048 (DXT1 64x64 mip size)
+      Context: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 08 00 00 95 55 55 55 00 58 00 00 60 5F 55 55 60 01 00 00 
+      As BulkHeader(i-8): flags=0x0 count=0 sizeOnDisk=2048 offset32=1431655829 offset64=96758454900117
+      As BulkHeader(i-4): flags=0x0 elementCount=2048 sizeOnDisk=1431655829 offset=22528
+    Offset +2223: found 131072 (DXT1 512x512 mip size)
+      Context: 00 00 00 00 40 00 00 00 40 00 00 00 06 06 04 00 00 00 02 00 00 00 BC 77 7D 05 00 00 00 00 40 08 16 00 40 08 
+      As BulkHeader(i-8): flags=0x40 count=263686 sizeOnDisk=131072 offset32=2008809472 offset64=6036437860352
+      As BulkHeader(i-4): flags=0x40606 elementCount=131072 sizeOnDisk=2008809472 offset=1405
+    Offset +2698: found 8192 (DXT1 128x128 mip size)
+      Context: 07 40 01 00 00 55 56 54 54 00 00 00 00 00 00 00 00 20 00 00 00 75 55 55 55 20 00 00 00 75 55 55 55 00 00 00 
+      As BulkHeader(i-8): flags=0x54 count=0 sizeOnDisk=8192 offset32=1431663872 offset64=35550875972864
+      As BulkHeader(i-4): flags=0x0 elementCount=8192 sizeOnDisk=1431663872 offset=8277
+    Offset +2722: found 524288 (DXT1 1024x1024 mip size)
+      Context: 55 20 00 00 00 75 55 55 55 00 00 00 00 00 00 00 00 00 08 00 00 95 55 55 55 00 30 00 00 5C 55 55 55 40 02 00 
+      As BulkHeader(i-8): flags=0x55 count=0 sizeOnDisk=524288 offset32=1431672064 offset64=13511165386003712
+      As BulkHeader(i-4): flags=0x0 elementCount=524288 sizeOnDisk=1431672064 offset=3145813
+    Offset +2723: found 2048 (DXT1 64x64 mip size)
+      Context: 20 00 00 00 75 55 55 55 00 00 00 00 00 00 00 00 00 08 00 00 95 55 55 55 00 30 00 00 5C 55 55 55 40 02 00 00 
+      As BulkHeader(i-8): flags=0x0 count=0 sizeOnDisk=2048 offset32=1431655829 offset64=52777989789077
+      As BulkHeader(i-4): flags=0x0 elementCount=2048 sizeOnDisk=1431655829 offset=12288
+    Offset +2758: found 8192 (DXT1 128x128 mip size)
+      Context: 00 0F 55 55 55 80 00 00 00 56 55 55 55 20 00 00 00 20 00 00 00 05 05 04 00 00 00 02 00 00 00 5C 78 7D 05 00 
+      As BulkHeader(i-8): flags=0x55555600 count=8277 sizeOnDisk=8192 offset32=67437824 offset64=144115188143293696
+      As BulkHeader(i-4): flags=0x2055 elementCount=8192 sizeOnDisk=67437824 offset=33554432
+    Offset +2767: found 131072 (DXT1 512x512 mip size)
+      Context: 56 55 55 55 20 00 00 00 20 00 00 00 05 05 04 00 00 00 02 00 00 00 5C 78 7D 05 00 00 00 00 40 02 62 00 40 02 
+      As BulkHeader(i-8): flags=0x20 count=263429 sizeOnDisk=131072 offset32=2019295232 offset64=6036448346112
+      As BulkHeader(i-4): flags=0x40505 elementCount=131072 sizeOnDisk=2019295232 offset=1405
+    Offset +2927: found 131072 (DXT1 512x512 mip size)
+      Context: 5B 72 5D 55 10 00 00 00 10 00 00 00 04 04 04 00 00 00 02 00 00 00 9B 78 7D 05 00 00 00 00 20 8F 01 21 20 8F 
+      As BulkHeader(i-8): flags=0x10 count=263172 sizeOnDisk=131072 offset32=2023424000 offset64=6036452474880
+      As BulkHeader(i-4): flags=0x40404 elementCount=131072 sizeOnDisk=2023424000 offset=1405
+    Offset +2980: found 524288 (DXT1 1024x1024 mip size)
+      Context: 40 00 F5 2A 35 55 E1 11 00 00 72 7B CD 75 08 00 00 00 08 00 00 00 03 03 04 00 00 00 02 00 00 00 C2 78 7D 05 
+      As BulkHeader(i-8): flags=0x7B720000 count=554445 sizeOnDisk=524288 offset32=50528256 offset64=17230397440
+      As BulkHeader(i-4): flags=0x875CD elementCount=524288 sizeOnDisk=50528256 offset=4
+    Offset +2981: found 2048 (DXT1 64x64 mip size)
+      Context: 00 F5 2A 35 55 E1 11 00 00 72 7B CD 75 08 00 00 00 08 00 00 00 03 03 04 00 00 00 02 00 00 00 C2 78 7D 05 00 
+      As BulkHeader(i-8): flags=0xCD7B7200 count=2165 sizeOnDisk=2048 offset32=67306240 offset64=144115188143162112
+      As BulkHeader(i-4): flags=0x875 elementCount=2048 sizeOnDisk=67306240 offset=33554432
+    Offset +2990: found 131072 (DXT1 512x512 mip size)
+      Context: 72 7B CD 75 08 00 00 00 08 00 00 00 03 03 04 00 00 00 02 00 00 00 C2 78 7D 05 00 00 00 00 08 05 01 C0 08 05 
+      As BulkHeader(i-8): flags=0x8 count=262915 sizeOnDisk=131072 offset32=2025979904 offset64=6036455030784
+      As BulkHeader(i-4): flags=0x40303 elementCount=131072 sizeOnDisk=2025979904 offset=1405
+
+--- Texture_52 (export 10984, serial 3193 bytes at 0x6D8FC26) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1
+  Native data: 3027 bytes remaining
+  First 128 bytes of native data:
+    +0000: 04 00 00 00 01 00 00 00 00 A0 0A 00 00 00 00 00 
+    +0010: 09 04 00 00 00 02 00 00 00 F2 FC D8 06 00 00 00 
+    +0020: 00 40 80 40 00 00 00 04 00 00 00 04 00 00 0A 0A 
+    +0030: 04 00 00 00 02 00 00 00 11 FD D8 06 00 00 00 00 
+    +0040: 40 80 10 00 00 00 02 00 00 00 02 00 00 09 09 04 
+    +0050: 00 00 00 02 00 00 00 30 FD D8 06 00 00 00 00 40 
+    +0060: 80 04 00 00 00 01 00 00 00 01 00 00 08 08 04 00 
+    +0070: 00 00 02 00 00 00 4F FD D8 06 00 00 00 00 40 80 
+
+  Trying FByteBulkData interpretations:
+  First INT32 = 4 (potential mip count)
+
+  Scanning for DXT1 mip sizes in native data:
+    Offset +19: found 131072 (DXT1 512x512 mip size)
+      Context: 00 01 00 00 00 00 A0 0A 00 00 00 00 00 09 04 00 00 00 02 00 00 00 F2 FC D8 06 00 00 00 00 40 80 40 00 00 00 
+      As BulkHeader(i-8): flags=0x0 count=264448 sizeOnDisk=131072 offset32=-51249152 offset64=7529026420736
+      As BulkHeader(i-4): flags=0x40900 elementCount=131072 sizeOnDisk=-51249152 offset=1752
+    Offset +50: found 131072 (DXT1 512x512 mip size)
+      Context: 80 40 00 00 00 04 00 00 00 04 00 00 0A 0A 04 00 00 00 02 00 00 00 11 FD D8 06 00 00 00 00 40 80 10 00 00 00 
+      As BulkHeader(i-8): flags=0x400 count=264714 sizeOnDisk=131072 offset32=-49217536 offset64=7529028452352
+      As BulkHeader(i-4): flags=0x40A0A elementCount=131072 sizeOnDisk=-49217536 offset=1752
+    Offset +68: found 131072 (DXT1 512x512 mip size)
+      Context: 02 00 00 00 11 FD D8 06 00 00 00 00 40 80 10 00 00 00 02 00 00 00 02 00 00 09 09 04 00 00 00 02 00 00 00 30 
+      As BulkHeader(i-8): flags=0x0 count=1081408 sizeOnDisk=131072 offset32=131072 offset64=290773546546888704
+      As BulkHeader(i-4): flags=0x108040 elementCount=131072 sizeOnDisk=131072 offset=67700992
+    Offset +72: found 131072 (DXT1 512x512 mip size)
+      Context: 11 FD D8 06 00 00 00 00 40 80 10 00 00 00 02 00 00 00 02 00 00 09 09 04 00 00 00 02 00 00 00 30 FD D8 06 00 
+      As BulkHeader(i-8): flags=0x108040 count=131072 sizeOnDisk=131072 offset32=67700992 offset64=144115188143556864
+      As BulkHeader(i-4): flags=0x20000 elementCount=131072 sizeOnDisk=67700992 offset=33554432
+    Offset +81: found 131072 (DXT1 512x512 mip size)
+      Context: 80 10 00 00 00 02 00 00 00 02 00 00 09 09 04 00 00 00 02 00 00 00 30 FD D8 06 00 00 00 00 40 80 04 00 00 00 
+      As BulkHeader(i-8): flags=0x200 count=264457 sizeOnDisk=131072 offset32=-47185920 offset64=7529030483968
+      As BulkHeader(i-4): flags=0x40909 elementCount=131072 sizeOnDisk=-47185920 offset=1752
+    Offset +112: found 131072 (DXT1 512x512 mip size)
+      Context: 80 04 00 00 00 01 00 00 00 01 00 00 08 08 04 00 00 00 02 00 00 00 4F FD D8 06 00 00 00 00 40 80 01 00 00 80 
+      As BulkHeader(i-8): flags=0x100 count=264200 sizeOnDisk=131072 offset32=-45154304 offset64=7529032515584
+      As BulkHeader(i-4): flags=0x40808 elementCount=131072 sizeOnDisk=-45154304 offset=1752
+    Offset +130: found 32768 (DXT1 256x256 mip size)
+      Context: 02 00 00 00 4F FD D8 06 00 00 00 00 40 80 01 00 00 80 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 00 6F 
+      As BulkHeader(i-8): flags=0x0 count=98368 sizeOnDisk=32768 offset32=32768 offset64=290208397570113536
+      As BulkHeader(i-4): flags=0x18040 elementCount=32768 sizeOnDisk=32768 offset=67569408
+    Offset +134: found 32768 (DXT1 256x256 mip size)
+      Context: 4F FD D8 06 00 00 00 00 40 80 01 00 00 80 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 00 6F 05 D9 06 00 
+      As BulkHeader(i-8): flags=0x18040 count=32768 sizeOnDisk=32768 offset32=67569408 offset64=144115188143425280
+      As BulkHeader(i-4): flags=0x8000 elementCount=32768 sizeOnDisk=67569408 offset=33554432
+    Offset +143: found 131072 (DXT1 512x512 mip size)
+      Context: 80 01 00 00 80 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 00 6F 05 D9 06 00 00 00 00 40 20 00 C8 40 20 
+      As BulkHeader(i-8): flags=0x80 count=263943 sizeOnDisk=131072 offset32=91160576 offset64=7529168830464
+      As BulkHeader(i-4): flags=0x40707 elementCount=131072 sizeOnDisk=91160576 offset=1753
+    Offset +482: found 8192 (DXT1 128x128 mip size)
+      Context: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 20 00 00 00 55 55 55 7D 00 00 00 00 00 00 00 00 20 00 00 
+      As BulkHeader(i-8): flags=0x0 count=0 sizeOnDisk=8192 offset32=1431655680 offset64=538302567680
+      As BulkHeader(i-4): flags=0x0 elementCount=8192 sizeOnDisk=1431655680 offset=125
+    Offset +498: found 8192 (DXT1 128x128 mip size)
+      Context: 00 20 00 00 00 55 55 55 7D 00 00 00 00 00 00 00 00 20 00 00 00 55 55 55 F5 00 00 00 00 00 00 00 00 00 00 00 
+      As BulkHeader(i-8): flags=0x7D count=0 sizeOnDisk=8192 offset32=1431655680 offset64=1053698643200
+      As BulkHeader(i-4): flags=0x0 elementCount=8192 sizeOnDisk=1431655680 offset=245
+    Offset +586: found 8192 (DXT1 128x128 mip size)
+      Context: 60 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 20 00 00 00 55 55 57 57 20 00 00 00 55 55 5D F5 20 00 00 
+      As BulkHeader(i-8): flags=0x0 count=0 sizeOnDisk=8192 offset32=1465210112 offset64=35559499453696
+      As BulkHeader(i-4): flags=0x0 elementCount=8192 sizeOnDisk=1465210112 offset=8279
+    Offset +1267: found 2048 (DXT1 64x64 mip size)
+      Context: 01 08 00 00 A9 55 55 55 01 08 00 00 EB 55 55 55 00 08 00 00 AF 55 55 55 00 00 00 00 00 00 00 00 00 00 00 00 
+      As BulkHeader(i-8): flags=0x801 count=1431655915 sizeOnDisk=2048 offset32=1431655855 offset64=1431655855
+      As BulkHeader(i-4): flags=0x555555EB elementCount=2048 sizeOnDisk=1431655855 offset=0
+    Offset +1570: found 8192 (DXT1 128x128 mip size)
+      Context: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 20 00 00 00 75 55 55 55 20 00 00 00 55 55 55 D5 62 04 40 
+      As BulkHeader(i-8): flags=0x0 count=0 sizeOnDisk=8192 offset32=1431663872 offset64=35550875972864
+      As BulkHeader(i-4): flags=0x0 elementCount=8192 sizeOnDisk=1431663872 offset=8277
+    Offset +2223: found 131072 (DXT1 512x512 mip size)
+      Context: 00 00 00 00 40 00 00 00 40 00 00 00 06 06 04 00 00 00 02 00 00 00 8F 07 D9 06 00 00 00 00 40 08 04 C0 40 08 
+      As BulkHeader(i-8): flags=0x40 count=263686 sizeOnDisk=131072 offset32=126812160 offset64=7529204482048
+      As BulkHeader(i-4): flags=0x40606 elementCount=131072 sizeOnDisk=126812160 offset=1753
+    Offset +2539: found 2048 (DXT1 64x64 mip size)
+      Context: 00 00 00 00 00 00 00 00 01 08 00 00 82 55 55 55 00 08 00 00 50 55 55 55 00 00 00 00 00 00 00 00 00 00 00 00 
+      As BulkHeader(i-8): flags=0x801 count=1431655810 sizeOnDisk=2048 offset32=1431655760 offset64=1431655760
+      As BulkHeader(i-4): flags=0x55555582 elementCount=2048 sizeOnDisk=1431655760 offset=0
+    Offset +2626: found 8192 (DXT1 128x128 mip size)
+      Context: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 20 00 00 00 D5 55 55 55 20 00 00 00 75 55 55 55 00 00 00 
+      As BulkHeader(i-8): flags=0x0 count=0 sizeOnDisk=8192 offset32=1431688448 offset64=35550875997440
+      As BulkHeader(i-4): flags=0x0 elementCount=8192 sizeOnDisk=1431688448 offset=8277
+    Offset +2754: found 8192 (DXT1 128x128 mip size)
+      Context: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 20 00 00 00 20 00 00 00 05 05 04 00 00 00 02 00 00 00 2F 
+      As BulkHeader(i-8): flags=0x0 count=0 sizeOnDisk=8192 offset32=8192 offset64=289643248593412096
+      As BulkHeader(i-4): flags=0x0 elementCount=8192 sizeOnDisk=8192 offset=67437824
+    Offset +2758: found 8192 (DXT1 128x128 mip size)
+      Context: 00 00 00 00 00 00 00 00 00 00 00 00 00 20 00 00 00 20 00 00 00 05 05 04 00 00 00 02 00 00 00 2F 08 D9 06 00 
+      As BulkHeader(i-8): flags=0x0 count=8192 sizeOnDisk=8192 offset32=67437824 offset64=144115188143293696
+      As BulkHeader(i-4): flags=0x2000 elementCount=8192 sizeOnDisk=67437824 offset=33554432
+    Offset +2767: found 131072 (DXT1 512x512 mip size)
+      Context: 00 00 00 00 20 00 00 00 20 00 00 00 05 05 04 00 00 00 02 00 00 00 2F 08 D9 06 00 00 00 00 40 02 00 10 40 02 
+      As BulkHeader(i-8): flags=0x20 count=263429 sizeOnDisk=131072 offset32=137297920 offset64=7529214967808
+      As BulkHeader(i-4): flags=0x40505 elementCount=131072 sizeOnDisk=137297920 offset=1753
+    Offset +2844: found 131072 (DXT1 512x512 mip size)
+      Context: 02 00 00 FD 49 7D 55 E7 CB 20 28 62 62 6B 7F 00 00 00 02 00 02 01 00 60 00 38 00 35 35 2E 00 20 00 00 00 57 
+      As BulkHeader(i-8): flags=0x622820CB count=8350562 sizeOnDisk=131072 offset32=1610612994 offset64=3819114058271949058
+      As BulkHeader(i-4): flags=0x7F6B62 elementCount=131072 sizeOnDisk=1610612994 offset=889206784
+    Offset +2858: found 8192 (DXT1 128x128 mip size)
+      Context: 7F 00 00 00 02 00 02 01 00 60 00 38 00 35 35 2E 00 20 00 00 00 57 57 55 55 01 10 00 00 6A 55 55 55 20 00 00 
+      As BulkHeader(i-8): flags=0x38006000 count=775238912 sizeOnDisk=8192 offset32=1431787264 offset64=4505065643005696
+      As BulkHeader(i-4): flags=0x2E353500 elementCount=8192 sizeOnDisk=1431787264 offset=1048917
+    Offset +2927: found 131072 (DXT1 512x512 mip size)
+      Context: 00 00 00 00 10 00 00 00 10 00 00 00 04 04 04 00 00 00 02 00 00 00 6E 08 D9 06 00 00 00 00 20 0B A0 42 20 0B 
+      As BulkHeader(i-8): flags=0x10 count=263172 sizeOnDisk=131072 offset32=141426688 offset64=7529219096576
+      As BulkHeader(i-4): flags=0x40404 elementCount=131072 sizeOnDisk=141426688 offset=1753
+    Offset +2980: found 524288 (DXT1 1024x1024 mip size)
+      Context: 20 00 5C 57 55 55 01 10 00 00 5E 55 55 55 08 00 00 00 08 00 00 00 03 03 04 00 00 00 02 00 00 00 95 08 D9 06 
+      As BulkHeader(i-8): flags=0x555E0000 count=546133 sizeOnDisk=524288 offset32=50528256 offset64=17230397440
+      As BulkHeader(i-4): flags=0x85555 elementCount=524288 sizeOnDisk=50528256 offset=4
+    Offset +2981: found 2048 (DXT1 64x64 mip size)
+      Context: 00 5C 57 55 55 01 10 00 00 5E 55 55 55 08 00 00 00 08 00 00 00 03 03 04 00 00 00 02 00 00 00 95 08 D9 06 00 
+      As BulkHeader(i-8): flags=0x55555E00 count=2133 sizeOnDisk=2048 offset32=67306240 offset64=144115188143162112
+      As BulkHeader(i-4): flags=0x855 elementCount=2048 sizeOnDisk=67306240 offset=33554432
+    Offset +2990: found 131072 (DXT1 512x512 mip size)
+      Context: 5E 55 55 55 08 00 00 00 08 00 00 00 03 03 04 00 00 00 02 00 00 00 95 08 D9 06 00 00 00 00 08 A6 58 21 08 A6 
+      As BulkHeader(i-8): flags=0x8 count=262915 sizeOnDisk=131072 offset32=143982592 offset64=7529221652480
+      As BulkHeader(i-4): flags=0x40303 elementCount=131072 sizeOnDisk=143982592 offset=1753
+
+--- Texture_53 (export 13804, serial 3193 bytes at 0x7FE3641) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1
+  Native data: 3027 bytes remaining
+  First 128 bytes of native data:
+    +0000: 04 00 00 00 01 00 00 00 00 A0 0A 00 00 00 00 00 
+    +0010: 09 04 00 00 00 02 00 00 00 0D 37 FE 07 00 00 00 
+    +0020: 00 40 80 40 00 00 00 04 00 00 00 04 00 00 0A 0A 
+    +0030: 04 00 00 00 02 00 00 00 2C 37 FE 07 00 00 00 00 
+    +0040: 40 80 10 00 00 00 02 00 00 00 02 00 00 09 09 04 
+    +0050: 00 00 00 02 00 00 00 4B 37 FE 07 00 00 00 00 40 
+    +0060: 80 04 00 00 00 01 00 00 00 01 00 00 08 08 04 00 
+    +0070: 00 00 02 00 00 00 6A 37 FE 07 00 00 00 00 40 80 
+
+  Trying FByteBulkData interpretations:
+  First INT32 = 4 (potential mip count)
+
+  Scanning for DXT1 mip sizes in native data:
+    Offset +19: found 131072 (DXT1 512x512 mip size)
+      Context: 00 01 00 00 00 00 A0 0A 00 00 00 00 00 09 04 00 00 00 02 00 00 00 0D 37 FE 07 00 00 00 00 40 80 40 00 00 00 
+      As BulkHeader(i-8): flags=0x0 count=264448 sizeOnDisk=131072 offset32=923598848 offset64=8788426686464
+      As BulkHeader(i-4): flags=0x40900 elementCount=131072 sizeOnDisk=923598848 offset=2046
+    Offset +50: found 131072 (DXT1 512x512 mip size)
+      Context: 80 40 00 00 00 04 00 00 00 04 00 00 0A 0A 04 00 00 00 02 00 00 00 2C 37 FE 07 00 00 00 00 40 80 10 00 00 00 
+      As BulkHeader(i-8): flags=0x400 count=264714 sizeOnDisk=131072 offset32=925630464 offset64=8788428718080
+      As BulkHeader(i-4): flags=0x40A0A elementCount=131072 sizeOnDisk=925630464 offset=2046
+    Offset +68: found 131072 (DXT1 512x512 mip size)
+      Context: 02 00 00 00 2C 37 FE 07 00 00 00 00 40 80 10 00 00 00 02 00 00 00 02 00 00 09 09 04 00 00 00 02 00 00 00 4B 
+      As BulkHeader(i-8): flags=0x0 count=1081408 sizeOnDisk=131072 offset32=131072 offset64=290773546546888704
+      As BulkHeader(i-4): flags=0x108040 elementCount=131072 sizeOnDisk=131072 offset=67700992
+    Offset +72: found 131072 (DXT1 512x512 mip size)
+      Context: 2C 37 FE 07 00 00 00 00 40 80 10 00 00 00 02 00 00 00 02 00 00 09 09 04 00 00 00 02 00 00 00 4B 37 FE 07 00 
+      As BulkHeader(i-8): flags=0x108040 count=131072 sizeOnDisk=131072 offset32=67700992 offset64=144115188143556864
+      As BulkHeader(i-4): flags=0x20000 elementCount=131072 sizeOnDisk=67700992 offset=33554432
+    Offset +81: found 131072 (DXT1 512x512 mip size)
+      Context: 80 10 00 00 00 02 00 00 00 02 00 00 09 09 04 00 00 00 02 00 00 00 4B 37 FE 07 00 00 00 00 40 80 04 00 00 00 
+      As BulkHeader(i-8): flags=0x200 count=264457 sizeOnDisk=131072 offset32=927662080 offset64=8788430749696
+      As BulkHeader(i-4): flags=0x40909 elementCount=131072 sizeOnDisk=927662080 offset=2046
+    Offset +112: found 131072 (DXT1 512x512 mip size)
+      Context: 80 04 00 00 00 01 00 00 00 01 00 00 08 08 04 00 00 00 02 00 00 00 6A 37 FE 07 00 00 00 00 40 80 01 00 00 80 
+      As BulkHeader(i-8): flags=0x100 count=264200 sizeOnDisk=131072 offset32=929693696 offset64=8788432781312
+      As BulkHeader(i-4): flags=0x40808 elementCount=131072 sizeOnDisk=929693696 offset=2046
+    Offset +130: found 32768 (DXT1 256x256 mip size)
+      Context: 02 00 00 00 6A 37 FE 07 00 00 00 00 40 80 01 00 00 80 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 00 8A 
+      As BulkHeader(i-8): flags=0x0 count=98368 sizeOnDisk=32768 offset32=32768 offset64=290208397570113536
+      As BulkHeader(i-4): flags=0x18040 elementCount=32768 sizeOnDisk=32768 offset=67569408
+    Offset +134: found 32768 (DXT1 256x256 mip size)
+      Context: 6A 37 FE 07 00 00 00 00 40 80 01 00 00 80 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 00 8A 3F FE 07 00 
+      As BulkHeader(i-8): flags=0x18040 count=32768 sizeOnDisk=32768 offset32=67569408 offset64=144115188143425280
+      As BulkHeader(i-4): flags=0x8000 elementCount=32768 sizeOnDisk=67569408 offset=33554432
+    Offset +143: found 131072 (DXT1 512x512 mip size)
+      Context: 80 01 00 00 80 00 00 00 80 00 00 00 07 07 04 00 00 00 02 00 00 00 8A 3F FE 07 00 00 00 00 40 20 00 00 40 20 
+      As BulkHeader(i-8): flags=0x80 count=263943 sizeOnDisk=131072 offset32=1066008576 offset64=8788569096192
+      As BulkHeader(i-4): flags=0x40707 elementCount=131072 sizeOnDisk=1066008576 offset=2046
+    Offset +457: found 524288 (DXT1 1024x1024 mip size)
+      Context: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 08 00 00 00 25 35 B5 95 0F 30 0A 00 0B 09 0D AD 03 08 
+      As BulkHeader(i-8): flags=0x0 count=0 sizeOnDisk=524288 offset32=891617280 offset64=3463151243984437248
+      As BulkHeader(i-4): flags=0x0 elementCount=524288 sizeOnDisk=891617280 offset=806327733
+    Offset +458: found 2048 (DXT1 64x64 mip size)
+      Context: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 08 00 00 00 25 35 B5 95 0F 30 0A 00 0B 09 0D AD 03 08 00 
+      As BulkHeader(i-8): flags=0x0 count=0 sizeOnDisk=2048 offset32=-1254808320 offset64=734103874926093568
+      As BulkHeader(i-4): flags=0x0 elementCount=2048 sizeOnDisk=-1254808320 offset=170921877
+    Offset +585: found 131072 (DXT1 512x512 mip size)
+      Context: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 02 00 00 00 15 D5 55 55 0B 28 02 00 0B AD F5 55 03 00 
+      As BulkHeader(i-8): flags=0x0 count=0 sizeOnDisk=131072 offset32=-720044032 offset64=2885493813396439040
+      As BulkHeader(i-4): flags=0x0 elementCount=131072 sizeOnDisk=-720044032 offset=671831381
+    Offset +2223: found 131072 (DXT1 512x512 mip size)
+      Context: 00 00 00 00 40 00 00 00 40 00 00 00 06 06 04 00 00 00 02 00 00 00 AA 41 FE 07 00 00 00 00 40 08 00 00 40 08 
+      As BulkHeader(i-8): flags=0x40 count=263686 sizeOnDisk=131072 offset32=1101660160 offset64=8788604747776
+      As BulkHeader(i-4): flags=0x40606 elementCount=131072 sizeOnDisk=1101660160 offset=2046
+    Offset +2754: found 8192 (DXT1 128x128 mip size)
+      Context: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 20 00 00 00 20 00 00 00 05 05 04 00 00 00 02 00 00 00 4A 
+      As BulkHeader(i-8): flags=0x0 count=0 sizeOnDisk=8192 offset32=8192 offset64=289643248593412096
+      As BulkHeader(i-4): flags=0x0 elementCount=8192 sizeOnDisk=8192 offset=67437824
+    Offset +2758: found 8192 (DXT1 128x128 mip size)
+      Context: 00 00 00 00 00 00 00 00 00 00 00 00 00 20 00 00 00 20 00 00 00 05 05 04 00 00 00 02 00 00 00 4A 42 FE 07 00 
+      As BulkHeader(i-8): flags=0x0 count=8192 sizeOnDisk=8192 offset32=67437824 offset64=144115188143293696
+      As BulkHeader(i-4): flags=0x2000 elementCount=8192 sizeOnDisk=67437824 offset=33554432
+    Offset +2767: found 131072 (DXT1 512x512 mip size)
+      Context: 00 00 00 00 20 00 00 00 20 00 00 00 05 05 04 00 00 00 02 00 00 00 4A 42 FE 07 00 00 00 00 40 02 00 00 40 02 
+      As BulkHeader(i-8): flags=0x20 count=263429 sizeOnDisk=131072 offset32=1112145920 offset64=8788615233536
+      As BulkHeader(i-4): flags=0x40505 elementCount=131072 sizeOnDisk=1112145920 offset=2046
+    Offset +2927: found 131072 (DXT1 512x512 mip size)
+      Context: 00 00 00 00 10 00 00 00 10 00 00 00 04 04 04 00 00 00 02 00 00 00 89 42 FE 07 00 00 00 00 20 06 08 00 20 06 
+      As BulkHeader(i-8): flags=0x10 count=263172 sizeOnDisk=131072 offset32=1116274688 offset64=8788619362304
+      As BulkHeader(i-4): flags=0x40404 elementCount=131072 sizeOnDisk=1116274688 offset=2046
+    Offset +2976: found 524288 (DXT1 1024x1024 mip size)
+      Context: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 08 00 00 00 08 00 00 00 03 03 04 00 00 00 02 00 00 00 
+      As BulkHeader(i-8): flags=0x0 count=0 sizeOnDisk=524288 offset32=524288 offset64=217017207044440064
+      As BulkHeader(i-4): flags=0x0 elementCount=524288 sizeOnDisk=524288 offset=50528256
+    Offset +2977: found 2048 (DXT1 64x64 mip size)
+      Context: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 08 00 00 00 08 00 00 00 03 03 04 00 00 00 02 00 00 00 B0 
+      As BulkHeader(i-8): flags=0x0 count=0 sizeOnDisk=2048 offset32=2048 offset64=289078099616729088
+      As BulkHeader(i-4): flags=0x0 elementCount=2048 sizeOnDisk=2048 offset=67306240
+    Offset +2980: found 524288 (DXT1 1024x1024 mip size)
+      Context: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 08 00 00 00 08 00 00 00 03 03 04 00 00 00 02 00 00 00 B0 42 FE 07 
+      As BulkHeader(i-8): flags=0x0 count=524288 sizeOnDisk=524288 offset32=50528256 offset64=17230397440
+      As BulkHeader(i-4): flags=0x80000 elementCount=524288 sizeOnDisk=50528256 offset=4
+    Offset +2981: found 2048 (DXT1 64x64 mip size)
+      Context: 00 00 00 00 00 00 00 00 00 00 00 00 00 08 00 00 00 08 00 00 00 03 03 04 00 00 00 02 00 00 00 B0 42 FE 07 00 
+      As BulkHeader(i-8): flags=0x0 count=2048 sizeOnDisk=2048 offset32=67306240 offset64=144115188143162112
+      As BulkHeader(i-4): flags=0x800 elementCount=2048 sizeOnDisk=67306240 offset=33554432
+    Offset +2990: found 131072 (DXT1 512x512 mip size)
+      Context: 00 00 00 00 08 00 00 00 08 00 00 00 03 03 04 00 00 00 02 00 00 00 B0 42 FE 07 00 00 00 00 08 04 08 00 08 04 
+      As BulkHeader(i-8): flags=0x8 count=262915 sizeOnDisk=131072 offset32=1118830592 offset64=8788621918208
+      As BulkHeader(i-4): flags=0x40303 elementCount=131072 sizeOnDisk=1118830592 offset=2046
+
+
+=== PackagePatch Analysis ===
+PackagePatch size: 23024902 bytes
+  Version: 2
+  Data offset: 29295 (0x726F)
+  Num patches: 27
+  Data offset2: 29295 (0x726F)
+  Bulk data region: 22995607 bytes (from offset 29295 to EOF)
+
+  Entropy at bulk start (0x726F): 7.037 [HIGH - likely compressed/pixel data]
+  First 8 DXT1 blocks at bulk start:
+    Block 0: c0=3F1B c1=9293 bits=BBBC3E92
+    Block 1: c0=3F3B c1=7574 bits=70B1426B
+    Block 2: c0=C2F8 c1=BFB1 bits=E1E24010
+    Block 3: c0=3F61 c1=9091 bits=EEEFBD10
+    Block 4: c0=BEEE c1=8A8B bits=DDDEBE8A
+    Block 5: c0=BF5D c1=DADB bits=C2C3BEDA
+    Block 6: c0=3EC2 c1=8182 bits=C5C6BF01
+    Block 7: c0=3F45 c1=8B29 bits=0000422B
+
+  Wrote DDS: tools/lightmap_probe/lightmap_test_offset0.dds (524288 bytes from offset 29295)
+
+=== Parsing PackagePatch name table ===
+  [ 0] "small_wood_Spec"
+  [ 1] "?"
+  [2] BAD charCount=0 at pos=0x44 ΓÇö name table ends here
+  Name table ended at offset 0x45 (69)
+
+=== Data after name table (offset 0x45 to 0x15F5506) ===
+  Remaining data: 23024833 bytes
+  First 128 bytes after names:
+    0045: 5F 00 73 00 6B 00 79 00 62 00 6F 00 78 00 67 00  |_.s.k.y.b.o.x.g.|
+    0055: 65 00 6F 00 6D 00 65 00 74 00 72 00 79 00 00 00  |e.o.m.e.t.r.y...|
+    0065: 10 00 07 00 00 00 00 00 01 71 72 00 00 0D 48 00  |.........qr...H.|
+    0075: 6B 00 4D 00 65 00 73 00 68 00 50 00 72 00 6F 00  |k.M.e.s.h.P.r.o.|
+    0085: 78 00 79 00 30 00 00 00 10 00 07 00 00 00 00 00  |x.y.0...........|
+    0095: 01 72 72 00 00 0A 75 00 6E 00 64 00 65 00 72 00  |.rr...u.n.d.e.r.|
+    00A5: 73 00 65 00 61 00 31 00 00 00 10 00 07 00 00 00  |s.e.a.1.........|
+    00B5: 00 00 01 73 72 00 00 0C 43 00 6F 00 6C 00 6F 00  |...sr...C.o.l.o.|
+
+  As INT32 values:
+    + 0:      7536735 (0x0073005F)
+    + 4:      7929963 (0x0079006B)
+    + 8:      7274594 (0x006F0062)
+    +12:      6750328 (0x00670078)
+    +16:      7274597 (0x006F0065)
+    +20:      6619245 (0x0065006D)
+    +24:      7471220 (0x00720074)
+    +28:          121 (0x00000079)
+    +32:       458768 (0x00070010)
+    +36:            0 (0x00000000)
+    +40:      7500033 (0x00727101)
+    +44:      4721920 (0x00480D00)
+    +48:      5046379 (0x004D006B)
+    +52:      7536741 (0x00730065)
+    +56:      5242984 (0x00500068)
+    +60:      7274610 (0x006F0072)
+
+  Hypothesis: export patch table at 0x45
+  Testing as [INT32 exportIdx, INT32 bulkSize] pairs:
+    [ 0] idx=7536735 size=7929963 (valid size)
+    [ 1] idx=7274594 size=6750328 (valid size)
+    [ 2] idx=7274597 size=6619245 (valid size)
+    [ 3] idx=7471220 size=121 (valid size)
+    [ 4] idx=458768 size=0 ** INVALID
+    [ 5] idx=7500033 size=4721920 (valid size)
+    [ 6] idx=5046379 size=7536741 (valid size)
+    [ 7] idx=5242984 size=7274610 (valid size)
+    [ 8] idx=7929976 size=48 (valid size)
+    [ 9] idx=458768 size=0 ** INVALID
+
+  Testing as [INT32 exportIdx, INT32 offset, INT32 size] triples:
+    [ 0] idx=7536735 offset=7929963 size=7274594 [PLAUSIBLE]
+    [ 1] idx=6750328 offset=7274597 size=6619245 [PLAUSIBLE]
+    [ 2] idx=7471220 offset=121 size=458768 [PLAUSIBLE]
+    [ 3] idx=0 offset=7500033 size=4721920 [PLAUSIBLE]
+    [ 4] idx=5046379 offset=7536741 size=5242984 [PLAUSIBLE]
+    [ 5] idx=7274610 offset=7929976 size=48 [PLAUSIBLE]
+    [ 6] idx=458768 offset=0 size=7500289 [PLAUSIBLE]
+    [ 7] idx=7670272 offset=6553710 size=7471205 [PLAUSIBLE]
+    [ 8] idx=6619251 offset=3211361 size=1048576 [PLAUSIBLE]
+    [ 9] idx=7 offset=1929445376 size=201326706
+
+=== Scanning for pixel data start (first 1KB window with entropy > 7.0) ===
+  Pixel data starts at offset 0xA445 (42053) ΓÇö entropy 7.013
+  Header/metadata size: 42053 bytes
+  First 4 DXT1 blocks:
+    Block 0: c0=(156, 48,213) c1=( 57,226,205)
+    Block 1: c0=(131, 16,  8) c1=( 57,113,  0)
+    Block 2: c0=(156,113,230) c1=(189,226,222)
+    Block 3: c0=(  0,174,164) c1=( 65, 97,  0)
+  Wrote: tools/lightmap_probe/pp_texture_0xA445.dds

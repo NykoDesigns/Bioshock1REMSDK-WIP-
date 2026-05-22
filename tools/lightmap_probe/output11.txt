@@ -1,0 +1,437 @@
+﻿Lightmap Probe v0.3 - BSM Texture BulkData Header Parser
+
+BSM: 214215598 bytes
+PackagePatch: 23024902 bytes
+
+Names: 29295, Exports: 49140, Imports: 1381
+Parsed 29295 names
+Parsed 49140 exports
+
+=== Texture exports (Texture_4x, Texture_5x) ===
+  Export[4086] 'Texture_49' serial=3193 offset=0x261CC8F
+  Export[4335] 'Texture_46' serial=3193 offset=0x2A09C3F
+  Export[4439] 'Texture_47' serial=3193 offset=0x2A3B414
+  Export[5002] 'Texture_50' serial=3193 offset=0x3851057
+  Export[5163] 'Texture_48' serial=3193 offset=0x3913CF7
+  Export[5417] 'Texture_54' serial=3193 offset=0x3D06A61
+  Export[5481] 'Texture_44' serial=3193 offset=0x3D16190
+  Export[5529] 'Texture_43' serial=3193 offset=0x3E12B37
+  Export[5574] 'Texture_55' serial=3193 offset=0x3F63557
+  Export[5988] 'Texture_45' serial=3193 offset=0x441DA15
+  Export[8007] 'Texture_42' serial=3193 offset=0x57D5DC1
+  Export[8010] 'Texture_51' serial=3193 offset=0x57D6C53
+  Export[10984] 'Texture_52' serial=3193 offset=0x6D8FC26
+  Export[13804] 'Texture_53' serial=3193 offset=0x7FE3641
+Found 14 lightmap texture exports
+
+=== Parsing texture serial data for BulkData headers ===
+
+--- Texture_49 (export 4086, serial 3193 bytes at 0x261CC8F) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1
+  Native data: 3027 bytes remaining
+  NativeHeader: ver=4 subVer=1 totalBulkSize=696320 mipCount=9
+  Scanning for mip entry patterns (04 00 00 00 02 00 00 00):
+  Found 9 mip entry patterns
+    [0] off=+17 gap=31 selfOff=0x261CD5B bytes16-17=4080 pages=64(524288B) dim=1024x1024(log=10,10) STRIPPED
+    [1] off=+48 gap=31 selfOff=0x261CD7A bytes16-17=4080 pages=16(131072B) dim=512x512(log=9,9) STRIPPED
+    [2] off=+79 gap=31 selfOff=0x261CD99 bytes16-17=4080 pages=4(32768B) dim=256x256(log=8,8) STRIPPED
+    [3] off=+110 gap=31 selfOff=0x261CDB8 bytes16-17=4080 pages=-2147483647(8192B) dim=128x128(log=7,7) STRIPPED
+    [4] off=+141 gap=2080 selfOff=0x261D5D8 bytes16-17=4020 pages=541065216(0B) dim=4x4(log=2,0) INLINE=2049 (expected 0)
+    [5] off=+2221 gap=544 selfOff=0x261D7F8 bytes16-17=4008 pages=138416128(33554432B) dim=8388608x8388608(log=87,32) INLINE=513 (expected 33554432)
+    [6] off=+2765 gap=160 selfOff=0x261D898 bytes16-17=4002 pages=37749280(4456448B) dim=262144x262144(log=114,34) INLINE=129 (expected 4456448)
+    [7] off=+2925 gap=63 selfOff=0x261D8D7 bytes16-17=20C2 pages=-1038065376(203685888B) dim=2x2(log=33,88) INLINE=32 (expected 203685888)
+    [8] off=+2988 gap=39 selfOff=0x261D8FE bytes16-17=08A2 pages=-1576509160(203620352B) dim=16x16(log=4,0) INLINE=8 (expected 203620352)
+
+--- Texture_46 (export 4335, serial 3193 bytes at 0x2A09C3F) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1
+  Native data: 3027 bytes remaining
+  NativeHeader: ver=4 subVer=1 totalBulkSize=696320 mipCount=9
+  Scanning for mip entry patterns (04 00 00 00 02 00 00 00):
+  Found 9 mip entry patterns
+    [0] off=+17 gap=31 selfOff=0x2A09D0B bytes16-17=4080 pages=64(524288B) dim=1024x1024(log=10,10) STRIPPED
+    [1] off=+48 gap=31 selfOff=0x2A09D2A bytes16-17=4080 pages=10512(86114304B) dim=512x512(log=9,9) STRIPPED
+    [2] off=+79 gap=31 selfOff=0x2A09D49 bytes16-17=4080 pages=52996(434143232B) dim=256x256(log=8,8) STRIPPED
+    [3] off=+110 gap=31 selfOff=0x2A09D68 bytes16-17=4080 pages=-2147446783(301998080B) dim=128x128(log=7,7) STRIPPED
+    [4] off=+141 gap=2080 selfOff=0x2A0A588 bytes16-17=4020 pages=541069570(35667968B) dim=1024x1024(log=170,224) INLINE=2049 (expected 35667968)
+    [5] off=+2221 gap=544 selfOff=0x2A0A7A8 bytes16-17=4008 pages=138416332(35225600B) dim=1024x1024(log=42,34) INLINE=513 (expected 35225600)
+    [6] off=+2765 gap=160 selfOff=0x2A0A848 bytes16-17=4002 pages=37753635(40132608B) dim=1073741824x1073741824(log=222,101) INLINE=129 (expected 40132608)
+    [7] off=+2925 gap=63 selfOff=0x2A0A887 bytes16-17=2063 pages=1663075082(274808832B) dim=32x32(log=165,16) INLINE=32 (expected 274808832)
+    [8] off=+2988 gap=39 selfOff=0x2A0A8AE bytes16-17=0882 pages=-2113404400(4325376B) dim=16x16(log=4,0) INLINE=8 (expected 4325376)
+
+--- Texture_47 (export 4439, serial 3193 bytes at 0x2A3B414) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1
+  Native data: 3027 bytes remaining
+  NativeHeader: ver=4 subVer=1 totalBulkSize=696320 mipCount=9
+  Scanning for mip entry patterns (04 00 00 00 02 00 00 00):
+  Found 9 mip entry patterns
+    [0] off=+17 gap=31 selfOff=0x2A3B4E0 bytes16-17=4080 pages=64(524288B) dim=1024x1024(log=10,10) STRIPPED
+    [1] off=+48 gap=31 selfOff=0x2A3B4FF bytes16-17=4080 pages=16(131072B) dim=512x512(log=9,9) STRIPPED
+    [2] off=+79 gap=31 selfOff=0x2A3B51E bytes16-17=4080 pages=4(32768B) dim=256x256(log=8,8) STRIPPED
+    [3] off=+110 gap=31 selfOff=0x2A3B53D bytes16-17=4080 pages=-2147482367(10493952B) dim=128x128(log=7,7) STRIPPED
+    [4] off=+141 gap=2080 selfOff=0x2A3BD5D bytes16-17=4020 pages=541114368(402653184B) dim=32768x32768(log=47,65) INLINE=2049 (expected 402653184)
+    [5] off=+2221 gap=544 selfOff=0x2A3BF7D bytes16-17=4008 pages=138457120(369360896B) dim=-2147483648x-2147483648(log=127,161) INLINE=513 (expected 369360896)
+    [6] off=+2765 gap=160 selfOff=0x2A3C01D bytes16-17=4002 pages=37771617(187441152B) dim=32x32(log=37,66) INLINE=129 (expected 187441152)
+    [7] off=+2925 gap=63 selfOff=0x2A3C05C bytes16-17=2061 pages=1629512512(208142336B) dim=1x1(log=128,16) INLINE=32 (expected 208142336)
+    [8] off=+2988 gap=39 selfOff=0x2A3C083 bytes16-17=0882 pages=-2113379568(207749120B) dim=16x16(log=4,0) INLINE=8 (expected 207749120)
+
+--- Texture_50 (export 5002, serial 3193 bytes at 0x3851057) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1
+  Native data: 3027 bytes remaining
+  NativeHeader: ver=4 subVer=1 totalBulkSize=696320 mipCount=9
+  Scanning for mip entry patterns (04 00 00 00 02 00 00 00):
+  Found 9 mip entry patterns
+    [0] off=+17 gap=31 selfOff=0x3851123 bytes16-17=4080 pages=2368(19398656B) dim=1024x1024(log=10,10) STRIPPED
+    [1] off=+48 gap=31 selfOff=0x3851142 bytes16-17=4080 pages=2576(21102592B) dim=512x512(log=9,9) STRIPPED
+    [2] off=+79 gap=31 selfOff=0x3851161 bytes16-17=4080 pages=3332(27295744B) dim=256x256(log=8,8) STRIPPED
+    [3] off=+110 gap=31 selfOff=0x3851180 bytes16-17=4080 pages=-2147478783(39854080B) dim=128x128(log=7,7) STRIPPED
+    [4] off=+141 gap=2080 selfOff=0x38519A0 bytes16-17=4020 pages=541118488(436404224B) dim=1x1(log=0,21) INLINE=2049 (expected 436404224)
+    [5] off=+2221 gap=544 selfOff=0x3851BC0 bytes16-17=4008 pages=138448921(302194688B) dim=1x1(log=64,32) INLINE=513 (expected 302194688)
+    [6] off=+2765 gap=160 selfOff=0x3851C60 bytes16-17=4002 pages=37781593(269164544B) dim=536870912x536870912(log=125,96) INLINE=129 (expected 269164544)
+    [7] off=+2925 gap=63 selfOff=0x3851C9F bytes16-17=208F pages=-1893711488(137363456B) dim=256x256(log=136,96) INLINE=32 (expected 137363456)
+    [8] off=+2988 gap=39 selfOff=0x3851CC6 bytes16-17=0823 pages=587776040(402980864B) dim=16x16(log=4,0) INLINE=8 (expected 402980864)
+
+--- Texture_48 (export 5163, serial 3193 bytes at 0x3913CF7) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1
+  Native data: 3027 bytes remaining
+  NativeHeader: ver=4 subVer=1 totalBulkSize=696320 mipCount=9
+  Scanning for mip entry patterns (04 00 00 00 02 00 00 00):
+  Found 9 mip entry patterns
+    [0] off=+17 gap=31 selfOff=0x3913DC3 bytes16-17=4080 pages=64(524288B) dim=1024x1024(log=10,10) STRIPPED
+    [1] off=+48 gap=31 selfOff=0x3913DE2 bytes16-17=4080 pages=16(131072B) dim=512x512(log=9,9) STRIPPED
+    [2] off=+79 gap=31 selfOff=0x3913E01 bytes16-17=4080 pages=4(32768B) dim=256x256(log=8,8) STRIPPED
+    [3] off=+110 gap=31 selfOff=0x3913E20 bytes16-17=4080 pages=-2147483647(8192B) dim=128x128(log=7,7) STRIPPED
+    [4] off=+141 gap=2080 selfOff=0x3914640 bytes16-17=4020 pages=541120512(452984832B) dim=512x512(log=9,0) INLINE=2049 (expected 452984832)
+    [5] off=+2221 gap=544 selfOff=0x3914860 bytes16-17=4008 pages=138467328(452984832B) dim=2048x2048(log=107,0) INLINE=513 (expected 452984832)
+    [6] off=+2765 gap=160 selfOff=0x3914900 bytes16-17=4002 pages=37799936(419430400B) dim=2097152x2097152(log=85,146) INLINE=129 (expected 419430400)
+    [7] off=+2925 gap=63 selfOff=0x391493F bytes16-17=2082 pages=-2111814248(145948672B) dim=4x4(log=130,64) INLINE=32 (expected 145948672)
+    [8] off=+2988 gap=39 selfOff=0x3914966 bytes16-17=08A4 pages=-1542962592(139198464B) dim=16x16(log=4,0) INLINE=8 (expected 139198464)
+
+--- Texture_54 (export 5417, serial 3193 bytes at 0x3D06A61) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1
+  Native data: 3027 bytes remaining
+  NativeHeader: ver=4 subVer=1 totalBulkSize=696320 mipCount=9
+  Scanning for mip entry patterns (04 00 00 00 02 00 00 00):
+  Found 9 mip entry patterns
+    [0] off=+17 gap=31 selfOff=0x3D06B2D bytes16-17=4080 pages=41024(336068608B) dim=1024x1024(log=10,10) STRIPPED
+    [1] off=+48 gap=31 selfOff=0x3D06B4C bytes16-17=4080 pages=16400(134348800B) dim=512x512(log=9,9) STRIPPED
+    [2] off=+79 gap=31 selfOff=0x3D06B6B bytes16-17=4080 pages=32772(268468224B) dim=256x256(log=8,8) STRIPPED
+    [3] off=+110 gap=31 selfOff=0x3D06B8A bytes16-17=4080 pages=-2147475455(67117056B) dim=128x128(log=7,7) STRIPPED
+    [4] off=+141 gap=2080 selfOff=0x3D073AA bytes16-17=4020 pages=541095233(245899264B) dim=2048x2048(log=11,227) INLINE=2049 (expected 245899264)
+    [5] off=+2221 gap=544 selfOff=0x3D075CA bytes16-17=4008 pages=138454689(349446144B) dim=2048x2048(log=11,228) INLINE=513 (expected 349446144)
+    [6] off=+2765 gap=160 selfOff=0x3D0766A bytes16-17=4002 pages=37793600(367525888B) dim=8x8(log=131,139) INLINE=129 (expected 367525888)
+    [7] off=+2925 gap=63 selfOff=0x3D076A9 bytes16-17=2061 pages=1629487510(3325952B) dim=8192x8192(log=13,8) INLINE=32 (expected 3325952)
+    [8] off=+2988 gap=39 selfOff=0x3D076D0 bytes16-17=0880 pages=-2146917267(344825856B) dim=16x16(log=4,0) INLINE=8 (expected 344825856)
+
+--- Texture_44 (export 5481, serial 3193 bytes at 0x3D16190) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1
+  Native data: 3027 bytes remaining
+  NativeHeader: ver=4 subVer=1 totalBulkSize=696320 mipCount=9
+  Scanning for mip entry patterns (04 00 00 00 02 00 00 00):
+  Found 9 mip entry patterns
+    [0] off=+17 gap=31 selfOff=0x3D1625C bytes16-17=4080 pages=64(524288B) dim=1024x1024(log=10,10) STRIPPED
+    [1] off=+48 gap=31 selfOff=0x3D1627B bytes16-17=4080 pages=16(131072B) dim=512x512(log=9,9) STRIPPED
+    [2] off=+79 gap=31 selfOff=0x3D1629A bytes16-17=4080 pages=4(32768B) dim=256x256(log=8,8) STRIPPED
+    [3] off=+110 gap=31 selfOff=0x3D162B9 bytes16-17=4080 pages=-2147483647(8192B) dim=128x128(log=7,7) STRIPPED
+    [4] off=+141 gap=2080 selfOff=0x3D16AD9 bytes16-17=4020 pages=541065280(524288B) dim=2097152x2097152(log=21,32) INLINE=2049 (expected 524288)
+    [5] off=+2221 gap=544 selfOff=0x3D16CF9 bytes16-17=4008 pages=138412064(262144B) dim=-2147483648x-2147483648(log=223,192) INLINE=513 (expected 262144)
+    [6] off=+2765 gap=160 selfOff=0x3D16D99 bytes16-17=4002 pages=37748960(1835008B) dim=512x512(log=137,132) INLINE=129 (expected 1835008)
+    [7] off=+2925 gap=63 selfOff=0x3D16DD8 bytes16-17=2043 pages=1126195474(203571200B) dim=2x2(log=97,8) INLINE=32 (expected 203571200)
+    [8] off=+2988 gap=39 selfOff=0x3D16DFF bytes16-17=0862 pages=1644716305(203563008B) dim=16x16(log=4,0) INLINE=8 (expected 203563008)
+
+--- Texture_43 (export 5529, serial 3193 bytes at 0x3E12B37) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1
+  Native data: 3027 bytes remaining
+  NativeHeader: ver=4 subVer=1 totalBulkSize=696320 mipCount=9
+  Scanning for mip entry patterns (04 00 00 00 02 00 00 00):
+  Found 9 mip entry patterns
+    [0] off=+17 gap=31 selfOff=0x3E12C03 bytes16-17=4080 pages=64(524288B) dim=1024x1024(log=10,10) STRIPPED
+    [1] off=+48 gap=31 selfOff=0x3E12C22 bytes16-17=4080 pages=16(131072B) dim=512x512(log=9,9) STRIPPED
+    [2] off=+79 gap=31 selfOff=0x3E12C41 bytes16-17=4080 pages=260(2129920B) dim=256x256(log=8,8) STRIPPED
+    [3] off=+110 gap=31 selfOff=0x3E12C60 bytes16-17=4080 pages=-2147483391(2105344B) dim=128x128(log=7,7) STRIPPED
+    [4] off=+141 gap=2080 selfOff=0x3E13480 bytes16-17=4020 pages=541065216(0B) dim=1x1(log=0,194) INLINE=2049 (expected 0)
+    [5] off=+2221 gap=544 selfOff=0x3E136A0 bytes16-17=4008 pages=138412610(4734976B) dim=2097152x2097152(log=149,64) INLINE=513 (expected 4734976)
+    [6] off=+2765 gap=160 selfOff=0x3E13740 bytes16-17=4002 pages=37750912(17825792B) dim=2048x2048(log=11,163) INLINE=129 (expected 17825792)
+    [7] off=+2925 gap=63 selfOff=0x3E1377F bytes16-17=2023 pages=589332739(270557184B) dim=16x16(log=164,17) INLINE=32 (expected 270557184)
+    [8] off=+2988 gap=39 selfOff=0x3E137A6 bytes16-17=0804 pages=67666442(272711680B) dim=16x16(log=4,0) INLINE=8 (expected 272711680)
+
+--- Texture_55 (export 5574, serial 3193 bytes at 0x3F63557) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1
+  Native data: 3027 bytes remaining
+  NativeHeader: ver=4 subVer=1 totalBulkSize=696320 mipCount=9
+  Scanning for mip entry patterns (04 00 00 00 02 00 00 00):
+  Found 9 mip entry patterns
+    [0] off=+17 gap=31 selfOff=0x3F63623 bytes16-17=4080 pages=8256(67633152B) dim=1024x1024(log=10,10) STRIPPED
+    [1] off=+48 gap=31 selfOff=0x3F63642 bytes16-17=4080 pages=16400(134348800B) dim=512x512(log=9,9) STRIPPED
+    [2] off=+79 gap=31 selfOff=0x3F63661 bytes16-17=4080 pages=16388(134250496B) dim=256x256(log=8,8) STRIPPED
+    [3] off=+110 gap=31 selfOff=0x3F63680 bytes16-17=4080 pages=-2147450879(268443648B) dim=128x128(log=7,7) STRIPPED
+    [4] off=+141 gap=2080 selfOff=0x3F63EA0 bytes16-17=4020 pages=541076160(89653248B) dim=2097152x2097152(log=213,192) INLINE=2049 (expected 89653248)
+    [5] off=+2221 gap=544 selfOff=0x3F640C0 bytes16-17=4008 pages=138427136(123731968B) dim=2097152x2097152(log=85,65) INLINE=513 (expected 123731968)
+    [6] off=+2765 gap=160 selfOff=0x3F64160 bytes16-17=4002 pages=37763648(122159104B) dim=2097152x2097152(log=85,0) INLINE=129 (expected 122159104)
+    [7] off=+2925 gap=63 selfOff=0x3F6419F bytes16-17=20E0 pages=-534765301(69296128B) dim=2x2(log=1,24) INLINE=32 (expected 69296128)
+    [8] off=+2988 gap=39 selfOff=0x3F641C6 bytes16-17=08E1 pages=-519561197(67264512B) dim=16x16(log=4,0) INLINE=8 (expected 67264512)
+
+--- Texture_45 (export 5988, serial 3193 bytes at 0x441DA15) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1
+  Native data: 3027 bytes remaining
+  NativeHeader: ver=4 subVer=1 totalBulkSize=696320 mipCount=9
+  Scanning for mip entry patterns (04 00 00 00 02 00 00 00):
+  Found 9 mip entry patterns
+    [0] off=+17 gap=31 selfOff=0x441DAE1 bytes16-17=4080 pages=64(524288B) dim=1024x1024(log=10,10) STRIPPED
+    [1] off=+48 gap=31 selfOff=0x441DB00 bytes16-17=4080 pages=16(131072B) dim=512x512(log=9,9) STRIPPED
+    [2] off=+79 gap=31 selfOff=0x441DB1F bytes16-17=4080 pages=4(32768B) dim=256x256(log=8,8) STRIPPED
+    [3] off=+110 gap=31 selfOff=0x441DB3E bytes16-17=4080 pages=-2147483647(8192B) dim=128x128(log=7,7) STRIPPED
+    [4] off=+141 gap=2080 selfOff=0x441E35E bytes16-17=4020 pages=541076672(93847552B) dim=2097152x2097152(log=85,96) INLINE=2049 (expected 93847552)
+    [5] off=+2221 gap=544 selfOff=0x441E57E bytes16-17=4008 pages=138429792(145489920B) dim=8388608x8388608(log=23,64) INLINE=513 (expected 145489920)
+    [6] off=+2765 gap=160 selfOff=0x441E61E bytes16-17=4002 pages=37760512(96468992B) dim=-2147483648x-2147483648(log=95,194) INLINE=129 (expected 96468992)
+    [7] off=+2925 gap=63 selfOff=0x441E65D bytes16-17=2030 pages=807453203(407003136B) dim=2x2(log=1,13) INLINE=32 (expected 407003136)
+    [8] off=+2988 gap=39 selfOff=0x441E684 bytes16-17=0805 pages=84410635(2187264B) dim=16x16(log=4,0) INLINE=8 (expected 2187264)
+
+--- Texture_42 (export 8007, serial 3193 bytes at 0x57D5DC1) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1
+  Native data: 3027 bytes remaining
+  NativeHeader: ver=4 subVer=1 totalBulkSize=696320 mipCount=9
+  Scanning for mip entry patterns (04 00 00 00 02 00 00 00):
+  Found 9 mip entry patterns
+    [0] off=+17 gap=31 selfOff=0x57D5E8D bytes16-17=4080 pages=64(524288B) dim=1024x1024(log=10,10) STRIPPED
+    [1] off=+48 gap=31 selfOff=0x57D5EAC bytes16-17=4080 pages=16(131072B) dim=512x512(log=9,9) STRIPPED
+    [2] off=+79 gap=31 selfOff=0x57D5ECB bytes16-17=4080 pages=4(32768B) dim=256x256(log=8,8) STRIPPED
+    [3] off=+110 gap=31 selfOff=0x57D5EEA bytes16-17=4080 pages=-2147423999(488644608B) dim=128x128(log=7,7) STRIPPED
+    [4] off=+141 gap=2080 selfOff=0x57D670A bytes16-17=4020 pages=541071780(53772288B) dim=8388608x8388608(log=119,197) INLINE=2049 (expected 53772288)
+    [5] off=+2221 gap=544 selfOff=0x57D692A bytes16-17=4008 pages=138414179(17588224B) dim=8388608x8388608(log=215,193) INLINE=513 (expected 17588224)
+    [6] off=+2765 gap=160 selfOff=0x57D69CA bytes16-17=4002 pages=37750849(17309696B) dim=67108864x67108864(log=90,33) INLINE=129 (expected 17309696)
+    [7] off=+2925 gap=63 selfOff=0x57D6A09 bytes16-17=2025 pages=622878994(203571200B) dim=64x64(log=102,17) INLINE=32 (expected 203571200)
+    [8] off=+2988 gap=39 selfOff=0x57D6A30 bytes16-17=08C7 pages=-955727352(406913024B) dim=16x16(log=4,0) INLINE=8 (expected 406913024)
+
+--- Texture_51 (export 8010, serial 3193 bytes at 0x57D6C53) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1
+  Native data: 3027 bytes remaining
+  NativeHeader: ver=4 subVer=1 totalBulkSize=696320 mipCount=9
+  Scanning for mip entry patterns (04 00 00 00 02 00 00 00):
+  Found 9 mip entry patterns
+    [0] off=+17 gap=31 selfOff=0x57D6D1F bytes16-17=4080 pages=64(524288B) dim=1024x1024(log=10,10) STRIPPED
+    [1] off=+48 gap=31 selfOff=0x57D6D3E bytes16-17=4080 pages=2064(16908288B) dim=512x512(log=9,9) STRIPPED
+    [2] off=+79 gap=31 selfOff=0x57D6D5D bytes16-17=4080 pages=2564(21004288B) dim=256x256(log=8,8) STRIPPED
+    [3] off=+110 gap=31 selfOff=0x57D6D7C bytes16-17=4080 pages=-2147480319(27271168B) dim=128x128(log=7,7) STRIPPED
+    [4] off=+141 gap=2080 selfOff=0x57D759C bytes16-17=4020 pages=541065235(155648B) dim=2097152x2097152(log=181,25) INLINE=2049 (expected 155648)
+    [5] off=+2221 gap=544 selfOff=0x57D77BC bytes16-17=4008 pages=138412054(180224B) dim=2097152x2097152(log=245,33) INLINE=513 (expected 180224)
+    [6] off=+2765 gap=160 selfOff=0x57D785C bytes16-17=4002 pages=37748834(802816B) dim=1x1(log=0,212) INLINE=129 (expected 802816)
+    [7] off=+2925 gap=63 selfOff=0x57D789B bytes16-17=208F pages=-1893719807(69214208B) dim=2x2(log=65,8) INLINE=32 (expected 69214208)
+    [8] off=+2988 gap=39 selfOff=0x57D78C2 bytes16-17=0805 pages=84459521(402661376B) dim=16x16(log=4,0) INLINE=8 (expected 402661376)
+
+--- Texture_52 (export 10984, serial 3193 bytes at 0x6D8FC26) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1
+  Native data: 3027 bytes remaining
+  NativeHeader: ver=4 subVer=1 totalBulkSize=696320 mipCount=9
+  Scanning for mip entry patterns (04 00 00 00 02 00 00 00):
+  Found 9 mip entry patterns
+    [0] off=+17 gap=31 selfOff=0x6D8FCF2 bytes16-17=4080 pages=64(524288B) dim=1024x1024(log=10,10) STRIPPED
+    [1] off=+48 gap=31 selfOff=0x6D8FD11 bytes16-17=4080 pages=16(131072B) dim=512x512(log=9,9) STRIPPED
+    [2] off=+79 gap=31 selfOff=0x6D8FD30 bytes16-17=4080 pages=4(32768B) dim=256x256(log=8,8) STRIPPED
+    [3] off=+110 gap=31 selfOff=0x6D8FD4F bytes16-17=4080 pages=-2147483647(8192B) dim=128x128(log=7,7) STRIPPED
+    [4] off=+141 gap=2080 selfOff=0x6D9056F bytes16-17=4020 pages=541116416(419430400B) dim=4x4(log=2,0) INLINE=2049 (expected 419430400)
+    [5] off=+2221 gap=544 selfOff=0x6D9078F bytes16-17=4008 pages=138461188(402685952B) dim=1x1(log=0,2) INLINE=513 (expected 402685952)
+    [6] off=+2765 gap=160 selfOff=0x6D9082F bytes16-17=4002 pages=37752832(33554432B) dim=32x32(log=37,32) INLINE=129 (expected 33554432)
+    [7] off=+2925 gap=63 selfOff=0x6D9086E bytes16-17=200B pages=186663584(139722752B) dim=32x32(log=165,154) INLINE=32 (expected 139722752)
+    [8] off=+2988 gap=39 selfOff=0x6D90895 bytes16-17=08A6 pages=-1509416616(69926912B) dim=16x16(log=4,0) INLINE=8 (expected 69926912)
+
+--- Texture_53 (export 13804, serial 3193 bytes at 0x7FE3641) ---
+  Properties: 15, ended at offset 166/3193
+  Format=3 USize=1024 VSize=1024 StrippedMips=5 Stripped=1 BulkSize=-1
+  Native data: 3027 bytes remaining
+  NativeHeader: ver=4 subVer=1 totalBulkSize=696320 mipCount=9
+  Scanning for mip entry patterns (04 00 00 00 02 00 00 00):
+  Found 9 mip entry patterns
+    [0] off=+17 gap=31 selfOff=0x7FE370D bytes16-17=4080 pages=64(524288B) dim=1024x1024(log=10,10) STRIPPED
+    [1] off=+48 gap=31 selfOff=0x7FE372C bytes16-17=4080 pages=16(131072B) dim=512x512(log=9,9) STRIPPED
+    [2] off=+79 gap=31 selfOff=0x7FE374B bytes16-17=4080 pages=4(32768B) dim=256x256(log=8,8) STRIPPED
+    [3] off=+110 gap=31 selfOff=0x7FE376A bytes16-17=4080 pages=-2147483647(8192B) dim=128x128(log=7,7) STRIPPED
+    [4] off=+141 gap=2080 selfOff=0x7FE3F8A bytes16-17=4020 pages=541065216(0B) dim=1x1(log=0,0) INLINE=2049 (expected 0)
+    [5] off=+2221 gap=544 selfOff=0x7FE41AA bytes16-17=4008 pages=138412032(0B) dim=1x1(log=0,0) INLINE=513 (expected 0)
+    [6] off=+2765 gap=160 selfOff=0x7FE424A bytes16-17=4002 pages=37748736(0B) dim=1x1(log=0,11) INLINE=129 (expected 0)
+    [7] off=+2925 gap=63 selfOff=0x7FE4289 bytes16-17=2006 pages=102760456(65536B) dim=1x1(log=0,0) INLINE=32 (expected 65536)
+    [8] off=+2988 gap=39 selfOff=0x7FE42B0 bytes16-17=0804 pages=67633160(65536B) dim=16x16(log=4,0) INLINE=8 (expected 65536)
+
+
+=== PackagePatch Analysis ===
+PackagePatch size: 23024902 bytes
+  Version: 2
+  Data offset: 29295 (0x726F)
+  Num patches: 27
+  Data offset2: 29295 (0x726F)
+  Bulk data region: 22995607 bytes (from offset 29295 to EOF)
+
+  Entropy at bulk start (0x726F): 7.037 [HIGH - likely compressed/pixel data]
+  First 8 DXT1 blocks at bulk start:
+    Block 0: c0=3F1B c1=9293 bits=BBBC3E92
+    Block 1: c0=3F3B c1=7574 bits=70B1426B
+    Block 2: c0=C2F8 c1=BFB1 bits=E1E24010
+    Block 3: c0=3F61 c1=9091 bits=EEEFBD10
+    Block 4: c0=BEEE c1=8A8B bits=DDDEBE8A
+    Block 5: c0=BF5D c1=DADB bits=C2C3BEDA
+    Block 6: c0=3EC2 c1=8182 bits=C5C6BF01
+    Block 7: c0=3F45 c1=8B29 bits=0000422B
+
+  Wrote DDS: tools/lightmap_probe/lightmap_test_offset0.dds (524288 bytes from offset 29295)
+
+=== PackagePatch raw hex dump (first 512 bytes) ===
+  0000: 02 00 00 00 6F 72 00 00 1B 00 00 00 6F 72 00 00  |....or......or..|
+  0010: 10 73 00 6D 00 61 00 6C 00 6C 00 5F 00 77 00 6F  |.s.m.a.l.l._.w.o|
+  0020: 00 6F 00 64 00 5F 00 53 00 70 00 65 00 63 00 00  |.o.d._.S.p.e.c..|
+  0030: 00 10 00 07 00 00 00 00 00 01 70 72 00 00 13 72  |..........pr...r|
+  0040: 00 65 00 73 00 5F 00 73 00 6B 00 79 00 62 00 6F  |.e.s._.s.k.y.b.o|
+  0050: 00 78 00 67 00 65 00 6F 00 6D 00 65 00 74 00 72  |.x.g.e.o.m.e.t.r|
+  0060: 00 79 00 00 00 10 00 07 00 00 00 00 00 01 71 72  |.y............qr|
+  0070: 00 00 0D 48 00 6B 00 4D 00 65 00 73 00 68 00 50  |...H.k.M.e.s.h.P|
+  0080: 00 72 00 6F 00 78 00 79 00 30 00 00 00 10 00 07  |.r.o.x.y.0......|
+  0090: 00 00 00 00 00 01 72 72 00 00 0A 75 00 6E 00 64  |......rr...u.n.d|
+  00A0: 00 65 00 72 00 73 00 65 00 61 00 31 00 00 00 10  |.e.r.s.e.a.1....|
+  00B0: 00 07 00 00 00 00 00 01 73 72 00 00 0C 43 00 6F  |........sr...C.o|
+  00C0: 00 6C 00 6F 00 72 00 43 00 79 00 63 00 6C 00 65  |.l.o.r.C.y.c.l.e|
+  00D0: 00 30 00 00 00 10 00 07 00 00 00 00 00 01 74 72  |.0............tr|
+  00E0: 00 00 18 61 00 6D 00 6D 00 6F 00 74 00 79 00 70  |...a.m.m.o.t.y.p|
+  00F0: 00 65 00 73 00 5F 00 66 00 72 00 6F 00 7A 00 65  |.e.s._.f.r.o.z.e|
+  0100: 00 6E 00 64 00 69 00 66 00 66 00 75 00 73 00 65  |.n.d.i.f.f.u.s.e|
+  0110: 00 00 00 10 00 07 00 00 00 00 00 01 75 72 00 00  |............ur..|
+  0120: 16 61 00 6D 00 6D 00 6F 00 74 00 79 00 70 00 65  |.a.m.m.o.t.y.p.e|
+  0130: 00 73 00 5F 00 72 00 69 00 6F 00 74 00 64 00 69  |.s._.r.i.o.t.d.i|
+  0140: 00 66 00 66 00 75 00 73 00 65 00 00 00 10 00 07  |.f.f.u.s.e......|
+  0150: 00 00 00 00 00 01 76 72 00 00 14 61 00 6D 00 6D  |......vr...a.m.m|
+  0160: 00 6F 00 73 00 74 00 61 00 6E 00 64 00 61 00 72  |.o.s.t.a.n.d.a.r|
+  0170: 00 64 00 5F 00 6E 00 6F 00 72 00 6D 00 61 00 6C  |.d._.n.o.r.m.a.l|
+  0180: 00 00 00 10 00 07 00 00 00 00 00 01 77 72 00 00  |............wr..|
+  0190: 16 61 00 6D 00 6D 00 6F 00 73 00 74 00 61 00 6E  |.a.m.m.o.s.t.a.n|
+  01A0: 00 64 00 61 00 72 00 64 00 5F 00 73 00 70 00 65  |.d.a.r.d._.s.p.e|
+  01B0: 00 63 00 75 00 6C 00 61 00 72 00 00 00 10 00 07  |.c.u.l.a.r......|
+  01C0: 00 00 00 00 00 01 78 72 00 00 1B 61 00 6D 00 6D  |......xr...a.m.m|
+  01D0: 00 6F 00 74 00 79 00 70 00 65 00 73 00 5F 00 66  |.o.t.y.p.e.s._.f|
+  01E0: 00 72 00 6F 00 7A 00 65 00 6E 00 5F 00 63 00 6F  |.r.o.z.e.n._.c.o|
+  01F0: 00 6C 00 6F 00 72 00 6D 00 61 00 73 00 6B 00 00  |.l.o.r.m.a.s.k..|
+
+=== Parsing PackagePatch name table ===
+  [ 0] "small_wood_Spec" flags=0x70010 idx=29296 (end=0x3E)
+  [ 1] "res_skyboxgeometry" flags=0x70010 idx=29297 (end=0x72)
+  [ 2] "HkMeshProxy0" flags=0x70010 idx=29298 (end=0x9A)
+  [ 3] "undersea1" flags=0x70010 idx=29299 (end=0xBC)
+  [ 4] "ColorCycle0" flags=0x70010 idx=29300 (end=0xE2)
+  [ 5] "ammotypes_frozendiffuse" flags=0x70010 idx=29301 (end=0x120)
+  [ 6] "ammotypes_riotdiffuse" flags=0x70010 idx=29302 (end=0x15A)
+  [ 7] "ammostandard_normal" flags=0x70010 idx=29303 (end=0x190)
+  [ 8] "ammostandard_specular" flags=0x70010 idx=29304 (end=0x1CA)
+  [ 9] "ammotypes_frozen_colormask" flags=0x70010 idx=29305 (end=0x20E)
+  [10] "ammotypes_riot" flags=0x70010 idx=29306 (end=0x23A)
+  [11] "ammotypes_frozen" flags=0x70010 idx=29307 (end=0x26A)
+  [12] "ammostandard_specular0" flags=0x70010 idx=29308 (end=0x2A6)
+  [13] "ammostandard_specular00" flags=0x70010 idx=29309 (end=0x2E4)
+  [14] "wood_plank2" flags=0x70010 idx=29310 (end=0x30A)
+  [15] "wood_plank_specular2" flags=0x70010 idx=29311 (end=0x342)
+  [16] "wood_plank_normal2" flags=0x70010 idx=29312 (end=0x376)
+  [17] "wood_plank_shader2" flags=0x70010 idx=29313 (end=0x3AA)
+  [18] "ProtectorBubbles" flags=0x70010 idx=29314 (end=0x3DA)
+  [19] "SpriteEmitter103" flags=0x70010 idx=29315 (end=0x40A)
+  [20] "HkMeshProxy1" flags=0x70010 idx=29316 (end=0x432)
+  [21] "MaterialColorFromLight6" flags=0x70010 idx=29317 (end=0x470)
+  [22] "FluidVolumeBelow" flags=0x70010 idx=29318 (end=0x4A0)
+  [23] "HeavyBubbles_O" flags=0x70010 idx=29319 (end=0x4CC)
+  [24] "HeavyBubbles_Normal" flags=0x70010 idx=29320 (end=0x502)
+  [25] "HeavyBubbles_Shader" flags=0x70010 idx=29321 (end=0x538)
+  [26] "SpriteEmitter13" flags=0x70010 idx=1381 (end=0x566)
+  Name table ended at offset 0x566 (1382), parsed 27 names
+
+=== Export Patch Section at 0x566 ===
+  Header: 0, 49140, numPatches=20, 49140
+  Parsing 20 export patch entries starting at 0x576:
+    [ 0] class=-19 super=0 pkg=3422 name='None'(0) num=1862270976 flags=0x40000
+         serialSize=15 serialOff=0x314B0000 extra=(-861559188,257) gen=0 (pos=0x59A)
+    [ 1] class=1 super=-4085 pkg=-754937088 name='Specification'(26) num=0 flags=0x3
+         serialSize=251659264 serialOff=0x0 extra=(-709798912,-1515820030) gen=-76 (pos=0x5C1)
+    [ 2] class=1 super=0 pkg=-167706624 name='?'(-63) num=9633792 flags=0x0
+         serialSize=248181 serialOff=0x4000000 extra=(3840,1174405120) gen=-43676 (pos=0x5E7)
+    [ 3] class=214215084 super=1 pkg=16777216 name='?'(-4087) num=-754937088 flags=0x78000000
+         serialSize=969 serialOff=0x40000 extra=(15,1566179328) gen=214215084 (pos=0x615)
+    [ 4] class=1 super=0 pkg=-134152192 name='?'(-63) num=9633792 flags=0x0
+         serialSize=248182 serialOff=0x4000000 extra=(3840,1761607680) gen=-53 (pos=0x639)
+    [ 5] class=-149 super=214215084 pkg=1 name='CheckpointTypePadding'(1) num=49145 flags=0x0
+         serialSize=-914948096 serialOff=0x3 extra=(251659264,0) gen=0 (pos=0x662)
+    [ 6] class=2796949 super=214215084 pkg=1 name='CheckpointTypePadding'(1) num=49146 flags=0x1A
+         serialSize=2030043136 serialOff=0x3C9 extra=(262144,15) gen=0 (pos=0x68D)
+    [ 7] class=0 super=153 pkg=-861559188 name='CheckpointTypePadding'(1) num=1 flags=0x1E400
+         serialSize=6867 serialOff=0x0 extra=(248186,67108864) gen=0 (pos=0x6B2)
+    [ 8] class=15 super=0 pkg=0 name='Operation'(164) num=-861559188 flags=0xBFFC0100
+         serialSize=9633792 serialOff=0xF78 extra=(0,248189) gen=0 (pos=0x6D7)
+    [ 9] class=0 super=0 pkg=983044 name='None'(0) num=1426063360 flags=0x1CCA5A6
+         serialSize=1 serialOff=0xBFFD01 extra=(2013303552,15) gen=0 (pos=0x6FB)
+    [10] class=0 super=0 pkg=248190 name='None'(0) num=262144 flags=0xB6550000
+         serialSize=-1502870827 serialOff=0x101CCA5 extra=(16777216,49150) gen=-19 (pos=0x71F)
+    [11] class=0 super=1016 pkg=0 name='None'(0) num=63536896 flags=0xF0004
+         serialSize=0 serialOff=0x2D5B655 extra=(-861559188,257) gen=0 (pos=0x744)
+    [12] class=1 super=-4095 pkg=2013308416 name='PhysicsVolume'(15) num=0 flags=0x3
+         serialSize=251659264 serialOff=0x0 extra=(1812035840,30188966) gen=1 (pos=0x76A)
+    [13] class=0 super=0 pkg=-1073741568 name='None'(0) num=1342220544 flags=0x50000000
+         serialSize=418 serialOff=0x40000 extra=(15,-1420230656) gen=5 (pos=0x78E)
+    [14] class=214215084 super=1 pkg=16777216 name='CheckpointTypePadding'(1) num=-1476394816 flags=0x0
+         serialSize=63587072 serialOff=0x0 extra=(458752,0) gen=844 (pos=0x7B7)
+    [15] class=214215084 super=1 pkg=16777216 name='Max'(2) num=-1241513792 flags=0x0
+         serialSize=63587328 serialOff=0x0 extra=(458756,0) gen=40 (pos=0x7DF)
+    [16] class=214215084 super=0 pkg=16777216 name='Min'(3) num=-1828716352 flags=0x0
+         serialSize=63587840 serialOff=0x0 extra=(983044,0) gen=44282 (pos=0x809)
+    [17] class=214215084 super=1 pkg=16777216 name='Range'(4) num=-1828716352 flags=0x0
+         serialSize=63588096 serialOff=0x0 extra=(983044,0) gen=3397 (pos=0x832)
+    [18] class=214215084 super=1 pkg=16777216 name='Vector'(5) num=-1509949248 flags=0x0
+         serialSize=63588352 serialOff=0x0 extra=(983044,0) gen=118 (pos=0x85B)
+    [19] class=214215084 super=1 pkg=16777216 name='Tag'(6) num=-1744830272 flags=0x0
+         serialSize=63588608 serialOff=0x0 extra=(458756,0) gen=923 (pos=0x884)
+  Export table ended at offset 0x884
+
+=== Region after export table (0x884) ===
+  Next 4 INT32s: -861559188, 257, -1073282816, 9961472
+  Hex: CCA5A66C 00000101 C0070100 00980000
+  Hex dump (first 256 bytes after export table):
+    0884: 6C A6 A5 CC 01 01 00 00 00 01 07 C0 00 00 98 00 
+    0894: 36 00 00 00 00 00 00 00 42 CA 03 00 00 00 00 04 
+    08A4: 00 07 00 00 00 00 00 59 0F 6C A6 A5 CC 01 01 00 
+    08B4: 00 00 01 A3 00 00 00 69 35 00 00 00 00 00 00 E0 
+    08C4: 00 00 00 04 00 00 00 03 00 00 00 04 00 00 00 01 
+    08D4: 00 00 00 00 00 00 00 00 00 00 00 00 6D 00 00 FF 
+    08E4: FF FF FF FF FF FF FF 00 00 00 00 00 36 36 6A D5 
+    08F4: 01 00 00 00 00 00 81 00 00 00 00 6A 02 00 00 00 
+    0904: 00 59 07 02 48 C4 03 46 C0 03 0B 00 00 00 00 15 
+    0914: 50 34 0C 00 00 00 00 5A 11 00 00 00 00 1E 0D 00 
+    0924: 00 00 00 15 6D 34 10 00 00 00 00 22 C5 03 00 00 
+    0934: 0E 00 00 00 00 01 2B 00 00 00 00 00 06 00 00 00 
+    0944: 00 56 06 6D 18 00 00 00 00 0F 00 00 00 00 15 51 
+    0954: 34 08 00 00 00 00 3A 05 00 00 00 00 00 20 DD C6 
+    0964: 00 00 E0 44 00 00 F6 45 45 01 00 00 00 00 24 00 
+    0974: 00 A0 40 09 00 00 00 00 56 06 7C 14 0B 00 00 00 
+
+  Scanning for section-like patterns:
+
+=== Scanning for pixel data start (256-byte steps, entropy > 7.0) ===
+  Pixel data starts at offset 0x10584 (66948) ΓÇö entropy 7.062
+  Gap from export table end: 64768 bytes
+
+=== Parsing Catalog.bdc ===
+  Catalog.bdc size: 516961 bytes
+  First 64 bytes:
+    0000: 00 D0 12 1A 53 89 FA 25 41 00 00 00 00 49 03 28  |....S..%A....I.(|
+    0010: 58 2D 9E 28 DF 25 41 11 42 00 75 00 6C 00 6B 00  |X-.(.%A.B.u.l.k.|
+    0020: 43 00 68 00 75 00 6E 00 6B 00 30 00 5F 00 30 00  |C.h.u.n.k.0._.0.|
+    0030: 2E 00 62 00 6C 00 6B 00 00 00 17 15 48 00 61 00  |..b.l.k.....H.a.|
+  Header: magic=0x1A12D000 ver=637176147 count=65 field3=671303936
+
+  Searching for '1-Medical' references in Catalog.bdc:
+  Total '1-Medical' occurrences: 0
+
+  Searching for lightmap BSM offset 0x06D8FCF2 in catalog:

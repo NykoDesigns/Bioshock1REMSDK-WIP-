@@ -224,10 +224,13 @@ static bool ParseNodes(const uint8_t* data, size_t& pos, size_t endPos,
 struct BSPSurf {
     int materialRef;     // CI object ref: positive=export(1-based), negative=import, 0=null
     int32_t polyFlags;
-    int32_t pBase;       // index into Points[] — texture origin
+    int32_t pBase;       // index into Points[] — texture origin (pan offsets baked in for v>=78)
     int32_t vNormal;     // index into Vectors[] — surface normal
     int32_t vTextureU;   // index into Vectors[] — texture U axis
     int32_t vTextureV;   // index into Vectors[] — texture V axis
+    // PanU/PanV NOT serialized for package version >= 78 (BioShock=141)
+    // Pan offsets are baked into pBase. Confirmed by UT2004 Engine.dll JGE+0x34 skip.
+    float lightMapScale;  // from 20B tail: FPlane(16B) + LightMapScale(4B)
 };
 
 static bool ParseSurfs(const uint8_t* data, size_t& pos, size_t endPos,
@@ -260,8 +263,10 @@ static bool ParseSurfs(const uint8_t* data, size_t& pos, size_t endPos,
         // CI Actor (variable length UObject reference)
         ReadCompactIndex(data + pos, endPos - pos, br); pos += br;
 
-        // 20B remaining fixed fields: FPlane(16B surface plane) + iLightMap(4B)
+        // 20B remaining: FPlane(16B surface plane) + float LightMapScale(4B)
+        // PanU/PanV NOT present — skipped for version >= 78 (confirmed by UT2004 serializer)
         if (pos + 20 > endPos) { surfs.resize(i); return true; }
+        memcpy(&surfs[i].lightMapScale, data + pos + 16, 4);
         pos += 20;
     }
     printf("[BSP] Parsed %d surfs (%d bytes)\n", numSurfs, (int)(pos - surfStart));
@@ -631,6 +636,10 @@ std::vector<ParsedMesh> ParseBSPGeometry(const uint8_t* serialData, int serialSi
         printf("\n");
     }
 
+    // NOTE: Lightmap textures in BioShock are stored as stripped UTexture exports in LightMaps_BSP
+    // package. Their pixel data resides in .PackagePatch bulk files, not inline in the .bsm.
+    // After FVerts: NumSharedSides(16968), NumZones(73), then zone data follows.
+
     // Count unique materials for diagnostics
     int matResolved = 0, matNull = 0;
     {
@@ -652,8 +661,8 @@ std::vector<ParsedMesh> ParseBSPGeometry(const uint8_t* serialData, int serialSi
         printf("[BSP-UV] First 10 surfs raw field values:\n");
         for (int si = 0; si < (int)surfs.size() && si < 10; si++) {
             auto& s = surfs[si];
-            printf("  Surf[%d]: matRef=%d polyFlags=0x%X pBase=%d vNormal=%d vTextureU=%d vTextureV=%d\n",
-                   si, s.materialRef, (unsigned)s.polyFlags, s.pBase, s.vNormal, s.vTextureU, s.vTextureV);
+            printf("  Surf[%d]: matRef=%d polyFlags=0x%X pBase=%d vNormal=%d vTextureU=%d vTextureV=%d LMScale=%.1f\n",
+                   si, s.materialRef, (unsigned)s.polyFlags, s.pBase, s.vNormal, s.vTextureU, s.vTextureV, s.lightMapScale);
             if (s.vTextureU >= 0 && s.vTextureU < numVectors &&
                 s.vTextureV >= 0 && s.vTextureV < numVectors) {
                 float ux = vectors[s.vTextureU*3], uy = vectors[s.vTextureU*3+1], uz = vectors[s.vTextureU*3+2];
@@ -664,6 +673,20 @@ std::vector<ParsedMesh> ParseBSPGeometry(const uint8_t* serialData, int serialSi
                        ux, uy, uz, uMag, vx, vy, vz, vMag);
             }
         }
+        // LightMapScale distribution
+        int lmZero = 0, lmSmall = 0, lmMed = 0, lmLarge = 0, lmHuge = 0;
+        float lmMin = 1e9f, lmMax = 0.0f;
+        for (auto& s : surfs) {
+            if (s.lightMapScale <= 0.0f) { lmZero++; continue; }
+            if (s.lightMapScale < lmMin) lmMin = s.lightMapScale;
+            if (s.lightMapScale > lmMax) lmMax = s.lightMapScale;
+            if (s.lightMapScale < 4.0f) lmSmall++;
+            else if (s.lightMapScale < 16.0f) lmMed++;
+            else if (s.lightMapScale < 64.0f) lmLarge++;
+            else lmHuge++;
+        }
+        printf("[BSP-LM] LightMapScale: zero=%d <4=%d 4-16=%d 16-64=%d 64+=%d range=[%.1f..%.1f]\n",
+               lmZero, lmSmall, lmMed, lmLarge, lmHuge, lmMin, lmMax);
     }
 
     // ─── 9. Triangulate BSP nodes, grouped by material ───────────────────────
@@ -674,6 +697,9 @@ std::vector<ParsedMesh> ParseBSPGeometry(const uint8_t* serialData, int serialSi
         std::vector<MeshVertex> vertices;
         std::vector<MeshTriangle> triangles;
         uint8_t zoneMask[16] = {}; // union of all nodes' ZoneMasks
+        float lightMapScaleSum = 0.0f;
+        int lightMapScaleCount = 0;
+        uint8_t zoneIndex = 0;
     };
     std::unordered_map<int64_t, MaterialGroup> groups; // key: materialRef * 256 + iZone
 
@@ -721,6 +747,13 @@ std::vector<ParsedMesh> ParseBSPGeometry(const uint8_t* serialData, int serialSi
             groups[groupKey] = std::move(g);
         }
         auto& group = groups[groupKey];
+        group.zoneIndex = node.iZone;
+
+        // Accumulate lightmap scale from surface
+        if (surf && surf->lightMapScale > 0.0f && surf->lightMapScale < 1e6f) {
+            group.lightMapScaleSum += surf->lightMapScale;
+            group.lightMapScaleCount++;
+        }
 
         // Accumulate zone visibility: OR node's mask into group's mask
         for (int zi = 0; zi < 16; zi++) group.zoneMask[zi] |= node.zoneMask[zi];
@@ -732,6 +765,9 @@ std::vector<ParsedMesh> ParseBSPGeometry(const uint8_t* serialData, int serialSi
                 ParsedMesh chunk;
                 chunk.name = "__BSP__";
                 chunk.textureName = StripShaderSuffix(group.matName);
+                chunk.lightMapScale = group.lightMapScaleCount > 0 ? group.lightMapScaleSum / group.lightMapScaleCount : 0.0f;
+                chunk.zoneIndex = group.zoneIndex;
+                memcpy(chunk.zoneMask, group.zoneMask, 16);
                 chunk.vertices = std::move(group.vertices);
                 chunk.triangles = std::move(group.triangles);
                 chunk.valid = true;
@@ -793,7 +829,7 @@ std::vector<ParsedMesh> ParseBSPGeometry(const uint8_t* serialData, int serialSi
             int pointIdx = verts[vertIdx].pVertex;
             if (pointIdx < 0 || pointIdx >= numPoints) { validPoly = false; break; }
 
-            MeshVertex mv;
+            MeshVertex mv = {};
             mv.x = points[pointIdx * 3 + 0];
             mv.y = points[pointIdx * 3 + 1];
             mv.z = points[pointIdx * 3 + 2];
@@ -808,9 +844,15 @@ std::vector<ParsedMesh> ParseBSPGeometry(const uint8_t* serialData, int serialSi
                 float dz = mv.z - baseZ;
                 mv.u = dx * texUx + dy * texUy + dz * texUz;
                 mv.v = dx * texVx + dy * texVy + dz * texVz;
+                // Tangent from texture U axis (normalized)
+                float tlen = std::sqrt(texUx*texUx + texUy*texUy + texUz*texUz);
+                if (tlen > 0.001f) { mv.tx = texUx/tlen; mv.ty = texUy/tlen; mv.tz = texUz/tlen; }
+                else { mv.tx = 1; mv.ty = 0; mv.tz = 0; }
+                mv.tw = 1.0f;
             } else {
                 mv.u = 0;
                 mv.v = 0;
+                mv.tx = 1; mv.ty = 0; mv.tz = 0; mv.tw = 1;
             }
 
             // Reject vertices with NaN or extreme values
@@ -841,13 +883,14 @@ std::vector<ParsedMesh> ParseBSPGeometry(const uint8_t* serialData, int serialSi
 
         // Skip utility brush materials that shouldn't be rendered
         std::string strippedName = StripShaderSuffix(group.matName);
+        bool isWaterSurf = strippedName.find("Water") != std::string::npos ||
+                           strippedName.find("water") != std::string::npos ||
+                           strippedName.find("CalmWater") != std::string::npos ||
+                           strippedName.find("Calmwater") != std::string::npos;
         if (strippedName.find("FakeBackdrop") != std::string::npos ||
             strippedName.find("ZoningOnly") != std::string::npos ||
             strippedName.find("PortalBrush") != std::string::npos ||
             strippedName.find("AntiPortalBrush") != std::string::npos ||
-            strippedName.find("WaterLowRef") != std::string::npos ||
-            strippedName.find("CalmWater") != std::string::npos ||
-            strippedName.find("Calmwater") != std::string::npos ||
             strippedName.find("Glass") != std::string::npos ||
             strippedName.find("glass") != std::string::npos ||
             strippedName.find("Window") != std::string::npos ||
@@ -856,8 +899,6 @@ std::vector<ParsedMesh> ParseBSPGeometry(const uint8_t* serialData, int serialSi
             strippedName.find("Sky") != std::string::npos ||
             strippedName.find("Invisible") != std::string::npos ||
             strippedName.find("invisible") != std::string::npos ||
-            strippedName.find("Water") != std::string::npos ||
-            strippedName.find("water") != std::string::npos ||
             strippedName.find("Trigger") != std::string::npos ||
             strippedName.find("Volume") != std::string::npos ||
             strippedName.find("Utility") != std::string::npos ||
@@ -869,6 +910,9 @@ std::vector<ParsedMesh> ParseBSPGeometry(const uint8_t* serialData, int serialSi
         ParsedMesh chunk;
         chunk.name = "__BSP__";
         chunk.textureName = strippedName;
+        chunk.isWater = isWaterSurf;
+        chunk.lightMapScale = group.lightMapScaleCount > 0 ? group.lightMapScaleSum / group.lightMapScaleCount : 0.0f;
+        chunk.zoneIndex = group.zoneIndex;
         memcpy(chunk.zoneMask, group.zoneMask, 16);
         chunk.vertices = std::move(group.vertices);
         chunk.triangles = std::move(group.triangles);

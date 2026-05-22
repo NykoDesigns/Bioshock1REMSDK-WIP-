@@ -25,6 +25,9 @@ void (APIENTRY *glUniform1i)(GLint, GLint) = nullptr;
 void (APIENTRY *glUniform1f)(GLint, GLfloat) = nullptr;
 void (APIENTRY *glUniform2f)(GLint, GLfloat, GLfloat) = nullptr;
 void (APIENTRY *glUniform3f)(GLint, GLfloat, GLfloat, GLfloat) = nullptr;
+void (APIENTRY *glUniform4f)(GLint, GLfloat, GLfloat, GLfloat, GLfloat) = nullptr;
+void (APIENTRY *glUniform3fv)(GLint, GLsizei, const GLfloat*) = nullptr;
+void (APIENTRY *glUniform4fv)(GLint, GLsizei, const GLfloat*) = nullptr;
 void (APIENTRY *glUniformMatrix4fv)(GLint, GLsizei, GLboolean, const GLfloat*) = nullptr;
 void (APIENTRY *glGetShaderiv)(GLuint, GLenum, GLint*) = nullptr;
 void (APIENTRY *glGetShaderInfoLog)(GLuint, GLsizei, GLsizei*, GLchar*) = nullptr;
@@ -32,6 +35,21 @@ void (APIENTRY *glGetProgramiv)(GLuint, GLenum, GLint*) = nullptr;
 void (APIENTRY *glGetProgramInfoLog)(GLuint, GLsizei, GLsizei*, GLchar*) = nullptr;
 void (APIENTRY *glGenerateMipmap)(GLenum) = nullptr;
 void (APIENTRY *glActiveTexture)(GLenum) = nullptr;
+
+// Framebuffer
+void (APIENTRY *glGenFramebuffers)(GLsizei, GLuint*) = nullptr;
+void (APIENTRY *glDeleteFramebuffers)(GLsizei, const GLuint*) = nullptr;
+void (APIENTRY *glBindFramebuffer)(GLenum, GLuint) = nullptr;
+void (APIENTRY *glFramebufferTexture2D)(GLenum, GLenum, GLenum, GLuint, GLint) = nullptr;
+GLenum (APIENTRY *glCheckFramebufferStatus)(GLenum) = nullptr;
+void (APIENTRY *glDrawBuffers)(GLsizei, const GLenum*) = nullptr;
+
+// Renderbuffer
+void (APIENTRY *glGenRenderbuffers)(GLsizei, GLuint*) = nullptr;
+void (APIENTRY *glDeleteRenderbuffers)(GLsizei, const GLuint*) = nullptr;
+void (APIENTRY *glBindRenderbuffer)(GLenum, GLuint) = nullptr;
+void (APIENTRY *glRenderbufferStorage)(GLenum, GLenum, GLsizei, GLsizei) = nullptr;
+void (APIENTRY *glFramebufferRenderbuffer)(GLenum, GLenum, GLenum, GLuint) = nullptr;
 
 #define LOAD(name) name = (decltype(name))SDL_GL_GetProcAddress(#name); if(!name) return false;
 
@@ -60,6 +78,9 @@ bool LoadGLFunctions()
     LOAD(glUniform1f);
     LOAD(glUniform2f);
     LOAD(glUniform3f);
+    LOAD(glUniform4f);
+    LOAD(glUniform3fv);
+    LOAD(glUniform4fv);
     LOAD(glUniformMatrix4fv);
     LOAD(glGetShaderiv);
     LOAD(glGetShaderInfoLog);
@@ -67,5 +88,16 @@ bool LoadGLFunctions()
     LOAD(glGetProgramInfoLog);
     LOAD(glGenerateMipmap);
     LOAD(glActiveTexture);
+    LOAD(glGenFramebuffers);
+    LOAD(glDeleteFramebuffers);
+    LOAD(glBindFramebuffer);
+    LOAD(glFramebufferTexture2D);
+    LOAD(glCheckFramebufferStatus);
+    LOAD(glDrawBuffers);
+    LOAD(glGenRenderbuffers);
+    LOAD(glDeleteRenderbuffers);
+    LOAD(glBindRenderbuffer);
+    LOAD(glRenderbufferStorage);
+    LOAD(glFramebufferRenderbuffer);
     return true;
 }

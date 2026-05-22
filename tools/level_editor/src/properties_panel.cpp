@@ -53,7 +53,43 @@ void PropertiesPanel::Render(BSMDocument& doc, int& selectedActor)
                 ImGui::Text("Texture: %s", mesh.textureName.c_str());
         } else {
             ImGui::TextDisabled("No mesh linked");
+            if (!actor.meshRefName.empty())
+                ImGui::TextColored(ImVec4(1.0f, 0.6f, 0.2f, 1.0f), "Ref: %s (unresolved)", actor.meshRefName.c_str());
         }
+        // Render type
+        const char* rtNames[] = {"VisibleStaticMesh","VisibleMover","VisiblePickup","VisibleDecoration",
+                                 "VisibleEmitter","VisibleDecal","LightOnly","CollisionOnly",
+                                 "TriggerOnly","EditorOnly","UnknownPlaceholder"};
+        int rti = (int)actor.renderType;
+        bool visible = IsVisibleInGame(actor.renderType);
+        ImGui::Text("Render Type: ");
+        ImGui::SameLine();
+        if (visible)
+            ImGui::TextColored(ImVec4(0.3f, 1.0f, 0.3f, 1.0f), "%s", rtNames[rti]);
+        else
+            ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "%s (hidden in-game)", rtNames[rti]);
+    }
+
+    // Light properties
+    if (actor.isLight && ImGui::CollapsingHeader("Light", ImGuiTreeNodeFlags_DefaultOpen)) {
+        ImGui::DragFloat("Brightness", &actor.lightBrightness, 0.01f, 0.0f, 10.0f);
+        ImGui::DragFloat("Radius", &actor.lightRadius, 10.0f, 0.0f, 50000.0f);
+        float lc[3] = {actor.lightColorR / 255.0f, actor.lightColorG / 255.0f, actor.lightColorB / 255.0f};
+        if (ImGui::ColorEdit3("Light Color", lc)) {
+            actor.lightColorR = (uint8_t)(lc[0] * 255);
+            actor.lightColorG = (uint8_t)(lc[1] * 255);
+            actor.lightColorB = (uint8_t)(lc[2] * 255);
+        }
+    }
+
+    // Projector/Decal properties
+    if (actor.isProjector && ImGui::CollapsingHeader("Projector / Decal", ImGuiTreeNodeFlags_DefaultOpen)) {
+        if (!actor.projTextureName.empty())
+            ImGui::TextColored(ImVec4(0.9f, 0.4f, 0.4f, 1.0f), "Texture: %s", actor.projTextureName.c_str());
+        else
+            ImGui::TextDisabled("No projected texture");
+        ImGui::DragFloat("FOV", &actor.projFOV, 1.0f, 1.0f, 170.0f);
+        ImGui::DragFloat("Max Distance", &actor.projMaxDist, 10.0f, 1.0f, 50000.0f);
     }
 
     // Info
@@ -79,10 +115,20 @@ void PropertiesPanel::Render(BSMDocument& doc, int& selectedActor)
             ImGui::TextColored(ImVec4(0.4f, 1.0f, 0.4f, 1.0f), "User-created actor");
     }
 
-    // Delete button
+    // Action buttons
     ImGui::Separator();
+    if (ImGui::Button("Duplicate (Ctrl+D)", ImVec2(-1, 24))) {
+        EditorActor copy = actor;
+        copy.exportIndex = -1;
+        copy.objectName += "_copy";
+        copy.location.x += 100.0f;
+        copy.location.y += 100.0f;
+        doc.GetActors().push_back(copy);
+        selectedActor = (int)doc.GetActors().size() - 1;
+    }
+
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.7f, 0.15f, 0.15f, 1.0f));
-    if (ImGui::Button("Delete Actor", ImVec2(-1, 28))) {
+    if (ImGui::Button("Delete Actor", ImVec2(-1, 24))) {
         doc.GetActors().erase(doc.GetActors().begin() + selectedActor);
         selectedActor = -1;
     }

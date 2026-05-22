@@ -150,3 +150,15 @@ Mat4 Camera::Perspective(float fovDeg, float aspect, float nearP, float farP)
     m.m[14] = -(2.0f * farP * nearP) / (farP - nearP);
     return m;
 }
+
+Mat4 Camera::Orthographic(float halfW, float halfH, float nearP, float farP)
+{
+    Mat4 m;
+    memset(&m, 0, sizeof(m));
+    m.m[0] = 1.0f / halfW;
+    m.m[5] = 1.0f / halfH;
+    m.m[10] = -2.0f / (farP - nearP);
+    m.m[14] = -(farP + nearP) / (farP - nearP);
+    m.m[15] = 1.0f;
+    return m;
+}
