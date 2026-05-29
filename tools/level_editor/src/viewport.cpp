@@ -19,11 +19,13 @@ layout(location = 0) in vec3 aPos;
 layout(location = 1) in vec3 aNormal;
 layout(location = 2) in vec2 aUV;
 layout(location = 3) in vec4 aTangent;
+layout(location = 4) in vec2 aLightmapUV;
 uniform mat4 uMVP;
 uniform mat4 uModel;
 out vec3 vNormal;
 out vec3 vWorldPos;
 out vec2 vUV;
+out vec2 vLightmapUV;
 out vec3 vTangent;
 out vec3 vBitangent;
 void main() {
@@ -34,6 +36,7 @@ void main() {
     vBitangent = cross(vNormal, vTangent) * aTangent.w;
     vWorldPos = (uModel * vec4(aPos, 1.0)).xyz;
     vUV = aUV;
+    vLightmapUV = aLightmapUV;
 }
 )";
 
@@ -53,6 +56,8 @@ uniform sampler2D uNormalMap;
 uniform int uHasNormalMap;  // 1 if normal map bound
 uniform sampler2D uSpecMap;
 uniform int uHasSpecMap;    // 1 if specular map bound
+uniform sampler2D uLightMap;
+uniform int uHasLightMap;   // 1 if lightmap texture bound
 
 // Lighting
 uniform vec3 uCamPos;
@@ -82,6 +87,7 @@ uniform float uAlpha;
 in vec3 vNormal;
 in vec3 vWorldPos;
 in vec2 vUV;
+in vec2 vLightmapUV;
 in vec3 vTangent;
 in vec3 vBitangent;
 out vec4 FragColor;
@@ -129,7 +135,11 @@ void main() {
     }
 
     // --- Full lighting (modes 1 and 3) ---
-    vec3 N = normalize(vNormal);
+    vec3 N = vNormal;
+    float nLen = length(N);
+    if (nLen < 0.001) N = vec3(0.0, 0.0, 1.0); // fallback for degenerate normals
+    else N = N / nLen;
+    if (!gl_FrontFacing) N = -N; // flip normal for back faces so they're lit correctly
     // Apply normal map if available (tangent-space -> world-space)
     if (uHasNormalMap != 0) {
         vec3 T = normalize(vTangent);
@@ -223,8 +233,18 @@ void main() {
         }
     }
 
+    // Lightmap contribution (replaces analytical lighting where available)
+    vec3 lightmapColor = vec3(1.0);
+    if (uHasLightMap != 0) {
+        lightmapColor = texture(uLightMap, vLightmapUV).rgb;
+    }
+
     // Combine all lighting contributions
     vec3 lighting = ambient + (sunContrib + fillContrib) * shadow + pointContrib + fresnelContrib;
+    if (uHasLightMap != 0) {
+        // Blend lightmap with analytical lighting: lightmap provides pre-baked GI
+        lighting = lighting * 0.3 + lightmapColor * 2.0;
+    }
 
     // Surface color
     vec3 baseColor = uColor;
@@ -359,6 +379,8 @@ bool Viewport::Init()
     m_LocHasNormalMap = glGetUniformLocation(m_ShaderProgram, "uHasNormalMap");
     m_LocSpecMap = glGetUniformLocation(m_ShaderProgram, "uSpecMap");
     m_LocHasSpecMap = glGetUniformLocation(m_ShaderProgram, "uHasSpecMap");
+    m_LocLightMap = glGetUniformLocation(m_ShaderProgram, "uLightMap");
+    m_LocHasLightMap = glGetUniformLocation(m_ShaderProgram, "uHasLightMap");
     m_LocAlpha = glGetUniformLocation(m_ShaderProgram, "uAlpha");
     for (int i = 0; i < MAX_POINT_LIGHTS; i++) {
         char buf[64];
@@ -1934,6 +1956,8 @@ void Viewport::Render(BSMDocument& doc, int selectedActor)
 
     // Draw BSP geometry (level shell — walls, floors, ceilings)
     if (!m_BSPGPU.empty()) {
+        // UE2 uses CW winding — set so gl_FrontFacing is correct in shader
+        glFrontFace(GL_CW);
         // Disable culling for BSP: interior environments need both face sides visible
         glDisable(GL_CULL_FACE);
 
@@ -1990,6 +2014,8 @@ void Viewport::Render(BSMDocument& doc, int selectedActor)
         glUniform1f(m_LocEmissive, 0.0f); // BSP is not emissive
         glUniform1i(m_LocHasNormalMap, 0); // BSP uses vertex normals only
         glUniform1i(m_LocHasSpecMap, 0);   // BSP no specular map
+        glUniform1i(m_LocLightMap, 4);     // lightmap on texture unit 4
+        glUniform1i(m_LocHasLightMap, 0);  // default off
         for (int ci = 0; ci < (int)m_BSPGPU.size(); ci++) {
             auto& gpu = m_BSPGPU[ci];
             if (gpu.vao == 0 || gpu.indexCount == 0) continue;
@@ -2047,6 +2073,14 @@ void Viewport::Render(BSMDocument& doc, int selectedActor)
                 glUniform1i(m_LocHasTexture, 0);
                 glUniform3f(m_LocColor, 0.45f, 0.45f, 0.50f);
             }
+            // Bind lightmap texture if available
+            if (gpu.lightMapId && !debugMode) {
+                glActiveTexture(GL_TEXTURE4);
+                glBindTexture(GL_TEXTURE_2D, gpu.lightMapId);
+                glUniform1i(m_LocHasLightMap, 1);
+            } else {
+                glUniform1i(m_LocHasLightMap, 0);
+            }
             glDrawElements(GL_TRIANGLES, gpu.indexCount, GL_UNSIGNED_SHORT, nullptr);
             m_DrawCalls++;
             m_TriCount += gpu.indexCount / 3;
@@ -2091,6 +2125,7 @@ void Viewport::Render(BSMDocument& doc, int selectedActor)
 
         if (wireframe)
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        glFrontFace(GL_CCW);    // Restore default
         glEnable(GL_CULL_FACE);
     }
 
@@ -2102,6 +2137,7 @@ void Viewport::Render(BSMDocument& doc, int selectedActor)
         glUniform1i(m_LocTexSampler, 0);
         glUniform1i(m_LocNormalMap, 2); // normal map on unit 2
         glUniform1i(m_LocSpecMap, 3);   // specular map on unit 3
+        glUniform1i(m_LocHasLightMap, 0); // no lightmap for actor meshes
         
         // Render all meshes with current view mode lighting
         int actorLitMode = 1;
@@ -2110,9 +2146,16 @@ void Viewport::Render(BSMDocument& doc, int selectedActor)
             case ViewMode::Unlit:        actorLitMode = 2; break;
             case ViewMode::Wireframe:    actorLitMode = 1; break;
             case ViewMode::LitNoTexture: actorLitMode = 3; break;
+            case ViewMode::SurfaceID:
+            case ViewMode::ZoneColor:
+            case ViewMode::LightmapScale:actorLitMode = 2; break; // unlit for debug modes
             default: break;
         }
         glUniform1i(m_LocLit, actorLitMode);
+        // UE2 uses CW winding — tell OpenGL so gl_FrontFacing is correct
+        glFrontFace(GL_CW);
+        // Disable backface culling: some meshes have mixed winding or need two-sided
+        glDisable(GL_CULL_FACE);
         for (int i = 0; i < (int)actors.size(); i++) {
             auto& a = actors[i];
             if (!a.visible) continue;
@@ -2145,8 +2188,6 @@ void Viewport::Render(BSMDocument& doc, int selectedActor)
             glUniformMatrix4fv(m_LocModel, 1, GL_FALSE, model.m);
             glBindVertexArray(gpu.vao);
 
-            // Two-sided materials (foliage, glass, FacingShaders)
-            if (gpu.isTwoSided) glDisable(GL_CULL_FACE);
 
             // Set emissive for self-illuminating meshes
             glUniform1f(m_LocEmissive, gpu.isEmissive ? 1.5f : 0.0f);
@@ -2190,7 +2231,6 @@ void Viewport::Render(BSMDocument& doc, int selectedActor)
                 glUniform1i(m_LocHasSpecMap, 0);
             }
             glDrawElements(GL_TRIANGLES, gpu.indexCount, GL_UNSIGNED_SHORT, nullptr);
-            if (gpu.isTwoSided) glEnable(GL_CULL_FACE);
             m_DrawCalls++;
             m_TriCount += gpu.indexCount / 3;
 
@@ -2210,6 +2250,8 @@ void Viewport::Render(BSMDocument& doc, int selectedActor)
                 glUniform1i(m_LocLit, actorLitMode);
             }
         }
+        glFrontFace(GL_CCW);    // Restore default front face
+        glEnable(GL_CULL_FACE); // Re-enable after actor meshes
         
         // Render actors with unmatched/missing meshes as wireframe boxes
         // In Game Preview mode: hide all placeholders (unless ShowUnknownActors is on)
@@ -2432,8 +2474,11 @@ void Viewport::UploadMeshes(const std::vector<ParsedMesh>& meshes, const std::st
         // UV: location 2, offset 24 bytes (after 6 floats)
         glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(MeshVertex), (void*)(6 * sizeof(float)));
         glEnableVertexAttribArray(2);
-        // Tangent: location 3, offset 32 bytes (after 8 floats: pos3+nrm3+uv2)
-        glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(MeshVertex), (void*)(8 * sizeof(float)));
+        // Lightmap UV: location 4, offset 32 bytes (after 8 floats: pos3+nrm3+uv2)
+        glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE, sizeof(MeshVertex), (void*)(8 * sizeof(float)));
+        glEnableVertexAttribArray(4);
+        // Tangent: location 3, offset 40 bytes (after 10 floats: pos3+nrm3+uv2+lmuv2)
+        glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(MeshVertex), (void*)(10 * sizeof(float)));
         glEnableVertexAttribArray(3);
         gpu.vertCount = (int)mesh.vertices.size();
         
@@ -2516,6 +2561,7 @@ void Viewport::UploadBSP(const std::vector<ParsedMesh>& bspMeshes, const std::st
     m_BSPGPU.clear();
 
     int bspTextured = 0;
+    int bspIdx = 0;
     for (auto& mesh : bspMeshes) {
         if (mesh.vertices.empty() || mesh.triangles.empty()) continue;
 
@@ -2561,6 +2607,26 @@ void Viewport::UploadBSP(const std::vector<ParsedMesh>& bspMeshes, const std::st
             }
         }
 
+        // Normalize lightmap UVs to [0,1] range within this chunk
+        // (temporary: until FLightMapIndex atlas rects are parsed)
+        {
+            float u2Min = 1e30f, u2Max = -1e30f, v2Min = 1e30f, v2Max = -1e30f;
+            for (auto& v : verts) {
+                if (v.u2 < u2Min) u2Min = v.u2;
+                if (v.u2 > u2Max) u2Max = v.u2;
+                if (v.v2 < v2Min) v2Min = v.v2;
+                if (v.v2 > v2Max) v2Max = v.v2;
+            }
+            float u2Range = u2Max - u2Min;
+            float v2Range = v2Max - v2Min;
+            if (u2Range > 0.001f && v2Range > 0.001f) {
+                for (auto& v : verts) {
+                    v.u2 = (v.u2 - u2Min) / u2Range;
+                    v.v2 = (v.v2 - v2Min) / v2Range;
+                }
+            }
+        }
+
         glGenVertexArrays(1, &gpu.vao);
         glGenBuffers(1, &gpu.vbo);
 
@@ -2574,8 +2640,11 @@ void Viewport::UploadBSP(const std::vector<ParsedMesh>& bspMeshes, const std::st
         glEnableVertexAttribArray(1);
         glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(MeshVertex), (void*)(6 * sizeof(float)));
         glEnableVertexAttribArray(2);
+        // Lightmap UV: location 4 (BSP lightmap texture coords)
+        glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE, sizeof(MeshVertex), (void*)(8 * sizeof(float)));
+        glEnableVertexAttribArray(4);
         // Tangent: location 3 (BSP has default tangents from MeshVertex struct)
-        glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(MeshVertex), (void*)(8 * sizeof(float)));
+        glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(MeshVertex), (void*)(10 * sizeof(float)));
         glEnableVertexAttribArray(3);
         gpu.vertCount = (int)verts.size();
 
@@ -2592,9 +2661,17 @@ void Viewport::UploadBSP(const std::vector<ParsedMesh>& bspMeshes, const std::st
         gpu.isWater = mesh.isWater;
         gpu.lightMapScale = mesh.lightMapScale;
         gpu.zoneIndex = mesh.zoneIndex;
+        // Look up lightmap texture from cache (uploaded as "LM_TextureNN")
+        if (!mesh.lightMapName.empty()) {
+            gpu.lightMapId = m_TextureCache.GetTexture(mesh.lightMapName);
+        }
         m_BSPGPU.push_back(gpu);
+        bspIdx++;
     }
-    printf("[Viewport] Uploaded %d BSP chunks to GPU (%d textured)\n", (int)m_BSPGPU.size(), bspTextured);
+    int bspLightmapped = 0;
+    for (auto& g : m_BSPGPU) { if (g.lightMapId) bspLightmapped++; }
+    printf("[Viewport] Uploaded %d BSP chunks to GPU (%d textured, %d lightmapped)\n",
+           (int)m_BSPGPU.size(), bspTextured, bspLightmapped);
     fflush(stdout);
 
     // Write BSP texture log to file for GUI debugging

@@ -1,10 +1,10 @@
 # True Co-op Implementation Plan
 ## BioShock Remastered — Full Shared-World Multiplayer
 
-**Status:** Planning (not started)  
+**Status:** Active — Resuming development (Ghost Co-op baseline working)  
 **Estimated Total Effort:** 8–12 weeks of focused work  
-**Prerequisite:** Current "Ghost Co-op" system (done)  
-**Last Updated:** May 13, 2026
+**Prerequisite:** Current "Ghost Co-op" system ✅ Done  
+**Last Updated:** May 26, 2026
 
 ---
 
@@ -397,4 +397,7 @@ Handle all the weird stuff that breaks.
    else builds on it. If it crashes, we know early.
 4. Test Phase 1 thoroughly before moving on.
 
-**This plan is parked until The War In Rapture and other mod work is done.**
+**This plan is now ACTIVE.** Gameplay mods (Goals 2–7) are all implemented.
+Level editor work is paused. Co-op is the primary development focus.
+
+Next step: Phase 1 — Freeze client AI. If this works cleanly, proceed to Phase 2.

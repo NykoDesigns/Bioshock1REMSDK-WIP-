@@ -116,7 +116,7 @@ SWAT 4's package format is well-documented by its modding community and should s
 | Field | Entry.bsm | Core.U | Match? |
 |-------|-----------|--------|--------|
 | Magic | 0x9E2A83C1 | 0x9E2A83C1 | YES |
-| File Version | 142 | 142 | YES |
+| File Version | 141 | 141 | YES |
 | Licensee Version | 56 | 56 | YES |
 | Name encoding | UTF-16LE | UTF-16LE | YES |
 | First name entry | "None" | "None" | YES |
@@ -125,7 +125,7 @@ SWAT 4's package format is well-documented by its modding community and should s
 **Header layout (confirmed):**
 ```
 +0x00: uint32 Magic           = 0x9E2A83C1
-+0x04: uint16 FileVersion     = 142
++0x04: uint16 FileVersion     = 141
 +0x06: uint16 LicenseeVersion = 56
 +0x08: uint32 PackageFlags
 +0x0C: int32  NameCount
@@ -338,13 +338,19 @@ Reverse-engineered via Ghidra decompilation + brute-force data correlation again
 | +72 | 4B | INT32 iRenderBound | UE2's +48 — 0 or -1 |
 | +76 | 1B | BYTE NodeFlags | UE2's +55 |
 | **+77** | **1B** | **BYTE iZone[0]** | **CONFIRMED 100% ZoneMask correlation** (back-side zone) |
-| +78 | 1B | BYTE iZone[1] | UE2's +53 — front-side zone (low correlation: may be unused) |
-| +79 | 1B | BYTE Pad | Alignment padding |
+| **+78** | **1B** | **BYTE NumVertices** | **CRITICAL: Was misidentified as iZone[1]. See bug note below.** |
+| +79 | 1B | BYTE iZone[1] / Pad | Front-side zone or alignment padding |
 | +80 | 4B | INT32 iLeaf[0] | UE2's +56 — leaf index (often -1) |
 | +84 | 4B | INT32 iLeaf[1] | UE2's +60 — leaf index (often -1) |
-| +88 | 4B | INT32 NumVertices | **Expanded from BYTE to INT32** (UE2's +54) |
+| +88 | 4B | INT32 (unknown) | **NOT NumVertices** — was wrongly used, purpose TBD |
 | +92 | 4B | INT32 iContentBound | **Vengeance-added** — increasing values, content index |
 | +96 | 4B | INT32 iRenderZone | **Vengeance-added** — small values 0-127 |
+
+**CRITICAL BUG FIX (2026):** NumVertices is at **BYTE offset +78**, NOT INT32 at +88.
+Reading INT32 at +88 produced garbage vertex counts (64% planarity failures, maxDist=37618).
+Reading BYTE at +78 gives 100% planarity match (0/7125 failures, maxDist=0.25 on 1-Medical).
+Confirmed via exhaustive probe of all 68 candidate byte offsets across 800 nodes.
+The field at +78 was originally misidentified as iZone[1] in Ghidra analysis. Commit: 6612df0.
 
 **Key discovery method:** Brute-force tested ALL byte offsets 52-99 for correlation with ZoneMask bit presence. Only byte offset +77 showed 100% match (4768/4768 polygon nodes on 1-Medical). Offset +96 (previously hypothesized as iZone) showed only 1% correlation.
 

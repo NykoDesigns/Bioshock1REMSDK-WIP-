@@ -27,4 +27,5 @@ std::vector<ParsedMesh> ParseBSPGeometry(const uint8_t* serialData, int serialSi
                                          const std::vector<std::string>& names,
                                          const std::vector<BSPExportInfo>& exports,
                                          const std::vector<std::string>& importNames,
-                                         std::vector<BSPTreeNodeOut>* outTree = nullptr);
+                                         std::vector<BSPTreeNodeOut>* outTree = nullptr,
+                                         const std::vector<std::string>* lightMapNames = nullptr);

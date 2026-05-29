@@ -31,7 +31,7 @@
 - **Gameplay Mods** — Decoy→Teleport, Chain Lightning, Friendly Bots, Rivet Pistol, Splicer Factions
 - **Mod Distribution** — winmm.dll proxy loader (no injector needed) + JSON config + packager script
 - **Co-op Framework** — UDP transport, player state sync, ghost puppet system, damage forwarding
-- **Level Editor** — Standalone BSM map viewer/editor with OpenGL 3.3 rendering, BSP geometry with zone-based visibility filtering (ZoneMask bit testing), 569 static meshes with textures, fly camera, distance culling, section clipping, actor picking/spawning/deletion, loading overlay, ImGui UI (scene tree, properties, content browser)
+- **Level Editor** — Standalone BSM map viewer/editor with OpenGL 3.3 rendering, BSP geometry with zone-based visibility filtering (ZoneMask bit testing), 662 meshes (569 inline + 93 glTF fallback), 4-pass actor-to-mesh linking (direct ref, import name, StaticMeshInstance, class-default mapping), PBR-lite lighting with 128 point lights, FXAA/SSAO/bloom/god rays post-processing, fly camera, distance culling, section clipping, actor picking/spawning/deletion, ImGui UI (scene tree, properties, content browser)
 
 ### Implemented Gameplay Mods
 
@@ -56,6 +56,8 @@ Build\Final\
   └── mod_config.json   ← Settings (editable, restart to apply)
 ```
 Package with: `.\scripts\package_mod.ps1 -Name "MyMod"`
+
+> **Want to make mods?** See **[MODDING_GUIDE.md](MODDING_GUIDE.md)** for a complete walkthrough — from console commands to Lua scripting to C++ modding.
 
 ### SDK Generator Output
 

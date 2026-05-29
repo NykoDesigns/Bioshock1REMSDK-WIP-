@@ -102,6 +102,9 @@ public:
     const std::vector<ParsedMesh>& GetBSPMeshes() const { return m_BSPMeshes; }
     bool HasBSP() const { return !m_BSPMeshes.empty(); }
 
+    // Lightmap atlas texture names in order (index 1 = [0], index 2 = [1], etc.)
+    const std::vector<std::string>& GetLightMapNames() const { return m_LightMapNames; }
+
     // BSP tree traversal for zone detection
     struct BSPTreeNode {
         float planeX, planeY, planeZ, planeW;
@@ -132,12 +135,14 @@ private:
     std::vector<ParsedMesh> m_Meshes;
     std::vector<ParsedMesh> m_BSPMeshes;
     std::vector<BSPTreeNode> m_BSPTree;
+    std::vector<std::string> m_LightMapNames; // lightmap atlas names in order (1-based index → [idx-1])
     std::unordered_map<std::string, int> m_MeshNameToIndex;
     std::vector<uint8_t> m_RawData;
 
     // Internal parse state
     struct ParsedExport {
         int classIndex;
+        int outerIndex; // parent export (1-based), 0 = top-level
         std::string className;
         std::string objectName;
         int serialSize;

@@ -692,54 +692,83 @@ INT32 Linked
 
 #### C.1.2 FBspNode (100 bytes, fixed)
 
+**Status:** Validated — 0/7125 planarity failures across all nodes on
+1-Medical after correcting the NumVertices field location.
+
 ```
 Offset  Size  Field
-0       16    FPlane Plane            (FVector + W float)
-16      16    QWORD ZoneMask[2]       (128-bit; truncated to 64-bit single QWORD on load)
-32      1    BYTE  NodeFlags
-33      ...   (alignment / padding)
-        4    INT   iVertPool
-        4    INT   iSurf
-        4    INT   iVertexIndex
-        4    INT   iCollisionBound
-        4    INT   iRenderBound
-        2    WORD  iZone[2]            (clamped to 0 if >= MAX_ZONES = 64)
-        1    BYTE  NumVertices
-        1    BYTE  iLeaf[2]
-        4    INT   iSection
-        4    INT   iFirstVertex
-        4    INT   iLightMap
-... (100 B total)
+0       16    FPlane Plane            (X, Y, Z, W — plane equation)
+16      16    QWORD ZoneMask[2]       (128-bit zone visibility bitmask)
+32      4     INT32 iVertPool         (index into FVert array)
+36      4     INT32 iSurf             (surface index)
+40      4     INT32 iBack             (back child node, -1 = leaf)
+44      4     INT32 iFront            (front child node, -1 = leaf)
+48      4     INT32 iPlane            (coplanar node index)
+52      12    FVector BoundOrigin     (Vengeance bounding sphere center)
+64      4     FLOAT BoundRadius       (Vengeance bounding sphere radius)
+68      4     INT32 iCollisionBound   (often -1)
+72      4     INT32 iRenderBound      (0 or -1)
+76      1     BYTE  NodeFlags
+77      1     BYTE  iZone[0]          (BACK-side zone index)
+78      1     BYTE  NumVertices       (**CRITICAL — see note below**)
+79      1     BYTE  iZone[1]          (FRONT-side zone index, or pad)
+80      4     INT32 iLeaf[0]          (often -1)
+84      4     INT32 iLeaf[1]          (often -1)
+88      4     INT32 (unknown)         (NOT NumVertices — see note)
+92      4     INT32 iContentBound
+96      4     INT32 iRenderZone       (0–127)
 ```
+
+**Critical bug note: NumVertices is at BYTE offset +78, NOT INT32 at +88.**
+The INT32 at +88 was incorrectly identified as NumVertices in initial Ghidra
+analysis. Reading it as INT32 produces garbage vertex counts (64% planarity
+failures, maxDist=37618). Reading BYTE at +78 gives 100% planarity match
+(0/7125 failures, maxDist=0.25). This was confirmed via exhaustive probe of
+all 68 candidate byte offsets across 800 nodes using plane-vertex distance
+validation.
 
 Bioshock ships **128-bit ZoneMask** because Vengeance's `MAX_ZONES = 128`.
 UE2.5 uses a single 64-bit QWORD (MAX_ZONES = 64). A UE2.5 loader should
-truncate to the lower 64 bits on load and clamp `iZone[0]/iZone[1]/iLeaf-iZone`
-to 0 when `>= 64`.
+truncate to the lower 64 bits on load and clamp zone indices to 0 when `>= 64`.
 
-`iLightMap`, `iSection`, `iFirstVertex` are typically cleared to `INDEX_NONE`
-after load — they should be rebuilt by the engine's render-data builder.
+The Vengeance-specific fields (BoundOrigin, BoundRadius at +52–67) are a
+per-node bounding sphere not present in stock UE2.5's 64-byte FBspNode.
 
-#### C.1.3 FBspSurf (52 B body + 8 B per-element Vengeance header)
+#### C.1.3 FBspSurf (variable body + 8 B per-element Vengeance header)
+
+**Status:** Validated — zero bad Vengeance headers on 0-Lighthouse (370 surfs),
+1-Medical (3386 surfs), 2-Fisheries (3724 surfs), 3-Arcadia (2906 surfs).
 
 ```
-8 B    per-element Vengeance header (check, sub_ver)
+8 B    per-element Vengeance header (INT32 check=4, INT32 sub_ver=1)
 
-CI     UObject* Material              (resolves to UShader/UTexture in package)
-CI     UObject* Actor                 (resolves to ABrush instance)
-INT32  PolyFlags
-INT32  pBase
-INT32  vNormal
-INT32  vTextureU
-INT32  vTextureV
-INT32  iLightMap
-INT32  iBrushPoly
-INT32  iZone[2]
-WORD   PanU
-WORD   PanV
-INT32  iLightmapIndex
-... (52 B body total)
+CI     UObject* Material              (CompactIndex, 1–3 bytes; UShader/UTexture)
+INT32  PolyFlags                      (4 B)
+INT32  pBase                          (4 B — index into Points array)
+INT32  vNormal                        (4 B — index into Vectors array)
+INT32  vTextureU                      (4 B — index into Vectors array)
+INT32  vTextureV                      (4 B — index into Vectors array)
+INT32  iBrushPoly                     (4 B — version >= 101)
+CI     UObject* Actor                 (CompactIndex, 1–3 bytes; ABrush ref)
+                                      [PanU/PanV SKIPPED — version >= 78]
+FPlane SurfNormal                     (16 B — version > 86; axis-aligned normals)
+FLOAT  LightMapScale                  (4 B — version >= 106; typically 8.0/16.0/32.0)
 ```
+
+**Typical total stride:** 56 bytes (with 2B material CI + 2B actor CI), but
+varies due to CompactIndex encoding. Large actor indices (e.g. 11135, 12168)
+require 3-byte CI encoding.
+
+**Key discovery: Actor ref is a CompactIndex AFTER iBrushPoly.** The order is
+Material → fixed fields → iBrushPoly → Actor → trailing fields. This was
+confirmed by analysis of UT2004 Engine.dll's `FBspSurf` serializer, which
+shows a version gate at `v >= 78` that SKIPS PanU/PanV entirely. BioShock
+(version 141) hits this gate.
+
+**The 20B block after Actor CI** contains: FPlane surface normal (16B, values
+are axis-aligned: -1.0, 0.0, 1.0) + FLOAT LightMapScale (4B, values:
+8.0, 16.0, 32.0). These are version-gated fields (v > 86 and v >= 106
+respectively), both always present in Bioshock.
 
 `Material` resolves through the pointer and is later flattened to a `UTexture`
 by a post-load pipeline (D.4) if the target renderer cannot evaluate
@@ -1111,6 +1140,80 @@ Discovered iteratively after initial mesh load implementation:
    `ColorStream.Colors` with `FColor(255, 255, 255, 255)` per vertex — opaque
    white is the neutral element under modulation. BSP rendering doesn't hit
    this because surf rendering uses a different shader path.
+
+#### C.4.3 StaticMeshInstance and BulkContent mesh data
+
+**Status:** Partial — structure identified, vertex data not extractable.
+
+Bioshock's baked BSM files contain `StaticMeshInstance` exports that reference
+per-placement mesh data stored in external **BulkContent (.blk)** files. These
+are NOT the same as `UStaticMesh` exports (C.4.1). Key differences:
+
+- **UStaticMesh** exports contain inline vertex/index/UV data and are fully
+  parseable (C.4.1). These cover map-specific static geometry.
+- **StaticMeshInstance** exports are ~100–300 byte stubs whose `outerIndex` is
+  typically 0 (top-level). They reference BulkData chunks in the per-level
+  `.blk` file containing the actual vertex/index buffers.
+
+Gameplay actors (`PlaceableVendingStation`, `PlaceableHealthStation`, etc.)
+reference their mesh via a `StaticMeshInstance` export, NOT a `UStaticMesh`
+export. The class default `StaticMesh` property (e.g.,
+`StaticMesh'ShockGame.MA_Vending.VendingWide'`) names a mesh that was baked
+into the level as a StaticMeshInstance — the named `VendingWide` does NOT
+exist as a standalone UStaticMesh export anywhere in the BSM or in any
+separate package file.
+
+**Architecture confirmation:**
+- Both original BioShock (2007) and BioShock Remastered use identical baked
+  BSM architecture — no separate `.upk` package files exist.
+- The `ShockGame` package is referenced only via imports; its content is baked
+  into each map.
+- UEViewer's `-export -nomesh` flag exports all inline UStaticMesh exports
+  successfully (587 on original 1-Medical, 611 on Remastered) but cannot
+  extract StaticMeshInstance BulkData.
+- Searching all 20+ BSMs across both game versions confirms `VendingWide`
+  never appears as a UStaticMesh export — only in sound effect names.
+
+**Workaround for a standalone editor:** Use placeholder meshes for gameplay
+actors whose real geometry is in BulkContent. Map the actor class name to the
+closest available inline UStaticMesh (e.g., `PlaceableVendingStation` →
+`ResStationBody`). This preserves correct placement (Location/Rotation) while
+showing approximate geometry.
+
+**To fully resolve:** Parse BulkContent `.blk` files alongside the BSM. The
+`.blk` files are 200+ MB per level and contain vertex/index buffers for all
+StaticMeshInstance exports. The BulkData offset/size would need to be extracted
+from the StaticMeshInstance's binary serialization body (not yet RE'd).
+
+#### C.4.4 Actor-to-mesh linking in a standalone parser
+
+A standalone BSM parser must link actors to their mesh geometry through
+multiple passes:
+
+1. **Direct export ref.** Actor property contains a positive integer
+   referencing a UStaticMesh export by index. Works for StaticMeshActor and
+   similar classes with per-instance mesh assignment.
+
+2. **Import mesh name matching.** Actor property references a negative import
+   index. The import's `ObjectName` is matched against loaded mesh names
+   (exact match first, then normalized: strip all underscores, lowercase).
+
+3. **StaticMeshInstance resolution.** The property references a
+   `StaticMeshInstance` export. Follow the outer chain to find a parent
+   `UStaticMesh` export. Fallback: scan the StaticMeshInstance's binary data
+   for CompactIndex references to UStaticMesh exports.
+
+4. **Class-default mesh mapping.** Gameplay classes (VendingStation,
+   HealthStation, TurretSpawner, etc.) have no per-instance mesh reference.
+   Their mesh is defined in the class's default properties (in external
+   packages). Map class names to known placeholder meshes.
+
+**Local class resolution.** The export table's `ClassIndex` field can be
+positive (referencing another export) for classes defined within the BSM
+itself. When `classIdx > 0`, resolve the class name from
+`exports[classIdx - 1].objectName`. Failure to do this collapses all locally-
+defined classes into a single "ExportClass" bucket, preventing proper actor
+classification.
 
 ### C.5 ULevel
 
@@ -1781,3 +1884,33 @@ Loading `5-Hephaestus.bsm` (Fort Frolic) with the full set of fixes:
 Load + render confirmed working across **Arcadia, Market, Fort Frolic,
 Hephaestus, Lighthouse, Medical, Welcome, Ryan, Resi** on both Windows XP and
 Windows 11, Debug and Release builds, with and without a debugger attached.
+
+### Per-map load stats — Standalone C++ Level Editor (1-Medical)
+
+Loading `1-Medical.bsm` with the standalone OpenGL editor (`BS1LevelEditor`):
+
+- 29,903 total exports parsed
+- 569 UStaticMesh exports parsed inline (from BSM binary)
+- 93 supplementary glTF meshes loaded (UEViewer export fallback)
+- 662 total unique meshes available
+- 7,125 BSP nodes (0 planarity failures)
+- 3,386 BSP surfs (0 bad Vengeance headers)
+- 4,065 actors linked by direct export mesh ref
+- 6 actors linked by import mesh name (normalized matching)
+- 84 actors linked by class-default mesh mapping
+- **4,155 total actors with mesh geometry** (of 29,903 exports)
+- 25,748 actors without mesh (non-visual: triggers, volumes, AI, script, etc.)
+- UE2 clockwise winding order (GL_CW) for correct front-face lighting
+- BSP + actor geometry rendered in Lit/Unlit/Wireframe/Lightmap debug views
+
+**Gameplay actor class-default mesh mapping** (placeholder assignments):
+- `PlaceableVendingStation` → `ResStationBody` (VendingWide in BulkContent)
+- `PlaceableHealthStation` → `ResStationBody` (Broken_Health in BulkContent)
+- `SecurityCameraSpawner` → `SmCamWallBase`
+- `TurretSpawner` → `Turret_Cover`
+- `FlowerVaseContainer` → `flower_vase` (extracted from original BioShock)
+- `MedHypoPickup` → `Health`
+- `EVEHypoPickup` → `eve_hypo_ad`
+
+**Known gap:** StaticMeshInstance BulkContent not parsed — ~147 import-
+referenced actors remain unresolved (their mesh geometry is in `.blk` files).

@@ -228,6 +228,7 @@ struct BSPSurf {
     int32_t vNormal;     // index into Vectors[] — surface normal
     int32_t vTextureU;   // index into Vectors[] — texture U axis
     int32_t vTextureV;   // index into Vectors[] — texture V axis
+    int32_t iLightMap;   // Lightmap texture atlas index: 0=none, 1-N = 1-based index into lightmap texture list
     // PanU/PanV NOT serialized for package version >= 78 (BioShock=141)
     // Pan offsets are baked into pBase. Confirmed by UT2004 Engine.dll JGE+0x34 skip.
     float lightMapScale;  // from 20B tail: FPlane(16B) + LightMapScale(4B)
@@ -258,6 +259,7 @@ static bool ParseSurfs(const uint8_t* data, size_t& pos, size_t endPos,
         memcpy(&surfs[i].vNormal,    data + pos + 8, 4);
         memcpy(&surfs[i].vTextureU,  data + pos + 12, 4);
         memcpy(&surfs[i].vTextureV,  data + pos + 16, 4);
+        memcpy(&surfs[i].iLightMap, data + pos + 20, 4);
         pos += 24;
 
         // CI Actor (variable length UObject reference)
@@ -315,7 +317,8 @@ std::vector<ParsedMesh> ParseBSPGeometry(const uint8_t* serialData, int serialSi
                                          const std::vector<std::string>& names,
                                          const std::vector<BSPExportInfo>& exports,
                                          const std::vector<std::string>& importNames,
-                                         std::vector<BSPTreeNodeOut>* outTree)
+                                         std::vector<BSPTreeNodeOut>* outTree,
+                                         const std::vector<std::string>* lightMapNames)
 {
     std::vector<ParsedMesh> results;
     if (serialSize < 200) return results;
@@ -636,6 +639,72 @@ std::vector<ParsedMesh> ParseBSPGeometry(const uint8_t* serialData, int serialSi
         printf("\n");
     }
 
+    // ─── Post-FVerts: navigate to LightMap array ───
+    // UModel layout after FVerts: SharedSides(TArray<int32>), NumZones(CI), Zone[](CI+16B each), 
+    // Polys(CI obj ref), LightMap(TArray), LightBits(TArray)
+    {
+        printf("[BSP-POST] Data remaining after FVerts: %d bytes at offset 0x%X\n",
+               (int)(endPos - pos), (int)pos);
+        size_t lmPos = pos;
+
+        // 1. SharedSides array: CI count + count*4 bytes
+        size_t br2;
+        int numSharedSides = ReadCompactIndex(serialData + lmPos, endPos - lmPos, br2);
+        lmPos += br2;
+        printf("[BSP-POST] NumSharedSides=%d at 0x%X\n", numSharedSides, (int)(lmPos - br2));
+        if (numSharedSides > 0 && numSharedSides < 10000000)
+            lmPos += (size_t)numSharedSides * 4;
+
+        // 2. NumZones + zone data
+        int numZones = ReadCompactIndex(serialData + lmPos, endPos - lmPos, br2);
+        size_t zoneStart = lmPos + br2;
+        lmPos = zoneStart;
+        printf("[BSP-POST] NumZones=%d at 0x%X\n", numZones, (int)(zoneStart - br2));
+
+        // Probe: try different zone fixed-data sizes (CI + N bytes per zone)
+        for (int fixedSize : {16, 24, 32, 40, 48, 64}) {
+            size_t tryPos = zoneStart;
+            bool valid = true;
+            for (int z = 0; z < numZones && tryPos + 1 < endPos; z++) {
+                ReadCompactIndex(serialData + tryPos, endPos - tryPos, br2);
+                tryPos += br2 + fixedSize;
+                if (tryPos > endPos) { valid = false; break; }
+            }
+            if (!valid) continue;
+            // Read next CI after zones - should be Polys ref (small number like export index)
+            int nextCI = ReadCompactIndex(serialData + tryPos, endPos - tryPos, br2);
+            printf("[BSP-POST] Zone fixedSize=%d: ends at 0x%X, next CI=%d\n",
+                   fixedSize, (int)tryPos, nextCI);
+        }
+
+        // Use fixedSize that gives a plausible Polys ref (positive, < numExports)
+        // Try 16B (standard UE2: 8B connectivity + 8B visibility)
+        for (int z = 0; z < numZones && lmPos + 1 < endPos; z++) {
+            ReadCompactIndex(serialData + lmPos, endPos - lmPos, br2);
+            lmPos += br2 + 16;
+        }
+        printf("[BSP-POST] After zones (16B): pos=0x%X\n", (int)lmPos);
+
+        // 3. Polys object reference (CI)
+        int polysRef = ReadCompactIndex(serialData + lmPos, endPos - lmPos, br2);
+        lmPos += br2;
+        printf("[BSP-POST] Polys ref=%d at 0x%X\n", polysRef, (int)(lmPos - br2));
+
+        // 4. LightMap TArray - this should be the lightmap index array
+        int numLightMaps = ReadCompactIndex(serialData + lmPos, endPos - lmPos, br2);
+        lmPos += br2;
+        printf("[BSP-POST] LightMap count=%d at 0x%X\n", numLightMaps, (int)(lmPos - br2));
+
+        // Dump first few entries to determine element structure
+        if (numLightMaps > 0 && numLightMaps < 100000) {
+            printf("[BSP-POST] First 64 bytes of LightMap data:\n  ");
+            for (int b = 0; b < 64 && lmPos + b < endPos; b++)
+                printf("%02X ", serialData[lmPos + b]);
+            printf("\n");
+        }
+
+    }
+
     // NOTE: Lightmap textures in BioShock are stored as stripped UTexture exports in LightMaps_BSP
     // package. Their pixel data resides in .PackagePatch bulk files, not inline in the .bsm.
     // After FVerts: NumSharedSides(16968), NumZones(73), then zone data follows.
@@ -673,6 +742,19 @@ std::vector<ParsedMesh> ParseBSPGeometry(const uint8_t* serialData, int serialSi
                        ux, uy, uz, uMag, vx, vy, vz, vMag);
             }
         }
+        // iLightMap field analysis (lightmap atlas index per surface)
+        int lm0 = 0;
+        std::unordered_map<int, int> lmIdxDist;
+        for (auto& s : surfs) {
+            if (s.iLightMap == 0) { lm0++; continue; }
+            lmIdxDist[s.iLightMap]++;
+        }
+        printf("[BSP-LM] iLightMap: %d surfaces with no LM, %d unique LM indices used\n",
+               lm0, (int)lmIdxDist.size());
+        printf("[BSP-LM] LM index distribution: ");
+        for (auto& kv : lmIdxDist) printf("lm%d=%d ", kv.first, kv.second);
+        printf("\n");
+
         // LightMapScale distribution
         int lmZero = 0, lmSmall = 0, lmMed = 0, lmLarge = 0, lmHuge = 0;
         float lmMin = 1e9f, lmMax = 0.0f;
@@ -700,6 +782,8 @@ std::vector<ParsedMesh> ParseBSPGeometry(const uint8_t* serialData, int serialSi
         float lightMapScaleSum = 0.0f;
         int lightMapScaleCount = 0;
         uint8_t zoneIndex = 0;
+        int32_t lightMapIndex = 0; // dominant lightmap atlas index for this group
+        std::string lightMapName;  // resolved cache key (e.g. "LM_Texture49")
     };
     std::unordered_map<int64_t, MaterialGroup> groups; // key: materialRef * 256 + iZone
 
@@ -749,10 +833,21 @@ std::vector<ParsedMesh> ParseBSPGeometry(const uint8_t* serialData, int serialSi
         auto& group = groups[groupKey];
         group.zoneIndex = node.iZone;
 
-        // Accumulate lightmap scale from surface
+        // Accumulate lightmap scale and index from surface
         if (surf && surf->lightMapScale > 0.0f && surf->lightMapScale < 1e6f) {
             group.lightMapScaleSum += surf->lightMapScale;
             group.lightMapScaleCount++;
+        }
+        if (surf && surf->iLightMap > 0 && group.lightMapIndex == 0) {
+            group.lightMapIndex = surf->iLightMap;
+            // Resolve lightmap texture cache key from name list
+            if (lightMapNames && surf->iLightMap <= (int)lightMapNames->size()) {
+                // BSM export name: "Texture_49" → catalog name: "Texture49" → cache: "LM_Texture49"
+                std::string bsmName = (*lightMapNames)[surf->iLightMap - 1];
+                std::string catName;
+                for (char c : bsmName) { if (c != '_') catName += c; }
+                group.lightMapName = "LM_" + catName;
+            }
         }
 
         // Accumulate zone visibility: OR node's mask into group's mask
@@ -766,6 +861,8 @@ std::vector<ParsedMesh> ParseBSPGeometry(const uint8_t* serialData, int serialSi
                 chunk.name = "__BSP__";
                 chunk.textureName = StripShaderSuffix(group.matName);
                 chunk.lightMapScale = group.lightMapScaleCount > 0 ? group.lightMapScaleSum / group.lightMapScaleCount : 0.0f;
+                chunk.lightMapIndex = group.lightMapIndex;
+                chunk.lightMapName = group.lightMapName;
                 chunk.zoneIndex = group.zoneIndex;
                 memcpy(chunk.zoneMask, group.zoneMask, 16);
                 chunk.vertices = std::move(group.vertices);
@@ -844,6 +941,10 @@ std::vector<ParsedMesh> ParseBSPGeometry(const uint8_t* serialData, int serialSi
                 float dz = mv.z - baseZ;
                 mv.u = dx * texUx + dy * texUy + dz * texUz;
                 mv.v = dx * texVx + dy * texVy + dz * texVz;
+                // Lightmap UVs: texture UVs divided by lightMapScale (gives texel coords)
+                float lmScale = (surf && surf->lightMapScale > 0.0f) ? surf->lightMapScale : 32.0f;
+                mv.u2 = mv.u / lmScale;
+                mv.v2 = mv.v / lmScale;
                 // Tangent from texture U axis (normalized)
                 float tlen = std::sqrt(texUx*texUx + texUy*texUy + texUz*texUz);
                 if (tlen > 0.001f) { mv.tx = texUx/tlen; mv.ty = texUy/tlen; mv.tz = texUz/tlen; }
@@ -852,6 +953,8 @@ std::vector<ParsedMesh> ParseBSPGeometry(const uint8_t* serialData, int serialSi
             } else {
                 mv.u = 0;
                 mv.v = 0;
+                mv.u2 = 0;
+                mv.v2 = 0;
                 mv.tx = 1; mv.ty = 0; mv.tz = 0; mv.tw = 1;
             }
 
@@ -912,6 +1015,8 @@ std::vector<ParsedMesh> ParseBSPGeometry(const uint8_t* serialData, int serialSi
         chunk.textureName = strippedName;
         chunk.isWater = isWaterSurf;
         chunk.lightMapScale = group.lightMapScaleCount > 0 ? group.lightMapScaleSum / group.lightMapScaleCount : 0.0f;
+        chunk.lightMapIndex = group.lightMapIndex;
+        chunk.lightMapName = group.lightMapName;
         chunk.zoneIndex = group.zoneIndex;
         memcpy(chunk.zoneMask, group.zoneMask, 16);
         chunk.vertices = std::move(group.vertices);

@@ -18,6 +18,37 @@
 
 extern void LogMsg(const char* msg);
 
+// Write raw DXT1 data as a .dds file (for lightmap verification)
+static void WriteDXT1DDS(const std::string& path, const uint8_t* data, int w, int h)
+{
+    std::ofstream f(path, std::ios::binary);
+    if (!f.is_open()) return;
+    // DDS magic
+    uint32_t magic = 0x20534444; // "DDS "
+    f.write((char*)&magic, 4);
+    // DDS_HEADER (124 bytes)
+    uint8_t hdr[124] = {};
+    auto* h32 = (uint32_t*)hdr;
+    h32[0] = 124;                          // dwSize
+    h32[1] = 0x1 | 0x2 | 0x4 | 0x1000 | 0x80000; // flags: CAPS|HEIGHT|WIDTH|PIXELFORMAT|LINEARSIZE
+    h32[2] = (uint32_t)h;                  // dwHeight
+    h32[3] = (uint32_t)w;                  // dwWidth
+    h32[4] = ((w + 3) / 4) * ((h + 3) / 4) * 8; // dwPitchOrLinearSize
+    h32[5] = 0;                            // dwDepth
+    h32[6] = 1;                            // dwMipMapCount
+    // DDS_PIXELFORMAT at offset 76 (19 dwords from start)
+    auto* pf = (uint32_t*)(hdr + 76);
+    pf[0] = 32;                            // pfSize
+    pf[1] = 0x4;                           // DDPF_FOURCC
+    pf[2] = 0x31545844;                    // 'DXT1'
+    // dwCaps at offset 108
+    h32[27] = 0x1000;                      // DDSCAPS_TEXTURE
+    f.write((char*)hdr, 124);
+    // Mip0 data
+    int mip0Size = ((w + 3) / 4) * ((h + 3) / 4) * 8;
+    f.write((char*)data, mip0Size);
+}
+
 bool App::Init(const char* mapPath)
 {
     LogMsg("[App] Init start");
@@ -64,6 +95,10 @@ bool App::Init(const char* mapPath)
     // Viewport
     if (!m_Viewport.Init()) { LogMsg("[App] Viewport init FAILED"); return false; }
 
+    // Thumbnail renderer for content browser mesh previews
+    if (!m_ThumbnailRenderer.Init(128)) { LogMsg("[App] Thumbnail renderer init failed (non-fatal)"); }
+    m_ContentBrowser.SetThumbnailRenderer(&m_ThumbnailRenderer);
+
     m_Running = true;
     LogMsg("[App] Viewport init done, loading map...");
 
@@ -102,9 +137,40 @@ bool App::Init(const char* mapPath)
         LogMsg("[App] Uploading meshes to GPU...");
         m_Viewport.UploadMeshes(m_Document.GetMeshes(), texDir);
         LogMsg("[App] Meshes uploaded");
+
+        // Upload lightmap textures AFTER UploadMeshes (which clears cache) but BEFORE UploadBSP
+        {
+            std::string mapPath = m_Document.GetFilePath();
+            size_t mapsPos = mapPath.find("Maps");
+            if (mapsPos != std::string::npos) {
+                std::string baseDir = mapPath.substr(0, mapsPos);
+                std::string bdcPath = baseDir + "BulkContent\\Catalog.bdc";
+                if (m_Catalog.Load(bdcPath)) {
+                    printf("[App] Catalog loaded: %d entries\n", m_Catalog.GetEntryCount());
+                    std::string mapShort = m_Document.GetMapName();
+                    { size_t dp = mapShort.find_last_of('.'); if (dp != std::string::npos) mapShort = mapShort.substr(0, dp); }
+                    auto lmEntries = m_Catalog.FindByPackage(mapShort);
+                    printf("[App] Lightmap textures in '%s': %d\n", mapShort.c_str(), (int)lmEntries.size());
+                    int uploaded = 0;
+                    for (auto* entry : lmEntries) {
+                        auto data = m_Catalog.ReadBulkData(entry->objectName, m_Catalog.GetBulkDir());
+                        if (!data.empty() && data.size() >= 524288) {
+                            std::string lmName = "LM_" + entry->objectName;
+                            if (m_Viewport.GetTextureCache().UploadDXT1(lmName, data.data(), 1024, 1024))
+                                uploaded++;
+                        }
+                    }
+                    printf("[App] Uploaded %d/%d lightmap textures to GPU\n", uploaded, (int)lmEntries.size());
+                }
+            }
+        }
+
         if (m_Document.HasBSP())
             m_Viewport.UploadBSP(m_Document.GetBSPMeshes(), texDir);
         m_ContentBrowser.ScanDirectory(m_ExportDir);
+        m_ThumbnailRenderer.SetTextureCache(&m_Viewport.GetTextureCache());
+        m_ThumbnailRenderer.SetTextureDir(texDir);
+        m_ThumbnailRenderer.SetMeshes(m_Document.GetMeshes());
 
         // Extract point lights from BSM Light actors for viewport rendering
         m_Viewport.m_SceneLights.clear();
@@ -557,6 +623,9 @@ void App::ProcessEvents()
 
 void App::Update(float dt)
 {
+    // Progressive thumbnail generation (4 per frame)
+    m_ThumbnailRenderer.GenerateBatch(4);
+
     // Autosave timer
     if (m_AutosaveEnabled && m_Document.IsLoaded() && !m_LayoutPath.empty()) {
         m_AutosaveTimer += dt;
@@ -860,7 +929,34 @@ void App::RenderUI()
         ImGui::End();
     }
 
-    // Handle spawn request from content browser
+    // Handle drag-and-drop from content browser into viewport
+    {
+        // Check if an ImGui drag-drop is active with our payload type
+        const ImGuiPayload* payload = ImGui::GetDragDropPayload();
+        if (payload && payload->IsDataType("MESH_ASSET")) {
+            // Show visual feedback: tinted overlay when dragging over viewport area
+            ImGuiIO& io = ImGui::GetIO();
+            if (!ImGui::IsAnyItemHovered() && !ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow)) {
+                // Mouse is over the viewport (not over any ImGui window)
+                ImDrawList* fg = ImGui::GetForegroundDrawList();
+                fg->AddRectFilled(ImVec2(io.MousePos.x - 30, io.MousePos.y - 10),
+                                  ImVec2(io.MousePos.x + 120, io.MousePos.y + 14),
+                                  IM_COL32(40, 40, 40, 200), 4.0f);
+                const char* meshName = (const char*)payload->Data;
+                fg->AddText(ImVec2(io.MousePos.x - 24, io.MousePos.y - 8),
+                           IM_COL32(100, 220, 100, 255), meshName);
+
+                // On mouse release, spawn the mesh
+                if (ImGui::IsMouseReleased(0)) {
+                    std::string name((const char*)payload->Data);
+                    SpawnMeshActor(name);
+                    printf("[App] Drag-dropped '%s' into viewport\n", name.c_str());
+                }
+            }
+        }
+    }
+
+    // Handle spawn request from content browser (double-click fallback)
     if (m_ContentBrowser.WantsSpawn()) {
         SpawnMeshActor(m_ContentBrowser.GetSpawnMesh());
         m_ContentBrowser.ConsumeSpawn();
@@ -1565,6 +1661,8 @@ void App::OpenFileDialog()
                 double cx = 0, cy = 0, cz = 0;
                 int validCount = 0;
                 for (auto& a : actors) {
+                    // Only use actors with parsed Location for centering
+                    if (!a.hasLocation) continue;
                     // Skip actors with bogus coords
                     if (std::isnan(a.location.x) || std::isnan(a.location.y) || std::isnan(a.location.z)) continue;
                     if (std::abs(a.location.x) > 500000.0f || std::abs(a.location.y) > 500000.0f || std::abs(a.location.z) > 500000.0f) continue;
@@ -1604,6 +1702,9 @@ void App::OpenFileDialog()
             if (m_Document.HasBSP())
                 m_Viewport.UploadBSP(m_Document.GetBSPMeshes(), texDir2);
             m_ContentBrowser.ScanDirectory(m_ExportDir);
+            m_ThumbnailRenderer.SetTextureCache(&m_Viewport.GetTextureCache());
+            m_ThumbnailRenderer.SetTextureDir(texDir2);
+            m_ThumbnailRenderer.SetMeshes(m_Document.GetMeshes());
         } else {
             printf("[App] FAILED to load!\n");
         }

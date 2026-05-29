@@ -242,6 +242,46 @@ void RenderCoopOverlay()
         colOuter, 2.0f
     );
 
+    // ─── Facing direction indicator ───
+    // Draw a small arrow showing which way the remote player is looking
+    {
+        // Remote yaw relative to local camera's yaw (both in degrees)
+        float relYaw = (s_RemoteState.rotYaw - s_CamYaw) * DEG2RAD;
+        // In screen space: right = +X, up = -Y
+        // UE2 yaw: 0 = forward (+X in world), 90 = left (+Y in world)
+        // After subtracting camera yaw, 0 means "same direction as camera"
+        // Screen mapping: camera forward = up on screen (-Y)
+        float arrowDirX = sinf(relYaw);    // left/right on screen
+        float arrowDirY = -cosf(relYaw);   // up/down (negative = up = forward)
+
+        float arrowLen = 18.0f * scale;
+        float arrowTipX = center.x + arrowDirX * arrowLen;
+        float arrowTipY = center.y + arrowDirY * arrowLen;
+
+        // Arrow shaft
+        dl->AddLine(
+            center,
+            ImVec2(arrowTipX, arrowTipY),
+            IM_COL32(0, 255, 180, 200), 2.5f * scale
+        );
+
+        // Arrowhead (two short wings)
+        float headLen = 6.0f * scale;
+        float baseAngle = atan2f(arrowDirY, arrowDirX);
+        dl->AddLine(
+            ImVec2(arrowTipX, arrowTipY),
+            ImVec2(arrowTipX - cosf(baseAngle - 0.5f) * headLen,
+                   arrowTipY - sinf(baseAngle - 0.5f) * headLen),
+            IM_COL32(0, 255, 180, 200), 2.0f * scale
+        );
+        dl->AddLine(
+            ImVec2(arrowTipX, arrowTipY),
+            ImVec2(arrowTipX - cosf(baseAngle + 0.5f) * headLen,
+                   arrowTipY - sinf(baseAngle + 0.5f) * headLen),
+            IM_COL32(0, 255, 180, 200), 2.0f * scale
+        );
+    }
+
     // ─── Vertical line from marker to floor (depth cue) ───
     float lineLen = 30.0f * scale;
     dl->AddLine(

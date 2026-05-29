@@ -1,6 +1,6 @@
 # BioShock 1 Remastered — Co-op Multiplayer Feasibility Study
 
-## Status: Research Phase
+## Status: Active Implementation — Ghost Co-op working, True Co-op next
 
 ## Executive Summary
 

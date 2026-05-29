@@ -36,6 +36,9 @@ void (APIENTRY *glGetProgramInfoLog)(GLuint, GLsizei, GLsizei*, GLchar*) = nullp
 void (APIENTRY *glGenerateMipmap)(GLenum) = nullptr;
 void (APIENTRY *glActiveTexture)(GLenum) = nullptr;
 
+// Compressed texture
+void (APIENTRY *glCompressedTexImage2D)(GLenum, GLint, GLenum, GLsizei, GLsizei, GLint, GLsizei, const void*) = nullptr;
+
 // Framebuffer
 void (APIENTRY *glGenFramebuffers)(GLsizei, GLuint*) = nullptr;
 void (APIENTRY *glDeleteFramebuffers)(GLsizei, const GLuint*) = nullptr;
@@ -88,6 +91,7 @@ bool LoadGLFunctions()
     LOAD(glGetProgramInfoLog);
     LOAD(glGenerateMipmap);
     LOAD(glActiveTexture);
+    LOAD(glCompressedTexImage2D);
     LOAD(glGenFramebuffers);
     LOAD(glDeleteFramebuffers);
     LOAD(glBindFramebuffer);

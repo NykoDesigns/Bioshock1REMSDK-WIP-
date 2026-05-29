@@ -28,13 +28,14 @@ from The War In Rapture Python mod into this SDK.
 | Vending machine unlocks | INI patching (per-deck vending tables) | `ini_config.py` |
 
 ### What we already have:
-- `bsm_tool v0.3.0` — Full BSM parsing with property deserialization
+- `bsm_tool v0.5.0` — Full BSM parsing with property deserialization, spawn patching, AI type editing
+- `ini_tool v2.0.0` — INI parser + patcher + IBF extract/repack
 - ProcessEvent hook — Can intercept all game events at runtime
 
 ### What we need to implement:
-1. **BSM Writer** — Port `bsm_spawn_patcher.py`'s export cloning + header rewrite to C++
-2. **INI Patcher tool** — Port INI round-trip parser from `ini_config.py` (or new `ini_tool`)
-3. **IBF Extractor** — Port `ibf_extract.py` to C++ for accessing ConfigINI.IBF
+1. **BSM Writer** — Port `bsm_spawn_patcher.py`'s export cloning + header rewrite to C++ (bsm_tool `patch` command done)
+2. ~~**INI Patcher tool**~~ — ✅ Done (ini_tool v2.0.0)
+3. ~~**IBF Extractor**~~ — ✅ Done (ini_tool `extract`/`repack` commands)
 
 ### Implementation approach:
 - **Option A (Offline):** Standalone tools that patch .bsm and .INI files before game launch
@@ -49,6 +50,8 @@ from The War In Rapture Python mod into this SDK.
 instead of Security Bullseye for teleport.
 
 **Feasibility: ✅ CONFIRMED — Decoy already places actor at a location**
+
+**Status: ✅ IMPLEMENTED** — `src/gameplay/decoy_teleport.cpp`. Hook intercepts DecoyHumanAbility.UseAbility, teleports player to spawn position instead of creating decoy clone.
 
 ### How Decoy works (from ShockGame.U analysis):
 - Class: `DecoyHumanAbility` (Export #218)
@@ -91,6 +94,8 @@ instead of Security Bullseye for teleport.
 bots directly instead of tagging enemies, with a hard cap of 3 bots.
 
 **Feasibility: ✅ CONFIRMED — SpawnSecurityBot + IsFriendly exist**
+
+**Status: ✅ IMPLEMENTED** — `src/gameplay/friendly_bots.cpp`. Security Command spawns friendly bots with 3-bot hard cap (oldest recycled).
 
 ### How Security Beacon currently works:
 - Class: `SecurityBeaconAbility` (Export #404)
@@ -169,6 +174,8 @@ static std::vector<UObject*> g_friendlyBots;
 
 **Feasibility: ✅ CONFIRMED — ProjectileClass swappable at runtime**
 
+**Status: ✅ IMPLEMENTED** — `src/gameplay/rivet_pistol.cpp`. Toggleable via console command, swaps Pistol projectile to Rosie rivet.
+
 ### How weapon projectiles work:
 - Each weapon ammo type has a `ProjectileClass` (ClassProperty)
 - `GetProjectileClass` function returns what to spawn when firing
@@ -204,6 +211,8 @@ static std::vector<UObject*> g_friendlyBots;
 **What:** Create two splicer groups that fight each other.
 
 **Feasibility: ✅ CONFIRMED — AI already has friendship/enemy targeting system**
+
+**Status: ✅ IMPLEMENTED** — `src/gameplay/splicer_factions.cpp`. Tags splicers into factions via AddForcedEnemy.
 
 ### Existing AI systems (from ShockAI.U):
 - `IsFriendly` / `PawnIsFriendly` — Check if two pawns are friendly
@@ -241,6 +250,8 @@ static std::vector<UObject*> g_friendlyBots;
 Static Discharge / Electric Body gene tonic.
 
 **Feasibility: ✅ CONFIRMED — Electro Bolt + radius damage + area search all exist**
+
+**Status: ✅ IMPLEMENTED** — `src/gameplay/chain_lightning.cpp`. Configurable radius/jumps/falloff, chains to nearby enemies on Electro Bolt hit.
 
 ### Existing systems:
 - `ElectricBoltAbility` (Export #493) — Base electro bolt plasmid
@@ -285,13 +296,13 @@ ChainDelay     = 100ms between jumps (visual effect)
 
 | # | Goal | Effort | Dependencies | Priority |
 |---|------|--------|-------------|----------|
-| 1 | Absorb War In Rapture | HIGH (BSM writer + INI tool) | bsm_tool, ibf_tool | 🔴 Critical |
-| 2 | Decoy → Teleport | LOW (PE hook, ~100 lines) | ProcessEvent already working | 🟢 Quick win |
-| 3 | Security → Friendly Bots | MEDIUM (spawn + track + limit) | ProcessEvent, actor spawning | 🟡 Medium |
-| 4 | Custom splicer types | MEDIUM (BSM property edit) | Goal 1 (BSM writer) | 🟡 Medium |
-| 5 | Revolver → Rivets | LOW (property swap, ~50 lines) | Runtime UObject access | 🟢 Quick win |
-| 6 | Splicer factions | MEDIUM (AI hook + tracking) | ProcessEvent, AI function calls | 🟡 Medium |
-| 7 | Chain Lightning | MEDIUM (damage hook + radius search) | ProcessEvent, GObjects iteration | 🟡 Medium |
+| 1 | Absorb War In Rapture | HIGH (BSM writer + INI tool) | bsm_tool, ini_tool | � Partially done (tools built, BSM patch command works) |
+| 2 | Decoy → Teleport | LOW (PE hook, ~100 lines) | ProcessEvent | ✅ **DONE** |
+| 3 | Security → Friendly Bots | MEDIUM (spawn + track + limit) | ProcessEvent, actor spawning | ✅ **DONE** |
+| 4 | Custom splicer types | MEDIUM (BSM property edit) | bsm_tool setaitype | ✅ **DONE** (bsm_tool aitypes/setaitype) |
+| 5 | Revolver → Rivets | LOW (property swap, ~50 lines) | Runtime UObject access | ✅ **DONE** |
+| 6 | Splicer factions | MEDIUM (AI hook + tracking) | ProcessEvent, AI function calls | ✅ **DONE** |
+| 7 | Chain Lightning | MEDIUM (damage hook + radius search) | ProcessEvent, GObjects iteration | ✅ **DONE** |
 
 ### Recommended start order:
 1. **Goal 2** (Decoy teleport) — Quick win, demonstrates plasmid hijacking on a new target

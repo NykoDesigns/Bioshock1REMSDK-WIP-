@@ -62,8 +62,28 @@ parse_test.cpp    → Standalone parsing validation tool
 2. **Actor extraction** — Reads tagged properties (Location, Rotation, DrawScale, StaticMesh ref, Light properties)
 3. **StaticMesh parsing** — 48B vertex stride (pos+normal+tangent), separate UV streams, uint16 indices
 4. **BSP geometry** — UModel export: Vectors → Points → Nodes (100B each) → Surfs (variable) → Verts (8B each)
-5. **Texture resolution** — Maps material names to TGA files via UEViewer export directory
-6. **GPU upload** — VAO/VBO/IBO per mesh chunk, textures to GL_TEXTURE_2D
+5. **glTF fallback loading** — Loads pre-exported meshes from UEViewer export dir (93 supplementary on 1-Medical)
+6. **Actor-to-mesh linking** (4-pass):
+   - Pass 1: Direct export ref (positive index → UStaticMesh export)
+   - Pass 2: Import mesh name matching (normalized: strip underscores + lowercase)
+   - Pass 3: StaticMeshInstance resolution (outer chain follow + binary scan fallback)
+   - Pass 4: Class-default mesh mapping (gameplay classes → known placeholder meshes)
+7. **Texture resolution** — Maps material names to TGA files via UEViewer export directory
+8. **GPU upload** — VAO/VBO/IBO per mesh chunk, textures to GL_TEXTURE_2D
+
+### Actor-to-Mesh Class Defaults
+Gameplay actors without per-instance mesh refs use class-default placeholders:
+| Actor Class | Placeholder Mesh | Real Mesh (in BulkContent) |
+|-------------|-----------------|---------------------------|
+| PlaceableVendingStation | ResStationBody | VendingWide |
+| PlaceableHealthStation | ResStationBody | Broken_Health |
+| SecurityCameraSpawner | SmCamWallBase | — |
+| TurretSpawner | Turret_Cover | — |
+| FlowerVaseContainer | flower_vase | — |
+| MedHypoPickup | Health | — |
+| EVEHypoPickup | eve_hypo_ad | — |
+
+**Local class resolution fix:** When `classIdx > 0` in export table, resolve class name from `exports[classIdx-1].objectName`. Without this, all locally-defined classes collapse into "ExportClass".
 
 ---
 
@@ -76,7 +96,9 @@ Fully reverse-engineered BioShock's Vengeance-engine BSP format:
 - **FVert** (8 bytes): INT32 pVertex + INT32 iSide
 - **Zone visibility**: 128-bit bitmask per node, camera zone detection via BSP tree traversal
 
-Key stats (1-Medical.bsm): 7125 nodes, 3386 surfs, 590 vectors, 11652 points → 29726 vertices, 17706 triangles in 379 material chunks
+Key stats (1-Medical.bsm): 7125 nodes (0 planarity failures), 3386 surfs (0 bad Vengeance headers), 590 vectors, 11652 points → 29726 vertices, 17706 triangles in 379 material chunks
+
+Total meshes: 569 inline UStaticMesh + 93 glTF fallback = 662 unique meshes. 4,155 actors linked to mesh geometry.
 
 ---
 
@@ -207,11 +229,16 @@ Applied in fullscreen pass after scene render:
 - UV precision fix: large UV offsets shifted near zero to avoid GPU interpolation artifacts
 
 ### Stats (1-Medical)
-- 471/569 meshes textured
+- 569 inline UStaticMesh + 93 glTF fallback meshes loaded
+- 471/569 inline meshes textured
 - 58 normal-mapped meshes
 - 32 specular-mapped meshes
 - 361/379 BSP chunks textured
 - 765 point lights extracted
+- 4,065 actors linked by direct export ref
+- 6 actors linked by import name (normalized)
+- 84 actors linked by class-default mapping
+- ~147 import-referenced actors unresolved (BulkContent gap)
 
 ---
 

@@ -115,39 +115,105 @@ static std::vector<SimpleProp> ParsePropsMinimal(const uint8_t* data, size_t pos
             if (sIdx >= 0 && sIdx < (int)names.size()) p.structName = names[sIdx];
         }
 
-        p.size = DecodePackedSize(data, pos, sizeBits);
-
         if (p.type == PT_Bool) {
-            // no payload
-        } else if (arrayFlag) {
-            uint8_t b = data[pos++];
-            if ((b & 0xC0) == 0x80) pos++;
-            else if ((b & 0xC0) == 0xC0) pos += 3;
+            // Bool value is in the arrayFlag bit; no size bytes, no payload
+            p.size = 0;
+            p.valueOffset = pos;
+        } else {
+            p.size = DecodePackedSize(data, pos, sizeBits);
+            if (arrayFlag) {
+                uint8_t b = data[pos++];
+                if ((b & 0xC0) == 0x80) pos++;
+                else if ((b & 0xC0) == 0xC0) pos += 3;
+            }
+            p.valueOffset = pos;
+            pos += p.size;
         }
-
-        p.valueOffset = pos;
-        pos += p.size;
         props.push_back(p);
     }
     return props;
 }
 
+// Known UE2 actor property names — used to detect where property serialization starts
+static bool IsKnownPropertyName(const std::string& s)
+{
+    static const char* known[] = {
+        "Tag","Group","Event","Location","Rotation","DrawScale","DrawScale3D",
+        "CollisionRadius","CollisionHeight","bCollideActors","bCollideWorld",
+        "bBlockActors","bBlockPlayers","bHidden","bStatic","bNoDelete",
+        "Physics","DrawType","AmbientGlow","bShadowCast","StaticMesh","Mesh",
+        "StaticMeshComponent","Texture","Skins","LightBrightness","LightColor",
+        "LightHue","LightRadius","LightSaturation","LightType","LightEffect",
+        "bDirectionalCorona","bCorona","Level","Region","PhysicsVolume",
+        "Label","RelativeLocation","RelativeRotation","Base","Owner",
+        "bStasis","bWorldGeometry","bAcceptsProjectors","bLightChanged",
+        "bDeleteMe","bDisableTick","bNoSmooth","Mass","Buoyancy",
+        "LifeSpan","InitialState","NetPriority","bAlwaysRelevant",
+        "bNetTemporary","RemoteRole","Role","NetUpdateFrequency",
+        "PrePivot","bUseDynamicLights","bUnlit","MaxLights",
+        "ScaleGlow","bMovable","LightEffect","bSpecialLit",
+        "AmbientSound","SoundRadius","SoundVolume","SoundPitch",
+        "ForcedVisibilityZoneTag","bForceStaticLighting",
+        // StaticMesh-export properties (so DetectHeaderSkip anchors on the mesh prop block)
+        "Materials","UseSimpleLineCollision","UseSimpleBoxCollision",
+        "UseSimpleKarmaCollision","UseVertexColor","InternalVersion",
+    };
+    for (auto& k : known)
+        if (s == k) return true;
+    return false;
+}
+
 static int DetectHeaderSkip(const uint8_t* data, size_t offset, int size,
                             const std::vector<std::string>& names)
 {
-    int bestSkip = 57;
+    // Strategy: scan byte-by-byte for the start of property serialization.
+    // A valid property starts with a compact index (name index) followed by a 4-byte number,
+    // then an info byte. We look for positions where:
+    //   1. Reading a compact index gives a valid name table entry
+    //   2. That name is a known UE2 property name
+    //   3. Parsing properties from that offset yields multiple valid properties
+    int maxScan = std::min(size - 5, 200); // Extend to 200 bytes to handle larger headers
+    int bestSkip = -1;
     int bestScore = 0;
-    static const char* known[] = {"Tag","Location","Rotation","Label","Region","Level",
-                                   "PhysicsVolume","StaticMesh","CollisionRadius"};
-    for (int skip = 4; skip < 80 && skip < size; skip++) {
+
+    for (int skip = 0; skip < maxScan; skip++) {
+        size_t br = 0;
+        int idx = ReadCompactIndex(data + offset + skip, size - skip, br);
+        if (idx <= 0 || idx >= (int)names.size()) continue;
+        if (br > 3) continue; // compact index shouldn't be huge for property names
+
+        // Check if this name is a known property
+        if (!IsKnownPropertyName(names[idx])) continue;
+
+        // Found a candidate — verify by parsing properties from here
         auto props = ParsePropsMinimal(data, offset + skip, names, offset + size);
         int score = 0;
-        for (auto& p : props)
-            for (auto& k : known)
-                if (p.name == k) score++;
-        if (score > bestScore) { bestScore = score; bestSkip = skip; }
+        for (auto& p : props) {
+            if (IsKnownPropertyName(p.name)) score += 2;
+            else if (p.name.size() > 1 && p.name.size() < 50) score++; // valid-looking name
+        }
+        if (score > bestScore) {
+            bestScore = score;
+            bestSkip = skip;
+            if (score >= 6) break; // confident enough
+        }
     }
-    return bestSkip;
+
+    // Fallback: if no good candidate, try the classic 4-80 range
+    if (bestSkip < 0 || bestScore < 2) {
+        for (int skip = 4; skip < std::min(size - 5, 120); skip++) {
+            auto props = ParsePropsMinimal(data, offset + skip, names, offset + size);
+            if ((int)props.size() >= 3) {
+                int score = 0;
+                for (auto& p : props)
+                    if (p.name.size() > 1 && p.name.size() < 50 &&
+                        p.size > 0 && p.size < 10000) score++;
+                if (score > bestScore) { bestScore = score; bestSkip = skip; }
+            }
+        }
+    }
+
+    return (bestSkip >= 0) ? bestSkip : 57;
 }
 
 // ─── BSMDocument Implementation ─────────────────────────────────────────────
@@ -230,7 +296,7 @@ bool BSMDocument::Load(const std::string& filepath)
         size_t br;
         int classIdx = ReadCompactIndex(d + pos, fileSize - pos, br); pos += br;
         ReadCompactIndex(d + pos, fileSize - pos, br); pos += br; // superIndex
-        pos += 4; // outerIndex
+        int32_t outerIdx = *reinterpret_cast<int32_t*>(d + pos); pos += 4; // outerIndex
         pos += 4; // unknownBS1
         int objNameIdx = ReadCompactIndex(d + pos, fileSize - pos, br); pos += br;
         int32_t objNameNum = *reinterpret_cast<int32_t*>(d + pos) - 1; pos += 4;
@@ -250,8 +316,12 @@ bool BSMDocument::Load(const std::string& filepath)
             if (idx < (int)imports.size()) className = imports[idx].objectName;
             else className = "?";
         } else {
-            // export ref — rare for class
-            className = "ExportClass";
+            // export ref — local class defined in this package
+            int idx = classIdx - 1; // 1-based to 0-based
+            if (idx < (int)m_ParsedExports.size())
+                className = m_ParsedExports[idx].objectName;
+            else
+                className = "ExportClass";
         }
 
         // Resolve object name
@@ -260,6 +330,7 @@ bool BSMDocument::Load(const std::string& filepath)
 
         ParsedExport pe;
         pe.classIndex = classIdx;
+        pe.outerIndex = outerIdx;
         pe.className = className;
         pe.objectName = objName;
         pe.serialSize = serialSize;
@@ -429,15 +500,17 @@ bool BSMDocument::Load(const std::string& filepath)
         // Check for mesh properties: multiple property names may reference mesh exports
         // Priority: StaticMesh > Mesh > StaticMeshComponent > Display
         static const char* meshPropNames[] = {
-            "StaticMesh", "Mesh", "StaticMeshComponent",
+            "StaticMesh", "Mesh", "StaticMeshComponent", "StaticMeshInstance",
             "PickupMesh", "ThirdPersonMesh", "PickupViewMesh",
         };
+        bool isSMActor = (pe.className == "StaticMeshActor");
         for (auto& propName : meshPropNames) {
             if (actor.meshIndex >= 0) break; // already found one
             for (auto& p : props) {
                 if (actor.meshIndex >= 0) break;
                 if (p.name != propName) continue;
-                if (p.size < 1 || p.size > 5) continue;
+                // Object references are compact-index encoded; typically 1-5 bytes
+                if (p.size < 1 || p.size > 8) continue;
                 size_t vpos = 0;
                 size_t remaining = p.size;
                 int ref = ReadCompactIndex(d + p.valueOffset, remaining, vpos);
@@ -446,6 +519,37 @@ bool BSMDocument::Load(const std::string& filepath)
                     if (actor.meshRefName.empty()) actor.meshRefName = refExport.objectName;
                     if (refExport.className == "StaticMesh") {
                         actor.meshIndex = ref - 1;
+                    } else if (refExport.className == "StaticMeshInstance") {
+                        // StaticMeshInstance uses binary serialization — resolve via outer chain
+                        int curIdx = ref - 1; // 0-based
+                        bool found = false;
+                        for (int depth = 0; depth < 5; depth++) {
+                            int outer = m_ParsedExports[curIdx].outerIndex;
+                            if (outer > 0 && outer <= (int)m_ParsedExports.size()) {
+                                if (m_ParsedExports[outer - 1].className == "StaticMesh") {
+                                    actor.meshIndex = outer - 1;
+                                    actor.meshRefName = m_ParsedExports[outer - 1].objectName;
+                                    found = true;
+                                    break;
+                                }
+                                curIdx = outer - 1;
+                            } else break;
+                        }
+                        // If outer chain didn't find it, scan binary data for StaticMesh references
+                        if (!found) {
+                            int scanLen = refExport.serialSize;
+                            // Try compact index at every byte offset
+                            for (int off = 0; off < scanLen - 2 && !found; off++) {
+                                size_t tbr;
+                                int tv = ReadCompactIndex(d + refExport.serialOffset + off, scanLen - off, tbr);
+                                if (tv > 0 && tv <= (int)m_ParsedExports.size() &&
+                                    m_ParsedExports[tv - 1].className == "StaticMesh") {
+                                    actor.meshIndex = tv - 1;
+                                    actor.meshRefName = m_ParsedExports[tv - 1].objectName;
+                                    found = true;
+                                }
+                            }
+                        }
                     } else if (refExport.className == "StaticMeshComponent" ||
                                refExport.className == "StaticMeshActor") {
                         // Follow indirect: parse the component's properties to find its StaticMesh
@@ -454,7 +558,7 @@ bool BSMDocument::Load(const std::string& filepath)
                             auto compProps = ParsePropsMinimal(d, refExport.serialOffset + compSkip, names,
                                                                refExport.serialOffset + refExport.serialSize);
                             for (auto& cp : compProps) {
-                                if (cp.name == "StaticMesh" && cp.size >= 1 && cp.size <= 5) {
+                                if (cp.name == "StaticMesh" && cp.size >= 1 && cp.size <= 8) {
                                     size_t cvpos = 0;
                                     size_t cremaining = cp.size;
                                     int cref = ReadCompactIndex(d + cp.valueOffset, cremaining, cvpos);
@@ -467,6 +571,12 @@ bool BSMDocument::Load(const std::string& filepath)
                                 }
                             }
                         }
+                    }
+                } else if (ref < 0) {
+                    // Negative ref = import reference (external package mesh)
+                    int impIdx = -ref - 1;
+                    if (impIdx < (int)imports.size()) {
+                        actor.meshRefName = imports[impIdx].objectName;
                     }
                 }
             }
@@ -505,7 +615,52 @@ bool BSMDocument::Load(const std::string& filepath)
 
     // ─── Parse StaticMesh geometry directly from BSM (C.4 spec) ────────────────
     printf("[BSM] Parsing StaticMesh exports directly from BSM...\n");
-    int meshesFound = 0, meshesParsed = 0;
+
+    // Resolve a package object ref (>0 export, <0 import) to its class + object name.
+    auto resolveRef = [&](int ref, std::string& cls, std::string& nm) {
+        if (ref > 0 && ref <= (int)m_ParsedExports.size()) {
+            cls = m_ParsedExports[ref - 1].className;
+            nm  = m_ParsedExports[ref - 1].objectName;
+        } else if (ref < 0 && (-ref - 1) < (int)imports.size()) {
+            cls = imports[-ref - 1].className;
+            nm  = imports[-ref - 1].objectName;
+        }
+    };
+    auto isMaterialClass = [](const std::string& c) -> bool {
+        return c.find("Shader") != std::string::npos ||
+               c.find("Material") != std::string::npos ||
+               c.find("Modifier") != std::string::npos ||
+               (c.size() >= 3 && c.compare(0, 3, "Tex") == 0) ||
+               c == "FinalBlend" || c == "Combiner" || c == "Texture" ||
+               c == "VertexColor" || c == "ConstantColor" || c == "ColorMaterial";
+    };
+    // Extract the first material/shader name from a StaticMesh export's "Materials"
+    // tagged property — the authoritative binding straight from the .bsm. Recovers
+    // meshes where UModel wrote a "dummy_material" placeholder into the glTF.
+    auto extractBSMMaterial = [&](size_t soff, size_t ssize) -> std::string {
+        if (ssize < 12 || soff + ssize > (size_t)fileSize) return "";
+        int hdrSkip = DetectHeaderSkip(d, soff, (int)ssize, names);
+        auto props = ParsePropsMinimal(d, soff + (size_t)hdrSkip, names, soff + ssize);
+        for (auto& p : props) {
+            if (p.name != "Materials" || p.size < 2) continue;
+            // The Materials array element layout (native StaticMeshMaterial struct) varies,
+            // so scan the whole payload for the first object ref that resolves to a material
+            // class — robust to EnableCollision flags / struct framing in front of it.
+            size_t scanEnd = p.valueOffset + (size_t)p.size;
+            if (scanEnd > soff + ssize) scanEnd = soff + ssize;
+            for (size_t sp = p.valueOffset; sp + 1 < scanEnd; sp++) {
+                size_t br;
+                int ref = ReadCompactIndex(d + sp, scanEnd - sp, br);
+                if (ref == 0) continue;
+                std::string cls, nm;
+                resolveRef(ref, cls, nm);
+                if (!nm.empty() && isMaterialClass(cls)) return nm;
+            }
+        }
+        return "";
+    };
+
+    int meshesFound = 0, meshesParsed = 0, meshesWithBSMMat = 0;
     for (int i = 0; i < (int)m_ParsedExports.size(); i++) {
         auto& pe = m_ParsedExports[i];
         if (pe.className != "StaticMesh") continue;
@@ -515,11 +670,15 @@ bool BSMDocument::Load(const std::string& filepath)
         ParsedMesh mesh = ParseStaticMesh(d + pe.serialOffset, pe.serialSize, names);
         if (mesh.valid) {
             mesh.name = pe.objectName;
+            mesh.bsmMaterialName = extractBSMMaterial((size_t)pe.serialOffset, (size_t)pe.serialSize);
+            if (!mesh.bsmMaterialName.empty()) meshesWithBSMMat++;
             m_MeshNameToIndex[pe.objectName] = (int)m_Meshes.size();
             m_Meshes.push_back(std::move(mesh));
             meshesParsed++;
         }
     }
+    printf("[BSM] StaticMesh Materials: %d/%d meshes carry a BSM material ref\n",
+           meshesWithBSMMat, meshesParsed);
     printf("[BSM] StaticMesh parsing: %d found, %d successfully parsed (%d verts, %d tris)\n",
            meshesFound, meshesParsed,
            [&]() { int v = 0; for (auto& m : m_Meshes) v += (int)m.vertices.size(); return v; }(),
@@ -555,9 +714,19 @@ bool BSMDocument::Load(const std::string& filepath)
                 for (auto& im : imports)
                     importNames.push_back(im.objectName);
 
+                // Build lightmap texture name list before BSP parse (iLightMap uses 1-based index)
+                m_LightMapNames.clear();
+                for (int li = 0; li < (int)m_ParsedExports.size(); li++) {
+                    auto& lpe = m_ParsedExports[li];
+                    if (lpe.className == "Texture" && lpe.objectName.substr(0, 7) == "Texture"
+                        && lpe.objectName.size() <= 10)
+                        m_LightMapNames.push_back(lpe.objectName);
+                }
+
                 std::vector<BSPTreeNodeOut> treeOut;
                 m_BSPMeshes = ParseBSPGeometry(d + pe.serialOffset, pe.serialSize, names,
-                                                bspExports, importNames, &treeOut);
+                                                bspExports, importNames, &treeOut,
+                                                &m_LightMapNames);
                 // Store BSP tree for zone traversal
                 m_BSPTree.resize(treeOut.size());
                 for (size_t ti = 0; ti < treeOut.size(); ti++) {
@@ -584,31 +753,60 @@ bool BSMDocument::Load(const std::string& filepath)
         }
     }
 
-    // If BSM parsing got nothing, try glTF exports as fallback
-    if (m_Meshes.empty()) {
+    // ─── Lightmap texture exports diagnostic ───
+    {
+        int texCount = 0;
+        int lmTexCount = 0;
+        for (int i = 0; i < (int)m_ParsedExports.size(); i++) {
+            auto& pe = m_ParsedExports[i];
+            if (pe.className != "Texture" && pe.className != "ShadowMap") continue;
+            texCount++;
+            // Lightmap textures are named "TextureNN" with small serial (stripped bulk data)
+            if (pe.objectName.substr(0, 7) == "Texture" && pe.objectName.size() <= 10) {
+                lmTexCount++;
+                if (lmTexCount <= 5)
+                    printf("[BSM-LM] Lightmap Texture export[%d]: '%s' serial=%d bytes at 0x%X\n",
+                           i, pe.objectName.c_str(), pe.serialSize, pe.serialOffset);
+            }
+        }
+        printf("[BSM-LM] Total Texture exports: %d, lightmap candidates: %d\n", texCount, lmTexCount);
+
+        // Build lightmap texture name list (index 1=first, etc.)
+        m_LightMapNames.clear();
+        for (int i = 0; i < (int)m_ParsedExports.size(); i++) {
+            auto& pe = m_ParsedExports[i];
+            if (pe.className != "Texture") continue;
+            if (pe.objectName.substr(0, 7) != "Texture" || pe.objectName.size() > 10) continue;
+            m_LightMapNames.push_back(pe.objectName);
+            printf("[BSM-LM] LM atlas %d → '%s'\n", (int)m_LightMapNames.size(), pe.objectName.c_str());
+        }
+    }
+
+    // Load supplementary glTF meshes from UEViewer exports (adds meshes not in BSM)
+    {
         std::string gltfMapName = m_MapName;
         { size_t dp = gltfMapName.find_last_of('.'); if (dp != std::string::npos) gltfMapName = gltfMapName.substr(0, dp); }
         std::string exportDir = "Z:\\UEViewer\\export\\" + gltfMapName;
-        printf("[BSM] No meshes from BSM, trying glTF fallback: %s\n", exportDir.c_str());
-        m_Meshes = LoadAllMeshesFromExportDir(exportDir);
-        for (int i = 0; i < (int)m_Meshes.size(); i++)
-            m_MeshNameToIndex[m_Meshes[i].name] = i;
+        auto gltfMeshes = LoadAllMeshesFromExportDir(exportDir);
+        int added = 0;
+        for (auto& gm : gltfMeshes) {
+            if (m_MeshNameToIndex.find(gm.name) == m_MeshNameToIndex.end()) {
+                m_MeshNameToIndex[gm.name] = (int)m_Meshes.size();
+                m_Meshes.push_back(std::move(gm));
+                added++;
+            }
+        }
+        printf("[BSM] Supplementary glTF: %d loaded, %d new (total meshes: %d)\n",
+               (int)gltfMeshes.size(), added, (int)m_Meshes.size());
     }
 
-    // Build normalized name map for fuzzy matching
+    // Build normalized name map for fuzzy matching (strip all underscores, lowercase)
     auto normalizeName = [](const std::string& s) -> std::string {
         std::string r;
         r.reserve(s.size());
-        for (size_t i = 0; i < s.size(); i++) {
-            char c = s[i];
-            char lc = (c >= 'A' && c <= 'Z') ? (c + 32) : c;
-            if (lc == '_') {
-                if (i + 1 < s.size() && s[i+1] >= '0' && s[i+1] <= '9') continue;
-                if (!r.empty() && r.back() == '_') continue;
-                r += '_';
-            } else {
-                r += lc;
-            }
+        for (char c : s) {
+            if (c == '_') continue; // strip all underscores
+            r += (c >= 'A' && c <= 'Z') ? (c + 32) : c;
         }
         return r;
     };
@@ -635,7 +833,7 @@ bool BSMDocument::Load(const std::string& filepath)
                     linked++;
                 } else {
                     if (unmatchedLogged < 10) {
-                        printf("[BSM] Unmatched mesh: '%s' (norm: '%s')\n",
+                        printf("[BSM] Unmatched export mesh: '%s' (norm: '%s')\n",
                                meshExport.objectName.c_str(), normalizeName(meshExport.objectName).c_str());
                         unmatchedLogged++;
                     }
@@ -651,7 +849,81 @@ bool BSMDocument::Load(const std::string& filepath)
             actor.meshIndex = -1;
         }
     }
+
+    // Second pass: link import-referenced actors by meshRefName against glTF pool
+    int importLinked = 0, importUnmatched = 0;
+    int importUnmatchedLogged = 0;
+    for (auto& actor : m_Actors) {
+        if (actor.meshIndex >= 0) continue; // already linked
+        if (actor.meshRefName.empty()) continue; // no reference at all
+        // Try exact match
+        auto it = m_MeshNameToIndex.find(actor.meshRefName);
+        if (it != m_MeshNameToIndex.end()) {
+            actor.meshIndex = it->second;
+            importLinked++;
+            continue;
+        }
+        // Try normalized match
+        auto it2 = normalizedNameMap.find(normalizeName(actor.meshRefName));
+        if (it2 != normalizedNameMap.end()) {
+            actor.meshIndex = it2->second;
+            importLinked++;
+            continue;
+        }
+        if (importUnmatchedLogged < 15) {
+            printf("[BSM] Unmatched import mesh: '%s' (class: %s)\n",
+                   actor.meshRefName.c_str(), actor.className.c_str());
+            importUnmatchedLogged++;
+        }
+        importUnmatched++;
+    }
     printf("[BSM] Linked %d actors to mesh geometry (%d no ref, %d bad ref, %d unmatched)\n", linked, noRef, badRef, noMatch);
+    printf("[BSM] Import mesh linking: %d linked, %d unmatched\n", importLinked, importUnmatched);
+
+    // Third pass: class-to-default-mesh mapping for gameplay classes
+    // These classes don't store per-instance mesh refs — the mesh is defined in class defaults
+    static const struct { const char* className; const char* meshName; } classDefaults[] = {
+        // Pickups
+        {"MedHypoPickup",              "Health"},
+        {"MedKitPickup",               "Health"},
+        {"EVEHypoPickup",              "eve_hypo_ad"},
+        {"PlasmidPickup",              "plasmid_pickup"},
+        {"AmmoPickup",                 "Pickup"},
+        {"WeaponPickup",               "Pickup"},
+        // Gameplay stations (VendingWide mesh not in BSM, use ResStationBody as placeholder)
+        {"PlaceableVendingStation",    "ResStationBody"},
+        {"PlaceableVendingStationAlt", "ResStationBody"},
+        {"PlaceableHealthStation",     "ResStationBody"},
+        {"DoorKeypadControl",          "Pickup"},
+        {"Lockbox",                    "Pickup"},
+        // Spawners
+        {"TurretSpawner",              "Turret_Cover"},
+        {"SecurityCameraSpawner",      "SmCamWallBase"},
+        {"SecurityBotSpawner",         "securytybot"},
+        {"AggressorSpawner",           "securytybot"},
+        // Containers
+        {"Container",                  "Pickup"},
+        {"DeadBodyContainer",          "Pickup"},
+        {"FlowerVaseContainer",        "flower_vase"},
+    };
+    int defaultLinked = 0;
+    for (auto& actor : m_Actors) {
+        if (actor.meshIndex >= 0) continue;
+        if (!actor.hasLocation) continue;
+        for (auto& [cls, meshName] : classDefaults) {
+            if (actor.className != cls) continue;
+            auto it = m_MeshNameToIndex.find(meshName);
+            if (it != m_MeshNameToIndex.end()) {
+                actor.meshIndex = it->second;
+                if (actor.meshRefName.empty()) actor.meshRefName = meshName;
+                defaultLinked++;
+            }
+            break;
+        }
+    }
+    if (defaultLinked > 0)
+        printf("[BSM] Class-default mesh linking: %d actors\n", defaultLinked);
+
     {
         int withLoc = 0, withoutLoc = 0;
         for (auto& a : m_Actors) { if (a.hasLocation) withLoc++; else withoutLoc++; }
@@ -953,7 +1225,7 @@ ActorRenderType ResolveActorRenderType(const std::string& cn, bool hasMesh, bool
         return hasMesh ? ActorRenderType::VisibleMover : ActorRenderType::UnknownPlaceholder;
     }
 
-    // Pickups / weapons / items
+    // Pickups / weapons / items / containers / stations
     if (cn.find("Pickup") != std::string::npos ||
         cn.find("Weapon") != std::string::npos ||
         cn.find("Ammo") != std::string::npos ||
@@ -961,7 +1233,11 @@ ActorRenderType ResolveActorRenderType(const std::string& cn, bool hasMesh, bool
         cn.find("Plasmid") != std::string::npos ||
         cn.find("Tonic") != std::string::npos ||
         cn.find("Gene") != std::string::npos ||
+        cn.find("Container") != std::string::npos ||
+        cn.find("Lockbox") != std::string::npos ||
+        cn.find("Keypad") != std::string::npos ||
         cn.find("HealthStation") != std::string::npos ||
+        cn.find("VendingStation") != std::string::npos ||
         cn.find("VendingMachine") != std::string::npos) {
         return hasMesh ? ActorRenderType::VisiblePickup : ActorRenderType::UnknownPlaceholder;
     }
@@ -988,7 +1264,7 @@ ActorRenderType ResolveActorRenderType(const std::string& cn, bool hasMesh, bool
         cn.find("Diary") != std::string::npos)
         return ActorRenderType::EditorOnly;
 
-    // Spawners / AI enemies (have skeletal meshes in-game, but we can't render them yet)
+    // Spawners / AI enemies — render with placeholder mesh if available, else editor-only
     if (cn.find("Spawner") != std::string::npos ||
         cn.find("Spawn") != std::string::npos ||
         cn.find("BigDaddy") != std::string::npos ||
@@ -998,7 +1274,7 @@ ActorRenderType ResolveActorRenderType(const std::string& cn, bool hasMesh, bool
         cn.find("Enemy") != std::string::npos ||
         cn.find("NPC") != std::string::npos ||
         cn.find("Bot") != std::string::npos)
-        return ActorRenderType::EditorOnly;
+        return hasMesh ? ActorRenderType::VisibleDecoration : ActorRenderType::EditorOnly;
 
     // Camera actors
     if (cn.find("Camera") != std::string::npos)
@@ -1056,85 +1332,170 @@ void BSMDocument::ResolveTextures(const std::string& umodelExportDir)
     std::string shaderDir = umodelExportDir + "\\Shader";
     std::string meshDir = umodelExportDir + "\\StaticMesh";
 
-    // Step 1: Load shader→diffuseTexture map from .mat files
+    // Normalize a shader/material name to a lookup key (strip trailing _shader/_Shader)
+    auto stripShaderSuffix = [](std::string n) -> std::string {
+        if (n.size() > 7) {
+            std::string tail = n.substr(n.size() - 7);
+            if (tail == "_shader" || tail == "_Shader") return n.substr(0, n.size() - 7);
+        }
+        return n;
+    };
+    // Parse a Diffuse value: handles both "0451_diffuse" (.mat) and
+    // "Texture'Res_Decor.4_poster_bed_d'" (.props.txt) → returns bare texture name.
+    auto parseDiffuseValue = [](std::string v) -> std::string {
+        // Trim leading/trailing whitespace
+        size_t a = v.find_first_not_of(" \t\r\n");
+        size_t b = v.find_last_not_of(" \t\r\n");
+        if (a == std::string::npos) return "";
+        v = v.substr(a, b - a + 1);
+        // Unwrap Texture'Pkg.name' form
+        size_t q1 = v.find('\'');
+        if (q1 != std::string::npos) {
+            size_t q2 = v.find('\'', q1 + 1);
+            if (q2 != std::string::npos) {
+                std::string inner = v.substr(q1 + 1, q2 - q1 - 1); // Pkg.name
+                size_t dot = inner.find_last_of('.');
+                return dot != std::string::npos ? inner.substr(dot + 1) : inner;
+            }
+        }
+        return v;
+    };
+
+    // Step 1: Load shader→diffuseTexture map from .mat AND .props.txt files.
+    // Keys are normalized (no _shader suffix) so glTF material names match either source.
     std::unordered_map<std::string, std::string> shaderToDiffuse;
     if (fs::is_directory(shaderDir)) {
         for (auto& entry : fs::directory_iterator(shaderDir)) {
-            if (entry.path().extension() != ".mat") continue;
-            std::string shaderName = entry.path().stem().string();
+            std::string fname = entry.path().filename().string();
+            std::string stem;
+            bool isProps = false;
+            if (entry.path().extension() == ".mat") {
+                stem = entry.path().stem().string();
+            } else if (fname.size() > 10 && fname.substr(fname.size() - 10) == ".props.txt") {
+                stem = fname.substr(0, fname.size() - 10);
+                isProps = true;
+            } else {
+                continue;
+            }
+            std::string key = stripShaderSuffix(stem);
+            // .mat is concise; prefer it. Only let .props fill gaps.
+            if (isProps && shaderToDiffuse.count(key)) continue;
             std::ifstream f(entry.path());
             std::string line;
             while (std::getline(f, line)) {
-                if (line.size() > 8 && line.substr(0, 8) == "Diffuse=") {
-                    shaderToDiffuse[shaderName] = line.substr(8);
-                    break;
+                // .mat:  "Diffuse=..."   .props.txt:  "Diffuse = Texture'...'"
+                size_t dpos = line.find("Diffuse");
+                if (dpos != 0) continue;
+                size_t eq = line.find('=');
+                if (eq == std::string::npos) continue;
+                std::string diff = parseDiffuseValue(line.substr(eq + 1));
+                if (!diff.empty() && diff != "None") {
+                    shaderToDiffuse[key] = diff;
                 }
+                break;
             }
         }
     }
 
-    // Step 2: For each mesh, find its material from the corresponding glTF
-    int resolved = 0;
+    // Step 2: Resolve each mesh's diffuse texture.
+    // Primary source = the material named in the per-mesh glTF; authoritative fallback
+    // = the Materials ref read straight from the .bsm (recovers dummy/missing glTF mats).
+    std::string texDir = umodelExportDir + "\\Texture";
+    // Strip the _shader suffix off a material name and resolve to a texture that exists
+    // (direct .tga match -> .mat/.props Diffuse= mapping -> best-guess passthrough).
+    auto matToTexName = [&](std::string m) -> std::string {
+        if (m.empty()) return "";
+        if (m.size() > 7) {
+            std::string suf = m.substr(m.size() - 7);
+            if (suf == "_shader" || suf == "_Shader") m = m.substr(0, m.size() - 7);
+        }
+        if (fs::exists(texDir + "\\" + m + ".tga")) return m;
+        auto it = shaderToDiffuse.find(m);
+        if (it != shaderToDiffuse.end() && fs::exists(texDir + "\\" + it->second + ".tga"))
+            return it->second;
+        return m;
+    };
+
+    int resolved = 0, resolvedFromBSM = 0;
     for (auto& mesh : m_Meshes) {
         if (mesh.name.empty()) continue;
-        std::string gltfPath = meshDir + "\\" + mesh.name + ".gltf";
-        std::ifstream f(gltfPath);
-        if (!f.is_open()) continue;
 
-        // Quick scan for first valid material name in the glTF JSON
-        std::string line;
+        // Primary: first non-dummy material name in the per-mesh glTF JSON.
         std::string matName;
-        bool inMaterials = false;
-        while (std::getline(f, line)) {
-            if (line.find("\"materials\"") != std::string::npos) inMaterials = true;
-            if (inMaterials) {
-                auto namePos = line.find("\"name\" : \"");
-                if (namePos != std::string::npos) {
-                    auto start = namePos + 10;
-                    auto end = line.find("\"", start);
-                    if (end != std::string::npos) {
-                        std::string candidate = line.substr(start, end - start);
-                        // Skip placeholder/dummy materials
-                        if (candidate.find("dummy_material") == std::string::npos &&
-                            candidate != "None" && !candidate.empty()) {
-                            matName = candidate;
-                            break;
+        std::ifstream f(meshDir + "\\" + mesh.name + ".gltf");
+        if (f.is_open()) {
+            std::string line;
+            bool inMaterials = false;
+            while (std::getline(f, line)) {
+                if (line.find("\"materials\"") != std::string::npos) inMaterials = true;
+                if (inMaterials) {
+                    auto namePos = line.find("\"name\" : \"");
+                    if (namePos != std::string::npos) {
+                        auto start = namePos + 10;
+                        auto end = line.find("\"", start);
+                        if (end != std::string::npos) {
+                            std::string candidate = line.substr(start, end - start);
+                            if (candidate.find("dummy_material") == std::string::npos &&
+                                candidate != "None" && !candidate.empty()) {
+                                matName = candidate;
+                                break;
+                            }
                         }
                     }
                 }
             }
         }
+
+        // Authoritative fallback straight from the .bsm Materials array.
+        bool fromBSM = false;
+        if (matName.empty() && !mesh.bsmMaterialName.empty()) {
+            matName = mesh.bsmMaterialName;
+            fromBSM = true;
+        }
         if (matName.empty()) continue;
 
-        // Strip _shader/_Shader suffix to get candidate texture name
-        std::string texName = matName;
-        if (texName.size() > 7 && texName.substr(texName.size() - 7) == "_shader") {
-            texName = texName.substr(0, texName.size() - 7);
-        } else if (texName.size() > 7 && texName.substr(texName.size() - 7) == "_Shader") {
-            texName = texName.substr(0, texName.size() - 7);
-        }
-
-        // Check if stripped name directly matches a texture file
-        std::string texDir = umodelExportDir + "\\Texture";
-        std::string directPath = texDir + "\\" + texName + ".tga";
-        if (fs::exists(directPath)) {
-            mesh.textureName = texName;
-        } else {
-            // Fall back to .mat Diffuse= value if it exists on disk
-            auto it = shaderToDiffuse.find(matName);
-            if (it != shaderToDiffuse.end() && fs::exists(texDir + "\\" + it->second + ".tga")) {
-                mesh.textureName = it->second;
-            } else {
-                mesh.textureName = texName; // best guess, TextureCache will try suffixes
+        mesh.textureName = matToTexName(matName);
+        // If the glTF-derived texture is absent on disk but the authoritative BSM
+        // material resolves to a real TGA, prefer the BSM binding.
+        if (!fromBSM && !mesh.bsmMaterialName.empty() &&
+            !fs::exists(texDir + "\\" + mesh.textureName + ".tga")) {
+            std::string bsmTex = matToTexName(mesh.bsmMaterialName);
+            if (!bsmTex.empty() && fs::exists(texDir + "\\" + bsmTex + ".tga")) {
+                mesh.textureName = bsmTex;
+                fromBSM = true;
             }
         }
+        if (fromBSM) resolvedFromBSM++;
         resolved++;
     }
-    printf("[BSM] Resolved %d/%d mesh texture names\n", resolved, (int)m_Meshes.size());
+    printf("[BSM] Resolved %d/%d mesh texture names (%d via BSM Materials fallback)\n",
+           resolved, (int)m_Meshes.size(), resolvedFromBSM);
+
+    // Diagnostic: report meshes whose final texture name has no TGA on disk
+    {
+        std::string td = umodelExportDir + "\\Texture";
+        int noName = 0, noFile = 0;
+        std::ofstream dump("mesh_tex_missing.txt");
+        for (auto& mesh : m_Meshes) {
+            if (mesh.name.empty()) continue;
+            if (mesh.textureName.empty()) {
+                noName++;
+                if (dump) dump << "NO-MAT\t" << mesh.name << "\tbsm='" << mesh.bsmMaterialName << "'\n";
+                continue;
+            }
+            if (!fs::exists(td + "\\" + mesh.textureName + ".tga")) {
+                noFile++;
+                if (dump) dump << "NO-TGA\t" << mesh.name << "\ttex='" << mesh.textureName
+                               << "'\tbsm='" << mesh.bsmMaterialName << "'\n";
+            }
+        }
+        printf("[MESH-TEX] untextured breakdown: %d no-material, %d missing-TGA "
+               "(full list -> mesh_tex_missing.txt)\n", noName, noFile);
+    }
 
     // Step 3: Resolve BSP chunk texture names (already set by BSP parser from surf Material refs)
+    // (texDir is declared at function scope above.)
     int bspResolved = 0;
-    std::string texDir = umodelExportDir + "\\Texture";
     for (auto& chunk : m_BSPMeshes) {
         if (chunk.textureName.empty()) continue;
         std::string candidate = chunk.textureName;
@@ -1145,19 +1506,9 @@ void BSMDocument::ResolveTextures(const std::string& umodelExportDir)
             continue;
         }
 
-        // Try shader→diffuse lookup via .mat files
-        // The chunk.textureName was already stripped of _Shader by the BSP parser,
-        // but the .mat file uses the full shader name. Try both.
-        std::string shaderName = candidate + "_Shader";
-        auto it = shaderToDiffuse.find(shaderName);
-        if (it == shaderToDiffuse.end()) {
-            shaderName = candidate + "_shader";
-            it = shaderToDiffuse.find(shaderName);
-        }
-        if (it == shaderToDiffuse.end()) {
-            // Try the candidate itself as a shader name
-            it = shaderToDiffuse.find(candidate);
-        }
+        // Shader→diffuse lookup. The map is keyed by normalized (stripped) shader
+        // names, and chunk.textureName was already stripped by the BSP parser.
+        auto it = shaderToDiffuse.find(candidate);
         if (it != shaderToDiffuse.end() && fs::exists(texDir + "\\" + it->second + ".tga")) {
             chunk.textureName = it->second;
             bspResolved++;

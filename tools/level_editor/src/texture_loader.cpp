@@ -228,3 +228,37 @@ LoadedTexture TextureCache::LoadTGA(const std::string& path)
     result.hasAlpha = hasAlpha;
     return result;
 }
+
+unsigned int TextureCache::UploadDXT1(const std::string& name, const uint8_t* data, int width, int height)
+{
+    if (!data || width <= 0 || height <= 0) return 0;
+    
+    // Check if already cached
+    auto it = m_Cache.find(name);
+    if (it != m_Cache.end()) return it->second.glTexture;
+    
+    // DXT1: 8 bytes per 4x4 block = 0.5 bytes per pixel
+    int dataSize = ((width + 3) / 4) * ((height + 3) / 4) * 8;
+    
+    GLuint tex;
+    glGenTextures(1, &tex);
+    glBindTexture(GL_TEXTURE_2D, tex);
+    
+    glCompressedTexImage2D(GL_TEXTURE_2D, 0, GL_COMPRESSED_RGB_S3TC_DXT1_EXT,
+                           width, height, 0, dataSize, data);
+    
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    
+    LoadedTexture lt;
+    lt.glTexture = tex;
+    lt.width = width;
+    lt.height = height;
+    lt.hasAlpha = false;
+    m_Cache[name] = lt;
+    
+    printf("[Tex] Uploaded DXT1 lightmap '%s' (%dx%d, %d bytes)\n", name.c_str(), width, height, dataSize);
+    return tex;
+}

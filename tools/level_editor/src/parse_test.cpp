@@ -2,6 +2,8 @@
 #include "bsm_document.h"
 #include <cstdio>
 #include <cstring>
+#include <unordered_map>
+#include <algorithm>
 
 int main(int argc, char* argv[])
 {
@@ -59,6 +61,44 @@ int main(int argc, char* argv[])
         else unlinked++;
     }
     printf("\nActors: %d linked, %d unlinked\n", linked, unlinked);
+
+    // Debug: find specific gameplay actors
+    printf("\n=== GAMEPLAY ACTOR SEARCH ===\n");
+    for (auto& a : doc.GetActors()) {
+        if (a.className.find("Vending") != std::string::npos ||
+            a.className.find("HealthStation") != std::string::npos ||
+            a.className.find("GeneBank") != std::string::npos ||
+            a.className.find("Circus") != std::string::npos ||
+            a.className.find("Container") != std::string::npos ||
+            a.className.find("ScriptableMover") != std::string::npos) {
+            printf("  [%d] class='%s' name='%s' loc=(%.0f,%.0f,%.0f) hasLoc=%d mesh=%d meshRef='%s'\n",
+                   a.exportIndex, a.className.c_str(), a.objectName.c_str(),
+                   a.location.x, a.location.y, a.location.z, a.hasLocation,
+                   a.meshIndex, a.meshRefName.c_str());
+        }
+    }
+
+    // Actors with location but no mesh (visible in-game but missing geometry)
+    printf("\n=== ACTORS WITH LOCATION BUT NO MESH ===\n");
+    std::unordered_map<std::string, int> missingByClass;
+    std::unordered_map<std::string, std::string> missingMeshRef;
+    for (auto& a : doc.GetActors()) {
+        if (a.meshIndex >= 0) continue;
+        if (!a.hasLocation) continue;
+        missingByClass[a.className]++;
+        if (!a.meshRefName.empty() && missingMeshRef.find(a.className) == missingMeshRef.end())
+            missingMeshRef[a.className] = a.meshRefName;
+    }
+    // Sort by count
+    std::vector<std::pair<std::string, int>> sorted(missingByClass.begin(), missingByClass.end());
+    std::sort(sorted.begin(), sorted.end(), [](auto& a, auto& b) { return a.second > b.second; });
+    for (auto& [cls, cnt] : sorted) {
+        auto it = missingMeshRef.find(cls);
+        if (it != missingMeshRef.end())
+            printf("  %4d  %-40s meshRef='%s'\n", cnt, cls.c_str(), it->second.c_str());
+        else
+            printf("  %4d  %s\n", cnt, cls.c_str());
+    }
 
     // ─── Spatial Diagnostics ───
     printf("\n=== SPATIAL DIAGNOSTICS ===\n");

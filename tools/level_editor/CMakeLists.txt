@@ -73,6 +73,10 @@ set(EDITOR_SOURCES
     src/texture_loader.cpp
     src/content_browser.h
     src/content_browser.cpp
+    src/thumbnail_renderer.h
+    src/thumbnail_renderer.cpp
+    src/catalog_parser.h
+    src/catalog_parser.cpp
 )
 
 add_executable(BS1LevelEditor ${EDITOR_SOURCES})

@@ -83,13 +83,14 @@ discoveries is a primary research strategy.
 ## File Formats
 
 ### .bsm (BioShock Map)
-- Confirmed standard Unreal Package format (magic 0x9E2A83C1, version 142, licensee 56)
+- Confirmed standard Unreal Package format (magic 0x9E2A83C1, version 141, licensee 56)
 - Contains: BSP geometry (UModel), StaticMeshes, actors, scripts, lighting, navigation
 - Compressed via zlib chunks
-- FBspNode: 100 bytes (vs stock UE2 64 bytes) — ZoneMask expanded to 128-bit, iZone at +77
-- FBspSurf: 8B Vengeance header + variable CI refs + 44B fixed fields per element
+- FBspNode: 100 bytes (vs stock UE2 64 bytes) — ZoneMask expanded to 128-bit, iZone[0] at +77, NumVertices at BYTE +78 (NOT INT32 +88)
+- FBspSurf: 8B Vengeance header + CI Material + 24B fixed fields + CI Actor + FPlane(16B) + LightMapScale(4B). PanU/PanV SKIPPED for version >= 78
 - FVert: 8B each (INT32 pVertex + INT32 iSide)
-- See `docs/reverse-engineering/bsm-format.md` for full specification
+- StaticMeshInstance exports reference BulkContent (.blk) for gameplay mesh data
+- See `bioshock1-bsm.md` for full specification, `docs/reverse-engineering/bsm-format.md` for early RE notes
 
 ## Build Requirements
 

@@ -53,6 +53,15 @@ bool GetActorPosition(UObject* actor, FVec3& outPos);
 /// Set an actor's position (writes Location property)
 bool SetActorPosition(UObject* actor, const FVec3& pos);
 
+/// Rotation (Pitch, Yaw, Roll) as int32 — UE2 FRotator units (65536 = 360°)
+struct FRot3 { int32_t Pitch, Yaw, Roll; };
+
+/// Get any actor's rotation (reads Rotation property)
+bool GetActorRotation(UObject* actor, FRot3& outRot);
+
+/// Set an actor's rotation (calls SetRotation via ProcessEvent, fallback to raw write)
+bool SetActorRotation(UObject* actor, const FRot3& rot);
+
 /// Get distance between two actors
 float GetActorDistance(UObject* a, UObject* b);
 

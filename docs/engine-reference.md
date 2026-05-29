@@ -1,7 +1,7 @@
 # BioShock Remastered (UE2.5) Engine Reference
 
 > Living document — updated as we reverse-engineer the engine.
-> Last updated: 2025-05-15
+> Last updated: 2026-05-26
 
 ## Module Info
 

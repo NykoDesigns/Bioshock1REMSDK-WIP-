@@ -9,6 +9,7 @@ struct MeshVertex {
     float x, y, z;    // position
     float nx, ny, nz; // normal
     float u, v;       // texture coordinates
+    float u2, v2;     // lightmap UV (BSP only: texel coords / atlasSize)
     float tx, ty, tz, tw; // tangent (xyz = direction, w = handedness ±1)
 };
 
@@ -28,6 +29,9 @@ struct ParsedMesh {
     uint8_t zoneMask[16] = {}; // BSP: union of zone visibility masks for all nodes in this chunk
     uint8_t zoneIndex = 0;     // BSP: zone this chunk belongs to (byte at +96)
     float lightMapScale = 0.0f;  // BSP: lightmap texel density (from FBspSurf 20B tail)
+    int32_t lightMapIndex = 0;   // BSP: lightmap atlas texture index (0=none, 1-N=1-based)
+    std::string lightMapName;    // BSP: lightmap cache key (e.g. "LM_Texture49")
+    std::string bsmMaterialName; // StaticMesh: material/shader name from BSM Materials array (authoritative)
 };
 
 // Parse a StaticMesh export's serial data into vertices + triangles.

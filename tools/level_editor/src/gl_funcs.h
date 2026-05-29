@@ -48,6 +48,9 @@ extern void (APIENTRY *glGetProgramInfoLog)(GLuint, GLsizei, GLsizei*, GLchar*);
 extern void (APIENTRY *glGenerateMipmap)(GLenum);
 extern void (APIENTRY *glActiveTexture)(GLenum);
 
+// Compressed texture upload (DXT1 lightmaps)
+extern void (APIENTRY *glCompressedTexImage2D)(GLenum, GLint, GLenum, GLsizei, GLsizei, GLint, GLsizei, const void*);
+
 // Framebuffer (shadow mapping + bloom)
 extern void (APIENTRY *glGenFramebuffers)(GLsizei, GLuint*);
 extern void (APIENTRY *glDeleteFramebuffers)(GLsizei, const GLuint*);
@@ -98,6 +101,9 @@ extern void (APIENTRY *glFramebufferRenderbuffer)(GLenum, GLenum, GLenum, GLuint
 #ifndef GL_TEXTURE3
 #define GL_TEXTURE3 0x84C3
 #endif
+#ifndef GL_TEXTURE4
+#define GL_TEXTURE4 0x84C4
+#endif
 #ifndef GL_TEXTURE_MAX_ANISOTROPY_EXT
 #define GL_TEXTURE_MAX_ANISOTROPY_EXT 0x84FE
 #endif
@@ -141,6 +147,12 @@ extern void (APIENTRY *glFramebufferRenderbuffer)(GLenum, GLenum, GLenum, GLuint
 #endif
 #ifndef GL_CLAMP_TO_EDGE
 #define GL_CLAMP_TO_EDGE 0x812F
+#endif
+#ifndef GL_COMPRESSED_RGB_S3TC_DXT1_EXT
+#define GL_COMPRESSED_RGB_S3TC_DXT1_EXT 0x83F0
+#endif
+#ifndef GL_COMPRESSED_RGBA_S3TC_DXT1_EXT
+#define GL_COMPRESSED_RGBA_S3TC_DXT1_EXT 0x83F1
 #endif
 
 bool LoadGLFunctions();

@@ -162,12 +162,32 @@ static void HostBuildRegistry()
             sa.Ptr = actor;
         }
 
-        // Read rotation (try offset from property_offsets discovery)
-        // For now use 0 — will be refined from debug dump data
-        sa.RotPitch = 0; sa.RotYaw = 0; sa.RotRoll = 0;
+        // Read rotation + mark dirty if rotated
+        FRot3 rot{};
+        if (GetActorRotation(actor, rot)) {
+            float newPitch = rot.Pitch * (360.0f / 65536.0f);
+            float newYaw = rot.Yaw * (360.0f / 65536.0f);
+            float newRoll = rot.Roll * (360.0f / 65536.0f);
+            float dYaw = std::abs(newYaw - sa.RotYaw);
+            if (dYaw > 2.0f) sa.Dirty = true; // rotated > 2 degrees
+            sa.RotPitch = newPitch;
+            sa.RotYaw = newYaw;
+            sa.RotRoll = newRoll;
+        }
 
-        // Try to read health if it's a Pawn-like actor
-        sa.Health = -1; // unknown by default
+        // Read health from Pawn-like actors
+        sa.Health = -1;
+        if (cn.find("Pawn") != std::string::npos ||
+            cn.find("Splicer") != std::string::npos ||
+            cn.find("BigDaddy") != std::string::npos ||
+            cn.find("Aggressor") != std::string::npos ||
+            cn.find("Fighter") != std::string::npos ||
+            cn.find("Security") != std::string::npos) {
+            float hp = 0;
+            if (GetActorProperty(actor, "Health", &hp, sizeof(hp))) {
+                sa.Health = hp;
+            }
+        }
 
         tracked++;
     }
@@ -225,9 +245,10 @@ static void HostSendBatches()
             sa->LastSendTime = s_HostTime;
         }
 
-        // Send via network
+        // Send via network (payload only — header added by SendPacket)
+        uint16_t payloadSize = (uint16_t)(8 + count * sizeof(ActorSyncData));
         NetSendRawPacket((PacketType)TrueCoopPackets::WorldStateBatch,
-                         &batch, sizeof(PacketHeader) + 8 + count * sizeof(ActorSyncData));
+                         &batch, payloadSize);
 
         s_PacketsSent++;
         s_BytesSent += 8 + count * sizeof(ActorSyncData);
@@ -368,9 +389,18 @@ static void ClientInterpolateAndApply()
 
         InterpState& state = ca.States[latest];
 
-        // Apply position to local actor
+        // Apply position to local actor (raw memcpy — safe for non-static actors)
         FVec3 newPos = {state.PosX, state.PosY, state.PosZ};
         SetActorPosition(ca.LocalPtr, newPos);
+
+        // Apply rotation
+        if (state.RotPitch != 0 || state.RotYaw != 0 || state.RotRoll != 0) {
+            FRot3 newRot;
+            newRot.Pitch = (int32_t)(state.RotPitch * (65536.0f / 360.0f));
+            newRot.Yaw = (int32_t)(state.RotYaw * (65536.0f / 360.0f));
+            newRot.Roll = (int32_t)(state.RotRoll * (65536.0f / 360.0f));
+            SetActorRotation(ca.LocalPtr, newRot);
+        }
     }
 }
 

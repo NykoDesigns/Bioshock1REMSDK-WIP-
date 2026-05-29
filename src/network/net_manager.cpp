@@ -2,6 +2,8 @@
 #include "coop_sync.h"
 #include "coop_economy.h"
 #include "coop_save.h"
+#include "coop_true.h"
+#include "coop_world_sync.h"
 #include "udp_socket.h"
 #include "../core/log.h"
 #include "../debug/crash_handler.h"
@@ -273,6 +275,20 @@ static void ProcessIncoming()
             OnSaveAckReceived(payload, hdr->size);
             break;
         default:
+            // True Co-op extended packet types (0x50+)
+            if ((uint8_t)hdr->type == TrueCoopPackets::WorldStateBatch) {
+                s_RemotePeer.lastRecvTime = s_Uptime;
+                if (hdr->size >= 8) // minimum: frameNum + counts
+                    HandleWorldStateBatch(*reinterpret_cast<const WorldStateBatchData*>(payload));
+            } else if ((uint8_t)hdr->type == TrueCoopPackets::ActorSpawn) {
+                s_RemotePeer.lastRecvTime = s_Uptime;
+                if (hdr->size >= sizeof(ActorSpawnData))
+                    HandleActorSpawn(*reinterpret_cast<const ActorSpawnData*>(payload));
+            } else if ((uint8_t)hdr->type == TrueCoopPackets::ActorDestroy) {
+                s_RemotePeer.lastRecvTime = s_Uptime;
+                if (hdr->size >= sizeof(ActorDestroyData))
+                    HandleActorDestroy(*reinterpret_cast<const ActorDestroyData*>(payload));
+            }
             break;
         }
     }

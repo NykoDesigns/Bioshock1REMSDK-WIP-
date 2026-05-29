@@ -368,6 +368,122 @@ bool SetActorPosition(UObject* actor, const FVec3& pos)
     return false;
 }
 
+bool GetActorRotation(UObject* actor, FRot3& outRot)
+{
+    if (!actor) return false;
+    UStruct* cls = reinterpret_cast<UStruct*>(actor->GetClass());
+    if (!cls) return false;
+
+    UField* child = cls;
+    int depth = 0;
+    while (child && depth < 64) {
+        UStruct* current = reinterpret_cast<UStruct*>(child);
+        UField* prop = current->GetChildren();
+        int limit = 2000;
+        while (prop && limit-- > 0) {
+            if (prop->GetObjClassName().find("Property") != std::string::npos) {
+                if (prop->GetName() == "Rotation") {
+                    UProperty* rotProp = reinterpret_cast<UProperty*>(prop);
+                    int32_t offset = rotProp->GetPropertyOffset();
+                    const uint8_t* base = reinterpret_cast<const uint8_t*>(actor);
+                    outRot.Pitch = *reinterpret_cast<const int32_t*>(base + offset);
+                    outRot.Yaw   = *reinterpret_cast<const int32_t*>(base + offset + 4);
+                    outRot.Roll  = *reinterpret_cast<const int32_t*>(base + offset + 8);
+                    return true;
+                }
+            }
+            prop = prop->GetNext();
+        }
+        UField* super = current->GetSuperField();
+        child = super;
+        depth++;
+    }
+    return false;
+}
+
+// SEH-safe wrapper for SetRotation ProcessEvent call
+static bool SafeCallSetRotation(ProcessEventFn pe, UObject* actor, UFunction* func,
+                                 int32_t pitch, int32_t yaw, int32_t roll)
+{
+    struct {
+        int32_t Pitch, Yaw, Roll;
+        uint32_t ReturnValue;
+    } parms{};
+    parms.Pitch = pitch; parms.Yaw = yaw; parms.Roll = roll;
+    __try {
+        pe(actor, func, &parms, nullptr);
+        return true;
+    } __except(EXCEPTION_EXECUTE_HANDLER) {
+        return false;
+    }
+}
+
+bool SetActorRotation(UObject* actor, const FRot3& rot)
+{
+    if (!actor) return false;
+
+    // Try SetRotation via ProcessEvent first
+    ProcessEventFn origPE = GetOriginalProcessEvent();
+    if (origPE) {
+        UStruct* cls = reinterpret_cast<UStruct*>(actor->GetClass());
+        if (cls) {
+            UField* walk = reinterpret_cast<UField*>(cls);
+            int depth = 0;
+            while (walk && depth < 64) {
+                UStruct* cur = reinterpret_cast<UStruct*>(walk);
+                UField* child = cur->GetChildren();
+                int limit = 2000;
+                while (child && limit-- > 0) {
+                    if (child->GetObjClassName() == "Function" && child->GetName() == "SetRotation") {
+                        UFunction* setRotFunc = reinterpret_cast<UFunction*>(child);
+                        uintptr_t nativePtr = setRotFunc->GetField<uintptr_t>(0x70);
+                        if (!nativePtr || nativePtr < 0x10000 ||
+                            !IsSafeToRead(reinterpret_cast<const void*>(nativePtr), 4)) {
+                            break;
+                        }
+                        if (SafeCallSetRotation(origPE, actor, setRotFunc, rot.Pitch, rot.Yaw, rot.Roll))
+                            return true;
+                        break;
+                    }
+                    child = child->GetNext();
+                }
+                walk = cur->GetSuperField();
+                depth++;
+            }
+        }
+    }
+
+    // Fallback: raw property write
+    UStruct* cls = reinterpret_cast<UStruct*>(actor->GetClass());
+    if (!cls) return false;
+
+    UField* child = reinterpret_cast<UField*>(cls);
+    int depth = 0;
+    while (child && depth < 64) {
+        UStruct* current = reinterpret_cast<UStruct*>(child);
+        UField* prop = current->GetChildren();
+        int limit = 2000;
+        while (prop && limit-- > 0) {
+            if (prop->GetObjClassName().find("Property") != std::string::npos) {
+                if (prop->GetName() == "Rotation") {
+                    UProperty* rotProp = reinterpret_cast<UProperty*>(prop);
+                    int32_t offset = rotProp->GetPropertyOffset();
+                    uint8_t* base = reinterpret_cast<uint8_t*>(actor);
+                    *reinterpret_cast<int32_t*>(base + offset)     = rot.Pitch;
+                    *reinterpret_cast<int32_t*>(base + offset + 4) = rot.Yaw;
+                    *reinterpret_cast<int32_t*>(base + offset + 8) = rot.Roll;
+                    return true;
+                }
+            }
+            prop = prop->GetNext();
+        }
+        UField* super = current->GetSuperField();
+        child = super;
+        depth++;
+    }
+    return false;
+}
+
 bool SetActorProperty(UObject* actor, const char* propName, const void* value, int size)
 {
     if (!actor || !propName) return false;

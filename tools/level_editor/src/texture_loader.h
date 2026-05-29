@@ -19,6 +19,7 @@ public:
     
     // Get or load a texture by name. Returns 0 if not found.
     unsigned int GetTexture(const std::string& textureName);
+    unsigned int GetDiffuse(const std::string& textureName) { return GetTexture(textureName); }
     
     // Get or load a normal map by base texture name. Returns 0 if not found.
     unsigned int GetNormalMap(const std::string& textureName);
@@ -28,6 +29,10 @@ public:
     
     // Get texture info including dimensions. Returns default (0,0,0) if not found.
     LoadedTexture GetTextureInfo(const std::string& textureName);
+    
+    // Upload DXT1 compressed data directly as a GL texture.
+    // Returns GL texture ID, or 0 on failure.
+    unsigned int UploadDXT1(const std::string& name, const uint8_t* data, int width, int height);
     
     // Release all loaded textures
     void Clear();

@@ -112,12 +112,21 @@ These fire through `UObject::ProcessEvent` and we can intercept ALL of them:
 | Position sync | ✅ Working | PlayerTick hook → PlayerStateData → UDP |
 | Health sync | ✅ Working | Read Health property, display on marker |
 | Diamond marker | ✅ Working | ImGui overlay with interpolation |
-| Chat | ✅ Working (just fixed) | Chat packet type + overlay display |
+| Chat | ✅ Working | Chat packet type + overlay display |
 | Damage sync | ✅ Framework | TakeDamage hook → DamageData packet |
 | Door sync | ✅ Framework | Open/Close hook → WorldEvent packet |
 | Pickup sync | ✅ Framework | PickedUp hook → WorldEvent packet |
-| Alt-tab keepalive | ✅ Working (just fixed) | Background thread pings |
+| Alt-tab keepalive | ✅ Working | Background thread pings |
 | Level mismatch detection | ✅ Working | Handshake includes levelName |
+| Economy sync | ✅ Working | Shared ADAM/Credits via coop_economy |
+| Puppet system | ✅ Working | Ghost NPC visualization via coop_puppet |
+| World state sync | ✅ Framework | Actor batch sync via coop_world_sync |
+| Level transitions | ✅ Framework | Auto-follow via coop_transitions |
+| Save/restore | ✅ Framework | Co-op state persistence via coop_save |
+| Testing framework | ✅ Working | Automated co-op tests via coop_testing |
+| Inventory sync | ✅ Framework | Item tracking via coop_inventory |
+
+**Next milestone:** True Co-op (Phase 1: Client AI freeze). See `docs/true-coop-plan.md`.
 
 ---
 

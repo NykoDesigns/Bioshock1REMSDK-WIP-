@@ -79,6 +79,7 @@ public:
     int PickActor(const BSMDocument& doc, float mouseX, float mouseY, float viewW, float viewH);
 
     Camera& GetCamera() { return m_Camera; }
+    TextureCache& GetTextureCache() { return m_TextureCache; }
 
     // Upload parsed meshes to GPU (call after document loads)
     void UploadMeshes(const std::vector<ParsedMesh>& meshes, const std::string& textureDir = "");
@@ -146,6 +147,8 @@ private:
     int m_LocHasNormalMap = -1; // whether normal map is bound
     int m_LocSpecMap = -1; // specular map sampler (texture unit 3)
     int m_LocHasSpecMap = -1; // whether specular map is bound
+    int m_LocLightMap = -1; // lightmap sampler (texture unit 4)
+    int m_LocHasLightMap = -1; // whether lightmap is bound
     int m_LocAlpha = -1;     // transparency (1.0 = opaque, <1 = water)
 
     // Per-mesh GPU data
@@ -167,6 +170,7 @@ private:
         bool isTwoSided = false; // FacingShader - disable backface culling
         bool isWater = false;    // water surface (transparent + animated)
         float lightMapScale = 0.0f; // BSP lightmap texel density (debug viz)
+        unsigned int lightMapId = 0; // BSP lightmap atlas texture ID
         uint8_t zoneIndex = 0;      // BSP zone index (debug viz)
     };
     std::vector<MeshGPU> m_MeshGPU;

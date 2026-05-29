@@ -1,0 +1,16 @@
+{
+  "ghidra_install": "Z:\\Ghidra\\ghidra_12.0.4_PUBLIC",
+  "ghidra_project_dir": "Z:\\Bioshock1SDK\\tools\\level_editor",
+  "ghidra_project_name": "ghidra_project",
+  "ghidra_program": "BioshockHD.exe",
+  "binary_path": "D:\\SteamLibrary\\steamapps\\common\\BioShock Remastered\\Build\\Final\\BioshockHD.exe",
+  "umodel_exe": "Z:\\UEViewer\\umodel_64.exe",
+  "umodel_export_dir": "Z:\\UEViewer\\export",
+  "ue_explorer_exe": "Z:\\Bioshock1SDK\\tools\\UE-Explorer\\UEExplorer.exe",
+  "uscript_decompiler_exe": "Z:\\Bioshock1SDK\\tools\\decompiler\\bin\\Release\\net48\\decompile.exe",
+  "baked_scripts_dir": "D:\\SteamLibrary\\steamapps\\common\\BioShock Remastered\\Build\\Final\\BakedScripts\\pc",
+  "decompiled_dir": "Z:\\Bioshock1SDK\\docs\\reverse-engineering\\decompiled",
+  "game_content_dir": "D:\\SteamLibrary\\steamapps\\common\\BioShock Remastered\\ContentBaked\\pc",
+  "game_root": "D:\\SteamLibrary\\steamapps\\common\\BioShock Remastered",
+  "umodel_game_tag": "bio"
+}

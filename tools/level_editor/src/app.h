@@ -5,6 +5,8 @@
 #include "scene_tree.h"
 #include "properties_panel.h"
 #include "content_browser.h"
+#include "thumbnail_renderer.h"
+#include "catalog_parser.h"
 #include <set>
 
 struct SDL_Window;
@@ -70,6 +72,8 @@ private:
     SceneTree m_SceneTree;
     PropertiesPanel m_PropertiesPanel;
     ContentBrowser m_ContentBrowser;
+    ThumbnailRenderer m_ThumbnailRenderer;
+    CatalogParser m_Catalog;
 
     int m_SelectedActor = -1;
     std::set<int> m_SelectedActors; // multi-select set
