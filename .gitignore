@@ -33,18 +33,23 @@ Thumbs.db
 *.ilk
 *.exp
 
-# Level editor build output
+# Level editor build output & session artifacts
 tools/level_editor/build/
+tools/level_editor/*.txt
+tools/level_editor/*.log
+tools/level_editor/*.dds
+tools/level_editor/*.ini
 build_editor/
 editor_log.txt
 editor_stdout.txt
 editor_stderr.txt
 imgui.ini
-tools/level_editor/*.txt
 
 # Ghidra project files (large binary analysis data)
 tools/level_editor/ghidra_project.gpr
 tools/level_editor/ghidra_project.rep/
+tools/level_editor/*.py
+tools/level_editor/*.java
 
 # Decompiled game source (generated, copyrighted)
 docs/reverse-engineering/decompiled/
