@@ -143,6 +143,11 @@ void TextureCache::AddAllMapTextureDirs(const std::string& exportRoot)
         if (!entry.is_directory()) continue;
         std::string texDir = entry.path().string() + "\\Texture";
         if (fs::is_directory(texDir) && texDir != m_TextureDir) {
+            // Skip duplicates (repeated map loads call this multiple times)
+            bool exists = false;
+            for (auto& d : m_ExtraSearchDirs)
+                if (d == texDir) { exists = true; break; }
+            if (exists) continue;
             m_ExtraSearchDirs.push_back(texDir);
             added++;
         }

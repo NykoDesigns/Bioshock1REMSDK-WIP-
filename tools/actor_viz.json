@@ -1,0 +1,4716 @@
+{
+  "version": 1,
+  "description": "Actor class \u2192 visual shape/color config for BS1LevelEditor viewport",
+  "totalEntries": 523,
+  "directRules": 87,
+  "inheritedRules": 5,
+  "config": {
+    "Light": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "PointLight": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "SpotLight": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "DirectionalLight": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "SkyLight": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "DominantDirectionalLight": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "DominantPointLight": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "DominantSpotLight": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "PointLightMovable": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "SpotLightMovable": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "TriggerLight": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.8,
+        0.1
+      ],
+      "radius": 32
+    },
+    "LightRig": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.8,
+        0.1
+      ],
+      "radius": 32
+    },
+    "Trigger": {
+      "shape": "box",
+      "color": [
+        0.2,
+        1.0,
+        0.3
+      ],
+      "radius": 48
+    },
+    "TriggerVolume": {
+      "shape": "box",
+      "color": [
+        0.2,
+        1.0,
+        0.3
+      ],
+      "radius": 48
+    },
+    "EncounterTriggerVolume": {
+      "shape": "box",
+      "color": [
+        0.2,
+        1.0,
+        0.3
+      ],
+      "radius": 48
+    },
+    "ActorGroupTrigger": {
+      "shape": "box",
+      "color": [
+        0.2,
+        1.0,
+        0.3
+      ],
+      "radius": 48
+    },
+    "SequenceTrigger": {
+      "shape": "box",
+      "color": [
+        0.2,
+        1.0,
+        0.3
+      ],
+      "radius": 48
+    },
+    "TriggerStreamVolume": {
+      "shape": "box",
+      "color": [
+        0.2,
+        1.0,
+        0.3
+      ],
+      "radius": 48
+    },
+    "DamageTrigger": {
+      "shape": "box",
+      "color": [
+        0.2,
+        1.0,
+        0.3
+      ],
+      "radius": 48
+    },
+    "Trigger_LOS": {
+      "shape": "box",
+      "color": [
+        0.2,
+        1.0,
+        0.3
+      ],
+      "radius": 48
+    },
+    "AmbientSound": {
+      "shape": "sphere",
+      "color": [
+        0.3,
+        0.5,
+        1.0
+      ],
+      "radius": 24
+    },
+    "AmbientSoundSimple": {
+      "shape": "sphere",
+      "color": [
+        0.3,
+        0.5,
+        1.0
+      ],
+      "radius": 24
+    },
+    "AmbientSoundNonLoop": {
+      "shape": "sphere",
+      "color": [
+        0.3,
+        0.5,
+        1.0
+      ],
+      "radius": 24
+    },
+    "SoundEmitter": {
+      "shape": "sphere",
+      "color": [
+        0.3,
+        0.5,
+        1.0
+      ],
+      "radius": 24
+    },
+    "SoundGroup": {
+      "shape": "sphere",
+      "color": [
+        0.3,
+        0.5,
+        1.0
+      ],
+      "radius": 24
+    },
+    "AudioComponent": {
+      "shape": "sphere",
+      "color": [
+        0.3,
+        0.5,
+        1.0
+      ],
+      "radius": 24
+    },
+    "BlockingVolume": {
+      "shape": "box",
+      "color": [
+        0.6,
+        0.3,
+        1.0
+      ],
+      "radius": 64
+    },
+    "PhysicsVolume": {
+      "shape": "box",
+      "color": [
+        0.6,
+        0.3,
+        1.0
+      ],
+      "radius": 64
+    },
+    "WaterVolume": {
+      "shape": "box",
+      "color": [
+        0.6,
+        0.3,
+        1.0
+      ],
+      "radius": 64
+    },
+    "PainCausingVolume": {
+      "shape": "box",
+      "color": [
+        0.6,
+        0.3,
+        1.0
+      ],
+      "radius": 64
+    },
+    "PostProcessVolume": {
+      "shape": "box",
+      "color": [
+        0.6,
+        0.3,
+        1.0
+      ],
+      "radius": 64
+    },
+    "ReverbVolume": {
+      "shape": "box",
+      "color": [
+        0.6,
+        0.3,
+        1.0
+      ],
+      "radius": 64
+    },
+    "LevelStreamingVolume": {
+      "shape": "box",
+      "color": [
+        0.6,
+        0.3,
+        1.0
+      ],
+      "radius": 64
+    },
+    "FogVolume": {
+      "shape": "box",
+      "color": [
+        0.6,
+        0.3,
+        1.0
+      ],
+      "radius": 64
+    },
+    "AudioVolume": {
+      "shape": "box",
+      "color": [
+        0.6,
+        0.3,
+        1.0
+      ],
+      "radius": 64
+    },
+    "PathNode": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "FlyingPathNode": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "NavigationPoint": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "JumpPoint": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "PlayerStart": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "Teleporter": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "Door": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "CoverNode": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "AggressorSpawner": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.2,
+        0.2
+      ],
+      "radius": 40
+    },
+    "AISpawnPoint": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.2,
+        0.2
+      ],
+      "radius": 40
+    },
+    "SpawnPoint": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.2,
+        0.2
+      ],
+      "radius": 40
+    },
+    "CreatureSpawner": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.2,
+        0.2
+      ],
+      "radius": 40
+    },
+    "NPCSpawnPoint": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.2,
+        0.2
+      ],
+      "radius": 40
+    },
+    "CameraActor": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.4,
+        0.8
+      ],
+      "radius": 24
+    },
+    "SecurityCamera": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.4,
+        0.8
+      ],
+      "radius": 24
+    },
+    "InterpActor": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.4,
+        0.8
+      ],
+      "radius": 24
+    },
+    "Matinee": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.4,
+        0.8
+      ],
+      "radius": 24
+    },
+    "SceneCapture": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.4,
+        0.8
+      ],
+      "radius": 24
+    },
+    "SceneCaptureActor": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.4,
+        0.8
+      ],
+      "radius": 24
+    },
+    "Pickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "InventoryPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "WeaponPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "AmmoPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "HealthPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "AudioDiaryPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "ItemPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "VendingMachine": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "VendingWide": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "UpgradeStation": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "LootSlot": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "LootItemSpecification": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "Emitter": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "SpriteEmitter": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "MeshEmitter": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "BeamEmitter": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "ParticleSystem": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "ParticleEmitter": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "LevelInfo": {
+      "shape": "diamond",
+      "color": [
+        0.8,
+        0.8,
+        0.8
+      ],
+      "radius": 12
+    },
+    "GameInfo": {
+      "shape": "diamond",
+      "color": [
+        0.8,
+        0.8,
+        0.8
+      ],
+      "radius": 12
+    },
+    "ZoneInfo": {
+      "shape": "diamond",
+      "color": [
+        0.8,
+        0.8,
+        0.8
+      ],
+      "radius": 12
+    },
+    "PhysicsInfo": {
+      "shape": "diamond",
+      "color": [
+        0.8,
+        0.8,
+        0.8
+      ],
+      "radius": 12
+    },
+    "ActorGroup": {
+      "shape": "diamond",
+      "color": [
+        0.8,
+        0.8,
+        0.8
+      ],
+      "radius": 12
+    },
+    "Note": {
+      "shape": "diamond",
+      "color": [
+        0.8,
+        0.8,
+        0.8
+      ],
+      "radius": 12
+    },
+    "Bookmark": {
+      "shape": "diamond",
+      "color": [
+        0.8,
+        0.8,
+        0.8
+      ],
+      "radius": 12
+    },
+    "SequenceAction": {
+      "shape": "diamond",
+      "color": [
+        1.0,
+        0.0,
+        1.0
+      ],
+      "radius": 16
+    },
+    "SequenceEvent": {
+      "shape": "diamond",
+      "color": [
+        1.0,
+        0.0,
+        1.0
+      ],
+      "radius": 16
+    },
+    "SequenceCondition": {
+      "shape": "diamond",
+      "color": [
+        1.0,
+        0.0,
+        1.0
+      ],
+      "radius": 16
+    },
+    "SequenceVariable": {
+      "shape": "diamond",
+      "color": [
+        1.0,
+        0.0,
+        1.0
+      ],
+      "radius": 16
+    },
+    "SequenceFrame": {
+      "shape": "diamond",
+      "color": [
+        1.0,
+        0.0,
+        1.0
+      ],
+      "radius": 16
+    },
+    "Sequence": {
+      "shape": "diamond",
+      "color": [
+        1.0,
+        0.0,
+        1.0
+      ],
+      "radius": 16
+    },
+    "Script": {
+      "shape": "diamond",
+      "color": [
+        1.0,
+        0.0,
+        1.0
+      ],
+      "radius": 16
+    },
+    "ScriptedAction": {
+      "shape": "diamond",
+      "color": [
+        1.0,
+        0.0,
+        1.0
+      ],
+      "radius": 16
+    },
+    "AIArchetype": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "AIContainerInfo": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "AIController": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "AIEventNotification": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "AbsinthePickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "AccordianGateDoor": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "ActionAISpeech": {
+      "shape": "sphere",
+      "color": [
+        0.3,
+        0.5,
+        1.0
+      ],
+      "radius": 24
+    },
+    "ActionActivateSecurityBot": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "ActionApplyScriptedHandAttachment": {
+      "shape": "diamond",
+      "color": [
+        1.0,
+        0.0,
+        1.0
+      ],
+      "radius": 16
+    },
+    "ActionAssignNextSecurityBotSpawnLocation": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "ActionBlockingExecuteScript": {
+      "shape": "box",
+      "color": [
+        0.2,
+        1.0,
+        0.3
+      ],
+      "radius": 48
+    },
+    "ActionChangePEGWaitDistance": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "ActionChangePawnPhysics": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "ActionCinematicFadeView": {
+      "shape": "diamond",
+      "color": [
+        1.0,
+        0.0,
+        1.0
+      ],
+      "radius": 16
+    },
+    "ActionClearAIDamageStates": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "ActionClearContainer": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "ActionClearTrainingMessage": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "ActionCloseDoor": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "ActionControlScriptedSequence": {
+      "shape": "diamond",
+      "color": [
+        1.0,
+        0.0,
+        1.0
+      ],
+      "radius": 16
+    },
+    "ActionDestroyAIs": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "ActionDoorKeypadUsed": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "ActionEnableOrDisableCascadingWaterVolume": {
+      "shape": "box",
+      "color": [
+        0.2,
+        1.0,
+        0.3
+      ],
+      "radius": 48
+    },
+    "ActionEnableOrDisableDamageVolume": {
+      "shape": "box",
+      "color": [
+        0.2,
+        1.0,
+        0.3
+      ],
+      "radius": 48
+    },
+    "ActionEnableOrDisableSoundPropagation": {
+      "shape": "sphere",
+      "color": [
+        0.3,
+        0.5,
+        1.0
+      ],
+      "radius": 24
+    },
+    "ActionEnableOrDisableTrainingMessages": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "ActionExitScript": {
+      "shape": "diamond",
+      "color": [
+        1.0,
+        0.0,
+        1.0
+      ],
+      "radius": 16
+    },
+    "ActionFadeVolumeOverride": {
+      "shape": "box",
+      "color": [
+        0.2,
+        1.0,
+        0.3
+      ],
+      "radius": 48
+    },
+    "ActionFailQuest": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "ActionFilterItem": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "ActionGathererCrawlThroughDoor": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "ActionGetNumAIsInSpawnZone": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.2,
+        0.2
+      ],
+      "radius": 40
+    },
+    "ActionGetNumItemsInContainer": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "ActionGetNumItemsInPlayersInventory": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "ActionGetPawnHealth": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "ActionGiveItemsToPlayer": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "ActionHackTurret": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "ActionKeypadContainerUsed": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "ActionLockDoor": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "ActionManipulateSpawnZoneRepopulation": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.2,
+        0.2
+      ],
+      "radius": 40
+    },
+    "ActionMuteAI": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "ActionNonBlockingExecuteScript": {
+      "shape": "box",
+      "color": [
+        0.2,
+        1.0,
+        0.3
+      ],
+      "radius": 48
+    },
+    "ActionOpenDoor": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "ActionPlaceItemInContainer": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "ActionPlaceItemInContainerSlot": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "ActionPlayEffect": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "ActionPlayEffectAndWaitForStart": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "ActionPlayScriptedHandAnimation": {
+      "shape": "diamond",
+      "color": [
+        1.0,
+        0.0,
+        1.0
+      ],
+      "radius": 16
+    },
+    "ActionRemoveAvailableHoldable": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "ActionRemoveItemFromContainer": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "ActionRemoveItemsFromPlayer": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "ActionRemoveScriptedHandAttachment": {
+      "shape": "diamond",
+      "color": [
+        1.0,
+        0.0,
+        1.0
+      ],
+      "radius": 16
+    },
+    "ActionScriptNote": {
+      "shape": "diamond",
+      "color": [
+        1.0,
+        0.0,
+        1.0
+      ],
+      "radius": 16
+    },
+    "ActionSendTriggerMessage": {
+      "shape": "box",
+      "color": [
+        0.2,
+        1.0,
+        0.3
+      ],
+      "radius": 48
+    },
+    "ActionSetAINormalLODOverrideTime": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "ActionSetAIPatrol": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "ActionSetAIRangedWeaponAccuracy": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "ActionSetAIState": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "ActionSetAIVulnerability": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "ActionSetDoorBrokenState": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "ActionSetEffectsSystemContext": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "ActionSetGathererVentPlayerCanSpawn": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "ActionSetLightProperties": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "ActionSetMovableSpotlightState": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "ActionSetMovableSpotlightTarget": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "ActionSetPawnInvincibility": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "ActionSetSpawnerRepopulationState": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.2,
+        0.2
+      ],
+      "radius": 40
+    },
+    "ActionShowTrainingMessage": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "ActionSpawnAI": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "ActionSpawnLinkedGathererAndProtector": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "ActionSpawnPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "ActionSpawnPlayerEscortedGatherer": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "ActionSpawnReactiveActor": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "ActionSpawnSecurityBot": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "ActionSpawnTurret": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "ActionStartAIHeadTracking": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "ActionStartScriptedHandAnimationSequence": {
+      "shape": "diamond",
+      "color": [
+        1.0,
+        0.0,
+        1.0
+      ],
+      "radius": 16
+    },
+    "ActionStopAIHeadTracking": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "ActionStopEffect": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "ActionStopScriptedHandAnimationSequence": {
+      "shape": "diamond",
+      "color": [
+        1.0,
+        0.0,
+        1.0
+      ],
+      "radius": 16
+    },
+    "ActionTeleportPawnToLocation": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "ActionTellAIToContinue": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "ActionTellAIToSendWeaponFireMessage": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "ActionTellAIToWait": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "ActionToggleAIAttachmentVisibility": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "ActionToggleAIAttacking": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "ActionToggleAIReactions": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "ActionToggleAIWeaponVisibility": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "ActionToggleSecurityCameraSpotlight": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "ActionTriggerHavokForceActor": {
+      "shape": "box",
+      "color": [
+        0.2,
+        1.0,
+        0.3
+      ],
+      "radius": 48
+    },
+    "ActionTweakAIHearing": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "ActionTweakAIVision": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "ActionUnlockDoor": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "ActionWait": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "ActionWaitForCriticalMessageStart": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "ActionWaitForGoal": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "ActionWaitForQuestLogToFinish": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "ActionWaitUntilActorHasLanded": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "ActivePlasmidPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "AdamPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "AnimNotify_AIEventNotification": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "AnimNotify_DispatchScriptingMessage": {
+      "shape": "diamond",
+      "color": [
+        1.0,
+        0.0,
+        1.0
+      ],
+      "radius": 16
+    },
+    "AnimNotify_DropAIAttachment": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "AnimNotify_EffectEvent": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "AnimNotify_EffectEventOnPlayer": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "AnimNotify_SpeechEvent": {
+      "shape": "sphere",
+      "color": [
+        0.3,
+        0.5,
+        1.0
+      ],
+      "radius": 24
+    },
+    "AnimNotify_StartScriptedHandSequence": {
+      "shape": "diamond",
+      "color": [
+        1.0,
+        0.0,
+        1.0
+      ],
+      "radius": 16
+    },
+    "AnimNotify_StopScriptedHandSequence": {
+      "shape": "diamond",
+      "color": [
+        1.0,
+        0.0,
+        1.0
+      ],
+      "radius": 16
+    },
+    "AnimateFXTest": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "AntiPersonnelBoltPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "AntiPersonnelBulletPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "ApiarySmokeSwitch": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "ArcSealDoorSwitch": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "Arc_WaterMurk": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "ArcadiaBlastDoor": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "ArcadiaGateDoor": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "ArmorPiercingBulletPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "AutoHackDevicePickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "BandagesPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "BannerRippedA_Artist_lightair01": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "BannerRippedB_Artist_lightair01": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "BathLight_8": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "BeerPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "BerserkToxinPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "BerzerkSmoke": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "BlastdoorDoor": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "BrandyPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "BrineOmni": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "BrineSparse_1024x_512": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "BrokenVendingMachine": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "Broken_Stairs": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "BubblesRisingA": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "BubblesRisingRed": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "Bubbles_512x_128": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "BulkheadDoors": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "CascadingWaterVolume": {
+      "shape": "box",
+      "color": [
+        0.2,
+        1.0,
+        0.3
+      ],
+      "radius": 48
+    },
+    "CeilingPathNode": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "CheapCigarettesPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "ChemicalThrowerAndNapalmPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "ChemicalThrowerPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "ChipsPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "ChlorophyllPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "ChompersDentalKeyPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "Cloth_Line_long_lightair01": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "Cloth_Line_short_lightair01": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "CoffeePickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "Container": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "ConvexVolume": {
+      "shape": "box",
+      "color": [
+        0.2,
+        1.0,
+        0.3
+      ],
+      "radius": 48
+    },
+    "CrossbowAndStandardBoltPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "CrossbowPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "DeadBodyContainer": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "DeadBreadwinnerContainer": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "DeadCatContainer": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "DeadGathererContainer": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "DefaultPhysicsVolume": {
+      "shape": "box",
+      "color": [
+        0.2,
+        1.0,
+        0.3
+      ],
+      "radius": 48
+    },
+    "DefaultSecurityCameraSpotlight": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "DistilledWaterPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "DoorKeypadControl": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "DoorSwitch": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "Door_ClosingOnHead": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "Drips_Gen": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "DustHanging_400x_400": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "DynamicLight": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "DynamicLightMuzzleFlash": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "DynamicLight_Camera": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "EVEHypoPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "ElevatorDoor": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "EngSteamControlPanelA": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "EngSteamJet_1": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "EngSteam_1": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "Eng_CoreSteamEmitter": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "Eng_CoreSteamEmitterB": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "Eng_CoreSteamJet": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "Eng_DoorCut": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "Eng_Electricwater": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "EngineeringDoors": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "EngineeringPlasmidPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "EventResponse_ModEffectsSubsystem": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "EventResponse_SoundEffectsSubsystem": {
+      "shape": "sphere",
+      "color": [
+        0.3,
+        0.5,
+        1.0
+      ],
+      "radius": 24
+    },
+    "EventResponse_VisualEffectsSubsystem": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "ExpensiveCigarettesPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "FilmPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "Fire_Big": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "Fire_LargeFlame": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "Fire_LargeSmoke": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "Fire_Mid": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "Fireflies_Area": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "FisFreezerGrateDoor_SIDE": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "Fis_PeachesAtDoor": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "FishFreezerDoorDown": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "FishFreezerDoorUP": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "FishGrateDoorSIDE": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "FishGrateDoorUP": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "Fish_DeadAI_A": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "Fish_DeadAI_B": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "FisheriesSlotDoor": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "FlameChemicalPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "FloatingDeadAI_01": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "FlowerVaseContainer": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "FluidVolume": {
+      "shape": "box",
+      "color": [
+        0.2,
+        1.0,
+        0.3
+      ],
+      "radius": 48
+    },
+    "FragGrenadePickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "FreezeChemicalPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "Gate01Door": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "GathererDoorDouble": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "GathererDoorSingle": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "GathererPheremoneSamplePickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "GinPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "GoreDrip": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "GoreLight_Decal": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "GrenadeLauncherAndFragGrenadesPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "GrenadeLauncherPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "HangingBAnner_Ascendancy_lightair01": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "HangingBanner_Creativity_lightair01": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "HangingBanner_Creativity_lightair02": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "HangingBanner_Independence_lightair01": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "HangingBanner_Independence_lightair02": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "Havok6DOFConstraint": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "HavokBSConstraint": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "HavokConeLimitConstraint": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "HavokForceTypePushFromDoor": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "HavokForceTypeTriggeredForce": {
+      "shape": "box",
+      "color": [
+        0.2,
+        1.0,
+        0.3
+      ],
+      "radius": 48
+    },
+    "HavokForceTypeTriggeredImpulse": {
+      "shape": "box",
+      "color": [
+        0.2,
+        1.0,
+        0.3
+      ],
+      "radius": 48
+    },
+    "HavokForceTypeTriggeredVelocity": {
+      "shape": "box",
+      "color": [
+        0.2,
+        1.0,
+        0.3
+      ],
+      "radius": 48
+    },
+    "HavokHingeConstraint": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "HavokPrismaticConstraint": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "HighExplosiveBuckshotPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "HighRentDoor": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "HighRentDoorWide": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "Hyd_WoodenCrawlSpaceDoor": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "InPlayerViewTrigger": {
+      "shape": "box",
+      "color": [
+        0.2,
+        1.0,
+        0.3
+      ],
+      "radius": 48
+    },
+    "Int_FireBig": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "Int_FireMover": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "Int_FrontDoor": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "Int_YBubbles": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "Intro_PlaneTail": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "IonicBuckshotPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "IonicChemicalPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "IonicPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "KeyframedDeadBodyContainer": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "LangfordPainting": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "LangfordRosePickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "LightBeamShader": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "LightSwitch": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "LoadRoomDoor": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "LockerDoorOpening": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "LogPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "LootTableSpecification": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "LowRentDoorsWide": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "MachineGunAndStandardBulletPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "MachineGunArmorPiercingBulletPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "MachineGunBulletPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "MachineGunFrozenBulletPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "MailTube": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "MaterialCascadingWater": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "MaterialColorFromLight": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "MaterialSequence": {
+      "shape": "diamond",
+      "color": [
+        1.0,
+        0.0,
+        1.0
+      ],
+      "radius": 16
+    },
+    "MedHypoPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "Med_DoorOnBot": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "MedicalDoor": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "MedicalDoors": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "MedicalDoors_Solid": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "MessageAIAttackingTarget": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "MessageAIRecognizedPlayer": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "MessageAISpawned": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "MessageAIWeaponFired": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "MessageAtlasAdamDrainStarted": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "MessageDoorOpen": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "MessageKeypadContainerUsed": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "MessagePawnAquiredState": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "MessagePawnDied": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "MessagePawnShattered": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "MessagePawnTookDamage": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "MessagePlayerClosedContainer": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "MessagePlayerCraftedItem": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "MessagePlayerFiredWeapon": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "MessagePlayerOpenedContainer": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "MessagePlayerRemovedItemFromContainer": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "MessageSoundStopped": {
+      "shape": "sphere",
+      "color": [
+        0.3,
+        0.5,
+        1.0
+      ],
+      "radius": 24
+    },
+    "MessageTriggerEnter": {
+      "shape": "box",
+      "color": [
+        0.2,
+        1.0,
+        0.3
+      ],
+      "radius": 48
+    },
+    "MessageTriggerExit": {
+      "shape": "box",
+      "color": [
+        0.2,
+        1.0,
+        0.3
+      ],
+      "radius": 48
+    },
+    "MessageTriggerVolumeEnter": {
+      "shape": "box",
+      "color": [
+        0.2,
+        1.0,
+        0.3
+      ],
+      "radius": 48
+    },
+    "MessageTriggerVolumeExit": {
+      "shape": "box",
+      "color": [
+        0.2,
+        1.0,
+        0.3
+      ],
+      "radius": 48
+    },
+    "MessageZoneEntered": {
+      "shape": "box",
+      "color": [
+        0.2,
+        1.0,
+        0.3
+      ],
+      "radius": 48
+    },
+    "MessageZoneExited": {
+      "shape": "box",
+      "color": [
+        0.2,
+        1.0,
+        0.3
+      ],
+      "radius": 48
+    },
+    "MistLow": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "MistingMachine": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "MistingRelease": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "ModEffectSpecification": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "MolotovSmoke": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "MultipleRibbonEmitter": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "NitroglycerinPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "NonPhysicalNonPathBlockingReactiveActor": {
+      "shape": "box",
+      "color": [
+        0.2,
+        1.0,
+        0.3
+      ],
+      "radius": 48
+    },
+    "ObjectContainer": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "OceanBrineWeather": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "PathBlockingVolume": {
+      "shape": "box",
+      "color": [
+        0.2,
+        1.0,
+        0.3
+      ],
+      "radius": 48
+    },
+    "PeepHoleDoor": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "PhysicalPlasmidPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "PhysicalSteamerTrunk": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "PistolAndStandardBulletPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "PistolPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "PlaceableDamageEmitter": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "PlaceableHealthStation": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "PlaceableMovableLight": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "PlaceableVendingStation": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "PlaceableVendingStationAlt": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "PlayerPathNode": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "PowerBarPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "PowerBarPickup_2": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "ProtectorSpawner": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.2,
+        0.2
+      ],
+      "radius": 40
+    },
+    "ProximityGrenadePickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "ResearchCameraAndFilmPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "ResearchCameraPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "RibbonEmitter": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "RocketGrenadePickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "RyanSpeech": {
+      "shape": "sphere",
+      "color": [
+        0.3,
+        0.5,
+        1.0
+      ],
+      "radius": 24
+    },
+    "SCI_GreatChainAnimation": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "Sci_MistDrop": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "Sci_VoiceboxAnim": {
+      "shape": "sphere",
+      "color": [
+        0.3,
+        0.5,
+        1.0
+      ],
+      "radius": 24
+    },
+    "ScienceDoors": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "ScotchPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "ScriptableMover": {
+      "shape": "diamond",
+      "color": [
+        1.0,
+        0.0,
+        1.0
+      ],
+      "radius": 16
+    },
+    "SecurityBotSpawner": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.2,
+        0.2
+      ],
+      "radius": 40
+    },
+    "SecurityCameraSparks": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "SecurityCameraSpawner": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.2,
+        0.2
+      ],
+      "radius": 40
+    },
+    "SewerWheelItem": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "ShockAIScout": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "ShockDamageVolume": {
+      "shape": "box",
+      "color": [
+        0.2,
+        1.0,
+        0.3
+      ],
+      "radius": 48
+    },
+    "ShockedBody_Water": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "ShojiDoors": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "ShotgunAnd00BuckPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "ShotgunPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "SingleStandardBoltPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "SkyZoneInfo": {
+      "shape": "box",
+      "color": [
+        0.2,
+        1.0,
+        0.3
+      ],
+      "radius": 48
+    },
+    "SlidingStoreDoors": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "SmugglerBanner_lightair01": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "Sound": {
+      "shape": "sphere",
+      "color": [
+        0.3,
+        0.5,
+        1.0
+      ],
+      "radius": 24
+    },
+    "SoundEffectSpecification": {
+      "shape": "sphere",
+      "color": [
+        0.3,
+        0.5,
+        1.0
+      ],
+      "radius": 24
+    },
+    "SoundMarker": {
+      "shape": "sphere",
+      "color": [
+        0.3,
+        0.5,
+        1.0
+      ],
+      "radius": 24
+    },
+    "SparkRain": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "SpawnZoneInfo": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.2,
+        0.2
+      ],
+      "radius": 40
+    },
+    "SpawningManager": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "Special_InPlayerViewTrigger": {
+      "shape": "box",
+      "color": [
+        0.2,
+        1.0,
+        0.3
+      ],
+      "radius": 48
+    },
+    "Splash_Foam": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "Splash_SmallStream": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "Splash_Trickle": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "StandardBoltPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "StandardBuckshotPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "StandardBulletPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "SteamHanging_800x_800": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "SteamLeakBig": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "Steam_LightRising": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "SteamerTrunk": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "SuperHeatedBoltPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "TennisTurret": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "ToArcadiaDoor": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "ToGauntDoor": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "ToHephDoor": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "ToMarketDoor": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "ToResiDoor": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "ToRyanDoor": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "ToScienceDoor": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "ToSlumsDoor": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "ToSubBayDoor": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "TrainingConcept": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "TrainingCondition": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "TrainingMarker": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "TrainingMessageTrigger": {
+      "shape": "box",
+      "color": [
+        0.2,
+        1.0,
+        0.3
+      ],
+      "radius": 48
+    },
+    "TrainingScript": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "TraitorBannerBreeze": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "TrapBoltPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "TriggerRadius": {
+      "shape": "box",
+      "color": [
+        0.2,
+        1.0,
+        0.3
+      ],
+      "radius": 48
+    },
+    "TurretDeadBody": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "TurretSmoking": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "TurretSpawner": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.2,
+        0.2
+      ],
+      "radius": 40
+    },
+    "TwinkiePickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "TwinkiePickup_2": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "VendingLootTable": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "VendingMachineBooby": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "VisualEffectSpecification": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "VisualFXProxyReactiveActor": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "VodkaPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "VoiceboxModificationMachine": {
+      "shape": "sphere",
+      "color": [
+        0.3,
+        0.5,
+        1.0
+      ],
+      "radius": 24
+    },
+    "Volume": {
+      "shape": "box",
+      "color": [
+        0.2,
+        1.0,
+        0.3
+      ],
+      "radius": 48
+    },
+    "WaterDripSplash": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "WaterDrip_256": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "WaterDrip_512": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "WaterSplashLocal_PP": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "WaterSplashSpray_Small": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "WaterSplash_Small": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "WaterSplash_SmallPP": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "WeaponsPlasmidPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "Wel_BHDoorBuckle": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "Wel_PlaneChairSpew": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "Wel_PlaneDrips": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "Wel_RadioPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "Wel_RapidWater": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "Wel_SpawnBag": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "Wel_StairRapidA": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "Wel_StairRapidB": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "WelcomeDoors": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "Welcome_WaterPour": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "Welcome_WaterSplash": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "WheelchairSafehouse": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "WhiskyPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "WinePickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "WrenchPickup": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.7,
+        0.0
+      ],
+      "radius": 16
+    },
+    "ZoneSoundPropagation": {
+      "shape": "sphere",
+      "color": [
+        0.3,
+        0.5,
+        1.0
+      ],
+      "radius": 24
+    },
+    "banner_Artist_wall_lightair01": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "banner_ChainHand_breeze01": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "banner_ChainHand_wall_lightair01": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "banner_Constrained_lightair01": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "banner_Constrained_wall_lightair01": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "banner_OnlyMan_lightair01": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "banner_OnlyMan_wall_lightair01": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "banner_ParasiteAsks_lightair01": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "banner_ParasiteAsks_wall_lightair01": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "banner_TiesUnties_lightair01_reverse": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "banner_TiesUnties_wall_lightair01": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "dyn_DeskChairB": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "dyn_Steamer_Trunk": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "dyn_cafe_chair": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "dyn_desk_chair": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "dyn_dining_chair": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "dyn_light_desk": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "dyn_med_wheelchair": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "dyn_painting_1x_1": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "dyn_painting_1x_2": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "dyn_restaurant_chair": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "dyn_thea_chair1_closed": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "dyn_theater_light": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "dyn_train_stool": {
+      "shape": "cone",
+      "color": [
+        1.0,
+        0.3,
+        0.3
+      ],
+      "radius": 36
+    },
+    "ventLight": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.9,
+        0.2
+      ],
+      "radius": 32
+    },
+    "AnimNotify_FootStep": {
+      "shape": "sphere",
+      "color": [
+        1.0,
+        0.5,
+        0.0
+      ],
+      "radius": 20
+    },
+    "CeilingPatrolPoint": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "FloorPoint": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "PatrolPoint": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    },
+    "TeleportPoint": {
+      "shape": "diamond",
+      "color": [
+        0.0,
+        1.0,
+        1.0
+      ],
+      "radius": 20
+    }
+  }
+}
