@@ -592,6 +592,13 @@ void App::ProcessEvents()
             if (e.key.keysym.sym == SDLK_F4) {
                 m_ShowSpawner = !m_ShowSpawner;
             }
+            // F5: Toggle game bridge connection
+            if (e.key.keysym.sym == SDLK_F5) {
+                if (m_BridgeClient.IsConnected())
+                    m_BridgeClient.Disconnect();
+                else
+                    m_BridgeClient.Connect();
+            }
             // Camera bookmarks: Ctrl+0-9 to save, 0-9 to recall (not while flying)
             if (!m_RMBDown) {
                 for (int bk = 0; bk <= 9; bk++) {
@@ -624,6 +631,9 @@ void App::ProcessEvents()
 
 void App::Update(float dt)
 {
+    // Poll live game bridge
+    m_BridgeClient.Poll();
+
     // Progressive thumbnail generation (4 per frame)
     m_ThumbnailRenderer.GenerateBatch(4);
 
@@ -774,6 +784,28 @@ void App::RenderUI()
             ImGui::MenuItem("Nearby Actor Inspector", nullptr, &m_ShowNearbyInspector);
             ImGui::MenuItem("Target Area Report", nullptr, &m_ShowTargetAreaReport);
             ImGui::MenuItem("ImGui Demo", nullptr, &m_ShowDemo);
+            ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("Game")) {
+            bool connected = m_BridgeClient.IsConnected();
+            if (!connected) {
+                if (ImGui::MenuItem("Connect to Game", "F5"))
+                    m_BridgeClient.Connect();
+            } else {
+                char buf[128];
+                snprintf(buf, sizeof(buf), "Connected (%.0fms) | tx=%d rx=%d",
+                         m_BridgeClient.GetLatencyMs(),
+                         m_BridgeClient.GetMessagesSent(),
+                         m_BridgeClient.GetMessagesReceived());
+                ImGui::TextDisabled("%s", buf);
+                if (ImGui::MenuItem("Disconnect"))
+                    m_BridgeClient.Disconnect();
+                ImGui::Separator();
+                if (ImGui::MenuItem("Sync Player Position"))
+                    m_BridgeClient.SendQueryPlayer();
+                if (ImGui::MenuItem("Ping"))
+                    m_BridgeClient.SendPing();
+            }
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("Help")) {

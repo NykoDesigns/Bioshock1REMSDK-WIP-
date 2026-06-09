@@ -24,6 +24,7 @@
 #include "../network/coop_render.h"
 #include "../network/coop_save.h"
 #include "../network/net_manager.h"
+#include "../engine/editor_bridge.h"
 
 #include <imgui.h>
 #include <imgui_impl_dx11.h>
@@ -2411,6 +2412,27 @@ void Overlay::RenderConsole()
         else if (tokens[0] == "functions") {
             DumpAllFunctions();
             LogGreen("All functions -> debug_dumps/all_functions.txt");
+        }
+        // ─── editorbridge ─── start/stop live editor bridge
+        else if (tokens[0] == "editorbridge" || tokens[0] == "eb") {
+            if (tokens.size() >= 2 && (tokens[1] == "stop" || tokens[1] == "off")) {
+                StopEditorBridge();
+                LogYellow("Editor bridge stopped");
+            } else {
+                if (IsEditorBridgeRunning()) {
+                    auto stats = GetEditorBridgeStats();
+                    char buf[256];
+                    snprintf(buf, sizeof(buf), "Bridge running | clients=%d | rx=%d tx=%d moves=%d",
+                             GetEditorBridgeClientCount(), stats.messagesReceived,
+                             stats.messagesSent, stats.actorMoves);
+                    LogInfo(buf);
+                } else {
+                    if (StartEditorBridge())
+                        LogGreen("Editor bridge started on localhost:19760");
+                    else
+                        LogRed("Failed to start editor bridge");
+                }
+            }
         }
         // ─── unknown ───
         else {

@@ -77,6 +77,8 @@ set(EDITOR_SOURCES
     src/thumbnail_renderer.cpp
     src/catalog_parser.h
     src/catalog_parser.cpp
+    src/editor_bridge_client.h
+    src/editor_bridge_client.cpp
 )
 
 add_executable(BS1LevelEditor ${EDITOR_SOURCES})
@@ -86,6 +88,7 @@ target_link_libraries(BS1LevelEditor PRIVATE
     SDL2-static
     SDL2main
     opengl32
+    ws2_32
 )
 
 target_include_directories(BS1LevelEditor PRIVATE

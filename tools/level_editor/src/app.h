@@ -7,6 +7,7 @@
 #include "content_browser.h"
 #include "thumbnail_renderer.h"
 #include "catalog_parser.h"
+#include "editor_bridge_client.h"
 #include <set>
 
 struct SDL_Window;
@@ -158,4 +159,7 @@ private:
     // Gizmo dragging state
     bool m_GizmoWasDragging = false;
     float m_ViewportW = 1, m_ViewportH = 1;
+
+    // Live game bridge
+    EditorBridgeClient m_BridgeClient;
 };
