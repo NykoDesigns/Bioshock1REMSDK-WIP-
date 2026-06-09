@@ -3,6 +3,7 @@
 #include <filesystem>
 #include <algorithm>
 #include <cmath>
+#include <set>
 
 // ─── Inline BSM parser (extracted from bsm_tool for self-contained build) ───
 // This is a minimal version that parses enough to extract actor positions.
@@ -809,9 +810,11 @@ bool BSMDocument::Load(const std::string& filepath)
                 if (!entry.is_directory()) continue;
                 std::string dirName = entry.path().filename().string();
                 if (dirName == gltfMapName || dirName == "_BulkTextures") continue;
-                std::vector<ParsedMesh> crossMeshes = LoadAllMeshesFromExportDir(entry.path().string());
+                std::string crossDir = entry.path().string();
+                std::vector<ParsedMesh> crossMeshes = LoadAllMeshesFromExportDir(crossDir);
                 for (size_t mi = 0; mi < crossMeshes.size(); mi++) {
                     if (m_MeshNameToIndex.find(crossMeshes[mi].name) == m_MeshNameToIndex.end()) {
+                        crossMeshes[mi].sourceExportDir = crossDir;
                         m_MeshNameToIndex[crossMeshes[mi].name] = (int)m_Meshes.size();
                         m_Meshes.push_back(std::move(crossMeshes[mi]));
                         crossMapAdded++;
@@ -1463,13 +1466,58 @@ void BSMDocument::ResolveTextures(const std::string& umodelExportDir)
         return m;
     };
 
+    // Also load shader→diffuse mappings from cross-map source directories
+    {
+        std::set<std::string> loadedShaderDirs;
+        loadedShaderDirs.insert(shaderDir);
+        for (auto& mesh : m_Meshes) {
+            if (mesh.sourceExportDir.empty()) continue;
+            std::string crossShaderDir = mesh.sourceExportDir + "\\Shader";
+            if (loadedShaderDirs.count(crossShaderDir)) continue;
+            loadedShaderDirs.insert(crossShaderDir);
+            if (!fs::is_directory(crossShaderDir)) continue;
+            int added = 0;
+            for (auto& entry : fs::directory_iterator(crossShaderDir)) {
+                std::string fname = entry.path().filename().string();
+                std::string stem;
+                bool isProps = false;
+                if (entry.path().extension() == ".mat") {
+                    stem = entry.path().stem().string();
+                } else if (fname.size() > 10 && fname.substr(fname.size() - 10) == ".props.txt") {
+                    stem = fname.substr(0, fname.size() - 10);
+                    isProps = true;
+                } else continue;
+                std::string key = stripShaderSuffix(stem);
+                if (shaderToDiffuse.count(key)) continue;
+                std::ifstream sf(entry.path());
+                std::string line;
+                while (std::getline(sf, line)) {
+                    size_t dpos = line.find("Diffuse");
+                    if (dpos != 0) continue;
+                    size_t eq = line.find('=');
+                    if (eq == std::string::npos) continue;
+                    std::string diff = parseDiffuseValue(line.substr(eq + 1));
+                    if (!diff.empty() && diff != "None") {
+                        shaderToDiffuse[key] = diff;
+                        added++;
+                    }
+                    break;
+                }
+            }
+        }
+        printf("[BSM] Shader maps loaded: %d total entries\n", (int)shaderToDiffuse.size());
+    }
+
     int resolved = 0, resolvedFromBSM = 0;
     for (auto& mesh : m_Meshes) {
         if (mesh.name.empty()) continue;
 
         // Primary: first non-dummy material name in the per-mesh glTF JSON.
+        // For cross-map meshes, look in the source directory's StaticMesh folder.
         std::string matName;
-        std::ifstream f(meshDir + "\\" + mesh.name + ".gltf");
+        std::string gltfDir = mesh.sourceExportDir.empty() ? meshDir
+            : (mesh.sourceExportDir + "\\StaticMesh");
+        std::ifstream f(gltfDir + "\\" + mesh.name + ".gltf");
         if (f.is_open()) {
             std::string line;
             bool inMaterials = false;

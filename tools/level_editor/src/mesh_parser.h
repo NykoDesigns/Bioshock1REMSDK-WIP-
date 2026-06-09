@@ -32,6 +32,7 @@ struct ParsedMesh {
     int32_t lightMapIndex = 0;   // BSP: lightmap atlas texture index (0=none, 1-N=1-based)
     std::string lightMapName;    // BSP: lightmap cache key (e.g. "LM_Texture49")
     std::string bsmMaterialName; // StaticMesh: material/shader name from BSM Materials array (authoritative)
+    std::string sourceExportDir; // cross-map: UModel export dir this mesh was loaded from (empty = current map)
 };
 
 // Parse a StaticMesh export's serial data into vertices + triangles.
