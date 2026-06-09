@@ -16,14 +16,11 @@
 
 1. Open **Command Prompt** (search "cmd" in Start Menu)
 
-2. Navigate to the level editor folder:
-   ```
-   cd path\to\Bioshock1REMSDK\tools\level_editor
-   ```
-   For example if you downloaded to your Downloads folder:
+2. **IMPORTANT: You MUST cd into the level_editor folder first.** Copy-paste this:
    ```
    cd %USERPROFILE%\Downloads\Bioshock1REMSDK-WIP--main\Bioshock1REMSDK-WIP--main\tools\level_editor
    ```
+   If you extracted somewhere else, adjust the path. Your prompt should end with `\tools\level_editor>` before continuing.
 
 3. Run these two commands (copy-paste one at a time):
    ```
