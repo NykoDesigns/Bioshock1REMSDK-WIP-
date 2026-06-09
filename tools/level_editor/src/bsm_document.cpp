@@ -783,10 +783,12 @@ bool BSMDocument::Load(const std::string& filepath)
     }
 
     // Load supplementary glTF meshes from UEViewer exports (adds meshes not in BSM)
+    // First load from current map, then cross-map fallback from all other map exports
     {
         std::string gltfMapName = m_MapName;
         { size_t dp = gltfMapName.find_last_of('.'); if (dp != std::string::npos) gltfMapName = gltfMapName.substr(0, dp); }
-        std::string exportDir = "Z:\\UEViewer\\export\\" + gltfMapName;
+        std::string exportRoot = "Z:\\UEViewer\\export";
+        std::string exportDir = exportRoot + "\\" + gltfMapName;
         auto gltfMeshes = LoadAllMeshesFromExportDir(exportDir);
         int added = 0;
         for (auto& gm : gltfMeshes) {
@@ -798,6 +800,27 @@ bool BSMDocument::Load(const std::string& filepath)
         }
         printf("[BSM] Supplementary glTF: %d loaded, %d new (total meshes: %d)\n",
                (int)gltfMeshes.size(), added, (int)m_Meshes.size());
+
+        // Cross-map mesh search: scan all other map export dirs for meshes we don't have yet
+        namespace fs = std::filesystem;
+        int crossMapAdded = 0;
+        if (fs::is_directory(exportRoot)) {
+            for (auto& entry : fs::directory_iterator(exportRoot)) {
+                if (!entry.is_directory()) continue;
+                std::string dirName = entry.path().filename().string();
+                if (dirName == gltfMapName || dirName == "_BulkTextures") continue;
+                std::vector<ParsedMesh> crossMeshes = LoadAllMeshesFromExportDir(entry.path().string());
+                for (size_t mi = 0; mi < crossMeshes.size(); mi++) {
+                    if (m_MeshNameToIndex.find(crossMeshes[mi].name) == m_MeshNameToIndex.end()) {
+                        m_MeshNameToIndex[crossMeshes[mi].name] = (int)m_Meshes.size();
+                        m_Meshes.push_back(std::move(crossMeshes[mi]));
+                        crossMapAdded++;
+                    }
+                }
+            }
+            printf("[BSM] Cross-map mesh search: %d additional meshes (total: %d)\n",
+                   crossMapAdded, (int)m_Meshes.size());
+        }
     }
 
     // Build normalized name map for fuzzy matching (strip all underscores, lowercase)
