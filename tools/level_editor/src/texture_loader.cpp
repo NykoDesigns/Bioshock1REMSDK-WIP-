@@ -2,6 +2,7 @@
 #include <cstdio>
 #include <cstring>
 #include <fstream>
+#include <filesystem>
 
 #ifdef _WIN32
 #ifndef NOMINMAX
@@ -38,18 +39,25 @@ unsigned int TextureCache::GetTexture(const std::string& textureName)
     
     // Try multiple naming conventions for the texture file
     LoadedTexture tex;
-    std::string candidates[] = {
-        m_TextureDir + "\\" + textureName + ".tga",
-        m_TextureDir + "\\" + textureName + "_diffuse.tga",
-        m_TextureDir + "\\" + textureName + "_Diffuse.tga",
-        m_TextureDir + "\\" + textureName + "_D.tga",
-        m_TextureDir + "\\" + textureName + "_d.tga",
-        m_TextureDir + "\\" + textureName + "_diff.tga",
-    };
-    for (auto& path : candidates) {
-        tex = LoadTGA(path);
+    static const char* suffixes[] = { ".tga", "_diffuse.tga", "_Diffuse.tga", "_D.tga", "_d.tga", "_diff.tga" };
+    
+    // First: search primary texture directory
+    for (auto& suf : suffixes) {
+        tex = LoadTGA(m_TextureDir + "\\" + textureName + suf);
         if (tex.glTexture) break;
     }
+    
+    // Fallback: search all extra directories (cross-map)
+    if (!tex.glTexture) {
+        for (auto& dir : m_ExtraSearchDirs) {
+            for (auto& suf : suffixes) {
+                tex = LoadTGA(dir + "\\" + textureName + suf);
+                if (tex.glTexture) break;
+            }
+            if (tex.glTexture) break;
+        }
+    }
+    
     m_Cache[textureName] = tex;
     return tex.glTexture;
 }
@@ -123,6 +131,24 @@ void TextureCache::Clear()
             glDeleteTextures(1, &pair.second.glTexture);
     }
     m_Cache.clear();
+}
+
+void TextureCache::AddAllMapTextureDirs(const std::string& exportRoot)
+{
+    namespace fs = std::filesystem;
+    if (exportRoot.empty() || !fs::is_directory(exportRoot)) return;
+    
+    int added = 0;
+    for (auto& entry : fs::directory_iterator(exportRoot)) {
+        if (!entry.is_directory()) continue;
+        std::string texDir = entry.path().string() + "\\Texture";
+        if (fs::is_directory(texDir) && texDir != m_TextureDir) {
+            m_ExtraSearchDirs.push_back(texDir);
+            added++;
+        }
+    }
+    printf("[TextureCache] Added %d cross-map texture directories from %s\n",
+           added, exportRoot.c_str());
 }
 
 LoadedTexture TextureCache::LoadTGA(const std::string& path)

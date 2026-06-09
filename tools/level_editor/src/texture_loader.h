@@ -17,6 +17,12 @@ public:
     // Set the base directory where textures are stored (e.g. Z:\UEViewer\export\1-Medical\Texture)
     void SetTextureDir(const std::string& dir) { m_TextureDir = dir; }
     
+    // Add additional search directories (e.g. other map exports for cross-map fallback)
+    void AddSearchDir(const std::string& dir) { m_ExtraSearchDirs.push_back(dir); }
+    
+    // Scan all map export directories under the root export path and add their Texture folders
+    void AddAllMapTextureDirs(const std::string& exportRoot);
+    
     // Get or load a texture by name. Returns 0 if not found.
     unsigned int GetTexture(const std::string& textureName);
     unsigned int GetDiffuse(const std::string& textureName) { return GetTexture(textureName); }
@@ -39,6 +45,7 @@ public:
 
 private:
     std::string m_TextureDir;
+    std::vector<std::string> m_ExtraSearchDirs;
     std::unordered_map<std::string, LoadedTexture> m_Cache;
     
     LoadedTexture LoadTGA(const std::string& path);

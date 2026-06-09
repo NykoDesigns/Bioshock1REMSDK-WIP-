@@ -1401,6 +1401,30 @@ void BSMDocument::ResolveTextures(const std::string& umodelExportDir)
     // Primary source = the material named in the per-mesh glTF; authoritative fallback
     // = the Materials ref read straight from the .bsm (recovers dummy/missing glTF mats).
     std::string texDir = umodelExportDir + "\\Texture";
+
+    // Build cross-map texture dirs for fallback resolution
+    std::vector<std::string> allTexDirs;
+    allTexDirs.push_back(texDir);
+    {
+        fs::path exportRoot = fs::path(umodelExportDir).parent_path();
+        if (fs::is_directory(exportRoot)) {
+            for (auto& entry : fs::directory_iterator(exportRoot)) {
+                if (!entry.is_directory()) continue;
+                std::string td = entry.path().string() + "\\Texture";
+                if (fs::is_directory(td) && td != texDir)
+                    allTexDirs.push_back(td);
+            }
+        }
+        printf("[BSM] Cross-map texture search: %d directories\n", (int)allTexDirs.size());
+    }
+
+    // Check if a TGA exists in any of our texture directories
+    auto findTGA = [&](const std::string& name) -> bool {
+        for (auto& dir : allTexDirs)
+            if (fs::exists(dir + "\\" + name + ".tga")) return true;
+        return false;
+    };
+
     // Strip the _shader suffix off a material name and resolve to a texture that exists
     // (direct .tga match -> .mat/.props Diffuse= mapping -> best-guess passthrough).
     auto matToTexName = [&](std::string m) -> std::string {
@@ -1409,9 +1433,9 @@ void BSMDocument::ResolveTextures(const std::string& umodelExportDir)
             std::string suf = m.substr(m.size() - 7);
             if (suf == "_shader" || suf == "_Shader") m = m.substr(0, m.size() - 7);
         }
-        if (fs::exists(texDir + "\\" + m + ".tga")) return m;
+        if (findTGA(m)) return m;
         auto it = shaderToDiffuse.find(m);
-        if (it != shaderToDiffuse.end() && fs::exists(texDir + "\\" + it->second + ".tga"))
+        if (it != shaderToDiffuse.end() && findTGA(it->second))
             return it->second;
         return m;
     };
@@ -1458,9 +1482,9 @@ void BSMDocument::ResolveTextures(const std::string& umodelExportDir)
         // If the glTF-derived texture is absent on disk but the authoritative BSM
         // material resolves to a real TGA, prefer the BSM binding.
         if (!fromBSM && !mesh.bsmMaterialName.empty() &&
-            !fs::exists(texDir + "\\" + mesh.textureName + ".tga")) {
+            !findTGA(mesh.textureName)) {
             std::string bsmTex = matToTexName(mesh.bsmMaterialName);
-            if (!bsmTex.empty() && fs::exists(texDir + "\\" + bsmTex + ".tga")) {
+            if (!bsmTex.empty() && findTGA(bsmTex)) {
                 mesh.textureName = bsmTex;
                 fromBSM = true;
             }
@@ -1471,9 +1495,8 @@ void BSMDocument::ResolveTextures(const std::string& umodelExportDir)
     printf("[BSM] Resolved %d/%d mesh texture names (%d via BSM Materials fallback)\n",
            resolved, (int)m_Meshes.size(), resolvedFromBSM);
 
-    // Diagnostic: report meshes whose final texture name has no TGA on disk
+    // Diagnostic: report meshes whose final texture name has no TGA on disk (any map)
     {
-        std::string td = umodelExportDir + "\\Texture";
         int noName = 0, noFile = 0;
         std::ofstream dump("mesh_tex_missing.txt");
         for (auto& mesh : m_Meshes) {
@@ -1483,7 +1506,7 @@ void BSMDocument::ResolveTextures(const std::string& umodelExportDir)
                 if (dump) dump << "NO-MAT\t" << mesh.name << "\tbsm='" << mesh.bsmMaterialName << "'\n";
                 continue;
             }
-            if (!fs::exists(td + "\\" + mesh.textureName + ".tga")) {
+            if (!findTGA(mesh.textureName)) {
                 noFile++;
                 if (dump) dump << "NO-TGA\t" << mesh.name << "\ttex='" << mesh.textureName
                                << "'\tbsm='" << mesh.bsmMaterialName << "'\n";
@@ -1494,14 +1517,13 @@ void BSMDocument::ResolveTextures(const std::string& umodelExportDir)
     }
 
     // Step 3: Resolve BSP chunk texture names (already set by BSP parser from surf Material refs)
-    // (texDir is declared at function scope above.)
     int bspResolved = 0;
     for (auto& chunk : m_BSPMeshes) {
         if (chunk.textureName.empty()) continue;
         std::string candidate = chunk.textureName;
 
-        // Check if it directly matches a TGA
-        if (fs::exists(texDir + "\\" + candidate + ".tga")) {
+        // Check if it directly matches a TGA (any map)
+        if (findTGA(candidate)) {
             bspResolved++;
             continue;
         }
@@ -1509,10 +1531,10 @@ void BSMDocument::ResolveTextures(const std::string& umodelExportDir)
         // Shader→diffuse lookup. The map is keyed by normalized (stripped) shader
         // names, and chunk.textureName was already stripped by the BSP parser.
         auto it = shaderToDiffuse.find(candidate);
-        if (it != shaderToDiffuse.end() && fs::exists(texDir + "\\" + it->second + ".tga")) {
+        if (it != shaderToDiffuse.end() && findTGA(it->second)) {
             chunk.textureName = it->second;
             bspResolved++;
-        } else if (fs::exists(texDir + "\\" + candidate + ".tga")) {
+        } else if (findTGA(candidate)) {
             bspResolved++;
         }
         // else leave textureName as-is; TextureCache will try suffixes
@@ -1521,7 +1543,7 @@ void BSMDocument::ResolveTextures(const std::string& umodelExportDir)
     int unresLog = 0;
     for (auto& chunk : m_BSPMeshes) {
         if (chunk.textureName.empty()) continue;
-        if (!fs::exists(texDir + "\\" + chunk.textureName + ".tga") && unresLog < 10) {
+        if (!findTGA(chunk.textureName) && unresLog < 10) {
             printf("[BSP-TEX] Unresolved: '%s'\n", chunk.textureName.c_str());
             unresLog++;
         }

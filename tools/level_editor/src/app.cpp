@@ -136,6 +136,7 @@ bool App::Init(const char* mapPath)
         std::string texDir = m_ExportDir + "\\Texture";
         LogMsg("[App] Uploading meshes to GPU...");
         m_Viewport.UploadMeshes(m_Document.GetMeshes(), texDir);
+        m_Viewport.GetTextureCache().AddAllMapTextureDirs("Z:\\UEViewer\\export");
         LogMsg("[App] Meshes uploaded");
 
         // Upload lightmap textures AFTER UploadMeshes (which clears cache) but BEFORE UploadBSP
@@ -1699,6 +1700,7 @@ void App::OpenFileDialog()
             RenderLoadingFrame(loadMsg, 0.8f);
 
             m_Viewport.UploadMeshes(m_Document.GetMeshes(), texDir2);
+            m_Viewport.GetTextureCache().AddAllMapTextureDirs("Z:\\UEViewer\\export");
             if (m_Document.HasBSP())
                 m_Viewport.UploadBSP(m_Document.GetBSPMeshes(), texDir2);
             m_ContentBrowser.ScanDirectory(m_ExportDir);
