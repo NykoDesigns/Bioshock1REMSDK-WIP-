@@ -85,6 +85,8 @@ public:
     void UploadMeshes(const std::vector<ParsedMesh>& meshes, const std::string& textureDir = "");
     void UploadBSP(const std::vector<ParsedMesh>& bspMeshes, const std::string& textureDir = "");
     void ClearMeshes();
+    // Re-link untextured meshes after bulk textures become available in cache
+    int RelinkMeshTextures(const std::vector<ParsedMesh>& meshes);
 
     // Query mesh GPU state (for diagnostics)
     bool HasMeshTexture(int meshIndex) const {

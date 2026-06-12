@@ -130,6 +130,10 @@ public:
     };
     const std::unordered_map<std::string, TextureMetadata>& GetTextureMetadata() const { return m_TextureMetadata; }
 
+    // Shader→Texture mappings parsed directly from BSM Shader/FinalBlend/Modifier exports
+    const std::unordered_map<std::string, std::string>& GetBSMShaderToDiffuse() const { return m_BSMShaderToDiffuse; }
+    const std::unordered_map<std::string, std::string>& GetBSMShaderToNormal() const { return m_BSMShaderToNormal; }
+
     // Stats
     int GetNameCount() const { return m_NameCount; }
     int GetImportCount() const { return m_ImportCount; }
@@ -149,6 +153,8 @@ private:
     std::vector<std::string> m_LightMapNames; // lightmap atlas names in order (1-based index → [idx-1])
     std::unordered_map<std::string, int> m_MeshNameToIndex;
     std::unordered_map<std::string, TextureMetadata> m_TextureMetadata;
+    std::unordered_map<std::string, std::string> m_BSMShaderToDiffuse;
+    std::unordered_map<std::string, std::string> m_BSMShaderToNormal;
     std::vector<uint8_t> m_RawData;
 
     // Internal parse state

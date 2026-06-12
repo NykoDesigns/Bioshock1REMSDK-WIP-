@@ -2818,3 +2818,25 @@ int Viewport::PickActor(const BSMDocument& doc, float mouseX, float mouseY, floa
     }
     return bestIdx;
 }
+
+int Viewport::RelinkMeshTextures(const std::vector<ParsedMesh>& meshes)
+{
+    int relinked = 0;
+    for (int i = 0; i < (int)meshes.size() && i < (int)m_MeshGPU.size(); i++) {
+        auto& gpu = m_MeshGPU[i];
+        if (gpu.textureId != 0) continue; // already has texture
+        auto& mesh = meshes[i];
+        if (mesh.textureName.empty()) continue;
+
+        // Try to find the texture in cache (may have been bulk-loaded since upload)
+        LoadedTexture texInfo = m_TextureCache.GetTextureInfo(mesh.textureName);
+        if (texInfo.glTexture) {
+            gpu.textureId = texInfo.glTexture;
+            gpu.hasAlpha = texInfo.hasAlpha;
+            if (texInfo.width > 0) gpu.texWidth = texInfo.width;
+            if (texInfo.height > 0) gpu.texHeight = texInfo.height;
+            relinked++;
+        }
+    }
+    return relinked;
+}

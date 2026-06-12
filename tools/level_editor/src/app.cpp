@@ -204,6 +204,14 @@ bool App::Init(const char* mapPath)
                     }
                     printf("[App] Bulk textures: %d loaded, %d already cached, %d no metadata\n",
                            bulkLoaded, bulkSkipped, bulkMissing);
+
+                    // Re-link meshes that were untextured during initial upload
+                    // (their textures may now be available from bulk loading)
+                    if (bulkLoaded > 0) {
+                        int relinked = m_Viewport.RelinkMeshTextures(m_Document.GetMeshes());
+                        if (relinked > 0)
+                            printf("[App] Re-linked %d meshes to bulk-loaded textures\n", relinked);
+                    }
                 }
             }
         }

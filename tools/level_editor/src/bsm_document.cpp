@@ -164,6 +164,13 @@ static bool IsKnownPropertyName(const std::string& s)
         "UBits","VBits","USize","VSize","UClamp","VClamp",
         "bParametric","bAlphaTexture","bMasked","bNoSmooth","LODSet",
         "NormalLOD","MipGenSettings","CompressionSettings","SourceMd",
+        // Shader/Material properties (for BSM shader→texture resolution)
+        "Diffuse","NormalMap","Specular","SpecularityMask","Opacity",
+        "SelfIllumination","SelfIlluminationMask","EmissiveMask",
+        "OutputBlending","TwoSided","Wireframe","PerformLighting",
+        "ModulateStaticLighting2X","ModulateSpecular2X","TreatAsTwoSided",
+        "ZWrite","AlphaTest","AlphaRef","Material","Modifier",
+        "FallbackMaterial","OpacityBitmap","FrameRate","Texture",
     };
     for (auto& k : known)
         if (s == k) return true;
@@ -738,10 +745,7 @@ bool BSMDocument::Load(const std::string& filepath)
                texParsed - fmtCounts[3] - fmtCounts[7] - fmtCounts[8] - fmtCounts[12] - fmtCounts[5]);
     }
 
-    // ─── Parse StaticMesh geometry directly from BSM (C.4 spec) ────────────────
-    printf("[BSM] Parsing StaticMesh exports directly from BSM...\n");
-
-    // Resolve a package object ref (>0 export, <0 import) to its class + object name.
+    // ─── Resolve helper: package object ref → (class, name) ──────────────────
     auto resolveRef = [&](int ref, std::string& cls, std::string& nm) {
         if (ref > 0 && ref <= (int)m_ParsedExports.size()) {
             cls = m_ParsedExports[ref - 1].className;
@@ -751,6 +755,75 @@ bool BSMDocument::Load(const std::string& filepath)
             nm  = imports[-ref - 1].objectName;
         }
     };
+    auto resolveRefName = [&](int ref) -> std::string {
+        if (ref > 0 && ref <= (int)m_ParsedExports.size())
+            return m_ParsedExports[ref - 1].objectName;
+        if (ref < 0 && (-ref - 1) < (int)imports.size())
+            return imports[-ref - 1].objectName;
+        return "";
+    };
+
+    // ─── Parse Shader/Material exports for shader→texture mappings ────────────
+    {
+        int shadersParsed = 0, shadersWithDiffuse = 0;
+        for (auto& pe : m_ParsedExports) {
+            bool isShader = pe.className == "Shader" || pe.className == "FinalBlend" ||
+                            pe.className == "ColorModifier" || pe.className == "OpacityModifier" ||
+                            pe.className == "TexModifier" || pe.className == "TexOscillator" ||
+                            pe.className == "TexPanner" || pe.className == "TexRotator" ||
+                            pe.className == "TexScaler" || pe.className == "Combiner" ||
+                            pe.className == "ConstantMaterial";
+            if (!isShader) continue;
+            if (pe.serialSize < 20 || pe.serialOffset + pe.serialSize > (int)fileSize) continue;
+
+            int hdrSkip = DetectHeaderSkip(d, pe.serialOffset, pe.serialSize, names);
+            if (hdrSkip < 0) continue;
+            auto props = ParsePropsMinimal(d, pe.serialOffset + hdrSkip, names,
+                                           pe.serialOffset + pe.serialSize);
+            shadersParsed++;
+
+            // Look for Diffuse, NormalMap, Material, Texture properties — they hold object references
+            for (auto& p : props) {
+                if (p.size < 1 || p.size > 8) continue;
+                if (p.name == "Diffuse" || p.name == "Material" || p.name == "Texture") {
+                    size_t vpos = 0;
+                    int ref = ReadCompactIndex(d + p.valueOffset, p.size, vpos);
+                    std::string refName = resolveRefName(ref);
+                    if (!refName.empty() && refName != "None") {
+                        if (!m_BSMShaderToDiffuse.count(pe.objectName)) {
+                            m_BSMShaderToDiffuse[pe.objectName] = refName;
+                            shadersWithDiffuse++;
+                        }
+                    }
+                } else if (p.name == "NormalMap") {
+                    size_t vpos = 0;
+                    int ref = ReadCompactIndex(d + p.valueOffset, p.size, vpos);
+                    std::string refName = resolveRefName(ref);
+                    if (!refName.empty() && refName != "None")
+                        m_BSMShaderToNormal[pe.objectName] = refName;
+                }
+            }
+        }
+        // Chase indirection: if a Shader's Diffuse points to another Shader/Modifier/FinalBlend,
+        // follow the chain up to 5 deep to find the actual Texture name
+        for (int depth = 0; depth < 5; depth++) {
+            bool changed = false;
+            for (auto& [key, val] : m_BSMShaderToDiffuse) {
+                auto it2 = m_BSMShaderToDiffuse.find(val);
+                if (it2 != m_BSMShaderToDiffuse.end() && it2->second != val) {
+                    val = it2->second;
+                    changed = true;
+                }
+            }
+            if (!changed) break;
+        }
+        printf("[BSM] Parsed %d Shader/Material exports, %d with Diffuse mapping\n",
+               shadersParsed, shadersWithDiffuse);
+    }
+
+    // ─── Parse StaticMesh geometry directly from BSM (C.4 spec) ────────────────
+    printf("[BSM] Parsing StaticMesh exports directly from BSM...\n");
+
     auto isMaterialClass = [](const std::string& c) -> bool {
         return c.find("Shader") != std::string::npos ||
                c.find("Material") != std::string::npos ||
@@ -1639,17 +1712,35 @@ void BSMDocument::ResolveTextures(const std::string& umodelExportDir)
     };
 
     // Strip the _shader suffix off a material name and resolve to a texture that exists
-    // (direct .tga match -> .mat/.props Diffuse= mapping -> best-guess passthrough).
+    // Priority: direct TGA → .mat/.props.txt Diffuse → BSM binary Shader→Texture → bulk metadata
     auto matToTexName = [&](std::string m) -> std::string {
         if (m.empty()) return "";
         if (m.size() > 7) {
             std::string suf = m.substr(m.size() - 7);
             if (suf == "_shader" || suf == "_Shader") m = m.substr(0, m.size() - 7);
         }
+        // 1. Direct TGA match
         if (findTGA(m)) return m;
+        // 2. .mat/.props.txt shader→diffuse mapping
         auto it = shaderToDiffuse.find(m);
         if (it != shaderToDiffuse.end() && findTGA(it->second))
             return it->second;
+        // 3. BSM binary Shader export → Diffuse property → Texture name
+        auto bsmIt = m_BSMShaderToDiffuse.find(m);
+        if (bsmIt != m_BSMShaderToDiffuse.end()) {
+            if (findTGA(bsmIt->second)) return bsmIt->second;
+            // The BSM texture name might itself need suffix stripping
+            std::string bsmTex = bsmIt->second;
+            if (bsmTex.size() > 7) {
+                std::string suf = bsmTex.substr(bsmTex.size() - 7);
+                if (suf == "_shader" || suf == "_Shader") bsmTex = bsmTex.substr(0, bsmTex.size() - 7);
+            }
+            if (findTGA(bsmTex)) return bsmTex;
+            // Even without TGA, if texture exists in bulk metadata, return it for bulk loading
+            if (m_TextureMetadata.count(bsmIt->second)) return bsmIt->second;
+        }
+        // 4. Check if name exists in bulk texture metadata (loadable from .blk)
+        if (m_TextureMetadata.count(m)) return m;
         return m;
     };
 
@@ -1724,7 +1815,31 @@ void BSMDocument::ResolveTextures(const std::string& umodelExportDir)
             matName = mesh.bsmMaterialName;
             fromBSM = true;
         }
-        if (matName.empty()) continue;
+        // Fallback for _2/_3 suffix meshes (UEViewer multi-material splits):
+        // inherit texture from the base mesh if it has already been resolved.
+        if (matName.empty()) {
+            std::string baseName = mesh.name;
+            // Strip trailing _N suffix (e.g. "med_pillar_large_cap_2" → "med_pillar_large_cap")
+            size_t lastUnderscore = baseName.find_last_of('_');
+            if (lastUnderscore != std::string::npos && lastUnderscore < baseName.size() - 1) {
+                bool allDigits = true;
+                for (size_t ci = lastUnderscore + 1; ci < baseName.size(); ci++)
+                    if (!isdigit(baseName[ci])) { allDigits = false; break; }
+                if (allDigits) {
+                    std::string parent = baseName.substr(0, lastUnderscore);
+                    auto pit = m_MeshNameToIndex.find(parent);
+                    if (pit != m_MeshNameToIndex.end() && !m_Meshes[pit->second].textureName.empty()) {
+                        mesh.textureName = m_Meshes[pit->second].textureName;
+                        mesh.normalMapName = m_Meshes[pit->second].normalMapName;
+                        mesh.specMapName = m_Meshes[pit->second].specMapName;
+                        mesh.emissiveMapName = m_Meshes[pit->second].emissiveMapName;
+                        resolved++;
+                        continue;
+                    }
+                }
+            }
+            continue;
+        }
 
         mesh.textureName = matToTexName(matName);
         // If the glTF-derived texture is absent on disk but the authoritative BSM
@@ -1745,6 +1860,11 @@ void BSMDocument::ResolveTextures(const std::string& umodelExportDir)
         auto nit = shaderToNormal.find(matKey);
         if (nit != shaderToNormal.end() && findTGA(nit->second))
             mesh.normalMapName = nit->second;
+        if (mesh.normalMapName.empty()) {
+            auto bsmNit = m_BSMShaderToNormal.find(matKey);
+            if (bsmNit != m_BSMShaderToNormal.end() && findTGA(bsmNit->second))
+                mesh.normalMapName = bsmNit->second;
+        }
         auto sit = shaderToSpec.find(matKey);
         if (sit != shaderToSpec.end() && findTGA(sit->second))
             mesh.specMapName = sit->second;
@@ -1793,21 +1913,32 @@ void BSMDocument::ResolveTextures(const std::string& umodelExportDir)
         if (findTGA(candidate)) {
             bspResolved++;
         } else {
-            // Shader→diffuse lookup
+            // .mat/.props.txt shader→diffuse lookup
             auto it = shaderToDiffuse.find(candidate);
             if (it != shaderToDiffuse.end() && findTGA(it->second)) {
                 chunk.textureName = it->second;
                 bspResolved++;
-            } else if (findTGA(candidate)) {
-                bspResolved++;
+            } else {
+                // BSM binary shader→diffuse fallback
+                auto bsmIt = m_BSMShaderToDiffuse.find(candidate);
+                if (bsmIt != m_BSMShaderToDiffuse.end() && findTGA(bsmIt->second)) {
+                    chunk.textureName = bsmIt->second;
+                    bspResolved++;
+                }
             }
         }
 
-        // Normal map lookup
+        // Normal map lookup (file-based + BSM binary)
         auto nit = shaderToNormal.find(candidate);
         if (nit != shaderToNormal.end() && findTGA(nit->second)) {
             chunk.normalMapName = nit->second;
             bspNormals++;
+        } else {
+            auto bsmNit = m_BSMShaderToNormal.find(candidate);
+            if (bsmNit != m_BSMShaderToNormal.end() && findTGA(bsmNit->second)) {
+                chunk.normalMapName = bsmNit->second;
+                bspNormals++;
+            }
         }
         // Specular map lookup
         auto sit = shaderToSpec.find(candidate);
