@@ -158,6 +158,12 @@ static bool IsKnownPropertyName(const std::string& s)
         // StaticMesh-export properties (so DetectHeaderSkip anchors on the mesh prop block)
         "Materials","UseSimpleLineCollision","UseSimpleBoxCollision",
         "UseSimpleKarmaCollision","UseVertexColor","InternalVersion",
+        // UTexture properties (for bulk texture loading metadata parsing)
+        "CheckpointTypePadding","InternalTime","MinLOD","HasBeenStripped",
+        "StrippedNumMips","CachedBulkDataSize","SourcePath","Format",
+        "UBits","VBits","USize","VSize","UClamp","VClamp",
+        "bParametric","bAlphaTexture","bMasked","bNoSmooth","LODSet",
+        "NormalLOD","MipGenSettings","CompressionSettings","SourceMd",
     };
     for (auto& k : known)
         if (s == k) return true;
@@ -612,6 +618,124 @@ bool BSMDocument::Load(const std::string& filepath)
         actor.renderType = ResolveActorRenderType(pe.className, hasMesh, actor.isLight);
         // Include all actors — even without Location — for matching against runtime scan
         m_Actors.push_back(actor);
+    }
+
+    // ─── Parse UTexture exports: extract Format + mip0 dimensions ──────────────
+    // Per BioShock_Texture_Lightmap_Format.md §2-3:
+    //   Tagged props include Format (ByteProperty, 1 byte = ETextureFormat ordinal)
+    //   After props: ObjHeader(8B) + [QWORD CachedBulkDataSize if subVer!=0]
+    //                + CI MipCount + Mip[] { ObjHeader(8B) + TLazyArray + INT USize + INT VSize + 2B }
+    {
+        int texParsed = 0, texFailed = 0;
+        for (int i = 0; i < (int)m_ParsedExports.size(); i++) {
+            auto& pe = m_ParsedExports[i];
+            if (pe.className != "Texture") continue;
+            if (pe.serialSize <= 0 || pe.serialOffset + pe.serialSize > (int)fileSize) continue;
+
+            const uint8_t* sd = d + pe.serialOffset;
+            size_t send = pe.serialSize;
+
+            // Parse tagged properties to find Format
+            int headerSkip = DetectHeaderSkip(d, pe.serialOffset, pe.serialSize, names);
+            auto props = ParsePropsMinimal(d, pe.serialOffset + headerSkip, names,
+                                            pe.serialOffset + pe.serialSize);
+            // Default format = DXT1 (ordinal 3). UE2 only serializes non-default values,
+            // so most DXT1 textures omit the Format property entirely.
+            int texFormat = 3;
+            for (auto& p : props) {
+                if (p.name == "Format" && p.size == 1) {
+                    texFormat = d[p.valueOffset];
+                    break;
+                }
+            }
+
+            // Find end of properties (None sentinel), then parse UTexture payload
+            // Scan for ObjHeader check==4 after the last property
+            size_t propEnd = headerSkip;
+            for (auto& p : props) {
+                size_t pEnd = p.valueOffset + p.size - pe.serialOffset;
+                if (pEnd > propEnd) propEnd = pEnd;
+            }
+            // After the last property value, there's a None sentinel (CI + 4B number)
+            // The ObjHeader (check==4, subVer) follows. Scan for it.
+            size_t scanPos = propEnd;
+            bool foundPayload = false;
+            while (scanPos + 20 < send) {
+                int32_t check;
+                memcpy(&check, sd + scanPos, 4);
+                if (check == 4) {
+                    int32_t subVer;
+                    memcpy(&subVer, sd + scanPos + 4, 4);
+                    if (subVer >= 0 && subVer <= 10) {
+                        // Found ObjHeader for UTexture payload
+                        size_t payPos = scanPos + 8; // past ObjHeader
+                        if (subVer != 0) payPos += 8; // skip QWORD CachedBulkDataSize
+
+                        if (payPos + 1 >= send) break;
+                        size_t br;
+                        int mipCount = ReadCompactIndex(sd + payPos, send - payPos, br);
+                        payPos += br;
+                        if (mipCount <= 0 || mipCount > 20) break;
+
+                        // Parse first mip to get dimensions
+                        // Mip: ObjHeader(8B) + TLazyArray { INT SkipOff, INT BulkA, INT BulkB, CI Num, BYTE[Num] }
+                        //       + INT USize + INT VSize + BYTE UBits + BYTE VBits
+                        if (payPos + 8 >= send) break;
+                        int32_t mipCheck;
+                        memcpy(&mipCheck, sd + payPos, 4);
+                        if (mipCheck != 4) break;
+                        payPos += 8; // skip mip ObjHeader
+
+                        // TLazyArray: SkipOffset(4) + BulkA(4) + BulkB(4) + CI Num
+                        if (payPos + 12 >= send) break;
+                        payPos += 12; // skip SkipOffset + BulkA + BulkB
+                        int mipNum = ReadCompactIndex(sd + payPos, send - payPos, br);
+                        payPos += br;
+                        if (mipNum < 0) break;
+                        payPos += mipNum; // skip inline pixel data (0 for externalized)
+
+                        // USize, VSize, UBits, VBits
+                        if (payPos + 10 > send) break;
+                        int32_t uSize, vSize;
+                        memcpy(&uSize, sd + payPos, 4);
+                        memcpy(&vSize, sd + payPos + 4, 4);
+
+                        if (uSize > 0 && uSize <= 4096 && vSize > 0 && vSize <= 4096) {
+                            TextureMetadata tm;
+                            tm.objectName = pe.objectName;
+                            tm.format = texFormat;
+                            tm.width = uSize;
+                            tm.height = vSize;
+                            tm.mipCount = mipCount;
+                            // Compute mip0 byte size per format doc §3
+                            int bw = (uSize + 3) / 4, bh = (vSize + 3) / 4;
+                            switch (texFormat) {
+                                case 3:  tm.mip0Size = bw * bh * 8; break;   // DXT1
+                                case 7:  tm.mip0Size = bw * bh * 16; break;  // DXT3
+                                case 8:  tm.mip0Size = bw * bh * 16; break;  // DXT5
+                                case 12: tm.mip0Size = bw * bh * 16; break;  // 3DC/BC5
+                                case 5:  tm.mip0Size = uSize * vSize * 4; break; // RGBA8
+                                default: tm.mip0Size = uSize * vSize; break;  // fallback
+                            }
+                            m_TextureMetadata[pe.objectName] = tm;
+                            texParsed++;
+                            foundPayload = true;
+                        }
+                        break;
+                    }
+                }
+                scanPos++;
+            }
+            if (!foundPayload) texFailed++;
+        }
+        printf("[BSM] Parsed %d UTexture metadata (%d failed)\n", texParsed, texFailed);
+        // Format distribution diagnostic
+        int fmtCounts[13] = {};
+        for (auto& kv : m_TextureMetadata)
+            if (kv.second.format >= 0 && kv.second.format < 13) fmtCounts[kv.second.format]++;
+        printf("[BSM] Texture formats: DXT1=%d DXT3=%d DXT5=%d 3DC=%d RGBA8=%d other=%d\n",
+               fmtCounts[3], fmtCounts[7], fmtCounts[8], fmtCounts[12], fmtCounts[5],
+               texParsed - fmtCounts[3] - fmtCounts[7] - fmtCounts[8] - fmtCounts[12] - fmtCounts[5]);
     }
 
     // ─── Parse StaticMesh geometry directly from BSM (C.4 spec) ────────────────

@@ -119,6 +119,17 @@ public:
     // Resolve texture names using UEViewer export directory
     void ResolveTextures(const std::string& umodelExportDir);
 
+    // UTexture metadata parsed from BSM exports (for bulk texture loading)
+    struct TextureMetadata {
+        std::string objectName;  // e.g. "0451_diffuse"
+        int format = -1;         // BioShock ETextureFormat ordinal (3=DXT1, 7=DXT3, 8=DXT5, 12=3DC)
+        int width = 0;           // mip0 width
+        int height = 0;          // mip0 height
+        int mipCount = 0;        // total mip count
+        int mip0Size = 0;        // expected mip0 byte count
+    };
+    const std::unordered_map<std::string, TextureMetadata>& GetTextureMetadata() const { return m_TextureMetadata; }
+
     // Stats
     int GetNameCount() const { return m_NameCount; }
     int GetImportCount() const { return m_ImportCount; }
@@ -137,6 +148,7 @@ private:
     std::vector<BSPTreeNode> m_BSPTree;
     std::vector<std::string> m_LightMapNames; // lightmap atlas names in order (1-based index → [idx-1])
     std::unordered_map<std::string, int> m_MeshNameToIndex;
+    std::unordered_map<std::string, TextureMetadata> m_TextureMetadata;
     std::vector<uint8_t> m_RawData;
 
     // Internal parse state

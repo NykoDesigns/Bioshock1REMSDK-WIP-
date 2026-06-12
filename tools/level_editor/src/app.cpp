@@ -162,6 +162,48 @@ bool App::Init(const char* mapPath)
                         }
                     }
                     printf("[App] Uploaded %d/%d lightmap textures to GPU\n", uploaded, (int)lmEntries.size());
+
+                    // ─── Bulk texture loading: load ALL textures from .blk ─────────────
+                    // For textures that don't have TGA exports, load directly from bulk
+                    // using metadata parsed from UTexture exports (Format + mip0 dims)
+                    auto& texMeta = m_Document.GetTextureMetadata();
+                    int bulkLoaded = 0, bulkSkipped = 0, bulkMissing = 0;
+                    for (int ei = 0; ei < m_Catalog.GetEntryCount(); ei++) {
+                        auto* entry = m_Catalog.GetEntry(ei);
+                        if (!entry) continue;
+                        // Skip lightmap textures (already handled above)
+                        if (entry->objectName.find("Texture_") == 0 &&
+                            entry->packageName.find("LightMaps") != std::string::npos) continue;
+
+                        // Check if already in texture cache (TGA or prior upload)
+                        if (m_Viewport.GetTextureCache().GetTexture(entry->objectName)) {
+                            bulkSkipped++;
+                            continue;
+                        }
+
+                        // Look up metadata for format + dimensions
+                        auto mit = texMeta.find(entry->objectName);
+                        if (mit == texMeta.end()) {
+                            bulkMissing++;
+                            continue;
+                        }
+                        auto& tm = mit->second;
+                        // Only load formats we support
+                        if (tm.format != 3 && tm.format != 7 && tm.format != 8 && tm.format != 12) continue;
+                        if (tm.width <= 0 || tm.height <= 0) continue;
+
+                        auto data = m_Catalog.ReadBulkData(entry->objectName, m_Catalog.GetBulkDir());
+                        if (data.empty()) continue;
+                        // Bulk data = all externalized mips concatenated largest-first
+                        // We only need mip0 (first tm.mip0Size bytes)
+                        if ((int)data.size() < tm.mip0Size) continue;
+
+                        m_Viewport.GetTextureCache().UploadCompressed(
+                            entry->objectName, data.data(), tm.width, tm.height, tm.format);
+                        bulkLoaded++;
+                    }
+                    printf("[App] Bulk textures: %d loaded, %d already cached, %d no metadata\n",
+                           bulkLoaded, bulkSkipped, bulkMissing);
                 }
             }
         }
