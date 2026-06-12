@@ -1502,14 +1502,20 @@ void BSMDocument::ResolveTextures(const std::string& umodelExportDir)
         std::string line;
         int braceDepth = 0;
         std::string currentField;
+        std::string lastProp; // track last top-level property name for multi-line braced blocks
         while (std::getline(f, line)) {
             // Track brace depth for multi-line fields like EmissiveMask = { ... }
+            int prevDepth = braceDepth;
             for (char c : line) {
                 if (c == '{') braceDepth++;
                 else if (c == '}') braceDepth--;
             }
+            // Entering a braced block: set currentField from last seen prop
+            if (prevDepth == 0 && braceDepth > 0 && currentField.empty()) {
+                currentField = lastProp;
+            }
             if (braceDepth > 0) {
-                // Inside a braced block — check for Material = Texture'...' for emissive
+                // Inside a braced block — check for Material = Texture'...'
                 if (!currentField.empty()) {
                     size_t matPos = line.find("Material");
                     if (matPos != std::string::npos) {
@@ -1517,14 +1523,21 @@ void BSMDocument::ResolveTextures(const std::string& umodelExportDir)
                         if (eq != std::string::npos) {
                             std::string val = parseDiffuseValue(line.substr(eq + 1));
                             if (!val.empty() && val != "None") {
-                                if (currentField == "EmissiveMask" || currentField == "SelfIllumination")
+                                if (currentField == "EmissiveMask" || currentField == "SelfIllumination"
+                                    || currentField == "SelfIlluminationMask")
                                     shaderToEmissive[key] = val;
-                                else if (currentField == "SpecularMask")
+                                else if (currentField == "SpecularMask" || currentField == "Specular"
+                                         || currentField == "SpecularityMask")
                                     shaderToSpec[key] = val;
                             }
                         }
                     }
                 }
+                continue;
+            }
+            // Exiting a braced block
+            if (prevDepth > 0 && braceDepth == 0) {
+                currentField.clear();
                 continue;
             }
             currentField.clear();
@@ -1535,7 +1548,30 @@ void BSMDocument::ResolveTextures(const std::string& umodelExportDir)
             std::string prop = line.substr(0, eq);
             // Trim prop
             while (!prop.empty() && (prop.back() == ' ' || prop.back() == '\t')) prop.pop_back();
+            lastProp = prop;
             std::string val = parseDiffuseValue(line.substr(eq + 1));
+
+            // Single-line braced value: e.g. SpecularMask = { Material=..., Channel=0 }
+            if (line.find('{') != std::string::npos && braceDepth == 0) {
+                // Fully contained on one line (braces opened and closed)
+                size_t matPos = line.find("Material");
+                if (matPos != std::string::npos) {
+                    size_t meq = line.find('=', matPos);
+                    if (meq != std::string::npos) {
+                        std::string mval = parseDiffuseValue(line.substr(meq + 1));
+                        if (!mval.empty() && mval != "None") {
+                            if (prop == "EmissiveMask" || prop == "SelfIllumination"
+                                || prop == "SelfIlluminationMask")
+                                shaderToEmissive[key] = mval;
+                            else if (prop == "SpecularMask" || prop == "Specular"
+                                     || prop == "SpecularityMask")
+                                shaderToSpec[key] = mval;
+                        }
+                    }
+                }
+                currentField = prop;
+                continue;
+            }
 
             if (prop == "Diffuse" && !val.empty() && val != "None") {
                 if (!isProps || !shaderToDiffuse.count(key))
@@ -1552,10 +1588,6 @@ void BSMDocument::ResolveTextures(const std::string& umodelExportDir)
             } else if (prop == "SelfIlluminationMask" && !val.empty() && val != "None") {
                 if (!shaderToEmissive.count(key))
                     shaderToEmissive[key] = val;
-            }
-            // Track braced fields
-            if (line.find('{') != std::string::npos) {
-                currentField = prop;
             }
         }
     };
