@@ -84,13 +84,17 @@ discoveries is a primary research strategy.
 
 ### .bsm (BioShock Map)
 - Confirmed standard Unreal Package format (magic 0x9E2A83C1, version 141, licensee 56)
-- Contains: BSP geometry (UModel), StaticMeshes, actors, scripts, lighting, navigation
+- Contains: BSP geometry (UModel), StaticMeshes, Shader/Material exports, UTexture exports, actors, scripts, lighting, navigation
 - Compressed via zlib chunks
 - FBspNode: 100 bytes (vs stock UE2 64 bytes) — ZoneMask expanded to 128-bit, iZone[0] at +77, NumVertices at BYTE +78 (NOT INT32 +88)
-- FBspSurf: 8B Vengeance header + CI Material + 24B fixed fields + CI Actor + FPlane(16B) + LightMapScale(4B). PanU/PanV SKIPPED for version >= 78
+- FBspSurf: 8B Vengeance header + CI Material + 24B fixed fields + CI Actor + FPlane(16B) + LightMapScale(4B). PanU/PanV SKIPPED for version >= 78 (confirmed via UE2.5 source + UT2004 Engine.dll disassembly)
 - FVert: 8B each (INT32 pVertex + INT32 iSide)
+- Shader exports: Tagged properties with `Diffuse`/`NormalMap`/`Specular` as CompactIndex object references to Texture exports
+- UTexture exports: Tagged properties (Format, USize, VSize) + mip table with TLazyArray inline/external data
+- FLightMapIndex: Per-surface lightmap descriptor with WorldToLightMap matrix + SizeX/SizeY
+- FLightMapLight: Per-baked-light entry with iAtlas + TileX + TileY
 - StaticMeshInstance exports reference BulkContent (.blk) for gameplay mesh data
-- See `bioshock1-bsm.md` for full specification, `docs/reverse-engineering/bsm-format.md` for early RE notes
+- See `bioshock1-bsm.md` for full specification, `docs/reverse-engineering/bsm-format.md` for RE notes, `docs/reverse-engineering/BioShock_Texture_Lightmap_Format.md` for texture/lightmap details
 
 ## Build Requirements
 

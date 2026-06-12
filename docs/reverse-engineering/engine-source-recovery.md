@@ -186,8 +186,46 @@ With decompiled source, we can:
 1. **Map __NFUN_XXX__ to actual function names** using SDK_NativeFunctions.txt
 2. **Cross-reference** decompiled function bodies with our ProcessEvent hooks
 3. **Fix parameter struct layouts** in coop_sync.cpp based on actual TakeDamage/Died signatures
-4. **Resolve remaining FBspNode fields** (+68, +72, +76, +78-79, +80, +84, +92, +96)
-5. **Verify UModel::Serialize** field order via Ghidra
+
+## UE2.5 C++ Source Integration (June 2026)
+
+Complete Unreal Engine 2.5 C++ source has been added to the project tree for cross-reference:
+
+```
+z:\Bioshock1SDK\unreal-src-part1\
+  └── Unreal Tournament 2003 [v2107] [2002-10-01] (Retail)\
+      ├── Editor\Classes\     — UnrealEd brush builders, tools
+      ├── Engine\Classes\     — Actor, Pawn, Trigger, Mover .uc sources
+      ├── Core\Classes\       — Object, Field, Package .uc sources
+      └── ... (Fire, IpDrv, UWeb, XInterface)
+
+z:\Bioshock1SDK\unreal-src-part-two\
+  └── Unreal Engine [v2.5]_ Unreal Warfare [09-29-2007]\
+      ├── Engine\Inc\         — UnRender.h, UnTex.h, UnRenderResource.h
+      ├── Engine\Src\         — UnTex.cpp, UnRender.cpp, UnModel.cpp
+      ├── Core\Inc\           — UnTemplate.h, UnObj.h
+      └── Core\Src\           — UnObj.cpp, UnLinker.cpp
+```
+
+### Key Findings from Source Cross-Reference
+
+| File | What We Learned | Applied To |
+|------|-----------------|-----------|
+| `Engine\Inc\UnRenderResource.h` | `ETextureFormat` enum: DXT1=3, DXT3=7, DXT5=8, RGBA8=5, 3DC=12 | UTexture metadata parsing |
+| `Engine\Inc\UnTex.h` | `FMipmap` struct with `TLazyArray<BYTE> DataArray` + USize/VSize/UBits/VBits | BSM texture wire format validation |
+| `Engine\Src\UnTex.cpp` | `UTexture::Serialize` mip loop, algorithmic texture handling | Confirmed no unknown fields between mips |
+| `Core\Inc\UnTemplate.h` | `TLazyArray` serialization: `INT32 SeekPos` then `CI Count + Data[Count]` for Ver>61 | Bulk vs inline mip detection |
+| `Engine\Inc\UnRender.h` | Stock `FBspNode` = 64 bytes, `ZoneMask` = 8 bytes | Confirmed Vengeance expanded to 100B/16B |
+| `Engine\Src\UnModel.cpp` | FBspSurf serialization with version gates | Confirmed PanU/PanV skip for v>=78 |
+
+### What This Resolved
+
+- ✅ **FBspNode layout** — All 100 bytes fully mapped (previously 4 unknown fields)
+- ✅ **FBspSurf PanU/PanV** — Confirmed SKIPPED, not missing or corrupt
+- ✅ **TLazyArray format** — Validated inline vs external mip detection logic
+- ✅ **Texture format ordinals** — No longer guessing format byte meanings
+- ✅ **UTexture serialization** — Exact field order and sizes confirmed
+- ✅ **FLightMapIndex** — WorldToLightMap matrix + tile packing formula from render code
 
 ---
 

@@ -31,7 +31,7 @@
 - **Gameplay Mods** — Decoy→Teleport, Chain Lightning, Friendly Bots, Rivet Pistol, Splicer Factions
 - **Mod Distribution** — winmm.dll proxy loader (no injector needed) + JSON config + packager script
 - **Co-op Framework** — UDP transport, player state sync, ghost puppet system, damage forwarding
-- **Level Editor** — Standalone BSM map viewer/editor with OpenGL 3.3 rendering, BSP geometry with zone-based visibility filtering (ZoneMask bit testing), 662 meshes (569 inline + 93 glTF fallback), 4-pass actor-to-mesh linking (direct ref, import name, StaticMeshInstance, class-default mapping), PBR-lite lighting with 128 point lights, FXAA/SSAO/bloom/god rays post-processing, fly camera, distance culling, section clipping, actor picking/spawning/deletion, ImGui UI (scene tree, properties, content browser)
+- **Level Editor** — Standalone BSM map viewer/editor with OpenGL 3.3 rendering, BSP geometry with zone-based visibility filtering (ZoneMask bit testing), 814 meshes with 605 textured (BSM Shader export parsing → texture resolution), PBR-lite lighting with 128 point lights + shadow mapping, normal/specular/emissive mapping (608/597/63 meshes), bulk texture loading from .blk files via Catalog.bdc, atmospheric depth fog, FXAA/SSAO/bloom/god rays post-processing, fly camera, distance culling, section clipping, actor picking/spawning/deletion, ImGui UI (scene tree, properties, content browser). See `docs/level-editor-roadmap.md` for full details.
 
 ### Implemented Gameplay Mods
 
@@ -89,8 +89,15 @@ sdk_gen/
 - Ghost puppet system for remote player visualization
 - Damage and world state synchronization
 
+**Level Editor** (see `docs/level-editor-roadmap.md`)
+- Lightmap binding to BSP surfaces (data parsed, UV math documented)
+- Transparency / alpha blending pass (glass, foliage)
+- Decal projection rendering (posters, blood splatters, graffiti)
+- Bloom / emissive post-process (neon signs, light beams)
+- Skeletal mesh rendering (NPCs, chains, ropes — bind pose)
+- Undo/redo, gizmo transforms, BSM write-back
+
 **Additional Content**
-- Level editor enhancements — undo/redo, gizmo transforms, multi-map support
 - Custom map creation — build new .bsm packages from scratch
 - External companion GUI — desktop window via IPC with injected DLL
 

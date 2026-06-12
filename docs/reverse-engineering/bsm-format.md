@@ -78,8 +78,15 @@ SWAT 4's package format is well-documented by its modding community and should s
 - [x] Batch decompile all .U packages (1,765 classes)
 - [x] Runtime SDK generation (4.5 MB headers)
 - [x] FBspNode layout fully resolved (all 100 bytes mapped)
+- [x] UTexture metadata parsing (Format + mip0 dimensions from BSM)
+- [x] Shader/Material export parsing (Diffuse/NormalMap object references)
+- [x] Bulk texture loading pipeline (Catalog.bdc → .blk → GPU)
+- [x] FLightMapIndex/FLightMapLight/FLightMapTexture parsing (atlas descriptors)
+- [x] FBspSurf PanU/PanV confirmed SKIPPED (v>=78, validated via UE2.5 source)
+- [x] UE2.5 C++ source cross-reference (UnTex.h/cpp, UnRender.h, UnTemplate.h)
 - [ ] Implement round-trip BSM writing (modify properties, rewrite package)
 - [ ] Export cloning (duplicate actors with offset positions)
+- [ ] Lightmap UV computation (WorldToLightMap × vertPos → atlas UV)
 
 ## Tools
 
@@ -376,3 +383,55 @@ The field at +78 was originally misidentified as iZone[1] in Ghidra analysis. Co
 +55: BYTE NodeFlags (1B)
 +56: INT iLeaf[2] (8B)
 ```
+
+### 2026-06: Shader/Material Export Parsing — CONFIRMED
+
+BSM packages contain Shader/FinalBlend/Modifier exports with tagged properties that
+hold object references to Texture exports. Parsing these directly from BSM binary
+provides a reliable shader→texture mapping without requiring UEViewer file exports.
+
+**Export classes parsed:**
+- `Shader` — Primary material class with `Diffuse`, `NormalMap`, `Specular` properties
+- `FinalBlend` — Alpha/blend wrapper with `Material` property pointing to inner Shader
+- `ColorModifier`, `OpacityModifier` — Tint/alpha wrappers
+- `TexModifier`, `TexOscillator`, `TexPanner`, `TexRotator`, `TexScaler` — UV animation wrappers
+- `Combiner` — Multi-texture blend
+- `ConstantMaterial` — Flat color
+
+**Property resolution:**
+```
+Shader export "PistolShader":
+  Diffuse = ObjRef → Export #1234 "WP_Pistol_Diffuse" (Texture)
+  NormalMap = ObjRef → Export #1235 "WP_Pistol_Normal" (Texture)
+
+FinalBlend export "glass_blend":
+  Material = ObjRef → Export #567 "glass_shader" (Shader)
+    → Shader "glass_shader".Diffuse = ObjRef → "glass_diffuse" (Texture)
+```
+
+**Indirection chain following (up to 5 deep):**
+- Shader.Diffuse → TexPanner (not a texture!) → resolve TexPanner.Material → Texture
+- FinalBlend.Material → Shader → Shader.Diffuse → Texture
+
+**Results on 1-Medical.bsm:**
+- 767 Shader/Material exports parsed
+- 621 with resolved Diffuse texture reference
+- Supplements .mat/.props.txt file-based resolution (fills gaps where UEViewer didn't export shader files)
+
+### 2026-06: UTexture Metadata Extraction — CONFIRMED
+
+UTexture exports in the BSM contain the `Format` property (ETextureFormat ordinal)
+plus mip0 dimensions in the mip table. This allows bulk texture loading without
+requiring UEViewer exports.
+
+**Parsing pipeline:**
+1. `DetectHeaderSkip` + `ParsePropsMinimal` on each UTexture export
+2. Extract `Format` property (default to DXT1=3 if absent)
+3. After tagged properties: `ObjHeader(4,1)` + `INT64 CachedBulkDataSize` + `CI MipCount`
+4. First mip: skip `ObjHeader(4,2)` + `INT32 SkipOffset` + `INT32 BulkA` + `INT32 BulkB` + `CI Num`
+5. After inline/skip: read `INT32 USize` + `INT32 VSize` = mip0 dimensions
+6. Compute `mip0Size = blockSize(format, USize, VSize)`
+
+**Results on 1-Medical.bsm:**
+- 5777 UTexture metadata entries parsed (99.5% success rate)
+- Format distribution: DXT1=4200+, DXT3=~50, DXT5=~800, 3DC=~200, RGBA8=~100
