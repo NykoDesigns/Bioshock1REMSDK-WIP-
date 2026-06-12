@@ -19,6 +19,16 @@ struct BSPTreeNodeOut {
     uint8_t iZone;        // zone index of this node's polygon
 };
 
+// Per-surface lightmap descriptor (parsed from UModel's FLightMapIndex + FLightMapLight)
+struct BSPLightMapInfo {
+    int iSurf = -1;            // back-ref to owning surface
+    int sizeX = 0, sizeY = 0;  // lightmap texel dimensions (7..512); UV scale = size/1024
+    float worldToLightMap[16] = {}; // 4x4 matrix: world pos → lightmap UV (row-major)
+    // From first FLightMapLight entry:
+    int iAtlas = -1;           // index into LightMapTextures[] — selects atlas texture
+    int tileX = 0, tileY = 0;  // pixel position of this surface's tile in the atlas (0..1016)
+};
+
 // Parse BSP geometry from a UModel export's serial data (C.1 spec).
 // Returns one ParsedMesh per unique material (each chunk has textureName set).
 // exports/importNames allow resolving FBspSurf.Material object references.

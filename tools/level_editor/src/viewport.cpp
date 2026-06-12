@@ -234,16 +234,18 @@ void main() {
     }
 
     // Lightmap contribution (replaces analytical lighting where available)
+    // Lightmap DXT textures store luminance swizzled for better compression;
+    // the pixel shader unswizzles with .yzx (see LayerLighting.hlsl line 247)
     vec3 lightmapColor = vec3(1.0);
     if (uHasLightMap != 0) {
-        lightmapColor = texture(uLightMap, vLightmapUV).rgb;
+        lightmapColor = texture(uLightMap, vLightmapUV).yzx;
     }
 
     // Combine all lighting contributions
     vec3 lighting = ambient + (sunContrib + fillContrib) * shadow + pointContrib + fresnelContrib;
     if (uHasLightMap != 0) {
         // Blend lightmap with analytical lighting: lightmap provides pre-baked GI
-        lighting = lighting * 0.3 + lightmapColor * 2.0;
+        lighting = lighting * 0.3 + lightmapColor * 2.5;
     }
 
     // Surface color
@@ -2607,25 +2609,8 @@ void Viewport::UploadBSP(const std::vector<ParsedMesh>& bspMeshes, const std::st
             }
         }
 
-        // Normalize lightmap UVs to [0,1] range within this chunk
-        // (temporary: until FLightMapIndex atlas rects are parsed)
-        {
-            float u2Min = 1e30f, u2Max = -1e30f, v2Min = 1e30f, v2Max = -1e30f;
-            for (auto& v : verts) {
-                if (v.u2 < u2Min) u2Min = v.u2;
-                if (v.u2 > u2Max) u2Max = v.u2;
-                if (v.v2 < v2Min) v2Min = v.v2;
-                if (v.v2 > v2Max) v2Max = v.v2;
-            }
-            float u2Range = u2Max - u2Min;
-            float v2Range = v2Max - v2Min;
-            if (u2Range > 0.001f && v2Range > 0.001f) {
-                for (auto& v : verts) {
-                    v.u2 = (v.u2 - u2Min) / u2Range;
-                    v.v2 = (v.v2 - v2Min) / v2Range;
-                }
-            }
-        }
+        // Lightmap UVs are now computed using WorldToLightMap matrix from FLightMapIndex
+        // and packed into atlas-space [0,1] coordinates — no normalization needed
 
         glGenVertexArrays(1, &gpu.vao);
         glGenBuffers(1, &gpu.vbo);

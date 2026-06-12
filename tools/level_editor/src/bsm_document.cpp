@@ -756,31 +756,9 @@ bool BSMDocument::Load(const std::string& filepath)
 
     // ─── Lightmap texture exports diagnostic ───
     {
-        int texCount = 0;
-        int lmTexCount = 0;
-        for (int i = 0; i < (int)m_ParsedExports.size(); i++) {
-            auto& pe = m_ParsedExports[i];
-            if (pe.className != "Texture" && pe.className != "ShadowMap") continue;
-            texCount++;
-            // Lightmap textures are named "TextureNN" with small serial (stripped bulk data)
-            if (pe.objectName.substr(0, 7) == "Texture" && pe.objectName.size() <= 10) {
-                lmTexCount++;
-                if (lmTexCount <= 5)
-                    printf("[BSM-LM] Lightmap Texture export[%d]: '%s' serial=%d bytes at 0x%X\n",
-                           i, pe.objectName.c_str(), pe.serialSize, pe.serialOffset);
-            }
-        }
-        printf("[BSM-LM] Total Texture exports: %d, lightmap candidates: %d\n", texCount, lmTexCount);
-
-        // Build lightmap texture name list (index 1=first, etc.)
-        m_LightMapNames.clear();
-        for (int i = 0; i < (int)m_ParsedExports.size(); i++) {
-            auto& pe = m_ParsedExports[i];
-            if (pe.className != "Texture") continue;
-            if (pe.objectName.substr(0, 7) != "Texture" || pe.objectName.size() > 10) continue;
-            m_LightMapNames.push_back(pe.objectName);
-            printf("[BSM-LM] LM atlas %d → '%s'\n", (int)m_LightMapNames.size(), pe.objectName.c_str());
-        }
+        printf("[BSM-LM] Lightmap atlas textures: %d\n", (int)m_LightMapNames.size());
+        for (int i = 0; i < (int)m_LightMapNames.size(); i++)
+            printf("[BSM-LM]   atlas %d → '%s'\n", i, m_LightMapNames[i].c_str());
     }
 
     // Load supplementary glTF meshes from UEViewer exports (adds meshes not in BSM)

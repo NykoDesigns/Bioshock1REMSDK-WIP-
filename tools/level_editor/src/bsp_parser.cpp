@@ -639,75 +639,110 @@ std::vector<ParsedMesh> ParseBSPGeometry(const uint8_t* serialData, int serialSi
         printf("\n");
     }
 
-    // ─── Post-FVerts: navigate to LightMap array ───
+    // ─── Post-FVerts: parse FLightMapIndex array from UModel ───
     // UModel layout after FVerts: SharedSides(TArray<int32>), NumZones(CI), Zone[](CI+16B each), 
-    // Polys(CI obj ref), LightMap(TArray), LightBits(TArray)
+    // Polys(CI obj ref), LightMap(TArray<FLightMapIndex>), LightBits(TArray), LightMapTextures(TArray)
+    // Ref: docs/reverse-engineering/BioShock_Texture_Lightmap_Format.md §5
+    std::unordered_map<int, BSPLightMapInfo> surfToLightMap; // iSurf → lightmap data
     {
-        printf("[BSP-POST] Data remaining after FVerts: %d bytes at offset 0x%X\n",
-               (int)(endPos - pos), (int)pos);
         size_t lmPos = pos;
-
-        // 1. SharedSides array: CI count + count*4 bytes
         size_t br2;
+
+        // 1. SharedSides: CI count + count*4 bytes
         int numSharedSides = ReadCompactIndex(serialData + lmPos, endPos - lmPos, br2);
         lmPos += br2;
-        printf("[BSP-POST] NumSharedSides=%d at 0x%X\n", numSharedSides, (int)(lmPos - br2));
         if (numSharedSides > 0 && numSharedSides < 10000000)
             lmPos += (size_t)numSharedSides * 4;
 
-        // 2. NumZones + zone data
+        // 2. Zones: CI count, each = CI objref + 16B fixed data
         int numZones = ReadCompactIndex(serialData + lmPos, endPos - lmPos, br2);
-        size_t zoneStart = lmPos + br2;
-        lmPos = zoneStart;
-        printf("[BSP-POST] NumZones=%d at 0x%X\n", numZones, (int)(zoneStart - br2));
-
-        // Probe: try different zone fixed-data sizes (CI + N bytes per zone)
-        for (int fixedSize : {16, 24, 32, 40, 48, 64}) {
-            size_t tryPos = zoneStart;
-            bool valid = true;
-            for (int z = 0; z < numZones && tryPos + 1 < endPos; z++) {
-                ReadCompactIndex(serialData + tryPos, endPos - tryPos, br2);
-                tryPos += br2 + fixedSize;
-                if (tryPos > endPos) { valid = false; break; }
-            }
-            if (!valid) continue;
-            // Read next CI after zones - should be Polys ref (small number like export index)
-            int nextCI = ReadCompactIndex(serialData + tryPos, endPos - tryPos, br2);
-            printf("[BSP-POST] Zone fixedSize=%d: ends at 0x%X, next CI=%d\n",
-                   fixedSize, (int)tryPos, nextCI);
-        }
-
-        // Use fixedSize that gives a plausible Polys ref (positive, < numExports)
-        // Try 16B (standard UE2: 8B connectivity + 8B visibility)
+        lmPos += br2;
         for (int z = 0; z < numZones && lmPos + 1 < endPos; z++) {
             ReadCompactIndex(serialData + lmPos, endPos - lmPos, br2);
             lmPos += br2 + 16;
         }
-        printf("[BSP-POST] After zones (16B): pos=0x%X\n", (int)lmPos);
 
         // 3. Polys object reference (CI)
-        int polysRef = ReadCompactIndex(serialData + lmPos, endPos - lmPos, br2);
+        ReadCompactIndex(serialData + lmPos, endPos - lmPos, br2);
         lmPos += br2;
-        printf("[BSP-POST] Polys ref=%d at 0x%X\n", polysRef, (int)(lmPos - br2));
 
-        // 4. LightMap TArray - this should be the lightmap index array
+        // 4. LightMap array: CI count, then FLightMapIndex entries
         int numLightMaps = ReadCompactIndex(serialData + lmPos, endPos - lmPos, br2);
         lmPos += br2;
-        printf("[BSP-POST] LightMap count=%d at 0x%X\n", numLightMaps, (int)(lmPos - br2));
+        printf("[BSP-LM] Parsing %d FLightMapIndex entries at 0x%X\n", numLightMaps, (int)lmPos);
 
-        // Dump first few entries to determine element structure
-        if (numLightMaps > 0 && numLightMaps < 100000) {
-            printf("[BSP-POST] First 64 bytes of LightMap data:\n  ");
-            for (int b = 0; b < 64 && lmPos + b < endPos; b++)
-                printf("%02X ", serialData[lmPos + b]);
+        int lmParsed = 0;
+        if (numLightMaps > 0 && numLightMaps < 200000) {
+            for (int li = 0; li < numLightMaps && lmPos + 8 < endPos; li++) {
+                // ObjHeader: INT32 check (==4) + INT32 version (==2)
+                int32_t check, ver;
+                memcpy(&check, serialData + lmPos, 4);
+                memcpy(&ver, serialData + lmPos + 4, 4);
+                lmPos += 8;
+                if (check != 4) {
+                    printf("[BSP-LM] Bad ObjHeader check=%d at entry %d, aborting\n", check, li);
+                    break;
+                }
+
+                BSPLightMapInfo info;
+                if (lmPos + 76 > endPos) break; // iSurf(4) + SizeX(4) + SizeY(4) + Matrix(64)
+                memcpy(&info.iSurf, serialData + lmPos, 4); lmPos += 4;
+                memcpy(&info.sizeX, serialData + lmPos, 4); lmPos += 4;
+                memcpy(&info.sizeY, serialData + lmPos, 4); lmPos += 4;
+                // WorldToLightMap: 4x4 float matrix (64 bytes, row-major)
+                memcpy(info.worldToLightMap, serialData + lmPos, 64); lmPos += 64;
+                // Pan/UVBias: 3 floats (12 bytes) — not used for UV build
+                lmPos += 12;
+
+                // Lights TArray<FLightMapLight>
+                int numLights = ReadCompactIndex(serialData + lmPos, endPos - lmPos, br2);
+                lmPos += br2;
+                if (numLights < 0 || numLights > 100) { break; }
+
+                for (int lti = 0; lti < numLights && lmPos + 8 < endPos; lti++) {
+                    // ObjHeader: check==4, ver==1
+                    int32_t lcheck;
+                    memcpy(&lcheck, serialData + lmPos, 4);
+                    lmPos += 8; // skip check + version
+                    if (lcheck != 4) break;
+
+                    // 3× objref (CI each) — light actor references
+                    for (int r = 0; r < 3; r++) {
+                        ReadCompactIndex(serialData + lmPos, endPos - lmPos, br2);
+                        lmPos += br2;
+                    }
+                    // iAtlas(4) + TileX(4) + TileY(4) = 12 bytes
+                    if (lmPos + 12 > endPos) break;
+                    int32_t iAtlas, tileX, tileY;
+                    memcpy(&iAtlas, serialData + lmPos, 4); lmPos += 4;
+                    memcpy(&tileX,  serialData + lmPos, 4); lmPos += 4;
+                    memcpy(&tileY,  serialData + lmPos, 4); lmPos += 4;
+
+                    // Use first light entry's atlas info (primary baked light)
+                    if (lti == 0) {
+                        info.iAtlas = iAtlas;
+                        info.tileX = tileX;
+                        info.tileY = tileY;
+                    }
+                }
+
+                if (info.iSurf >= 0 && info.sizeX > 0 && info.sizeY > 0) {
+                    surfToLightMap[info.iSurf] = info;
+                    lmParsed++;
+                }
+            }
+        }
+        printf("[BSP-LM] Parsed %d/%d lightmap entries (%d surfs total)\n",
+               lmParsed, numLightMaps, (int)surfs.size());
+        if (lmParsed > 0) {
+            // Diagnostic: atlas distribution
+            std::unordered_map<int, int> atlasDist;
+            for (auto& kv : surfToLightMap) atlasDist[kv.second.iAtlas]++;
+            printf("[BSP-LM] Atlas distribution: ");
+            for (auto& kv : atlasDist) printf("atlas%d=%d ", kv.first, kv.second);
             printf("\n");
         }
-
     }
-
-    // NOTE: Lightmap textures in BioShock are stored as stripped UTexture exports in LightMaps_BSP
-    // package. Their pixel data resides in .PackagePatch bulk files, not inline in the .bsm.
-    // After FVerts: NumSharedSides(16968), NumZones(73), then zone data follows.
 
     // Count unique materials for diagnostics
     int matResolved = 0, matNull = 0;
@@ -785,7 +820,7 @@ std::vector<ParsedMesh> ParseBSPGeometry(const uint8_t* serialData, int serialSi
         int32_t lightMapIndex = 0; // dominant lightmap atlas index for this group
         std::string lightMapName;  // resolved cache key (e.g. "LM_Texture49")
     };
-    std::unordered_map<int64_t, MaterialGroup> groups; // key: materialRef * 256 + iZone
+    std::unordered_map<int64_t, MaterialGroup> groups; // key: materialRef * 65536 + iZone * 256 + atlas
 
     int totalVerts = 0, totalTris = 0;
 
@@ -823,8 +858,20 @@ std::vector<ParsedMesh> ParseBSPGeometry(const uint8_t* serialData, int serialSi
                 continue;
         }
 
-        // Group by (material, zone) so each chunk is spatially coherent
-        int64_t groupKey = (int64_t)matRef * 256 + (int64_t)node.iZone;
+        // Look up per-surface lightmap data from the parsed FLightMapIndex array
+        int lmAtlas = -1;
+        const BSPLightMapInfo* lmInfo = nullptr;
+        if (surfIdx >= 0) {
+            auto lmIt = surfToLightMap.find(surfIdx);
+            if (lmIt != surfToLightMap.end()) {
+                lmInfo = &lmIt->second;
+                lmAtlas = lmInfo->iAtlas;
+            }
+        }
+
+        // Group by (material, zone, atlas) so each chunk maps to one lightmap texture
+        int atlasKey = (lmAtlas >= 0) ? lmAtlas : 255;
+        int64_t groupKey = (int64_t)matRef * 65536 + (int64_t)node.iZone * 256 + atlasKey;
         if (groups.find(groupKey) == groups.end()) {
             MaterialGroup g;
             g.matName = ResolveMaterialName(matRef, exports, importNames);
@@ -838,12 +885,11 @@ std::vector<ParsedMesh> ParseBSPGeometry(const uint8_t* serialData, int serialSi
             group.lightMapScaleSum += surf->lightMapScale;
             group.lightMapScaleCount++;
         }
-        if (surf && surf->iLightMap > 0 && group.lightMapIndex == 0) {
-            group.lightMapIndex = surf->iLightMap;
-            // Resolve lightmap texture cache key from name list
-            if (lightMapNames && surf->iLightMap <= (int)lightMapNames->size()) {
-                // BSM export name: "Texture_49" → catalog name: "Texture49" → cache: "LM_Texture49"
-                std::string bsmName = (*lightMapNames)[surf->iLightMap - 1];
+        // Resolve lightmap atlas texture name from FLightMapIndex
+        if (lmInfo && lmInfo->iAtlas >= 0 && group.lightMapIndex == 0) {
+            group.lightMapIndex = lmInfo->iAtlas + 1; // 1-based for compatibility
+            if (lightMapNames && lmInfo->iAtlas < (int)lightMapNames->size()) {
+                std::string bsmName = (*lightMapNames)[lmInfo->iAtlas];
                 std::string catName;
                 for (char c : bsmName) { if (c != '_') catName += c; }
                 group.lightMapName = "LM_" + catName;
@@ -934,17 +980,13 @@ std::vector<ParsedMesh> ParseBSPGeometry(const uint8_t* serialData, int serialSi
             mv.ny = ny;
             mv.nz = nz;
 
-            // Compute UV from texture vectors: dot(vertex - base, texAxis)
+            // Compute diffuse UV from texture vectors: dot(vertex - base, texAxis)
             if (hasTexVecs) {
                 float dx = mv.x - baseX;
                 float dy = mv.y - baseY;
                 float dz = mv.z - baseZ;
                 mv.u = dx * texUx + dy * texUy + dz * texUz;
                 mv.v = dx * texVx + dy * texVy + dz * texVz;
-                // Lightmap UVs: texture UVs divided by lightMapScale (gives texel coords)
-                float lmScale = (surf && surf->lightMapScale > 0.0f) ? surf->lightMapScale : 32.0f;
-                mv.u2 = mv.u / lmScale;
-                mv.v2 = mv.v / lmScale;
                 // Tangent from texture U axis (normalized)
                 float tlen = std::sqrt(texUx*texUx + texUy*texUy + texUz*texUz);
                 if (tlen > 0.001f) { mv.tx = texUx/tlen; mv.ty = texUy/tlen; mv.tz = texUz/tlen; }
@@ -953,9 +995,24 @@ std::vector<ParsedMesh> ParseBSPGeometry(const uint8_t* serialData, int serialSi
             } else {
                 mv.u = 0;
                 mv.v = 0;
+                mv.tx = 1; mv.ty = 0; mv.tz = 0; mv.tw = 1;
+            }
+
+            // Lightmap UVs: use WorldToLightMap matrix from FLightMapIndex
+            // Formula (§6): (U',V') = WorldToLightMap × worldPos
+            //   U = U' * (SizeX/1024) + (TileX + 0.5) / 1024
+            //   V = V' * (SizeY/1024) + (TileY + 0.5) / 1024
+            if (lmInfo && lmInfo->iAtlas >= 0) {
+                const float* m = lmInfo->worldToLightMap;
+                // Row-major 4x4 matrix multiply: result = M * [x,y,z,1]
+                float lmU = m[0]*mv.x + m[1]*mv.y + m[2]*mv.z + m[3];
+                float lmV = m[4]*mv.x + m[5]*mv.y + m[6]*mv.z + m[7];
+                // Pack into atlas: scale by tile size, offset by tile position
+                mv.u2 = lmU * (lmInfo->sizeX / 1024.0f) + (lmInfo->tileX + 0.5f) / 1024.0f;
+                mv.v2 = lmV * (lmInfo->sizeY / 1024.0f) + (lmInfo->tileY + 0.5f) / 1024.0f;
+            } else {
                 mv.u2 = 0;
                 mv.v2 = 0;
-                mv.tx = 1; mv.ty = 0; mv.tz = 0; mv.tw = 1;
             }
 
             // Reject vertices with NaN or extreme values
