@@ -1365,9 +1365,77 @@ void BSMDocument::ResolveTextures(const std::string& umodelExportDir)
         return v;
     };
 
-    // Step 1: Load shader→diffuseTexture map from .mat AND .props.txt files.
+    // Step 1: Load shader→texture maps from .mat AND .props.txt files.
     // Keys are normalized (no _shader suffix) so glTF material names match either source.
     std::unordered_map<std::string, std::string> shaderToDiffuse;
+    std::unordered_map<std::string, std::string> shaderToNormal;
+    std::unordered_map<std::string, std::string> shaderToSpec;
+    std::unordered_map<std::string, std::string> shaderToEmissive;
+
+    // Parse all material properties from a .props.txt or .mat file into the maps
+    auto parseShaderProps = [&](const fs::path& filePath, const std::string& key, bool isProps) {
+        std::ifstream f(filePath);
+        std::string line;
+        int braceDepth = 0;
+        std::string currentField;
+        while (std::getline(f, line)) {
+            // Track brace depth for multi-line fields like EmissiveMask = { ... }
+            for (char c : line) {
+                if (c == '{') braceDepth++;
+                else if (c == '}') braceDepth--;
+            }
+            if (braceDepth > 0) {
+                // Inside a braced block — check for Material = Texture'...' for emissive
+                if (!currentField.empty()) {
+                    size_t matPos = line.find("Material");
+                    if (matPos != std::string::npos) {
+                        size_t eq = line.find('=', matPos);
+                        if (eq != std::string::npos) {
+                            std::string val = parseDiffuseValue(line.substr(eq + 1));
+                            if (!val.empty() && val != "None") {
+                                if (currentField == "EmissiveMask" || currentField == "SelfIllumination")
+                                    shaderToEmissive[key] = val;
+                                else if (currentField == "SpecularMask")
+                                    shaderToSpec[key] = val;
+                            }
+                        }
+                    }
+                }
+                continue;
+            }
+            currentField.clear();
+
+            // Top-level lines: "Property = Value"
+            size_t eq = line.find('=');
+            if (eq == std::string::npos) continue;
+            std::string prop = line.substr(0, eq);
+            // Trim prop
+            while (!prop.empty() && (prop.back() == ' ' || prop.back() == '\t')) prop.pop_back();
+            std::string val = parseDiffuseValue(line.substr(eq + 1));
+
+            if (prop == "Diffuse" && !val.empty() && val != "None") {
+                if (!isProps || !shaderToDiffuse.count(key))
+                    shaderToDiffuse[key] = val;
+            } else if (prop == "NormalMap" && !val.empty() && val != "None") {
+                shaderToNormal[key] = val;
+            } else if (prop == "Specular" && !val.empty() && val != "None") {
+                shaderToSpec[key] = val;
+            } else if (prop == "SpecularityMask" && !val.empty() && val != "None") {
+                if (!shaderToSpec.count(key))
+                    shaderToSpec[key] = val;
+            } else if (prop == "SelfIllumination" && !val.empty() && val != "None") {
+                shaderToEmissive[key] = val;
+            } else if (prop == "SelfIlluminationMask" && !val.empty() && val != "None") {
+                if (!shaderToEmissive.count(key))
+                    shaderToEmissive[key] = val;
+            }
+            // Track braced fields
+            if (line.find('{') != std::string::npos) {
+                currentField = prop;
+            }
+        }
+    };
+
     if (fs::is_directory(shaderDir)) {
         for (auto& entry : fs::directory_iterator(shaderDir)) {
             std::string fname = entry.path().filename().string();
@@ -1382,22 +1450,7 @@ void BSMDocument::ResolveTextures(const std::string& umodelExportDir)
                 continue;
             }
             std::string key = stripShaderSuffix(stem);
-            // .mat is concise; prefer it. Only let .props fill gaps.
-            if (isProps && shaderToDiffuse.count(key)) continue;
-            std::ifstream f(entry.path());
-            std::string line;
-            while (std::getline(f, line)) {
-                // .mat:  "Diffuse=..."   .props.txt:  "Diffuse = Texture'...'"
-                size_t dpos = line.find("Diffuse");
-                if (dpos != 0) continue;
-                size_t eq = line.find('=');
-                if (eq == std::string::npos) continue;
-                std::string diff = parseDiffuseValue(line.substr(eq + 1));
-                if (!diff.empty() && diff != "None") {
-                    shaderToDiffuse[key] = diff;
-                }
-                break;
-            }
+            parseShaderProps(entry.path(), key, isProps);
         }
     }
 
@@ -1467,23 +1520,13 @@ void BSMDocument::ResolveTextures(const std::string& umodelExportDir)
                 } else continue;
                 std::string key = stripShaderSuffix(stem);
                 if (shaderToDiffuse.count(key)) continue;
-                std::ifstream sf(entry.path());
-                std::string line;
-                while (std::getline(sf, line)) {
-                    size_t dpos = line.find("Diffuse");
-                    if (dpos != 0) continue;
-                    size_t eq = line.find('=');
-                    if (eq == std::string::npos) continue;
-                    std::string diff = parseDiffuseValue(line.substr(eq + 1));
-                    if (!diff.empty() && diff != "None") {
-                        shaderToDiffuse[key] = diff;
-                        added++;
-                    }
-                    break;
-                }
+                parseShaderProps(entry.path(), key, isProps);
+                if (shaderToDiffuse.count(key)) added++;
             }
         }
-        printf("[BSM] Shader maps loaded: %d total entries\n", (int)shaderToDiffuse.size());
+        printf("[BSM] Shader maps loaded: %d diffuse, %d normal, %d spec, %d emissive\n",
+               (int)shaderToDiffuse.size(), (int)shaderToNormal.size(),
+               (int)shaderToSpec.size(), (int)shaderToEmissive.size());
     }
 
     int resolved = 0, resolvedFromBSM = 0;
@@ -1540,9 +1583,28 @@ void BSMDocument::ResolveTextures(const std::string& umodelExportDir)
         }
         if (fromBSM) resolvedFromBSM++;
         resolved++;
+
+        // Resolve normal/spec/emissive maps for this mesh from material tree
+        std::string matKey = stripShaderSuffix(matName);
+        auto nit = shaderToNormal.find(matKey);
+        if (nit != shaderToNormal.end() && findTGA(nit->second))
+            mesh.normalMapName = nit->second;
+        auto sit = shaderToSpec.find(matKey);
+        if (sit != shaderToSpec.end() && findTGA(sit->second))
+            mesh.specMapName = sit->second;
+        auto eit = shaderToEmissive.find(matKey);
+        if (eit != shaderToEmissive.end() && findTGA(eit->second))
+            mesh.emissiveMapName = eit->second;
+    }
+    int meshNrm = 0, meshSpec = 0, meshEmit = 0;
+    for (auto& m : m_Meshes) {
+        if (!m.normalMapName.empty()) meshNrm++;
+        if (!m.specMapName.empty()) meshSpec++;
+        if (!m.emissiveMapName.empty()) meshEmit++;
     }
     printf("[BSM] Resolved %d/%d mesh texture names (%d via BSM Materials fallback)\n",
            resolved, (int)m_Meshes.size(), resolvedFromBSM);
+    printf("[BSM] Mesh material maps: %d normal, %d spec, %d emissive\n", meshNrm, meshSpec, meshEmit);
 
     // Diagnostic: report meshes whose final texture name has no TGA on disk (any map)
     {
@@ -1565,8 +1627,8 @@ void BSMDocument::ResolveTextures(const std::string& umodelExportDir)
                "(full list -> mesh_tex_missing.txt)\n", noName, noFile);
     }
 
-    // Step 3: Resolve BSP chunk texture names (already set by BSP parser from surf Material refs)
-    int bspResolved = 0;
+    // Step 3: Resolve BSP chunk texture names + normal/spec/emissive maps
+    int bspResolved = 0, bspNormals = 0, bspSpec = 0, bspEmissive = 0;
     for (auto& chunk : m_BSPMeshes) {
         if (chunk.textureName.empty()) continue;
         std::string candidate = chunk.textureName;
@@ -1574,19 +1636,35 @@ void BSMDocument::ResolveTextures(const std::string& umodelExportDir)
         // Check if it directly matches a TGA (any map)
         if (findTGA(candidate)) {
             bspResolved++;
-            continue;
+        } else {
+            // Shader→diffuse lookup
+            auto it = shaderToDiffuse.find(candidate);
+            if (it != shaderToDiffuse.end() && findTGA(it->second)) {
+                chunk.textureName = it->second;
+                bspResolved++;
+            } else if (findTGA(candidate)) {
+                bspResolved++;
+            }
         }
 
-        // Shader→diffuse lookup. The map is keyed by normalized (stripped) shader
-        // names, and chunk.textureName was already stripped by the BSP parser.
-        auto it = shaderToDiffuse.find(candidate);
-        if (it != shaderToDiffuse.end() && findTGA(it->second)) {
-            chunk.textureName = it->second;
-            bspResolved++;
-        } else if (findTGA(candidate)) {
-            bspResolved++;
+        // Normal map lookup
+        auto nit = shaderToNormal.find(candidate);
+        if (nit != shaderToNormal.end() && findTGA(nit->second)) {
+            chunk.normalMapName = nit->second;
+            bspNormals++;
         }
-        // else leave textureName as-is; TextureCache will try suffixes
+        // Specular map lookup
+        auto sit = shaderToSpec.find(candidate);
+        if (sit != shaderToSpec.end() && findTGA(sit->second)) {
+            chunk.specMapName = sit->second;
+            bspSpec++;
+        }
+        // Emissive map lookup
+        auto eit = shaderToEmissive.find(candidate);
+        if (eit != shaderToEmissive.end() && findTGA(eit->second)) {
+            chunk.emissiveMapName = eit->second;
+            bspEmissive++;
+        }
     }
     // Diagnostic: show first 10 unresolved BSP texture names
     int unresLog = 0;
@@ -1597,7 +1675,8 @@ void BSMDocument::ResolveTextures(const std::string& umodelExportDir)
             unresLog++;
         }
     }
-    printf("[BSM] BSP textures: %d/%d chunks resolved\n", bspResolved, (int)m_BSPMeshes.size());
+    printf("[BSM] BSP textures: %d/%d diffuse, %d normal, %d spec, %d emissive\n",
+           bspResolved, (int)m_BSPMeshes.size(), bspNormals, bspSpec, bspEmissive);
 }
 
 int BSMDocument::FindCameraZone(Vec3 pos) const

@@ -31,6 +31,9 @@ struct ParsedMesh {
     float lightMapScale = 0.0f;  // BSP: lightmap texel density (from FBspSurf 20B tail)
     int32_t lightMapIndex = 0;   // BSP: lightmap atlas texture index (0=none, 1-N=1-based)
     std::string lightMapName;    // BSP: lightmap cache key (e.g. "LM_Texture49")
+    std::string normalMapName;   // Normal map texture name (from Shader .props.txt)
+    std::string specMapName;     // Specular map texture name (from Shader .props.txt)
+    std::string emissiveMapName; // Emissive/self-illumination texture name (from Shader .props.txt)
     std::string bsmMaterialName; // StaticMesh: material/shader name from BSM Materials array (authoritative)
     std::string sourceExportDir; // cross-map: UModel export dir this mesh was loaded from (empty = current map)
 };

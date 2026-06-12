@@ -70,21 +70,24 @@ unsigned int TextureCache::GetNormalMap(const std::string& textureName)
     auto it = m_Cache.find(cacheKey);
     if (it != m_Cache.end()) return it->second.glTexture;
     
-    // Try multiple naming conventions for normal map files
+    // Try bare name first (for material-tree-resolved names like "0451_normalmap")
     LoadedTexture tex;
-    std::string candidates[] = {
-        m_TextureDir + "\\" + textureName + "_NormalMap.tga",
-        m_TextureDir + "\\" + textureName + "_normalmap.tga",
-        m_TextureDir + "\\" + textureName + "_Normal.tga",
-        m_TextureDir + "\\" + textureName + "_normal.tga",
-        m_TextureDir + "\\" + textureName + "_norm.tga",
-        m_TextureDir + "\\" + textureName + "_Norm.tga",
-        m_TextureDir + "\\" + textureName + "_n.tga",
-        m_TextureDir + "\\" + textureName + "_N.tga",
-    };
-    for (auto& path : candidates) {
-        tex = LoadTGA(path);
+    static const char* nrmSuffixes[] = { ".tga", "_NormalMap.tga", "_normalmap.tga",
+        "_Normal.tga", "_normal.tga", "_norm.tga", "_Norm.tga", "_n.tga", "_N.tga" };
+    // Primary dir
+    for (auto& suf : nrmSuffixes) {
+        tex = LoadTGA(m_TextureDir + "\\" + textureName + suf);
         if (tex.glTexture) break;
+    }
+    // Cross-map fallback
+    if (!tex.glTexture) {
+        for (auto& dir : m_ExtraSearchDirs) {
+            for (auto& suf : nrmSuffixes) {
+                tex = LoadTGA(dir + "\\" + textureName + suf);
+                if (tex.glTexture) break;
+            }
+            if (tex.glTexture) break;
+        }
     }
     m_Cache[cacheKey] = tex;
     return tex.glTexture;
@@ -99,17 +102,22 @@ unsigned int TextureCache::GetSpecularMap(const std::string& textureName)
     if (it != m_Cache.end()) return it->second.glTexture;
     
     LoadedTexture tex;
-    std::string candidates[] = {
-        m_TextureDir + "\\" + textureName + "_Specular.tga",
-        m_TextureDir + "\\" + textureName + "_specular.tga",
-        m_TextureDir + "\\" + textureName + "_spec.tga",
-        m_TextureDir + "\\" + textureName + "_Spec.tga",
-        m_TextureDir + "\\" + textureName + "_s.tga",
-        m_TextureDir + "\\" + textureName + "_S.tga",
-    };
-    for (auto& path : candidates) {
-        tex = LoadTGA(path);
+    static const char* specSuffixes[] = { ".tga", "_Specular.tga", "_specular.tga",
+        "_spec.tga", "_Spec.tga", "_s.tga", "_S.tga" };
+    // Primary dir
+    for (auto& suf : specSuffixes) {
+        tex = LoadTGA(m_TextureDir + "\\" + textureName + suf);
         if (tex.glTexture) break;
+    }
+    // Cross-map fallback
+    if (!tex.glTexture) {
+        for (auto& dir : m_ExtraSearchDirs) {
+            for (auto& suf : specSuffixes) {
+                tex = LoadTGA(dir + "\\" + textureName + suf);
+                if (tex.glTexture) break;
+            }
+            if (tex.glTexture) break;
+        }
     }
     m_Cache[cacheKey] = tex;
     return tex.glTexture;
@@ -260,36 +268,88 @@ LoadedTexture TextureCache::LoadTGA(const std::string& path)
     return result;
 }
 
-unsigned int TextureCache::UploadDXT1(const std::string& name, const uint8_t* data, int width, int height)
+// Helper: upload a compressed texture with the given GL internal format and block size
+static GLuint UploadCompressedTexture(GLenum glFormat, int blockBytes,
+                                       const uint8_t* data, int width, int height, bool clamp)
 {
-    if (!data || width <= 0 || height <= 0) return 0;
-    
-    // Check if already cached
-    auto it = m_Cache.find(name);
-    if (it != m_Cache.end()) return it->second.glTexture;
-    
-    // DXT1: 8 bytes per 4x4 block = 0.5 bytes per pixel
-    int dataSize = ((width + 3) / 4) * ((height + 3) / 4) * 8;
-    
+    int dataSize = ((width + 3) / 4) * ((height + 3) / 4) * blockBytes;
     GLuint tex;
     glGenTextures(1, &tex);
     glBindTexture(GL_TEXTURE_2D, tex);
-    
-    glCompressedTexImage2D(GL_TEXTURE_2D, 0, GL_COMPRESSED_RGB_S3TC_DXT1_EXT,
-                           width, height, 0, dataSize, data);
-    
+    glCompressedTexImage2D(GL_TEXTURE_2D, 0, glFormat, width, height, 0, dataSize, data);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    
-    LoadedTexture lt;
-    lt.glTexture = tex;
-    lt.width = width;
-    lt.height = height;
-    lt.hasAlpha = false;
-    m_Cache[name] = lt;
-    
-    printf("[Tex] Uploaded DXT1 lightmap '%s' (%dx%d, %d bytes)\n", name.c_str(), width, height, dataSize);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, clamp ? GL_CLAMP_TO_EDGE : GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, clamp ? GL_CLAMP_TO_EDGE : GL_REPEAT);
     return tex;
+}
+
+unsigned int TextureCache::UploadDXT1(const std::string& name, const uint8_t* data, int width, int height)
+{
+    if (!data || width <= 0 || height <= 0) return 0;
+    auto it = m_Cache.find(name);
+    if (it != m_Cache.end()) return it->second.glTexture;
+    
+    GLuint tex = UploadCompressedTexture(GL_COMPRESSED_RGB_S3TC_DXT1_EXT, 8, data, width, height, true);
+    LoadedTexture lt;
+    lt.glTexture = tex; lt.width = width; lt.height = height; lt.hasAlpha = false;
+    m_Cache[name] = lt;
+    printf("[Tex] Uploaded DXT1 '%s' (%dx%d)\n", name.c_str(), width, height);
+    return tex;
+}
+
+unsigned int TextureCache::UploadDXT3(const std::string& name, const uint8_t* data, int width, int height)
+{
+    if (!data || width <= 0 || height <= 0) return 0;
+    auto it = m_Cache.find(name);
+    if (it != m_Cache.end()) return it->second.glTexture;
+    
+    GLuint tex = UploadCompressedTexture(GL_COMPRESSED_RGBA_S3TC_DXT3_EXT, 16, data, width, height, false);
+    LoadedTexture lt;
+    lt.glTexture = tex; lt.width = width; lt.height = height; lt.hasAlpha = true;
+    m_Cache[name] = lt;
+    printf("[Tex] Uploaded DXT3 '%s' (%dx%d)\n", name.c_str(), width, height);
+    return tex;
+}
+
+unsigned int TextureCache::UploadDXT5(const std::string& name, const uint8_t* data, int width, int height)
+{
+    if (!data || width <= 0 || height <= 0) return 0;
+    auto it = m_Cache.find(name);
+    if (it != m_Cache.end()) return it->second.glTexture;
+    
+    GLuint tex = UploadCompressedTexture(GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, 16, data, width, height, false);
+    LoadedTexture lt;
+    lt.glTexture = tex; lt.width = width; lt.height = height; lt.hasAlpha = true;
+    m_Cache[name] = lt;
+    printf("[Tex] Uploaded DXT5 '%s' (%dx%d)\n", name.c_str(), width, height);
+    return tex;
+}
+
+unsigned int TextureCache::UploadBC5(const std::string& name, const uint8_t* data, int width, int height)
+{
+    if (!data || width <= 0 || height <= 0) return 0;
+    auto it = m_Cache.find(name);
+    if (it != m_Cache.end()) return it->second.glTexture;
+    
+    GLuint tex = UploadCompressedTexture(GL_COMPRESSED_RG_RGTC2, 16, data, width, height, false);
+    LoadedTexture lt;
+    lt.glTexture = tex; lt.width = width; lt.height = height; lt.hasAlpha = false;
+    m_Cache[name] = lt;
+    printf("[Tex] Uploaded BC5/3DC '%s' (%dx%d)\n", name.c_str(), width, height);
+    return tex;
+}
+
+unsigned int TextureCache::UploadCompressed(const std::string& name, const uint8_t* data,
+                                             int width, int height, int bioshockFormat)
+{
+    switch (bioshockFormat) {
+        case 3:  return UploadDXT1(name, data, width, height);
+        case 7:  return UploadDXT3(name, data, width, height);
+        case 8:  return UploadDXT5(name, data, width, height);
+        case 12: return UploadBC5(name, data, width, height);
+        default:
+            printf("[Tex] Unsupported BioShock format %d for '%s'\n", bioshockFormat, name.c_str());
+            return 0;
+    }
 }

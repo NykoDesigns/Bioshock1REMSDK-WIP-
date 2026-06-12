@@ -2013,9 +2013,8 @@ void Viewport::Render(BSMDocument& doc, int selectedActor)
         if (wireframe)
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-        glUniform1f(m_LocEmissive, 0.0f); // BSP is not emissive
-        glUniform1i(m_LocHasNormalMap, 0); // BSP uses vertex normals only
-        glUniform1i(m_LocHasSpecMap, 0);   // BSP no specular map
+        glUniform1i(m_LocNormalMap, 2);   // normal map on texture unit 2
+        glUniform1i(m_LocSpecMap, 3);      // specular map on texture unit 3
         glUniform1i(m_LocLightMap, 4);     // lightmap on texture unit 4
         glUniform1i(m_LocHasLightMap, 0);  // default off
         for (int ci = 0; ci < (int)m_BSPGPU.size(); ci++) {
@@ -2074,6 +2073,25 @@ void Viewport::Render(BSMDocument& doc, int selectedActor)
             } else {
                 glUniform1i(m_LocHasTexture, 0);
                 glUniform3f(m_LocColor, 0.45f, 0.45f, 0.50f);
+            }
+            // Per-chunk emissive flag
+            glUniform1f(m_LocEmissive, gpu.isEmissive ? 0.8f : 0.0f);
+
+            // Bind normal map if available (from Shader .props.txt NormalMap=)
+            if (gpu.normalMapId && !debugMode) {
+                glActiveTexture(GL_TEXTURE2);
+                glBindTexture(GL_TEXTURE_2D, gpu.normalMapId);
+                glUniform1i(m_LocHasNormalMap, 1);
+            } else {
+                glUniform1i(m_LocHasNormalMap, 0);
+            }
+            // Bind specular map if available
+            if (gpu.specularMapId && !debugMode) {
+                glActiveTexture(GL_TEXTURE3);
+                glBindTexture(GL_TEXTURE_2D, gpu.specularMapId);
+                glUniform1i(m_LocHasSpecMap, 1);
+            } else {
+                glUniform1i(m_LocHasSpecMap, 0);
             }
             // Bind lightmap texture if available
             if (gpu.lightMapId && !debugMode) {
@@ -2507,10 +2525,22 @@ void Viewport::UploadMeshes(const std::vector<ParsedMesh>& meshes, const std::st
                               gpu.hasAlpha); // alpha textures are typically two-sided
         }
         
-        // Load normal map if available
-        gpu.normalMapId = m_TextureCache.GetNormalMap(mesh.textureName);
-        // Load specular map if available
-        gpu.specularMapId = m_TextureCache.GetSpecularMap(mesh.textureName);
+        // Load normal map: prefer material-tree-resolved name, fallback to suffix heuristic
+        if (!mesh.normalMapName.empty()) {
+            gpu.normalMapId = m_TextureCache.GetNormalMap(mesh.normalMapName);
+            if (!gpu.normalMapId)
+                gpu.normalMapId = m_TextureCache.GetTexture(mesh.normalMapName);
+        }
+        if (!gpu.normalMapId)
+            gpu.normalMapId = m_TextureCache.GetNormalMap(mesh.textureName);
+        // Load specular map: prefer material-tree-resolved name, fallback to suffix heuristic
+        if (!mesh.specMapName.empty()) {
+            gpu.specularMapId = m_TextureCache.GetSpecularMap(mesh.specMapName);
+            if (!gpu.specularMapId)
+                gpu.specularMapId = m_TextureCache.GetTexture(mesh.specMapName);
+        }
+        if (!gpu.specularMapId)
+            gpu.specularMapId = m_TextureCache.GetSpecularMap(mesh.textureName);
 
         // Detect emissive meshes (neon signs, light beams, lamps)
         {
@@ -2650,13 +2680,32 @@ void Viewport::UploadBSP(const std::vector<ParsedMesh>& bspMeshes, const std::st
         if (!mesh.lightMapName.empty()) {
             gpu.lightMapId = m_TextureCache.GetTexture(mesh.lightMapName);
         }
+        // Look up normal map from material tree (Shader .props.txt NormalMap=)
+        if (!mesh.normalMapName.empty()) {
+            gpu.normalMapId = m_TextureCache.GetNormalMap(mesh.normalMapName);
+            if (!gpu.normalMapId)
+                gpu.normalMapId = m_TextureCache.GetTexture(mesh.normalMapName);
+        }
+        // Look up specular map
+        if (!mesh.specMapName.empty()) {
+            gpu.specularMapId = m_TextureCache.GetSpecularMap(mesh.specMapName);
+            if (!gpu.specularMapId)
+                gpu.specularMapId = m_TextureCache.GetTexture(mesh.specMapName);
+        }
+        // Emissive flag from material tree
+        if (!mesh.emissiveMapName.empty()) {
+            gpu.isEmissive = true;
+        }
         m_BSPGPU.push_back(gpu);
         bspIdx++;
     }
-    int bspLightmapped = 0;
-    for (auto& g : m_BSPGPU) { if (g.lightMapId) bspLightmapped++; }
-    printf("[Viewport] Uploaded %d BSP chunks to GPU (%d textured, %d lightmapped)\n",
-           (int)m_BSPGPU.size(), bspTextured, bspLightmapped);
+    int bspLightmapped = 0, bspNormalMapped = 0;
+    for (auto& g : m_BSPGPU) {
+        if (g.lightMapId) bspLightmapped++;
+        if (g.normalMapId) bspNormalMapped++;
+    }
+    printf("[Viewport] Uploaded %d BSP chunks to GPU (%d textured, %d lightmapped, %d normal-mapped)\n",
+           (int)m_BSPGPU.size(), bspTextured, bspLightmapped, bspNormalMapped);
     fflush(stdout);
 
     // Write BSP texture log to file for GUI debugging

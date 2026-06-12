@@ -40,6 +40,20 @@ public:
     // Returns GL texture ID, or 0 on failure.
     unsigned int UploadDXT1(const std::string& name, const uint8_t* data, int width, int height);
     
+    // Upload DXT3 compressed data (explicit alpha). Returns GL texture ID, or 0 on failure.
+    unsigned int UploadDXT3(const std::string& name, const uint8_t* data, int width, int height);
+    
+    // Upload DXT5 compressed data (interpolated alpha). Returns GL texture ID, or 0 on failure.
+    unsigned int UploadDXT5(const std::string& name, const uint8_t* data, int width, int height);
+    
+    // Upload BC5/3DC/ATI2N compressed data (2-channel, normal maps). Returns GL texture ID, or 0.
+    unsigned int UploadBC5(const std::string& name, const uint8_t* data, int width, int height);
+    
+    // Upload compressed texture with auto-detected format (by BioShock format enum ordinal).
+    // Format: 3=DXT1, 7=DXT3, 8=DXT5, 12=3DC/BC5. Returns GL texture ID, or 0.
+    unsigned int UploadCompressed(const std::string& name, const uint8_t* data,
+                                  int width, int height, int bioshockFormat);
+    
     // Release all loaded textures
     void Clear();
 
