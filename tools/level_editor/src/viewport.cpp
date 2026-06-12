@@ -1901,6 +1901,9 @@ void Viewport::Render(BSMDocument& doc, int selectedActor)
         for (int i = 0; i < (int)actors.size(); i++) {
             auto& a = actors[i];
             if (!a.visible || a.meshIndex < 0 || a.meshIndex >= (int)m_MeshGPU.size()) continue;
+            if (!a.hasLocation) continue;
+            if (a.renderType == ActorRenderType::VisibleDecal) continue;
+            if (a.renderType == ActorRenderType::VisibleEmitter) continue;
             auto& gpu = m_MeshGPU[a.meshIndex];
             if (gpu.vao == 0 || gpu.indexCount == 0) continue;
             if (std::isnan(a.location.x) || std::isinf(a.location.x)) continue;
@@ -2181,6 +2184,12 @@ void Viewport::Render(BSMDocument& doc, int selectedActor)
             if (!a.visible) continue;
             // Game Preview: only render actors classified as visible in-game
             if (m_GamePreview && !IsVisibleInGame(a.renderType)) continue;
+            // Skip decal/projector actors — they are projection volumes, not solid geometry
+            if (a.renderType == ActorRenderType::VisibleDecal) continue;
+            // Skip emitter actors — particle systems, not solid geometry
+            if (a.renderType == ActorRenderType::VisibleEmitter) continue;
+            // Skip actors without a valid Location (would render at origin)
+            if (!a.hasLocation) continue;
             if (a.meshIndex < 0 || a.meshIndex >= (int)m_MeshGPU.size()) continue;
             auto& gpu = m_MeshGPU[a.meshIndex];
             if (gpu.vao == 0 || gpu.indexCount == 0) continue;
@@ -2409,6 +2418,7 @@ void Viewport::Render(BSMDocument& doc, int selectedActor)
             for (int i = 0; i < (int)actors.size(); i++) {
                 auto& a = actors[i];
                 if (!a.visible || !a.isProjector) continue;
+                if (!a.hasLocation) continue;
                 if (std::isnan(a.location.x)) continue;
 
                 float dx = a.location.x - camPos.x;
