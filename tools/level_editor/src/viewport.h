@@ -43,15 +43,15 @@ struct LightingSettings {
     float fillIntensity = 0.3f;
 
     // Ambient — visible baseline so nothing is pure black
-    float ambientSkyColor[3] = {0.15f, 0.17f, 0.25f};
-    float ambientGroundColor[3] = {0.08f, 0.07f, 0.06f};
+    float ambientSkyColor[3] = {0.18f, 0.20f, 0.28f};
+    float ambientGroundColor[3] = {0.12f, 0.13f, 0.16f};
     float ambientIntensity = 1.0f;
 
-    // Fog — disabled by default for full visibility
-    bool fogEnabled = false;
-    float fogColor[3] = {0.02f, 0.03f, 0.05f};
-    float fogStart = 3000.0f;
-    float fogEnd = 20000.0f;
+    // Fog — light blue-green depth fog for underwater Rapture atmosphere
+    bool fogEnabled = true;
+    float fogColor[3] = {0.01f, 0.025f, 0.04f};
+    float fogStart = 2000.0f;
+    float fogEnd = 15000.0f;
 
     // Tone mapping & exposure
     float exposure = 1.2f;
