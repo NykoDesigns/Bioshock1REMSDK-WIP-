@@ -34,30 +34,49 @@ static int ReadCI_Cat(const uint8_t* d, size_t maxLen, size_t& bytesRead)
     return sign ? -val : val;
 }
 
-// Read BioShock FString: CompactIndex length (always positive), then |len| wchar_t chars (Unicode)
+// Read BioShock FString: BioShock REVERSES the UE2 sign convention:
+//   len > 0 → UTF-16LE, len code units (includes NUL terminator)
+//   len < 0 → ANSI, |len| bytes (includes NUL terminator)
+//   len == 0 → empty
 static std::string ReadBioString(const uint8_t* data, size_t maxLen, size_t& bytesRead)
 {
     bytesRead = 0;
     size_t br;
     int rawLen = ReadCI_Cat(data, maxLen, br);
     bytesRead += br;
-    
-    // BioShock: positive CI = Unicode string length (chars, including null terminator)
-    if (rawLen <= 0 || rawLen > 65536) return "";
-    
-    int charCount = rawLen;
-    size_t byteSize = charCount * 2; // UTF-16LE
-    if (bytesRead + byteSize > maxLen) return "";
-    
-    std::string result;
-    result.reserve(charCount);
-    for (int i = 0; i < charCount; i++) {
-        uint16_t wc = *(uint16_t*)(data + bytesRead + i * 2);
-        if (wc == 0) break; // null terminator
-        result += (char)(wc & 0xFF); // ASCII subset
+
+    if (rawLen == 0) return "";
+
+    if (rawLen > 0) {
+        // Positive = UTF-16LE, rawLen code units including NUL
+        if (rawLen > 65536) return "";
+        size_t byteSize = (size_t)rawLen * 2;
+        if (bytesRead + byteSize > maxLen) return "";
+        std::string result;
+        result.reserve(rawLen);
+        for (int i = 0; i < rawLen; i++) {
+            uint16_t wc;
+            memcpy(&wc, data + bytesRead + (size_t)i * 2, 2);
+            if (wc == 0) break;
+            result += (char)(wc & 0xFF); // ASCII subset
+        }
+        bytesRead += byteSize;
+        return result;
+    } else {
+        // Negative = ANSI, |rawLen| bytes including NUL
+        int absLen = -rawLen;
+        if (absLen > 65536) return "";
+        if (bytesRead + (size_t)absLen > maxLen) return "";
+        std::string result;
+        result.reserve(absLen);
+        for (int i = 0; i < absLen; i++) {
+            char c = (char)data[bytesRead + i];
+            if (c == 0) break;
+            result += c;
+        }
+        bytesRead += (size_t)absLen;
+        return result;
     }
-    bytesRead += byteSize;
-    return result;
 }
 
 bool CatalogParser::Load(const std::string& bdcPath)

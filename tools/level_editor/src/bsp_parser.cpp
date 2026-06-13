@@ -645,31 +645,69 @@ std::vector<ParsedMesh> ParseBSPGeometry(const uint8_t* serialData, int serialSi
     // Ref: docs/reverse-engineering/BioShock_Texture_Lightmap_Format.md §5
     std::unordered_map<int, BSPLightMapInfo> surfToLightMap; // iSurf → lightmap data
     {
-        size_t lmPos = pos;
         size_t br2;
 
-        // 1. SharedSides: CI count + count*4 bytes
-        int numSharedSides = ReadCompactIndex(serialData + lmPos, endPos - lmPos, br2);
-        lmPos += br2;
-        if (numSharedSides > 0 && numSharedSides < 10000000)
-            lmPos += (size_t)numSharedSides * 4;
+        // Scan for FLightMapIndex array: CI count ≈ numSurfs, then ObjHeader(4,2)+valid iSurf
+        // The sequential skip (SharedSides → Zones → Polys → LightMap) was unreliable
+        // because the exact UModel layout between FVerts and LightMap is uncertain.
+        // Instead: scan from pos forward for a CI that gives a count close to numSurfs,
+        // immediately followed by check==4, ver==2, and a valid iSurf.
+        int numSurfsInt = (int)surfs.size();
+        size_t lmPos = 0;
+        int numLightMaps = 0;
+        bool lmFound = false;
 
-        // 2. Zones: CI count, each = CI objref + 16B fixed data
-        int numZones = ReadCompactIndex(serialData + lmPos, endPos - lmPos, br2);
-        lmPos += br2;
-        for (int z = 0; z < numZones && lmPos + 1 < endPos; z++) {
-            ReadCompactIndex(serialData + lmPos, endPos - lmPos, br2);
-            lmPos += br2 + 16;
+        for (size_t sc = pos; sc + 100 < endPos && !lmFound; sc++) {
+            size_t scBr;
+            int candidate = ReadCompactIndex(serialData + sc, endPos - sc, scBr);
+            // FLightMapIndex count should be close to numSurfs (within 50% tolerance)
+            if (candidate < numSurfsInt / 2 || candidate > numSurfsInt * 2) continue;
+            if (candidate > 500000) continue;
+
+            size_t dataStart = sc + scBr;
+            // Validate: first 3 entries should have ObjHeader check==4, ver==2, valid iSurf
+            int goodEntries = 0;
+            size_t probe = dataStart;
+            for (int pi = 0; pi < 3 && probe + 88 < endPos; pi++) {
+                int32_t check, ver, iSurf, sizeX, sizeY;
+                memcpy(&check, serialData + probe, 4);
+                memcpy(&ver, serialData + probe + 4, 4);
+                if (check != 4 || ver != 2) break;
+                memcpy(&iSurf, serialData + probe + 8, 4);
+                memcpy(&sizeX, serialData + probe + 12, 4);
+                memcpy(&sizeY, serialData + probe + 16, 4);
+                if (iSurf < 0 || iSurf >= numSurfsInt) break;
+                if (sizeX < 4 || sizeX > 1024 || sizeY < 4 || sizeY > 1024) break;
+                goodEntries++;
+                // Skip to next entry: 8(hdr)+4(iSurf)+4(sizeX)+4(sizeY)+64(matrix)+12(pan)=96 fixed
+                // + CI numLights + variable light entries
+                probe += 8 + 4 + 4 + 4 + 64 + 12;
+                int nLights = ReadCompactIndex(serialData + probe, endPos - probe, scBr);
+                probe += scBr;
+                if (nLights < 0 || nLights > 100) break;
+                for (int lt = 0; lt < nLights && probe + 8 < endPos; lt++) {
+                    int32_t lc; memcpy(&lc, serialData + probe, 4);
+                    if (lc != 4) break;
+                    probe += 8; // ObjHeader
+                    for (int r = 0; r < 3; r++) {
+                        ReadCompactIndex(serialData + probe, endPos - probe, scBr);
+                        probe += scBr;
+                    }
+                    probe += 12; // iAtlas + TileX + TileY
+                }
+            }
+            if (goodEntries >= 3) {
+                lmPos = dataStart;
+                numLightMaps = candidate;
+                lmFound = true;
+                printf("[BSP-LM] Found FLightMapIndex array at 0x%X (CI at 0x%X): %d entries\n",
+                       (int)lmPos, (int)sc, numLightMaps);
+            }
         }
-
-        // 3. Polys object reference (CI)
-        ReadCompactIndex(serialData + lmPos, endPos - lmPos, br2);
-        lmPos += br2;
-
-        // 4. LightMap array: CI count, then FLightMapIndex entries
-        int numLightMaps = ReadCompactIndex(serialData + lmPos, endPos - lmPos, br2);
-        lmPos += br2;
-        printf("[BSP-LM] Parsing %d FLightMapIndex entries at 0x%X\n", numLightMaps, (int)lmPos);
+        if (!lmFound) {
+            printf("[BSP-LM] FAILED to locate FLightMapIndex array by scan\n");
+            numLightMaps = 0;
+        }
 
         int lmParsed = 0;
         if (numLightMaps > 0 && numLightMaps < 200000) {
@@ -741,6 +779,60 @@ std::vector<ParsedMesh> ParseBSPGeometry(const uint8_t* serialData, int serialSi
             printf("[BSP-LM] Atlas distribution: ");
             for (auto& kv : atlasDist) printf("atlas%d=%d ", kv.first, kv.second);
             printf("\n");
+        }
+
+        // ─── Parse LightMapTextures array (after LightBits) ───
+        // Scan for it: small CI count (8-20), then ObjHeader(4, ver≥1) + CI objref entries
+        // The objrefs index into the export table and give us the atlas texture names IN ORDER.
+        if (lmParsed > 0 && lmPos + 10 < endPos) {
+            // After FLightMapIndex, skip LightBits TArray: CI count + count bytes
+            size_t lbtPos = lmPos;
+            size_t lbtBr;
+            int numLightBits = ReadCompactIndex(serialData + lbtPos, endPos - lbtPos, lbtBr);
+            lbtPos += lbtBr;
+            if (numLightBits >= 0 && numLightBits < 10000000)
+                lbtPos += (size_t)numLightBits;
+
+            // Now try to read LightMapTextures: CI count, each = ObjHeader(8B) + CI objref
+            if (lbtPos + 4 < endPos) {
+                int numLMTex = ReadCompactIndex(serialData + lbtPos, endPos - lbtPos, lbtBr);
+                lbtPos += lbtBr;
+                if (numLMTex > 0 && numLMTex < 100) {
+                    // Validate: check first entry has ObjHeader check==4
+                    int32_t tCheck;
+                    memcpy(&tCheck, serialData + lbtPos, 4);
+                    if (tCheck == 4) {
+                        // Parse all LightMapTexture entries
+                        std::vector<std::string> parsedAtlasNames;
+                        for (int ti = 0; ti < numLMTex && lbtPos + 8 < endPos; ti++) {
+                            int32_t tc; memcpy(&tc, serialData + lbtPos, 4);
+                            if (tc != 4) break;
+                            lbtPos += 8; // skip ObjHeader (check + version)
+                            int objRef = ReadCompactIndex(serialData + lbtPos, endPos - lbtPos, lbtBr);
+                            lbtPos += lbtBr;
+                            // Resolve objref to export name
+                            int expIdx = objRef - 1; // objrefs are 1-based for exports
+                            if (expIdx >= 0 && expIdx < (int)exports.size()) {
+                                parsedAtlasNames.push_back(exports[expIdx].objectName);
+                            } else {
+                                parsedAtlasNames.push_back("?");
+                            }
+                        }
+                        if ((int)parsedAtlasNames.size() == numLMTex) {
+                            printf("[BSP-LM] Parsed LightMapTextures array: %d atlases\n", numLMTex);
+                            // Override the externally-provided lightMapNames with correct order
+                            if (lightMapNames) {
+                                auto* mutableNames = const_cast<std::vector<std::string>*>(lightMapNames);
+                                *mutableNames = parsedAtlasNames;
+                                printf("[BSP-LM] Atlas order (from UModel):");
+                                for (int ai = 0; ai < (int)parsedAtlasNames.size(); ai++)
+                                    printf(" %d='%s'", ai, parsedAtlasNames[ai].c_str());
+                                printf("\n");
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 

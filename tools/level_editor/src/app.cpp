@@ -172,8 +172,8 @@ bool App::Init(const char* mapPath)
                         auto* entry = m_Catalog.GetEntry(ei);
                         if (!entry) continue;
                         // Skip lightmap textures (already handled above)
-                        if (entry->objectName.find("Texture_") == 0 &&
-                            entry->packageName.find("LightMaps") != std::string::npos) continue;
+                        // FName convention: "Texture49" (no underscore); check packageName for LightMaps group
+                        if (entry->packageName.find("LightMaps") != std::string::npos) continue;
 
                         // Check if already in texture cache (TGA or prior upload)
                         if (m_Viewport.GetTextureCache().GetTexture(entry->objectName)) {
