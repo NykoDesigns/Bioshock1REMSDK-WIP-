@@ -131,8 +131,11 @@ public:
     const std::unordered_map<std::string, TextureMetadata>& GetTextureMetadata() const { return m_TextureMetadata; }
 
     // Shader→Texture mappings parsed directly from BSM Shader/FinalBlend/Modifier exports
+    // Per Materials spec: materials are plain tagged-property objects, textures are objrefs
     const std::unordered_map<std::string, std::string>& GetBSMShaderToDiffuse() const { return m_BSMShaderToDiffuse; }
     const std::unordered_map<std::string, std::string>& GetBSMShaderToNormal() const { return m_BSMShaderToNormal; }
+    const std::unordered_map<std::string, std::string>& GetBSMShaderToEmissive() const { return m_BSMShaderToEmissive; }
+    const std::unordered_map<std::string, std::string>& GetBSMShaderToSpecular() const { return m_BSMShaderToSpecular; }
 
     // Stats
     int GetNameCount() const { return m_NameCount; }
@@ -155,6 +158,8 @@ private:
     std::unordered_map<std::string, TextureMetadata> m_TextureMetadata;
     std::unordered_map<std::string, std::string> m_BSMShaderToDiffuse;
     std::unordered_map<std::string, std::string> m_BSMShaderToNormal;
+    std::unordered_map<std::string, std::string> m_BSMShaderToEmissive;
+    std::unordered_map<std::string, std::string> m_BSMShaderToSpecular;
     std::vector<uint8_t> m_RawData;
 
     // Internal parse state

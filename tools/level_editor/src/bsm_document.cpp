@@ -165,9 +165,18 @@ static bool IsKnownPropertyName(const std::string& s)
         "bParametric","bAlphaTexture","bMasked","bNoSmooth","LODSet",
         "NormalLOD","MipGenSettings","CompressionSettings","SourceMd",
         // Shader/Material properties (for BSM shader→texture resolution)
-        "Diffuse","NormalMap","Specular","SpecularityMask","Opacity",
-        "SelfIllumination","SelfIlluminationMask","EmissiveMask",
-        "OutputBlending","TwoSided","Wireframe","PerformLighting",
+        // From BioShock Materials spec: materials are plain tagged-property objects
+        "Diffuse","DiffuseColor","NormalMap","Specular","SpecularColor",
+        "SpecularColorMap","SpecularMask","GlossinessMask","Opacity",
+        "Emissive","EmissiveColor","EmissiveMask",
+        "SelfIllumination","SelfIlluminationMask",
+        "Subsurface","SubsurfaceColor2x","SubsurfaceMask",
+        "ClipMask","Masked","OutputBlending","TwoSided",
+        "ReflectionCubemap","ReflectionMask","ReflectionBrightness",
+        "UseSpecularCubemaps","HeightMap","DistortionStrength",
+        "ForceTransparentSorting","ShaderTag","MaterialType","MaterialVisualType",
+        "DefaultMaterial","AcceptProjectors","Keywords",
+        "Wireframe","PerformLighting","SpecularityMask",
         "ModulateStaticLighting2X","ModulateSpecular2X","TreatAsTwoSided",
         "ZWrite","AlphaTest","AlphaRef","Material","Modifier",
         "FallbackMaterial","OpacityBitmap","FrameRate","Texture",
@@ -296,11 +305,13 @@ bool BSMDocument::Load(const std::string& filepath)
         pos += 4; // className number
         pos += 4; // outerIndex
         int objIdx = ReadCompactIndex(d + pos, fileSize - pos, br); pos += br;
-        pos += 4; // objectName number
+        int32_t objNum = *reinterpret_cast<int32_t*>(d + pos) - 1; pos += 4; // objectName number
 
         ImportInfo ii;
         ii.className = (clsIdx >= 0 && clsIdx < (int)names.size()) ? names[clsIdx] : "?";
         ii.objectName = (objIdx >= 0 && objIdx < (int)names.size()) ? names[objIdx] : "?";
+        // FName number suffix: number>0 → append (number-1) with no separator
+        if (objNum > 0) ii.objectName += std::to_string(objNum - 1);
         imports.push_back(ii);
     }
 
@@ -338,9 +349,10 @@ bool BSMDocument::Load(const std::string& filepath)
                 className = "ExportClass";
         }
 
-        // Resolve object name
+        // Resolve object name — FName number rule: number==0 = bare name,
+        // number>0 = basename + (number-1) with NO separator (BioShock convention)
         std::string objName = (objNameIdx >= 0 && objNameIdx < (int)names.size()) ? names[objNameIdx] : "?";
-        if (objNameNum >= 0) objName += "_" + std::to_string(objNameNum);
+        if (objNameNum > 0) objName += std::to_string(objNameNum - 1);
 
         ParsedExport pe;
         pe.classIndex = classIdx;
@@ -782,7 +794,8 @@ bool BSMDocument::Load(const std::string& filepath)
                                            pe.serialOffset + pe.serialSize);
             shadersParsed++;
 
-            // Look for Diffuse, NormalMap, Material, Texture properties — they hold object references
+            // Look for texture properties — all are object references (objref)
+            // Per Materials spec: materials are plain tagged-property objects, textures are objrefs
             for (auto& p : props) {
                 if (p.size < 1 || p.size > 8) continue;
                 if (p.name == "Diffuse" || p.name == "Material" || p.name == "Texture") {
@@ -795,28 +808,47 @@ bool BSMDocument::Load(const std::string& filepath)
                             shadersWithDiffuse++;
                         }
                     }
-                } else if (p.name == "NormalMap") {
+                } else if (p.name == "NormalMap" || p.name == "HeightMap") {
                     size_t vpos = 0;
                     int ref = ReadCompactIndex(d + p.valueOffset, p.size, vpos);
                     std::string refName = resolveRefName(ref);
                     if (!refName.empty() && refName != "None")
                         m_BSMShaderToNormal[pe.objectName] = refName;
+                } else if (p.name == "Emissive" || p.name == "SelfIllumination") {
+                    size_t vpos = 0;
+                    int ref = ReadCompactIndex(d + p.valueOffset, p.size, vpos);
+                    std::string refName = resolveRefName(ref);
+                    if (!refName.empty() && refName != "None")
+                        m_BSMShaderToEmissive[pe.objectName] = refName;
+                } else if (p.name == "SpecularColorMap" || p.name == "SpecularMask") {
+                    size_t vpos = 0;
+                    int ref = ReadCompactIndex(d + p.valueOffset, p.size, vpos);
+                    std::string refName = resolveRefName(ref);
+                    if (!refName.empty() && refName != "None")
+                        m_BSMShaderToSpecular[pe.objectName] = refName;
                 }
             }
         }
         // Chase indirection: if a Shader's Diffuse points to another Shader/Modifier/FinalBlend,
-        // follow the chain up to 5 deep to find the actual Texture name
-        for (int depth = 0; depth < 5; depth++) {
-            bool changed = false;
-            for (auto& [key, val] : m_BSMShaderToDiffuse) {
-                auto it2 = m_BSMShaderToDiffuse.find(val);
-                if (it2 != m_BSMShaderToDiffuse.end() && it2->second != val) {
-                    val = it2->second;
-                    changed = true;
+        // follow the chain up to 5 deep to find the actual Texture name.
+        // Same for normal, emissive, specular maps.
+        auto chaseIndirection = [](std::unordered_map<std::string, std::string>& map) {
+            for (int depth = 0; depth < 5; depth++) {
+                bool changed = false;
+                for (auto& [key, val] : map) {
+                    auto it2 = map.find(val);
+                    if (it2 != map.end() && it2->second != val) {
+                        val = it2->second;
+                        changed = true;
+                    }
                 }
+                if (!changed) break;
             }
-            if (!changed) break;
-        }
+        };
+        chaseIndirection(m_BSMShaderToDiffuse);
+        chaseIndirection(m_BSMShaderToNormal);
+        chaseIndirection(m_BSMShaderToEmissive);
+        chaseIndirection(m_BSMShaderToSpecular);
         printf("[BSM] Parsed %d Shader/Material exports, %d with Diffuse mapping\n",
                shadersParsed, shadersWithDiffuse);
     }
